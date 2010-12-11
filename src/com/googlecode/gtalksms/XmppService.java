@@ -9,7 +9,6 @@ import java.util.List;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -103,7 +102,8 @@ public class XmppService extends Service {
     Runnable mReconnectRunnable = null;
     Handler mReconnectHandler = new Handler();
 
-    public final static String LOG_TAG = "talkmyphone";
+    public final static String LOG_TAG = "gtalksms";
+    
     /** Updates the status about the service state (and the statusbar)*/
     private void updateStatus(int status) {
         if (status != mStatus) {
@@ -165,10 +165,10 @@ public class XmppService extends Service {
                 mStartForeground.invoke(this, mStartForegroundArgs);
             } catch (InvocationTargetException e) {
                 // Should not happen.
-                Log.w("ApiDemos", "Unable to invoke startForeground", e);
+                Log.w(LOG_TAG, "Unable to invoke startForeground", e);
             } catch (IllegalAccessException e) {
                 // Should not happen.
-                Log.w("ApiDemos", "Unable to invoke startForeground", e);
+                Log.w(LOG_TAG, "Unable to invoke startForeground", e);
             }
             return;
         }
@@ -189,10 +189,10 @@ public class XmppService extends Service {
                 mStopForeground.invoke(this, mStopForegroundArgs);
             } catch (InvocationTargetException e) {
                 // Should not happen.
-                Log.w("ApiDemos", "Unable to invoke stopForeground", e);
+                Log.w(LOG_TAG, "Unable to invoke stopForeground", e);
             } catch (IllegalAccessException e) {
                 // Should not happen.
-                Log.w("ApiDemos", "Unable to invoke stopForeground", e);
+                Log.w(LOG_TAG, "Unable to invoke stopForeground", e);
             }
             return;
         }
@@ -303,7 +303,7 @@ public class XmppService extends Service {
         XMPPConnection connection = new XMPPConnection(mConnectionConfiguration);
         try {
             connection.connect();
-        } catch (XMPPException e) {
+        } catch (Exception e) {
             Log.e(LOG_TAG, "xmpp connection failed: " + e);
             Toast.makeText(this, "Connection failed.", Toast.LENGTH_SHORT).show();
             maybeStartReconnect();
@@ -311,8 +311,13 @@ public class XmppService extends Service {
         }
         try {
             connection.login(mLogin, mPassword);
-        } catch (XMPPException e) {
-            connection.disconnect();
+        } catch (Exception e) {
+            try {
+                connection.disconnect();
+            } catch (Exception e2) {
+                Log.e(LOG_TAG, "xmpp disconnect failed: " + e2);
+            }
+            
             Log.e(LOG_TAG, "xmpp login failed: " + e);
             // sadly, smack throws the same generic XMPPException for network
             // related messages (eg "no response from the server") as for
@@ -675,20 +680,22 @@ public class XmppService extends Service {
         }
 
         if (contacts.size() > 0) {
+            
             StringBuilder noSms = new StringBuilder();
             Boolean hasMatch = false;
             for (Contact contact : contacts) {
-                ArrayList<Sms> smsArrayList = SmsMmsManager.getSms(contact.id, contact.name);
+                ArrayList<Sms> smsArrayList = SmsMmsManager.getSms(contact.rawIds, contact.name);
                 if(displaySentSms) {
                     smsArrayList.addAll(SmsMmsManager.getSentSms(ContactsManager.getPhones(contact.id),sentSms));
                     Collections.sort(smsArrayList);
                 }
-
+                int nbSms = smsArrayList.size();
+                
                 List<Sms> smsList = smsArrayList.subList(Math.max(smsArrayList.size() - smsNumber,0), smsArrayList.size());
                 if (smsList.size() > 0) {
                     hasMatch = true;
                     StringBuilder smsContact = new StringBuilder();
-                    smsContact.append(makeBold(contact.name));
+                    smsContact.append(makeBold(contact.name) + " (" + nbSms + " sms)" );
                     for (Sms sms : smsList) {
                         smsContact.append("\r\n" + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
                         smsContact.append("\r\n" + sms.message);
@@ -728,10 +735,18 @@ public class XmppService extends Service {
         ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(searchedText);
 
         if (contacts.size() > 0) {
+            
+            if (contacts.size() > 1) {
+                send(contacts.size() + " contacts found for \"" + searchedText + "\"");
+            }
+            
             for (Contact contact : contacts) {
                 StringBuilder strContact = new StringBuilder();
                 strContact.append(makeBold(contact.name));
-
+                
+//                strContact.append("\r\n" + "Id : " + contact.id);
+//                strContact.append("\r\n" + "Raw Ids : " + TextUtils.join(" ", contact.rawIds));
+                
                 ArrayList<Phone> mobilePhones = ContactsManager.getPhones(contact.id);
                 if (mobilePhones.size() > 0) {
                     strContact.append("\r\n" + makeItalic("Phones"));

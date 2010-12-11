@@ -1,8 +1,8 @@
 package com.googlecode.gtalksms;
 
 import android.content.BroadcastReceiver;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 /** Allows the application to start at boot */

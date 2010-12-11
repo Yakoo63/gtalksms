@@ -1,13 +1,13 @@
 package com.googlecode.gtalksms;
 
-import com.googlecode.gtalksms.contacts.ContactsManager;
-
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
+import com.googlecode.gtalksms.contacts.ContactsManager;
+
 public class PhoneCallListener extends PhoneStateListener {
 
-    public void onCallStateChanged(int state,String incomingNumber) {
+    public void onCallStateChanged(int state, String incomingNumber) {
         switch(state) {
             case TelephonyManager.CALL_STATE_IDLE:
                 break;

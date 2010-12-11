@@ -12,7 +12,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
-import android.telephony.gsm.SmsManager;
+import android.telephony.SmsManager;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.googlecode.gtalksms.Tools;
 import com.googlecode.gtalksms.XmppService;
@@ -45,13 +47,11 @@ public class SmsMmsManager {
     public static void initSmsMonitors() {
         if (notifySmsSent) {
             String SENT = "SMS_SENT";
-            sentPI = PendingIntent.getBroadcast(XmppService.getInstance(), 0,
-                new Intent(SENT), 0);
-            sentSmsReceiver = new BroadcastReceiver(){
+            sentPI = PendingIntent.getBroadcast(XmppService.getInstance(), 0, new Intent(SENT), 0);
+            sentSmsReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
-                    switch (getResultCode())
-                    {
+                    switch (getResultCode()) {
                         case Activity.RESULT_OK:
                             XmppService.getInstance().send("SMS sent");
                             break;
@@ -74,13 +74,11 @@ public class SmsMmsManager {
         }
         if (notifySmsDelivered) {
             String DELIVERED = "SMS_DELIVERED";
-            deliveredPI = PendingIntent.getBroadcast(XmppService.getInstance(), 0,
-                    new Intent(DELIVERED), 0);
-            deliveredSmsReceiver = new BroadcastReceiver(){
+            deliveredPI = PendingIntent.getBroadcast(XmppService.getInstance(), 0, new Intent(DELIVERED), 0);
+            deliveredSmsReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
-                    switch (getResultCode())
-                    {
+                    switch (getResultCode()) {
                         case Activity.RESULT_OK:
                             XmppService.getInstance().send("SMS delivered");
                             break;
@@ -95,84 +93,80 @@ public class SmsMmsManager {
     }
 
     /** Sends a sms to the specified phone number */
-//    public static void sendSMSByPhoneNumber(String message, String phoneNumber) {
-//        SmsManager sms = SmsManager.getDefault();
-//        ArrayList<String> messages = sms.divideMessage(message);
-//        for (int i=0; i < messages.size(); i++) {
-//            sms.sendTextMessage(phoneNumber, null, messages.get(i), sentPI, deliveredPI);
-//            addSmsToSentBox(message, phoneNumber);
-//        }
-//    }
-    
     public static void sendSMSByPhoneNumber(String message, String phoneNumber) {
-        //send("Sending sms to " + getContactName(phoneNumber));
+        // send("Sending sms to " + getContactName(phoneNumber));
         SmsManager sms = SmsManager.getDefault();
         ArrayList<String> messages = sms.divideMessage(message);
-        
-        //création des liste d'instents
+
+        // création des liste d'instents
         ArrayList<PendingIntent> listOfSentIntents = new ArrayList<PendingIntent>();
         listOfSentIntents.add(sentPI);
         ArrayList<PendingIntent> listOfDelIntents = new ArrayList<PendingIntent>();
         listOfDelIntents.add(deliveredPI);
-        for (int i=1; i < messages.size(); i++){
+        for (int i = 1; i < messages.size(); i++) {
             listOfSentIntents.add(null);
             listOfDelIntents.add(null);
-        }        
-        
+        }
+
         sms.sendMultipartTextMessage(phoneNumber, null, messages, listOfSentIntents, listOfDelIntents);
-        
+
         addSmsToSentBox(message, phoneNumber);
     }
+
     /**
-     * Returns a ArrayList of <Sms> with count sms where the contactId match the argument
+     * Returns a ArrayList of <Sms> with count sms where the contactId match the
+     * argument
      */
-    public static ArrayList<Sms> getSms(Long contactId, String contactName) {
+    public static ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName) {
         ArrayList<Sms> res = new ArrayList<Sms>();
+        XmppService xmpp = XmppService.getInstance();
 
-        if(null != contactId) {
+        if (rawIds.size() > 0) {
             Uri mSmsQueryUri = Uri.parse("content://sms/inbox");
-            String columns[] = new String[] { "person", "address", "body", "date", "status"};
-            Cursor c = XmppService.getInstance().getContentResolver().query(mSmsQueryUri, columns, "person = " + contactId, null, null);
+            String columns[] = new String[] { "person", "address", "body", "date", "status" };
+            String where = "person IN (" + TextUtils.join(", ", rawIds) + ")";
 
-            if (c.getCount() > 0) {
-                for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
-                    Date date = new Date();
-                    date.setTime(Long.parseLong(Tools.getString(c ,"date")));
-                    Sms sms = new Sms();
-                    sms.date = date;
-                    sms.number = Tools.getString(c ,"address");
-                    sms.message = Tools.getString(c ,"body");
-                    sms.sender = contactName;
-                    res.add( sms );
-                }
+            Cursor c = xmpp.getContentResolver().query(mSmsQueryUri, columns, where, null, null);
+
+            Log.d(XmppService.LOG_TAG, "getSms: " + c.getCount() + " sms for " + contactName + " - " + where);
+
+            for (boolean hasData = c.moveToFirst(); hasData; hasData = c.moveToNext()) {
+                Date date = new Date();
+                date.setTime(Tools.getLong(c, "date"));
+                Sms sms = new Sms();
+                sms.date = date;
+                sms.number = Tools.getString(c, "address");
+                sms.message = Tools.getString(c, "body");
+                sms.sender = contactName;
+                res.add(sms);
             }
+
             c.close();
         }
         return res;
     }
 
     /**
-     * Returns a ArrayList of <Sms> with count sms where the contactId match the argument
+     * Returns a ArrayList of <Sms> with count sms where the contactId match the
+     * argument
      */
     public static ArrayList<Sms> getAllSentSms() {
         ArrayList<Sms> res = new ArrayList<Sms>();
 
         Uri mSmsQueryUri = Uri.parse("content://sms/sent");
-        String columns[] = new String[] { "address", "body", "date", "status"};
+        String columns[] = new String[] { "address", "body", "date", "status" };
         Cursor c = XmppService.getInstance().getContentResolver().query(mSmsQueryUri, columns, null, null, null);
 
-        if (c.getCount() > 0) {
-            for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
-                Date date = new Date();
-                date.setTime(Long.parseLong(Tools.getString(c ,"date")));
-                Sms sms = new Sms();
-                sms.date = date;
-                sms.number = Tools.getString(c ,"address");
-                sms.message = Tools.getString(c ,"body");
-                sms.sender = "Me";
-                res.add( sms );
+        for (boolean hasData = c.moveToFirst(); hasData; hasData = c.moveToNext()) {
+            Date date = new Date();
+            date.setTime(Long.parseLong(Tools.getString(c, "date")));
+            Sms sms = new Sms();
+            sms.date = date;
+            sms.number = Tools.getString(c, "address");
+            sms.message = Tools.getString(c, "body");
+            sms.sender = "Me";
+            res.add(sms);
 
-            }
         }
         c.close();
 
@@ -180,7 +174,8 @@ public class SmsMmsManager {
     }
 
     /**
-     * Returns a ArrayList of <Sms> with count sms where the contactId match the argument
+     * Returns a ArrayList of <Sms> with count sms where the contactId match the
+     * argument
      */
     public static ArrayList<Sms> getSentSms(ArrayList<Phone> phones, ArrayList<Sms> sms) {
         ArrayList<Sms> res = new ArrayList<Sms>();
@@ -196,7 +191,7 @@ public class SmsMmsManager {
             }
 
             if (phoneMatch) {
-                res.add( aSms );
+                res.add(aSms);
             }
         }
 

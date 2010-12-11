@@ -1,3 +1,10 @@
+0.2
+Recode ContactsManager to manage all accounts (GMail, Exchange) with SDK 2.0
+Adapt SmsManager for ContactsManager compatibility
+Set min SDK version to 2.0 ECLAIR
+Fix ForceClose on XMPP disconnection
+Add current version in the main window
+
 0.1
 Create GTalkSMS from TalkMyPhone
 Fix long SMS issues

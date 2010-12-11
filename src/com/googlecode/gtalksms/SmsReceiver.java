@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.googlecode.gtalksms.contacts.ContactsManager;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.telephony.gsm.SmsMessage;
+import android.telephony.SmsMessage;
+
+import com.googlecode.gtalksms.contacts.ContactsManager;
 
 
 public class SmsReceiver extends BroadcastReceiver {
