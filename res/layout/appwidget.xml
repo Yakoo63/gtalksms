@@ -9,7 +9,7 @@
             android:layout_width="52dip" 
             android:layout_height="52dip" />
 <TextView   android:text="Free" android:id="@+id/Label" android:visibility="invisible"
+            android:textStyle="bold"
             android:layout_height="wrap_content" android:layout_width="fill_parent" 
             android:gravity="bottom|center" />   
 </LinearLayout>
-             

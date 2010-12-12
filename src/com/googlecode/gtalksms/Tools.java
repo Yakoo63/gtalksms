@@ -14,7 +14,7 @@ public class Tools {
             PackageInfo pinfo = context.getPackageManager().getPackageInfo(
                     comp.getPackageName(), 0);
 
-            return "v" + pinfo.versionName + "." + pinfo.versionCode;
+            return "v" + pinfo.versionName + " by Yakoo";
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {
             return "";
         }

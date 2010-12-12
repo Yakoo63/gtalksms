@@ -1,5 +1,5 @@
 0.3
-Add command "sms" without parameter that show last sms from everyone
+Add command "sms" without parameter that shows last sms from everyone
 Optimize sms read by limiting search results
 Add Widget support to XMPP connection
 
