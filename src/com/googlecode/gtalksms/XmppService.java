@@ -18,7 +18,9 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -34,6 +36,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.text.ClipboardManager;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.googlecode.gtalksms.contacts.Contact;
@@ -107,6 +110,9 @@ public class XmppService extends Service {
     /** Updates the status about the service state (and the statusbar)*/
     private void updateStatus(int status) {
         if (status != mStatus) {
+            // Get the layout for the AppWidget and attach an on-click listener to the button
+            RemoteViews views = new RemoteViews(getPackageName(), R.layout.appwidget);
+            
             Notification notification = new Notification();
             switch(status) {
                 case CONNECTED:
@@ -119,6 +125,7 @@ public class XmppService extends Service {
                             "GTalkSMS",
                             "Connected",
                             contentIntent);
+                    views.setImageViewResource(R.id.Button, R.drawable.icon_green);     
                     break;
                 case CONNECTING:
                     notification = new Notification(
@@ -130,6 +137,7 @@ public class XmppService extends Service {
                             "GTalkSMS",
                             "Connecting...",
                             contentIntent);
+                    views.setImageViewResource(R.id.Button, R.drawable.icon_orange);     
                     break;
                 case DISCONNECTED:
                     notification = new Notification(
@@ -141,10 +149,17 @@ public class XmppService extends Service {
                             "GTalkSMS",
                             "Disconnected",
                             contentIntent);
+                    views.setImageViewResource(R.id.Button, R.drawable.icon_red);     
                     break;
                 default:
                     break;
             }
+            
+            // Update all AppWidget with current status
+            AppWidgetManager manager = AppWidgetManager.getInstance(this);
+            ComponentName component = new ComponentName(getBaseContext().getPackageName(), WidgetProvider.class.getName());
+            manager.updateAppWidget(manager.getAppWidgetIds(component), views);
+            
             notification.flags |= Notification.FLAG_ONGOING_EVENT;
             notification.flags |= Notification.FLAG_NO_CLEAR;
             stopForegroundCompat(mStatus);
@@ -152,6 +167,7 @@ public class XmppService extends Service {
             mStatus = status;
         }
     }
+    
     /**
      * This is a wrapper around the startForeground method, using the older
      * APIs if it is not available.
@@ -246,7 +262,6 @@ public class XmppService extends Service {
         smsNumber = prefs.getInt("smsNumber", 5);
         formatChatResponses = prefs.getBoolean("formatResponses", false);
     }
-
 
     /** clears the XMPP connection */
     public void clearConnection() {

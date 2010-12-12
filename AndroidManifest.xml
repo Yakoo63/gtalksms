@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms" android:versionName="0.3" android:versionCode="0">
     <uses-sdk android:minSdkVersion="5" />
-    <application android:icon="@drawable/icon" android:label="@string/app_name">
+    <application android:icon="@drawable/icon_green" android:label="@string/app_name">
         <activity android:name="com.googlecode.gtalksms.MainScreen"
                   android:label="@string/app_name">
             <intent-filter>
@@ -21,6 +21,18 @@
                 <action android:name=".GTalkSMS.ACTION" />
             </intent-filter>
         </service>
+        <receiver android:name="com.googlecode.gtalksms.WidgetProvider" >
+		    <intent-filter>
+		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                       android:resource="@xml/appwidget_info" />
+        </receiver>
+        <receiver android:name="com.googlecode.gtalksms.WidgetActivator">
+            <intent-filter>
+                <action android:name=".WidgetGTalkSMS.ACTION" />
+            </intent-filter>
+        </receiver>
         <service android:enabled="true" android:name="com.googlecode.gtalksms.LocationService" />
         <receiver android:name="com.googlecode.gtalksms.BootReceiver">
             <intent-filter>

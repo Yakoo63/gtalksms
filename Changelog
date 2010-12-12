@@ -1,3 +1,8 @@
+0.3
+Add command "sms" without parameter that show last sms from everyone
+Optimize sms read by limiting search results
+Add Widget support to XMPP connection
+
 0.2
 Recode ContactsManager to manage all accounts (GMail, Exchange) with SDK 2.0
 Adapt SmsManager for ContactsManager compatibility
