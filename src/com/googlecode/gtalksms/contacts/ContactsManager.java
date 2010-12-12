@@ -41,6 +41,37 @@ public class ContactsManager {
     /**
      * Returns a ArrayList of <Contact> where the names/company match the argument
      */
+    public static String getContactName(long rawId) {
+        String res = "Unknown";
+        
+        ContentResolver resolver = XmppService.getInstance().getContentResolver();
+        Cursor c = resolver.query(RawContacts.CONTENT_URI,
+                new String[]{RawContacts.CONTACT_ID},
+                RawContacts._ID + "=?",
+                new String[]{String.valueOf(rawId)}, null);
+        
+        long id = -1;
+        if (c.moveToFirst()) {
+            id = Tools.getLong(c, RawContacts.CONTACT_ID);
+        }
+        c.close();
+        
+        c = resolver.query(Contacts.CONTENT_URI,
+                new String[]{Contacts.DISPLAY_NAME},
+                RawContacts._ID + "=?",
+                new String[]{String.valueOf(id)}, null);
+        
+        if (c.moveToFirst()) {
+            res = Tools.getString(c, Contacts.DISPLAY_NAME);
+        }
+        c.close();
+       
+        return res;
+    }
+
+    /**
+     * Returns a ArrayList of <Contact> where the names/company match the argument
+     */
     public static ArrayList<Contact> getMatchingContacts(String searchedName) {
         ArrayList<Contact> res = new ArrayList<Contact>();
         if (Phone.isCellPhoneNumber(searchedName)) {

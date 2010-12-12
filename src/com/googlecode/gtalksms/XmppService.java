@@ -80,7 +80,7 @@ public class XmppService extends Service {
     private boolean notifyBattery;
 
     // sms
-    private int smsNumber;
+    public int smsNumber;
     private boolean displaySentSms;
 
     // notification stuff
@@ -359,7 +359,8 @@ public class XmppService extends Service {
         updateStatus(CONNECTED);
         // Send welcome message
         if (notifyApplicationConnection) {
-            send("Welcome to GTalkSMS. Send \"?\" for getting help");
+            send("Welcome to GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()) + 
+                 ". Send \"?\" for getting help");
         }
     }
 
@@ -562,14 +563,15 @@ public class XmppService extends Service {
                     message = args.substring(separatorPos + 1);
                     sendSMS(message, contact);
                 } else if (args.length() > 0) {
-                    contact = args;
-                    readSMS(contact);
+                    readSMS(args);
                 } else {
-                    displayLastRecipient(lastRecipient);
+                    readLastSMS();
                 }
             }
             else if (command.equals("reply")) {
-                if (lastRecipient == null) {
+                if (args.length() == 0) {
+                    displayLastRecipient(lastRecipient);
+                } else if (lastRecipient == null) {
                     send("Error: no recipient registered.");
                 } else {
                     sendSMS(args, lastRecipient);
@@ -687,15 +689,14 @@ public class XmppService extends Service {
                 ArrayList<Sms> smsArrayList = SmsMmsManager.getSms(contact.rawIds, contact.name);
                 if(displaySentSms) {
                     smsArrayList.addAll(SmsMmsManager.getSentSms(ContactsManager.getPhones(contact.id),sentSms));
-                    Collections.sort(smsArrayList);
                 }
-                int nbSms = smsArrayList.size();
+                Collections.sort(smsArrayList);
                 
-                List<Sms> smsList = smsArrayList.subList(Math.max(smsArrayList.size() - smsNumber,0), smsArrayList.size());
+                List<Sms> smsList = smsArrayList.subList(Math.max(smsArrayList.size() - smsNumber, 0), smsArrayList.size());
                 if (smsList.size() > 0) {
                     hasMatch = true;
                     StringBuilder smsContact = new StringBuilder();
-                    smsContact.append(makeBold(contact.name) + " (" + nbSms + " sms)" );
+                    smsContact.append(makeBold(contact.name));
                     for (Sms sms : smsList) {
                         smsContact.append("\r\n" + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
                         smsContact.append("\r\n" + sms.message);
@@ -714,6 +715,29 @@ public class XmppService extends Service {
         } else {
             send("No match for \"" + searchedText + "\"");
         }
+    }
+
+    /** reads last (count) SMS from all contacts */
+    public void readLastSMS() {
+
+        ArrayList<Sms> smsArrayList = SmsMmsManager.getAllReceivedSms();
+        StringBuilder allSms = new StringBuilder();
+        
+        if (displaySentSms) {
+            smsArrayList.addAll(SmsMmsManager.getAllSentSms());
+        }
+        Collections.sort(smsArrayList);
+        
+        List<Sms> smsList = smsArrayList.subList(Math.max(smsArrayList.size() - smsNumber, 0), smsArrayList.size());
+        if (smsList.size() > 0) {
+            for (Sms sms : smsList) {
+                allSms.append("\r\n" + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
+                allSms.append("\r\n" + sms.message);
+            }
+        } else {
+            allSms.append("No sms found");
+        }
+        send(allSms.toString() + "\r\n");
     }
 
 

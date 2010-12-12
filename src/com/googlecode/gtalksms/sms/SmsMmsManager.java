@@ -14,10 +14,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.googlecode.gtalksms.Tools;
 import com.googlecode.gtalksms.XmppService;
+import com.googlecode.gtalksms.contacts.ContactsManager;
 import com.googlecode.gtalksms.contacts.Phone;
 
 public class SmsMmsManager {
@@ -118,32 +118,10 @@ public class SmsMmsManager {
      * argument
      */
     public static ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName) {
-        ArrayList<Sms> res = new ArrayList<Sms>();
-        XmppService xmpp = XmppService.getInstance();
-
         if (rawIds.size() > 0) {
-            Uri mSmsQueryUri = Uri.parse("content://sms/inbox");
-            String columns[] = new String[] { "person", "address", "body", "date", "status" };
-            String where = "person IN (" + TextUtils.join(", ", rawIds) + ")";
-
-            Cursor c = xmpp.getContentResolver().query(mSmsQueryUri, columns, where, null, null);
-
-            Log.d(XmppService.LOG_TAG, "getSms: " + c.getCount() + " sms for " + contactName + " - " + where);
-
-            for (boolean hasData = c.moveToFirst(); hasData; hasData = c.moveToNext()) {
-                Date date = new Date();
-                date.setTime(Tools.getLong(c, "date"));
-                Sms sms = new Sms();
-                sms.date = date;
-                sms.number = Tools.getString(c, "address");
-                sms.message = Tools.getString(c, "body");
-                sms.sender = contactName;
-                res.add(sms);
-            }
-
-            c.close();
+            return getAllSms("content://sms/inbox", contactName, "person IN (" + TextUtils.join(", ", rawIds) + ")");
         }
-        return res;
+        return new ArrayList<Sms>();
     }
 
     /**
@@ -151,20 +129,36 @@ public class SmsMmsManager {
      * argument
      */
     public static ArrayList<Sms> getAllSentSms() {
+        return getAllSms("content://sms/sent", "Me", null);
+    }
+
+    public static ArrayList<Sms> getAllReceivedSms() {
+        return getAllSms("content://sms/inbox", null, null);
+    }
+
+    private static ArrayList<Sms> getAllSms(String folder, String sender, String where) {
         ArrayList<Sms> res = new ArrayList<Sms>();
 
-        Uri mSmsQueryUri = Uri.parse("content://sms/sent");
-        String columns[] = new String[] { "address", "body", "date", "status" };
-        Cursor c = XmppService.getInstance().getContentResolver().query(mSmsQueryUri, columns, null, null, null);
+        Uri mSmsQueryUri = Uri.parse(folder);
+        String columns[] = new String[] { "person", "address", "body", "date", "status" };
+        String sortOrder = "date DESC";
 
-        for (boolean hasData = c.moveToFirst(); hasData; hasData = c.moveToNext()) {
+        Cursor c = XmppService.getInstance().getContentResolver().query(mSmsQueryUri, columns, where, null, sortOrder);
+        int maxSms = XmppService.getInstance().smsNumber;
+        int nbSms = 0;
+        
+        for (boolean hasData = c.moveToFirst(); hasData && nbSms < maxSms; hasData = c.moveToNext(), ++nbSms) {
             Date date = new Date();
             date.setTime(Long.parseLong(Tools.getString(c, "date")));
             Sms sms = new Sms();
             sms.date = date;
             sms.number = Tools.getString(c, "address");
             sms.message = Tools.getString(c, "body");
-            sms.sender = "Me";
+            if (sender == null) {
+                sms.sender = ContactsManager.getContactName(Tools.getLong(c, "person"));
+            } else {
+                sms.sender = sender;
+            }
             res.add(sms);
 
         }

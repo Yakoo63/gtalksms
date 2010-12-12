@@ -1,7 +1,5 @@
 package com.googlecode.gtalksms;
 
-import com.googlecode.gtalksms.R;
-
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
