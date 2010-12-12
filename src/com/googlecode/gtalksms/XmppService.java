@@ -559,7 +559,9 @@ public class XmppService extends Service {
                 builder.append("- \"?\": shows this help.\n");
                 builder.append("- \"dial:#contact#\": dial the specified contact.\n");
                 builder.append("- \"reply:#message#\": send a sms to your last recipient with content message.\n");
-                builder.append("- \"sms:#contact#[:#message#]\": sends a sms to number with content message or display last sent sms.\n");
+                builder.append("- \"sms\": display last sent sms from all contact.\n");
+                builder.append("- \"sms:#contact#\": display last sent sms from searched contacts.\n");
+                builder.append("- \"sms:#contact#:#message#\": sends a sms to number with content message.\n");
                 builder.append("- \"contact:#contact#\": display informations of a searched contact.\n");
                 builder.append("- \"geo:#address#\": Open Maps or Navigation or Street view on specific address\n");
                 builder.append("- \"where\": sends you google map updates about the location of the phone until you send \"stop\"\n");

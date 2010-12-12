@@ -13,6 +13,7 @@ public class Phone {
     public static String cleanPhoneNumber(String number) {
         return number.replace("(", "")
                      .replace(")", "")
+                     .replace("-", "")
                      .replace(" ", "");
     }
 

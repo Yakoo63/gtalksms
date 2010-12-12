@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.PhoneLookup;
 import android.provider.ContactsContract.RawContacts;
 
 import com.googlecode.gtalksms.Tools;
@@ -25,10 +26,9 @@ public class ContactsManager {
         if (phoneNumber != null) {
             res = phoneNumber;
             ContentResolver resolver = XmppService.getInstance().getContentResolver();
-            String[] projection = new String[] { CommonDataKinds.Phone.DISPLAY_NAME, CommonDataKinds.Phone.NUMBER };
-            
-            Uri contactUri = Uri.withAppendedPath(CommonDataKinds.Phone.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-            Cursor c = resolver.query(contactUri, projection, null, null, null);
+            Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+            Cursor c = resolver.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
+
             if (c.moveToFirst()) {
                 res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
             }
