@@ -1,7 +1,9 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.panels;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
+import com.googlecode.gtalksms.R;
 
 public class Preferences extends PreferenceActivity {
 

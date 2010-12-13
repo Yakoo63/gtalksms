@@ -1,7 +1,6 @@
 package com.googlecode.gtalksms.sms;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -15,20 +14,22 @@ import android.net.Uri;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
 
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.Tools;
 import com.googlecode.gtalksms.XmppService;
 import com.googlecode.gtalksms.contacts.ContactsManager;
-import com.googlecode.gtalksms.contacts.Phone;
+import com.googlecode.gtalksms.phone.Phone;
 
 public class SmsMmsManager {
+
+    static SettingsManager Settings = XmppService.Settings;
+    
     // intents for sms sending
     public static PendingIntent sentPI = null;
     public static PendingIntent deliveredPI = null;
     public static BroadcastReceiver sentSmsReceiver = null;
     public static BroadcastReceiver deliveredSmsReceiver = null;
-    public static boolean notifySmsSent;
-    public static boolean notifySmsDelivered;
-
+    
     /** clear the sms monitoring related stuff */
     public static void clearSmsMonitors() {
         if (sentSmsReceiver != null) {
@@ -45,7 +46,7 @@ public class SmsMmsManager {
 
     /** reinit sms monitors (that tell the user the status of the sms) */
     public static void initSmsMonitors() {
-        if (notifySmsSent) {
+        if (Settings.notifySmsSent) {
             String SENT = "SMS_SENT";
             sentPI = PendingIntent.getBroadcast(XmppService.getInstance(), 0, new Intent(SENT), 0);
             sentSmsReceiver = new BroadcastReceiver() {
@@ -72,7 +73,8 @@ public class SmsMmsManager {
             };
             XmppService.getInstance().registerReceiver(sentSmsReceiver, new IntentFilter(SENT));
         }
-        if (notifySmsDelivered) {
+    
+        if (Settings.notifySmsDelivered) {
             String DELIVERED = "SMS_DELIVERED";
             deliveredPI = PendingIntent.getBroadcast(XmppService.getInstance(), 0, new Intent(DELIVERED), 0);
             deliveredSmsReceiver = new BroadcastReceiver() {
@@ -144,14 +146,12 @@ public class SmsMmsManager {
         String sortOrder = "date DESC";
 
         Cursor c = XmppService.getInstance().getContentResolver().query(mSmsQueryUri, columns, where, null, sortOrder);
-        int maxSms = XmppService.getInstance().smsNumber;
+        int maxSms = Settings.smsNumber;
         int nbSms = 0;
         
         for (boolean hasData = c.moveToFirst(); hasData && nbSms < maxSms; hasData = c.moveToNext(), ++nbSms) {
-            Date date = new Date();
-            date.setTime(Long.parseLong(Tools.getString(c, "date")));
             Sms sms = new Sms();
-            sms.date = date;
+            sms.date = Tools.getDateMilliSeconds(c, "date");
             sms.number = Tools.getString(c, "address");
             sms.message = Tools.getString(c, "body");
             if (sender == null) {

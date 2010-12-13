@@ -63,10 +63,22 @@
             android:title="@string/show_sent_sms"
             android:summary="Check if you want to see sent sms"/>
         <com.googlecode.gtalksms.EditIntegerPreference
-                android:key="smsNumber"
-                android:numeric="integer"
-                android:defaultValue="5"
-                android:title="@string/sms_number" android:summary="Number of SMS to show for each contact"/>
+            android:key="smsNumber"
+            android:numeric="integer"
+            android:defaultValue="5"
+            android:title="@string/sms_number" android:summary="Number of SMS to show for each contact"/>
+        <com.googlecode.gtalksms.EditIntegerPreference
+            android:key="callLogsNumber"
+            android:numeric="integer"
+            android:defaultValue="10"
+            android:title="@string/call_logs_number" android:summary="Number of call logs to show"/>
+        <ListPreference
+            android:title="Battery notification interval"
+            android:key="batteryNotificationInterval"
+            android:summary="This preference allows to set the battery notification interval in percents"
+            android:defaultValue="10"
+            android:entries="@array/list_bat_notif_interval"
+            android:entryValues="@array/list_bat_notif_interval"/>
         <RingtonePreference
             android:title="@string/ringtone"
             android:key="ringtone"

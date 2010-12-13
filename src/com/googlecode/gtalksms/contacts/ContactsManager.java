@@ -14,6 +14,7 @@ import android.provider.ContactsContract.RawContacts;
 
 import com.googlecode.gtalksms.Tools;
 import com.googlecode.gtalksms.XmppService;
+import com.googlecode.gtalksms.phone.Phone;
 
 public class ContactsManager {
 

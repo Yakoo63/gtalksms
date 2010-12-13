@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.panels;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,6 +7,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.Tools;
+import com.googlecode.gtalksms.XmppService;
 
 public class MainScreen extends Activity {
 
