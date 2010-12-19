@@ -1,9 +1,9 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.receivers;
 
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
-import com.googlecode.gtalksms.contacts.ContactsManager;
+import com.googlecode.gtalksms.MainService;
 
 public class PhoneCallListener extends PhoneStateListener {
 
@@ -14,10 +14,9 @@ public class PhoneCallListener extends PhoneStateListener {
             case TelephonyManager.CALL_STATE_OFFHOOK:
                 break;
             case TelephonyManager.CALL_STATE_RINGING:
-                XmppService service = XmppService.getInstance();
+                MainService service = MainService.getInstance();
                 if (service != null) {
-                    String contact = ContactsManager.getContactName(incomingNumber);
-                    service.send(contact + " is calling");
+                    service.OnIncomingCall(incomingNumber);
                 }
                 break;
         }

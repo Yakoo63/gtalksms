@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.tools;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,13 +10,14 @@ import android.content.pm.PackageInfo;
 import android.database.Cursor;
 
 public class Tools {
+    public final static String LOG_TAG = "gtalksms";
 
+    
     public static String getVersionName(Context context, Class<?> cls) {
 
         try {
             ComponentName comp = new ComponentName(context, cls);
-            PackageInfo pinfo = context.getPackageManager().getPackageInfo(
-                    comp.getPackageName(), 0);
+            PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
 
             return "v" + pinfo.versionName + " by Yakoo";
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {

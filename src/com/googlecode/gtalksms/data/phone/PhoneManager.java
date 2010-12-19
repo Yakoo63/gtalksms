@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms.phone;
+package com.googlecode.gtalksms.data.phone;
 
 import java.util.ArrayList;
 
@@ -8,8 +8,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CallLog;
 
-import com.googlecode.gtalksms.Tools;
-import com.googlecode.gtalksms.XmppService;
+import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.tools.Tools;
 
 public class PhoneManager {
 
@@ -18,7 +18,7 @@ public class PhoneManager {
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + number));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            XmppService.getInstance().startActivity(intent);
+            MainService.getInstance().startActivity(intent);
             return true;
         } catch (Exception e) {
             return false;
@@ -28,7 +28,7 @@ public class PhoneManager {
     public static ArrayList<Call> getPhoneLogs() {
         ArrayList<Call> res = new ArrayList<Call>();
 
-        ContentResolver resolver = XmppService.getInstance().getContentResolver();
+        ContentResolver resolver = MainService.getInstance().getContentResolver();
         
         String[] projection = new String[] { CallLog.Calls.NUMBER, CallLog.Calls.TYPE, 
                 CallLog.Calls.DURATION, CallLog.Calls.DATE};

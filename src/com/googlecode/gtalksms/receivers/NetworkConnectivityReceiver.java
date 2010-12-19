@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,12 +7,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.tools.Tools;
+
 public class NetworkConnectivityReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        XmppService service = XmppService.getInstance();
+        MainService service = MainService.getInstance();
         if (service != null) {
             // is this notification telling us about a new network which is a 
             // 'failover' due to another network stopping? 
@@ -24,13 +27,13 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
             // (meaning the network we are connected to has stopped) 
             // and we are connected , we must disconnect.
             if (network == null || !network.isConnected() || (failover && service.isConnected())) {
-                Log.i(XmppService.LOG_TAG, "network unavailable - closing connection");
-                service.clearConnection();
+                Log.i(Tools.LOG_TAG, "network unavailable - closing connection");
+                service.stopConnection();
             }
             // connect if not already connected (eg, if we disconnected above) and we have connectivity
             if (!nocon && !service.isConnected()) {
-                Log.i(XmppService.LOG_TAG, "network available and not connected - connecting");
-                service.initConnection();
+                Log.i(Tools.LOG_TAG, "network available and not connected - connecting");
+                service.startConnection();
             }
         }
     }

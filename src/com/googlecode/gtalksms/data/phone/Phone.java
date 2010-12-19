@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms.phone;
+package com.googlecode.gtalksms.data.phone;
 
 public class Phone {
     private final static String cellPhonePattern = "\\+*\\d+";
@@ -14,6 +14,7 @@ public class Phone {
         return number.replace("(", "")
                      .replace(")", "")
                      .replace("-", "")
+                     .replace(".", "")
                      .replace(" ", "");
     }
 

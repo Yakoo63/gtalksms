@@ -9,6 +9,14 @@ public class MediaManager {
     private MediaPlayer mMediaPlayer;
     private boolean canRing;
     
+    Context _context;
+    SettingsManager _settings;
+    
+    public MediaManager(SettingsManager settings, Context baseContext) {
+        _settings = settings;
+        _context = baseContext;
+    }
+
     /** clears the media player */
     public void clearMediaPlayer() {
         if (mMediaPlayer != null) {
@@ -18,12 +26,12 @@ public class MediaManager {
     }
 
     /** init the media player */
-    public void initMediaPlayer(Context c) {
+    public void initMediaPlayer() {
         canRing = true;
-        Uri alert = Uri.parse(XmppService.Settings.ringtone);
+        Uri alert = Uri.parse(_settings.ringtone);
         mMediaPlayer = new MediaPlayer();
         try {
-            mMediaPlayer.setDataSource(c, alert);
+            mMediaPlayer.setDataSource(_context, alert);
         } catch (Exception e) {
             canRing = false;
         }
@@ -32,9 +40,9 @@ public class MediaManager {
     }
     
     /** makes the phone ring */
-    public boolean ring(Context c) {
+    public boolean ring() {
         boolean res = false;
-        final AudioManager audioManager = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
+        final AudioManager audioManager = (AudioManager) _context.getSystemService(Context.AUDIO_SERVICE);
         if (canRing && audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
             try {
                 mMediaPlayer.prepare();

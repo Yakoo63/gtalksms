@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms.contacts;
+package com.googlecode.gtalksms.data.contacts;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,9 +12,9 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.PhoneLookup;
 import android.provider.ContactsContract.RawContacts;
 
-import com.googlecode.gtalksms.Tools;
-import com.googlecode.gtalksms.XmppService;
-import com.googlecode.gtalksms.phone.Phone;
+import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.data.phone.Phone;
+import com.googlecode.gtalksms.tools.Tools;
 
 public class ContactsManager {
 
@@ -26,7 +26,7 @@ public class ContactsManager {
         String res;
         if (phoneNumber != null) {
             res = phoneNumber;
-            ContentResolver resolver = XmppService.getInstance().getContentResolver();
+            ContentResolver resolver = MainService.getInstance().getContentResolver();
             Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
             Cursor c = resolver.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
 
@@ -45,7 +45,7 @@ public class ContactsManager {
     public static String getContactName(long rawId) {
         String res = "Unknown";
         
-        ContentResolver resolver = XmppService.getInstance().getContentResolver();
+        ContentResolver resolver = MainService.getInstance().getContentResolver();
         Cursor c = resolver.query(RawContacts.CONTENT_URI,
                 new String[]{RawContacts.CONTACT_ID},
                 RawContacts._ID + "=?",
@@ -80,7 +80,7 @@ public class ContactsManager {
         }
 
         if (!searchedName.equals("")) {
-            ContentResolver resolver = XmppService.getInstance().getContentResolver();
+            ContentResolver resolver = MainService.getInstance().getContentResolver();
             String[] projection = new String[] { Contacts._ID, Contacts.DISPLAY_NAME };
             String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
 
@@ -120,13 +120,13 @@ public class ContactsManager {
      */
     public static ArrayList<ContactAddress> getPostalAddresses(Long contactId) {
         ArrayList<ContactAddress> res = new ArrayList<ContactAddress>();
-        XmppService xmpp = XmppService.getInstance();
+        MainService service = MainService.getInstance();
         
         if(null != contactId) {
             String where = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
             String[] whereParams = new String[]{contactId.toString(), ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE}; 
         
-            Cursor c = xmpp.getContentResolver().query(ContactsContract.Data.CONTENT_URI, 
+            Cursor c = service.getContentResolver().query(ContactsContract.Data.CONTENT_URI, 
                         null, where, whereParams, null); 
             
             while(c.moveToNext()) {
@@ -141,7 +141,7 @@ public class ContactsManager {
 //                String country      = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY);
 
                 if (label == null || label.compareTo("") != 0) {
-                    label = ContactsContract.CommonDataKinds.StructuredPostal.getTypeLabel(xmpp.getResources(), type, "").toString();
+                    label = ContactsContract.CommonDataKinds.StructuredPostal.getTypeLabel(service.getResources(), type, "").toString();
                 }
                 
                 ContactAddress a = new ContactAddress();
@@ -160,18 +160,18 @@ public class ContactsManager {
      */
     public static ArrayList<ContactAddress> getEmailAddresses(Long contactId) {
         ArrayList<ContactAddress> res = new ArrayList<ContactAddress>();
-        XmppService xmpp = XmppService.getInstance();
+        MainService service = MainService.getInstance();
 
         if(null != contactId) {
             String where =  ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId;
-            Cursor c = xmpp.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, where, null, null); 
+            Cursor c = service.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, where, null, null); 
             while(c.moveToNext()) {
 
                 String label = Tools.getString(c, ContactsContract.CommonDataKinds.Email.LABEL);
                 int type = Tools.getLong(c, ContactsContract.CommonDataKinds.Email.TYPE).intValue();
 
                 if (label == null || label.compareTo("") != 0) {
-                    label = ContactsContract.CommonDataKinds.Email.getTypeLabel(xmpp.getResources(), type, "").toString();
+                    label = ContactsContract.CommonDataKinds.Email.getTypeLabel(service.getResources(), type, "").toString();
                 }
 
                 ContactAddress a = new ContactAddress();
@@ -190,11 +190,11 @@ public class ContactsManager {
      */
     public static ArrayList<Phone> getPhones(Long contactId) {
         ArrayList<Phone> res = new ArrayList<Phone>();
-        XmppService xmpp = XmppService.getInstance();
+        MainService service = MainService.getInstance();
         
         if(null != contactId) {
             String where =  ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId;
-            Cursor c = xmpp.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, where, null, null);
+            Cursor c = service.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, where, null, null);
             
             while (c.moveToNext()) {
 
@@ -203,7 +203,7 @@ public class ContactsManager {
                 int type = Tools.getLong(c, CommonDataKinds.Phone.TYPE).intValue();
     
                 if (label == null || label.compareTo("") != 0) {
-                    label = ContactsContract.CommonDataKinds.Phone.getTypeLabel(xmpp.getResources(), type, "").toString();
+                    label = ContactsContract.CommonDataKinds.Phone.getTypeLabel(service.getResources(), type, "").toString();
                 }
     
                 Phone phone = new Phone();

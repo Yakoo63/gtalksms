@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.receivers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 
-import com.googlecode.gtalksms.contacts.ContactsManager;
+import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.data.contacts.ContactsManager;
 
 
 public class SmsReceiver extends BroadcastReceiver {
@@ -21,7 +22,7 @@ public class SmsReceiver extends BroadcastReceiver {
         SmsMessage[] msgs = null;
         
         if (bundle != null)  {
-            XmppService service = XmppService.getInstance();
+            MainService service = MainService.getInstance();
             if (service != null) {
                 Object[] pdus = (Object[]) bundle.get("pdus");                
                 int nbrOfpdus = pdus.length;
@@ -29,7 +30,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 
                 // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
                 // However, send long SMS of same sender in one message
-                ArrayList<String> sndr = new ArrayList<String>();
+                ArrayList<String> senders = new ArrayList<String>();
                 Map<String, String> msg = new HashMap<String, String>();
                 
                 for (int i = 0; i < nbrOfpdus; i++) {
@@ -38,7 +39,7 @@ public class SmsReceiver extends BroadcastReceiver {
                     String msgString = msg.get(msgs[i].getOriginatingAddress()); // Check if index with number exists
                     
                     if(msgString == null) { // Index with number doesn't exist                                               
-                        sndr.add(msgs[i].getOriginatingAddress());  // Save sender for accessing associative array later
+                        senders.add(msgs[i].getOriginatingAddress());  // Save sender for accessing associative array later
 
                         StringBuilder builder = new StringBuilder();    // Build string  
                         builder.append("SMS from ");
@@ -56,9 +57,8 @@ public class SmsReceiver extends BroadcastReceiver {
                 }
 
                 // Finally, send all SMS via XMPP by sender
-                for(int i = 0; i < sndr.size(); i++) {
-                    service.send(msg.get(sndr.get(i)) + "\n");
-                    service.setLastRecipient(sndr.get(i));
+                for(String sender : senders) {
+                    service.OnReceivedSms(sender, msg.get(sender) + "\n");
                 }
 
             }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.googlecode.gtalksms" android:versionName="0.3.1" android:versionCode="5">
+    package="com.googlecode.gtalksms" android:versionName="1.0" android:versionCode="6">
     <uses-sdk android:minSdkVersion="5" />
     <application android:icon="@drawable/icon_green" android:label="@string/app_name">
         <activity android:name="com.googlecode.gtalksms.panels.MainScreen"
@@ -10,13 +10,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.googlecode.gtalksms.geo.GeoPopup"
+        <activity android:name="com.googlecode.gtalksms.panels.GeoPopup"
                   android:label="@string/app_name">
         </activity>
         <activity android:name="com.googlecode.gtalksms.panels.Preferences"
                   android:label="@string/set_preferences">
         </activity>
-        <service android:enabled="true" android:name="com.googlecode.gtalksms.XmppService">
+        <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService">
             <intent-filter>
                 <action android:name=".GTalkSMS.ACTION" />
             </intent-filter>
@@ -34,23 +34,23 @@
             </intent-filter>
         </receiver>
         <service android:enabled="true" android:name="com.googlecode.gtalksms.LocationService" />
-        <receiver android:name="com.googlecode.gtalksms.BootReceiver">
+        <receiver android:name="com.googlecode.gtalksms.receivers.BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.googlecode.gtalksms.SmsReceiver">
+        <receiver android:name="com.googlecode.gtalksms.receivers.SmsReceiver">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.googlecode.gtalksms.CallReceiver">
+        <receiver android:name="com.googlecode.gtalksms.receivers.CallReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.googlecode.gtalksms.NetworkConnectivityReceiver" android:enabled="true">
+        <receiver android:name="com.googlecode.gtalksms.receivers.NetworkConnectivityReceiver" android:enabled="true">
              <intent-filter>
                  <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
              </intent-filter>

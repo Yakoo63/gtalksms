@@ -53,14 +53,11 @@ public class LocationService extends Service {
 
     private void setGPSStatus(boolean pNewGPSStatus)
     {
-        String allowedLocationProviders =
-            Settings.System.getString(getContentResolver(),
-            Settings.System.LOCATION_PROVIDERS_ALLOWED);
+        String allowedLocationProviders = Settings.System.getString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED);
         if (allowedLocationProviders == null) {
             allowedLocationProviders = "";
         }
-        boolean networkProviderStatus =
-            allowedLocationProviders.contains(LocationManager.NETWORK_PROVIDER);
+        boolean networkProviderStatus = allowedLocationProviders.contains(LocationManager.NETWORK_PROVIDER);
         allowedLocationProviders = "";
         if (networkProviderStatus == true) {
             allowedLocationProviders += LocationManager.NETWORK_PROVIDER;
@@ -71,8 +68,7 @@ public class LocationService extends Service {
         Settings.System.putString(getContentResolver(),
             Settings.System.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
         try {
-            Method m =
-                mLocationManager.getClass().getMethod("updateProviders", new Class[] {});
+            Method m = mLocationManager.getClass().getMethod("updateProviders", new Class[] {});
             m.setAccessible(true);
             m.invoke(mLocationManager, new Object[]{});
         }
@@ -92,7 +88,8 @@ public class LocationService extends Service {
         builder.append("altitude: " + location.getAltitude() + " ");
         builder.append("speed: " + location.getSpeed() + "m/s ");
         builder.append("provider: " + location.getProvider() + ")");
-        XmppService service = XmppService.getInstance();
+        
+        MainService service = MainService.getInstance();
         if (service != null) {
             service.send(builder.toString());
         }
@@ -101,17 +98,18 @@ public class LocationService extends Service {
     public void onStart(final Intent intent, int startId) {
         super.onStart(intent, startId);
 
-        if ( intent.getAction().equals(STOP_SERVICE) ) {
+        if (intent.getAction().equals(STOP_SERVICE)) {
             destroy();
             stopSelf();
             return;
         }
 
         try {
-            if(!getGPSStatus())
+            if (!getGPSStatus()) {
                 setGPSStatus(true);
+            }
         }
-        catch(Exception e) {
+        catch (Exception e) {
         }
         mLocationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
@@ -136,7 +134,7 @@ public class LocationService extends Service {
             if (location != null) {
                 if (isBetterLocation(location, currentBestLocation)) {
                     currentBestLocation = location;
-                    XmppService service = XmppService.getInstance();
+                    MainService service = MainService.getInstance();
                     if (service != null) {
                         service.send("Last known location");
                     }

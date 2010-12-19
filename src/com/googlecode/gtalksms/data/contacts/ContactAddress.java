@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms.contacts;
+package com.googlecode.gtalksms.data.contacts;
 
 public class ContactAddress {
     public Long id;

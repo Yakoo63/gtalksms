@@ -12,6 +12,7 @@
     <string name="your_gmail_address">Your GMail address</string>
     <string name="your_gmail_password">Your GMail password</string>
     <string name="start_at_boot">Start at boot</string>
+    <string name="show_status_icon">Status notification icon</string>
     <string name="battery_state">Battery state changes</string>
     <string name="incoming_sms">Incoming SMS</string>
     <string name="incoming_calls">Incoming calls</string>

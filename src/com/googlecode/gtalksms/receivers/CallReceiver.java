@@ -1,4 +1,5 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.receivers;
+
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

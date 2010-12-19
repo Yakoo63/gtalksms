@@ -8,13 +8,23 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.XmppListener;
+import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.R;
-import com.googlecode.gtalksms.Tools;
-import com.googlecode.gtalksms.XmppService;
 
 public class MainScreen extends Activity {
 
-
+    @Override
+    public void onPause() {
+        super.onPause();
+        
+        if (MainService.getInstance() != null) {
+            MainService.getInstance().setXmppListener(null);
+        }  
+    }
+   
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -24,6 +34,8 @@ public class MainScreen extends Activity {
         TextView label = (TextView) findViewById(R.id.VersionLabel);
         label.setText("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()));
 
+        registerListener();
+        
         Button prefBtn = (Button) findViewById(R.id.Preferences);
         prefBtn.setOnClickListener(new OnClickListener() {
 
@@ -37,13 +49,43 @@ public class MainScreen extends Activity {
         startStopButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
                     Intent intent = new Intent(".GTalkSMS.ACTION");
-                    if (XmppService.getInstance() == null) {
+                    if (MainService.getInstance() == null) {
                         startService(intent);
+                        registerListener();
                     }
                     else {
                         stopService(intent);
                     }
                 }
         });
+    }
+    
+    public void updateConsole() {
+//        TextView console = (TextView) findViewById(R.id.Console);
+//        console.append("\n" + MainService.getInstance().getContactsList());
+    }
+    
+    public void registerListener() {
+        if (MainService.getInstance() != null) {
+            MainService.getInstance().setXmppListener(new XmppListener() {
+                @Override
+                public void onMessageReceived(String message) {
+                }
+                
+                @Override
+                public void onConnectionStatusChanged(int oldStatus, int status) {
+                    if (status == XmppManager.CONNECTED) {
+                        updateConsole();
+                    }
+                }
+
+                @Override
+                public void onPresenceStatusChanged(String person, String status) {
+//                    TextView console = (TextView) findViewById(R.id.Console);
+//                    console.append("\n" + person + " : " + status);
+                }
+            });
+            updateConsole();
+        }
     }
 }

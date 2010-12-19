@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.tools;
 
 import android.content.Context;
 import android.preference.EditTextPreference;

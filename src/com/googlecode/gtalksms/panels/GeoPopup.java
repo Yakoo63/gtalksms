@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms.geo;
+package com.googlecode.gtalksms.panels;
 
 import android.app.Activity;
 import android.app.AlertDialog;

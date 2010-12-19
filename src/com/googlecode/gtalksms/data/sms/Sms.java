@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms.sms;
+package com.googlecode.gtalksms.data.sms;
 
 import java.util.Date;
 

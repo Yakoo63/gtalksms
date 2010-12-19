@@ -18,7 +18,8 @@ public class SettingsManager {
     // notifications
     public boolean notifyApplicationConnection;
     public boolean formatChatResponses;
-
+    public boolean showStatusIcon;
+    
     // ring
     public String ringtone = null;
 
@@ -52,6 +53,7 @@ public class SettingsManager {
             mLogin = mTo;
         }
         
+        showStatusIcon = prefs.getBoolean("showStatusIcon", true);
         notifyApplicationConnection = prefs.getBoolean("notifyApplicationConnection", true);
         notifyBattery = prefs.getBoolean("notifyBattery", true);
         batteryNotificationInterval = Integer.valueOf(prefs.getString("batteryNotificationInterval", "10"));

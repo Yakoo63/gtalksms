@@ -19,7 +19,7 @@
         <EditTextPreference
             android:key="login"
             android:title="@string/login"
-            android:defaultValue="your.login@gmail.com"
+            android:defaultValue="your.login"
             android:dependency="useDifferentAccount"
             android:summary="Login used by the phone"/>
         <EditTextPreference
@@ -34,7 +34,7 @@
                 android:key="serverHost"
                 android:summary="Server host used by the phone"
                 android:defaultValue="talk.google.com"/>
-            <com.googlecode.gtalksms.EditIntegerPreference
+            <com.googlecode.gtalksms.tools.EditIntegerPreference
                 android:key="serverPort"
                 android:numeric="integer"
                 android:defaultValue="5222"
@@ -53,6 +53,11 @@
             android:title="@string/start_at_boot"
             android:summary="Check if you want TalkMyPhone to start at boot"/>
         <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="showStatusIcon"
+            android:title="@string/show_status_icon"
+            android:summary="Check if you want to see TalkMyPhone status icon in notification bar"/>
+        <CheckBoxPreference
             android:defaultValue="false"
             android:key="formatResponses"
             android:title="@string/format_responses"
@@ -62,12 +67,12 @@
             android:key="showSentSms"
             android:title="@string/show_sent_sms"
             android:summary="Check if you want to see sent sms"/>
-        <com.googlecode.gtalksms.EditIntegerPreference
+        <com.googlecode.gtalksms.tools.EditIntegerPreference
             android:key="smsNumber"
             android:numeric="integer"
             android:defaultValue="5"
             android:title="@string/sms_number" android:summary="Number of SMS to show for each contact"/>
-        <com.googlecode.gtalksms.EditIntegerPreference
+        <com.googlecode.gtalksms.tools.EditIntegerPreference
             android:key="callLogsNumber"
             android:numeric="integer"
             android:defaultValue="10"
