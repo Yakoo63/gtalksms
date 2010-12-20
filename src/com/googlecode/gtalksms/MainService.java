@@ -19,6 +19,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Address;
 import android.net.Uri;
+import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.text.ClipboardManager;
@@ -195,42 +197,20 @@ public class MainService extends Service implements XmppListener {
         contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
     }
 
-    private void _onStart() {
-        // Get configuration
-        if (instance == null) {
-            instance = this;
-
-            _settingsMgr.importPreferences(getBaseContext());
-            if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
-                Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
-                Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
-                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(settingsActivity);
-                instance = null;
-                return;
-            }
-
-            _xmppMgr = new XmppManager(this, _settingsMgr, getBaseContext());
-            _mediaMgr = new MediaManager(_settingsMgr, getBaseContext());
-            _geoMgr = new GeoManager(_settingsMgr, getBaseContext());
-            _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
-            _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext());
-            
-            // first, clean everything
-            // cleanUp();
-
-            initNotificationStuff();
-
-            _mediaMgr.initMediaPlayer();
-            initSmsMonitors();
-
-            Log.i(Tools.LOG_TAG, "Starting xmpp.");
-            _xmppMgr.start();
+    public boolean isConnected() {
+        if (_xmppMgr != null) {
+            return _xmppMgr.isConnected();
         }
+        
+        return false;
     }
 
-    public boolean isConnected() {
-        return _xmppMgr.isConnected();
+    public int getConnectionStatus() {
+        if (_xmppMgr != null) {
+            return _xmppMgr.getConnectionStatus();
+        }
+        
+        return XmppManager.DISCONNECTED;
     }
 
     public void stopConnection() {
@@ -245,14 +225,67 @@ public class MainService extends Service implements XmppListener {
         return instance;
     }
 
-    @Override
-    public IBinder onBind(Intent arg0) {
-        return null;
+    /**
+     * Class for clients to access.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with
+     * IPC.
+     */
+    public class LocalBinder extends Binder {
+        public MainService getService() {
+            return MainService.this;
+        }
     }
+    
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    // This is the object that receives interactions from clients.  See
+    // RemoteService for a more complete example.
+    private final IBinder mBinder = new LocalBinder();
 
     @Override
     public void onStart(Intent intent, int startId) {
-        _onStart();
+        
+        // Get configuration
+        if (instance == null) {
+            instance = this;
+
+            _settingsMgr.importPreferences(getBaseContext());
+            if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
+                Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
+                Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
+                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(settingsActivity);
+                instance = null;
+                return;
+            }
+
+            _xmppMgr = new XmppManager(instance, _settingsMgr, getBaseContext());
+            _mediaMgr = new MediaManager(_settingsMgr, getBaseContext());
+            _geoMgr = new GeoManager(_settingsMgr, getBaseContext());
+            _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
+            _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext());
+            
+            Runnable asyncInit = new Runnable() {
+                public void run() {
+                    // first, clean everything
+                    // cleanUp();
+        
+                    initNotificationStuff();
+        
+                    _mediaMgr.initMediaPlayer();
+                    initSmsMonitors();
+        
+                    Log.i(Tools.LOG_TAG, "Starting xmpp.");
+                    _xmppMgr.start();
+                }
+            };
+            
+            // Async start to release UI lock
+            new Handler().postDelayed(asyncInit, 50);
+        }
     };
 
     @Override

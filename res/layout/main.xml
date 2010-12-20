@@ -7,13 +7,21 @@
 	<Button android:text="Start/Stop GTalkSMS" android:id="@+id/StartStop" 
 			android:layout_height="wrap_content" android:layout_width="fill_parent"/>
 	<Button android:text="GTalkSMS Preferences" android:id="@+id/Preferences"
-			android:layout_height="wrap_content" android:layout_width="fill_parent"/> 
+			android:layout_height="wrap_content" android:layout_width="fill_parent" android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/> 
     <ScrollView android:id="@+id/ScrollView" android:layout_width="fill_parent" android:layout_height="fill_parent" 
                 android:layout_weight=".9">
 	   <TextView android:id="@+id/Console" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
     </ScrollView>
-	<TextView android:text="Version X.X.X" android:id="@+id/VersionLabel"
-	          android:layout_height="wrap_content" android:layout_width="fill_parent" 
-	          android:gravity="bottom|right" />
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content" >
+        <ImageView android:id="@+id/StatusImage" android:src="@drawable/led_red" android:scaleType="centerCrop"
+                   android:layout_width="30px" android:layout_height="30px" /> 
+		<TextView android:text="Version X.X.X" android:id="@+id/VersionLabel"
+		          android:layout_height="fill_parent" android:layout_width="fill_parent" 
+		          android:gravity="bottom|right" />
 	
+    </LinearLayout>
 </LinearLayout>

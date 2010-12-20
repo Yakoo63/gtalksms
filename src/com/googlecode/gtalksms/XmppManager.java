@@ -7,6 +7,7 @@ import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.Presence;
 
 import android.app.Service;
 import android.content.Context;
@@ -144,7 +145,7 @@ public class XmppManager {
         }
         
         try {
-            connection.login(_settings.mLogin, _settings.mPassword);
+            connection.login(_settings.mLogin, _settings.mPassword, "GTalkSMS");
         } catch (Exception e) {
             try {
                 connection.disconnect();
@@ -194,9 +195,12 @@ public class XmppManager {
         updateStatus(CONNECTED);
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
-            send("Welcome to GTalkSMS " + Tools.getVersionName(_context, getClass()) + 
-                 ". Send \"?\" for getting help");
+            send("Welcome to GTalkSMS " + Tools.getVersionName(_context, getClass()) + ". Send \"?\" for getting help");
         }
+        Presence presence = new Presence(Presence.Type.available);
+        presence.setStatus("GTalkSMS");
+        presence.setPriority(24);                   
+        mConnection.sendPacket(presence);
     }
     
     /** returns true if the service is correctly connected */
@@ -204,6 +208,11 @@ public class XmppManager {
         return    (mConnection != null
                 && mConnection.isConnected()
                 && mConnection.isAuthenticated());
+    }
+
+    /** returns true if the service is correctly connected */
+    public int getConnectionStatus() {
+        return mStatus;
     }
 
     /** sends a message to the user */
