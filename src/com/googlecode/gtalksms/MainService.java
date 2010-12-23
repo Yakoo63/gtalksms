@@ -6,23 +6,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.Address;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
-import android.telephony.SmsManager;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -39,6 +34,7 @@ import com.googlecode.gtalksms.data.sms.SmsMmsManager;
 import com.googlecode.gtalksms.geo.GeoManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
+import com.googlecode.gtalksms.receivers.XmppListener;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class MainService extends Service implements XmppListener {
@@ -55,7 +51,8 @@ public class MainService extends Service implements XmppListener {
     private GeoManager _geoMgr;
 
     private BatteryMonitor _batteryMonitor;
-
+    private SmsMonitor _smsMonitor;
+    
     // last person who sent sms/who we sent an sms to
     public String _lastRecipient = null;
 
@@ -214,6 +211,7 @@ public class MainService extends Service implements XmppListener {
     }
 
     public void stopConnection() {
+        stopNotifications();
         _xmppMgr.stop();
     }
 
@@ -266,18 +264,27 @@ public class MainService extends Service implements XmppListener {
             _mediaMgr = new MediaManager(_settingsMgr, getBaseContext());
             _geoMgr = new GeoManager(_settingsMgr, getBaseContext());
             _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
-            _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext());
+            _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext()) {
+                void sendBatteryInfos(int level) {
+                    if (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0) {
+                        send("Battery level " + level + "%");
+                    }
+                    if (_settings.notifyBatteryInStatus && _xmppMgr != null) {
+                        _xmppMgr.setStatus(level);
+                    }
+                }
+            };
+            
+            _smsMonitor = new SmsMonitor(_settingsMgr, getBaseContext()) {
+                void sendSmsStatus(String message) {
+                    send(message);
+                }
+            };
             
             Runnable asyncInit = new Runnable() {
                 public void run() {
-                    // first, clean everything
-                    // cleanUp();
-        
                     initNotificationStuff();
-        
                     _mediaMgr.initMediaPlayer();
-                    initSmsMonitors();
-        
                     Log.i(Tools.LOG_TAG, "Starting xmpp.");
                     _xmppMgr.start();
                 }
@@ -290,10 +297,11 @@ public class MainService extends Service implements XmppListener {
 
     @Override
     public void onDestroy() {
+        stopNotifications();
+        
         _geoMgr.stopLocatingPhone();
-
         _mediaMgr.clearMediaPlayer();
-        clearSmsMonitors();
+        _smsMonitor.clearSmsMonitor();
         _xmppMgr.stop();
         _batteryMonitor.clearBatteryMonitor();
 
@@ -305,98 +313,8 @@ public class MainService extends Service implements XmppListener {
     }
 
     public void send(String msg) {
-        _xmppMgr.send(msg);
-    }
-
-    
-
-    // intents for sms sending
-    public BroadcastReceiver sentSmsReceiver = null;
-    public BroadcastReceiver deliveredSmsReceiver = null;
-    public PendingIntent sentPI = null;
-    public PendingIntent deliveredPI = null;
-
-    /** Sends a sms to the specified phone number */
-    public void sendSMSByPhoneNumber(String message, String phoneNumber) {
-        // send("Sending sms to " + getContactName(phoneNumber));
-        SmsManager sms = SmsManager.getDefault();
-        ArrayList<String> messages = sms.divideMessage(message);
-
-        // création des liste d'instents
-        ArrayList<PendingIntent> listOfSentIntents = new ArrayList<PendingIntent>();
-        listOfSentIntents.add(sentPI);
-        ArrayList<PendingIntent> listOfDelIntents = new ArrayList<PendingIntent>();
-        listOfDelIntents.add(deliveredPI);
-        for (int i = 1; i < messages.size(); i++) {
-            listOfSentIntents.add(null);
-            listOfDelIntents.add(null);
-        }
-
-        sms.sendMultipartTextMessage(phoneNumber, null, messages, listOfSentIntents, listOfDelIntents);
-
-        _smsMgr.addSmsToSentBox(message, phoneNumber);
-    }
-
-    /** clear the sms monitoring related stuff */
-    public void clearSmsMonitors() {
-        if (sentSmsReceiver != null) {
-            getBaseContext().unregisterReceiver(sentSmsReceiver);
-        }
-        if (deliveredSmsReceiver != null) {
-            getBaseContext().unregisterReceiver(deliveredSmsReceiver);
-        }
-        sentSmsReceiver = null;
-        deliveredSmsReceiver = null;
-    }
-
-    /** reinit sms monitors (that tell the user the status of the sms) */
-    public void initSmsMonitors() {
-        if (_settingsMgr.notifySmsSent) {
-            String SENT = "SMS_SENT";
-            sentPI = PendingIntent.getBroadcast(getBaseContext(), 0, new Intent(SENT), 0);
-            sentSmsReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context arg0, Intent arg1) {
-                    switch (getResultCode()) {
-                        case Activity.RESULT_OK:
-                            MainService.getInstance().send("SMS sent");
-                            break;
-                        case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                            MainService.getInstance().send("Generic failure");
-                            break;
-                        case SmsManager.RESULT_ERROR_NO_SERVICE:
-                            MainService.getInstance().send("No service");
-                            break;
-                        case SmsManager.RESULT_ERROR_NULL_PDU:
-                            MainService.getInstance().send("Null PDU");
-                            break;
-                        case SmsManager.RESULT_ERROR_RADIO_OFF:
-                            MainService.getInstance().send("Radio off");
-                            break;
-                    }
-                }
-            };
-            registerReceiver(sentSmsReceiver, new IntentFilter(SENT));
-        }
-
-        if (_settingsMgr.notifySmsDelivered) {
-            String DELIVERED = "SMS_DELIVERED";
-            deliveredPI = PendingIntent.getBroadcast(getBaseContext(), 0, new Intent(DELIVERED), 0);
-            deliveredSmsReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context arg0, Intent arg1) {
-                    switch (getResultCode()) {
-                        case Activity.RESULT_OK:
-                            MainService.getInstance().send("SMS delivered");
-                            break;
-                        case Activity.RESULT_CANCELED:
-                            MainService.getInstance().send("SMS not delivered");
-                            break;
-                    }
-                }
-            };
-
-            registerReceiver(deliveredSmsReceiver, new IntentFilter(DELIVERED));
+        if (_xmppMgr != null) {
+            _xmppMgr.send(msg);
         }
     }
 
@@ -422,6 +340,8 @@ public class MainService extends Service implements XmppListener {
 
             if (command.equals("?")) {
                 showHelp();
+            } else if (command.equals("exit")) {
+                stopService(new Intent(".GTalkSMS.ACTION"));
             } else if (command.equals("sms")) {
                 int separatorPos = args.indexOf(":");
                 String contact = null;
@@ -455,10 +375,14 @@ public class MainService extends Service implements XmppListener {
                 }
             } else if (command.equals("calls")) {
                 readCallLogs();
-            } else if (command.equals("batt")) {
+            } else if (command.equals("battery") || command.equals("batt")) {
                 _batteryMonitor.sendBatteryInfos();
             } else if (command.equals("copy")) {
-                copyToClipboard(args);
+                if (args.length() > 0) {
+                    copyToClipboard(args);
+                } else {
+                    sendClipboard();
+                }
             } else if (command.equals("geo")) {
                 geo(args);
             } else if (command.equals("dial")) {
@@ -525,14 +449,14 @@ public class MainService extends Service implements XmppListener {
         builder.append("- " + makeBold("\"sms\"") + ": display last sent sms from all contact.\n");
         builder.append("- " + makeBold("\"sms:#contact#\"") + ": display last sent sms from searched contacts.\n");
         builder.append("- " + makeBold("\"sms:#contact#:#message#\"") + ": sends a sms to number with content message.\n");
-        builder.append("- " + makeBold("\"markAsRead:#contact#\"") + ": mark sms as read for last recipient or given contact.\n");
-        builder.append("- " + makeBold("\"mar:#contact#\"") + ": same as markAsRead command.\n");
+        builder.append("- " + makeBold("\"markAsRead:#contact#\"") + " or " + makeBold("\"mar\"") + ": mark sms as read for last recipient or given contact.\n");
+        builder.append("- " + makeBold("\"battery\"") + " or " + makeBold("\"batt\"") + ": show battery level in percent.\n");
         builder.append("- " + makeBold("\"calls\"") + ": display call log.\n");
         builder.append("- " + makeBold("\"contact:#contact#\"") + ": display informations of a searched contact.\n");
         builder.append("- " + makeBold("\"geo:#address#\"") + ": Open Maps or Navigation or Street view on specific address\n");
         builder.append("- " + makeBold("\"where\"") + ": sends you google map updates about the location of the phone until you send \"stop\"\n");
         builder.append("- " + makeBold("\"ring\"") + ": rings the phone until you send \"stop\"\n");
-        builder.append("- " + makeBold("\"copy:#text#\"") + ": copy text to clipboard\n");
+        builder.append("- " + makeBold("\"copy:#text#\"") + ": copy text to clipboard or sent phone clipboard if text is empty\n");
         builder.append("and you can paste links and open it with the appropriate app\n");
         send(builder.toString());
     }
@@ -583,6 +507,13 @@ public class MainService extends Service implements XmppListener {
                 send("No match for \"" + contact + "\"");
             }
         }
+    }
+    
+    /** Sends a sms to the specified phone number */
+    public void sendSMSByPhoneNumber(String message, String phoneNumber) {
+
+        _smsMonitor.sendSMSByPhoneNumber(message, phoneNumber);
+        _smsMgr.addSmsToSentBox(message, phoneNumber);
     }
 
     public void markSmsAsRead(String contact) {
@@ -780,6 +711,16 @@ public class MainService extends Service implements XmppListener {
         }
     }
 
+    /** copy text to clipboard */
+    public void sendClipboard() {
+        try {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Service.CLIPBOARD_SERVICE);
+            send("GPhone clipboard: " + clipboard.getText());
+        } catch (Exception ex) {
+            send("Clipboard access failed");
+        }
+    }
+
     /** lets the user choose an activity compatible with the url */
     private void openLink(String url) {
         Intent target = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -789,7 +730,7 @@ public class MainService extends Service implements XmppListener {
     }
 
     /** dial the specified contact */
-    public void dial(String contactInfo) {
+    private void dial(String contactInfo) {
         String number = null;
         String contact = null;
 

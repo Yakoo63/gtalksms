@@ -102,6 +102,11 @@
             android:title="@string/battery_state"
             android:summary="Battery state notification"/>
         <CheckBoxPreference
+            android:key="notifyBatteryInStatus"
+            android:defaultValue="true"
+            android:title="@string/battery_state_in_status"
+            android:summary="Battery state notification in presence status"/>
+        <CheckBoxPreference
             android:key="notifyIncomingSms"
             android:defaultValue="true"
             android:title="@string/incoming_sms"

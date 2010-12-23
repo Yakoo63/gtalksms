@@ -1,4 +1,5 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.receivers;
+
 
 
 

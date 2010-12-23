@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-public class BatteryMonitor {
+public abstract class BatteryMonitor {
 
-    BroadcastReceiver mBatInfoReceiver = null;
-    int lastPercentageNotified = -1;
+    BroadcastReceiver _batInfoReceiver = null;
+    int _lastPercentageNotified = -1;
     Context _context;
     SettingsManager _settings;
 
@@ -16,39 +16,40 @@ public class BatteryMonitor {
         _settings = settings;
         _context = baseContext;
 
-        mBatInfoReceiver = new BroadcastReceiver() {
+        _batInfoReceiver = new BroadcastReceiver() {
             
             @Override
             public void onReceive(Context arg0, Intent intent) {
                 int level = intent.getIntExtra("level", 0);
-                if (lastPercentageNotified == -1) {
+                if (_lastPercentageNotified == -1) {
                     notifyAndSavePercentage(level);
                 } else {
-                    if (level != lastPercentageNotified && level % _settings.batteryNotificationInterval == 0) {
+                    if (level != _lastPercentageNotified) {
                         notifyAndSavePercentage(level);
                     }
                 }
             }
 
             private void notifyAndSavePercentage(int level) {
-                lastPercentageNotified = level;                
-                if (_settings.notifyBattery) {
-                    sendBatteryInfos();
-                }
+                _lastPercentageNotified = level;                
+                sendBatteryInfos(level);
             }
         };
-        _context.registerReceiver(mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        _context.registerReceiver(_batInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
-    public void sendBatteryInfos() {
-        MainService.getInstance().send("Battery level " + lastPercentageNotified + "%");
+
+    void sendBatteryInfos() {
+        sendBatteryInfos(_lastPercentageNotified);
     }
+
+    abstract void sendBatteryInfos(int level);
 
     /** clear the battery monitor */
     public void clearBatteryMonitor() {
-        if (mBatInfoReceiver != null) {
-            _context.unregisterReceiver(mBatInfoReceiver);
+        if (_batInfoReceiver != null) {
+            _context.unregisterReceiver(_batInfoReceiver);
         }
-        mBatInfoReceiver = null;
+        _batInfoReceiver = null;
     }
 }

@@ -1,8 +1,15 @@
+1.2
+Add send clipboard (Phone => PC) by command & main screen button
+Add battery level in presence message
+Add exit command to remotely stop GTalkSMS
+Fix annoying multiple incoming call notification
+Stop ringing & GPS localization when loosing XMPP connection
+
 1.1
 Add connection status icon in application main panel
 
 1.0
-Add "markAsRead" command and mark sms as read on "reply" command
+Add "markAsRead" command and mark SMS as read on "reply" command
 Add "batt" command to show battery status
 Add preference to hide status icon in notification bar
 
@@ -13,8 +20,8 @@ Send message on closing if connection notifications are enabled
 Add calls commands that shows call logs
 
 0.3
-Add command "sms" without parameter that shows last sms from everyone
-Optimize sms read by limiting search results
+Add command "sms" without parameter that shows last SMS from everyone
+Optimize SMS read by limiting search results
 Add Widget support to XMPP connection
 
 0.2

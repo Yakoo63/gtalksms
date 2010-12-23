@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
-import com.googlecode.gtalksms.XmppListener;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.receivers.XmppListener;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class MainScreen extends Activity {
@@ -79,6 +79,16 @@ public class MainScreen extends Activity {
             public void onClick(View v) {
                 Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
                 startActivity(settingsActivity);
+            }
+        });
+        
+        Button clipboardBtn = (Button) findViewById(R.id.Clipboard);
+        clipboardBtn.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+                if (mainService != null ) {
+                    mainService.sendClipboard();
+                }
             }
         });
 

@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.googlecode.gtalksms.receivers.XmppListener;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppManager {
@@ -30,7 +31,8 @@ public class XmppManager {
 
     // Indicates the current state of the service (disconnected/connecting/connected)
     private int mStatus = DISCONNECTED;
-
+    private String presenceMessage = "GTalkSMS";
+    
     private ConnectionConfiguration mConnectionConfiguration = null;
     private XMPPConnection mConnection = null;
     private PacketListener mPacketListener = null;
@@ -198,7 +200,7 @@ public class XmppManager {
             send("Welcome to GTalkSMS " + Tools.getVersionName(_context, getClass()) + ". Send \"?\" for getting help");
         }
         Presence presence = new Presence(Presence.Type.available);
-        presence.setStatus("GTalkSMS");
+        presence.setStatus(presenceMessage);
         presence.setPriority(24);                   
         mConnection.sendPacket(presence);
     }
@@ -221,6 +223,17 @@ public class XmppManager {
             Message msg = new Message(_settings.mTo, Message.Type.chat);
             msg.setBody(message);
             mConnection.sendPacket(msg);
+        }
+    }
+    
+    public void setStatus(int batteryLevel) {
+        presenceMessage = "GTalkSMS - " + batteryLevel + "%";
+        
+        if (isConnected()) {
+            Presence presence = new Presence(Presence.Type.available);
+            presence.setStatus(presenceMessage);
+            presence.setPriority(24);                   
+            mConnection.sendPacket(presence);
         }
     }
 }

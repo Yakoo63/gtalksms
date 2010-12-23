@@ -24,6 +24,7 @@ public class SettingsManager {
     public String ringtone = null;
 
     // battery
+    public boolean notifyBatteryInStatus;
     public boolean notifyBattery;
     public int batteryNotificationInterval;
 
@@ -56,6 +57,7 @@ public class SettingsManager {
         showStatusIcon = prefs.getBoolean("showStatusIcon", true);
         notifyApplicationConnection = prefs.getBoolean("notifyApplicationConnection", true);
         notifyBattery = prefs.getBoolean("notifyBattery", true);
+        notifyBatteryInStatus = prefs.getBoolean("notifyBatteryInStatus", true);
         batteryNotificationInterval = Integer.valueOf(prefs.getString("batteryNotificationInterval", "10"));
         notifySmsSent = prefs.getBoolean("notifySmsSent", true);
         notifySmsDelivered = prefs.getBoolean("notifySmsDelivered", true);
