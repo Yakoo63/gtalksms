@@ -3,32 +3,42 @@ package com.googlecode.gtalksms.data.phone;
 import java.util.ArrayList;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CallLog;
 
-import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class PhoneManager {
 
+    Context _context;
+    SettingsManager _settings;
+
+    public PhoneManager(SettingsManager settings, Context baseContext) {
+        _settings = settings;
+        _context = baseContext;
+    }
+
     /** Dial a phone number */
-    public static Boolean Dial(String number) {
+    public Boolean Dial(String number) {
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + number));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            MainService.getInstance().startActivity(intent);
+            _context.startActivity(intent);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
     
-    public static ArrayList<Call> getPhoneLogs() {
+    
+    public ArrayList<Call> getPhoneLogs() {
         ArrayList<Call> res = new ArrayList<Call>();
 
-        ContentResolver resolver = MainService.getInstance().getContentResolver();
+        ContentResolver resolver = _context.getContentResolver();
         
         String[] projection = new String[] { CallLog.Calls.NUMBER, CallLog.Calls.TYPE, 
                 CallLog.Calls.DURATION, CallLog.Calls.DATE};

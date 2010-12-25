@@ -19,7 +19,7 @@ public class PhoneCallListener extends PhoneStateListener {
                 break;
             case TelephonyManager.CALL_STATE_RINGING:
                 MainService service = MainService.getInstance();
-                if (service != null || _manageIncoming) {
+                if (service != null && _manageIncoming) {
                     _manageIncoming = false;
                     service.OnIncomingCall(incomingNumber);
                 }

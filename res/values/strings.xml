@@ -3,6 +3,7 @@
     <string name="ringtone">Ring with</string>
     <string name="useSameAccount">useSameAccount</string>
     <string name="app_name">GTalkSMS</string>
+    <string name="about">About GTalkSMS</string>
     <string name="set_preferences">Preferences</string>
     <string name="server_host">Server host</string>
     <string name="server_port">Server port</string>

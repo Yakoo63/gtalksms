@@ -12,7 +12,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         
-        // Create an Intent to launch ExampleActivity
+        // Create an Intent to launch activity
         Intent intent = new Intent(".WidgetGTalkSMS.ACTION");
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

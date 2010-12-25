@@ -77,8 +77,15 @@ public class MainScreen extends Activity {
         prefBtn.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
-                Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
-                startActivity(settingsActivity);
+                startActivity(new Intent(getBaseContext(), Preferences.class));
+            }
+        });
+        
+        Button aboutBtn = (Button) findViewById(R.id.About);
+        aboutBtn.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+                startActivity(new Intent(getBaseContext(), About.class));
             }
         });
         
@@ -114,11 +121,19 @@ public class MainScreen extends Activity {
                 }
             }
         });
+        
+        updateConsole();
     }
     
     public void updateConsole() {
 //      TextView console = (TextView) findViewById(R.id.Console);
+//      console.setAutoLinkMask(Linkify.ALL);
 //      console.append("\n" + MainService.getInstance().getContactsList());
+//      console.setText("http://code.google.com/p/gtalksms");
+//      console.append("\n\nDonors\n");
+//      console.append(Web.DownloadFromUrl("http://gtalksms.googlecode.com/hg/Donors"));
+//      console.append("\n\nChange log\n");
+//      console.append(Web.DownloadFromUrl("http://gtalksms.googlecode.com/hg/Changelog"));
     }
   
     public void updateStatus(int status) {
@@ -142,7 +157,7 @@ public class MainScreen extends Activity {
     public void registerListener() {
         if (mainService != null) {
             mainService.setXmppListener(xmppListener);
-            updateConsole();
+            //updateConsole();
             updateStatus(mainService.getConnectionStatus());
         }
     }

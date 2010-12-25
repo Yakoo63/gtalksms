@@ -25,6 +25,30 @@ public class Tools {
         }
     }
     
+    public static String getVersion(Context context, Class<?> cls) {
+
+        try {
+            ComponentName comp = new ComponentName(context, cls);
+            PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
+
+            return pinfo.versionName;
+        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+            return "";
+        }
+    }
+    
+    public static String getVersionCode(Context context, Class<?> cls) {
+
+        try {
+            ComponentName comp = new ComponentName(context, cls);
+            PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
+
+            return "" + pinfo.versionCode;
+        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+            return "";
+        }
+    }
+    
     public static <T> List<T> getLastElements(ArrayList<T> list, int nbElems) {
         return list.subList(Math.max(list.size() - nbElems, 0), list.size());
     }

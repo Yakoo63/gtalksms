@@ -23,6 +23,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.googlecode.gtalksms.data.contacts.Contact;
 import com.googlecode.gtalksms.data.contacts.ContactAddress;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
@@ -48,6 +49,7 @@ public class MainService extends Service implements XmppListener {
     private XmppManager _xmppMgr;
     private XmppListener _xmppListener = null;
     private SmsMmsManager _smsMgr;
+    private PhoneManager _phoneMgr;
     private GeoManager _geoMgr;
 
     private BatteryMonitor _batteryMonitor;
@@ -68,6 +70,13 @@ public class MainService extends Service implements XmppListener {
     private Object[] mStopForegroundArgs = new Object[1];
     private PendingIntent contentIntent = null;
 
+    // This is the object that receives interactions from clients.  See
+    // RemoteService for a more complete example.
+    private final IBinder mBinder = new LocalBinder();
+
+    GoogleAnalyticsTracker _gAnalytics;
+
+    
     public void setXmppListener(XmppListener listener) {
         _xmppListener = listener;
     }
@@ -239,10 +248,6 @@ public class MainService extends Service implements XmppListener {
         return mBinder;
     }
 
-    // This is the object that receives interactions from clients.  See
-    // RemoteService for a more complete example.
-    private final IBinder mBinder = new LocalBinder();
-
     @Override
     public void onStart(Intent intent, int startId) {
         
@@ -250,6 +255,18 @@ public class MainService extends Service implements XmppListener {
         if (instance == null) {
             instance = this;
 
+            _gAnalytics = GoogleAnalyticsTracker.getInstance();
+            _gAnalytics.setProductVersion(
+                    Tools.getVersion(getBaseContext(), getClass()), 
+                    Tools.getVersionCode(getBaseContext(), getClass()));
+            _gAnalytics.start("UA-20245441-1", this);
+            _gAnalytics.trackEvent(
+                    "GTalkSMS",  // Category
+                    "Service",  // Action
+                    "Start " + Tools.getVersionName(getBaseContext(), getClass()), // Label
+                    0);       // Value      
+            _gAnalytics.dispatch();
+            
             _settingsMgr.importPreferences(getBaseContext());
             if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
                 Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
@@ -264,6 +281,7 @@ public class MainService extends Service implements XmppListener {
             _mediaMgr = new MediaManager(_settingsMgr, getBaseContext());
             _geoMgr = new GeoManager(_settingsMgr, getBaseContext());
             _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
+            _phoneMgr = new PhoneManager(_settingsMgr, getBaseContext());
             _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext()) {
                 void sendBatteryInfos(int level) {
                     if (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0) {
@@ -297,19 +315,19 @@ public class MainService extends Service implements XmppListener {
 
     @Override
     public void onDestroy() {
+        _gAnalytics.stop();
+        stopForegroundCompat(XmppManager.DISCONNECTED);
+
+        instance = null;
+        Toast.makeText(this, "GTalkSMS stopped", Toast.LENGTH_SHORT).show();
+
         stopNotifications();
+        _xmppMgr.stop();
         
         _geoMgr.stopLocatingPhone();
         _mediaMgr.clearMediaPlayer();
         _smsMonitor.clearSmsMonitor();
-        _xmppMgr.stop();
         _batteryMonitor.clearBatteryMonitor();
-
-        stopForegroundCompat(XmppManager.DISCONNECTED);
-
-        instance = null;
-
-        Toast.makeText(this, "GTalkSMS stopped", Toast.LENGTH_SHORT).show();
     }
 
     public void send(String msg) {
@@ -611,7 +629,7 @@ public class MainService extends Service implements XmppListener {
     /** reads last Call Logs from all contacts */
     public void readCallLogs() {
 
-        ArrayList<Call> arrayList = PhoneManager.getPhoneLogs();
+        ArrayList<Call> arrayList = _phoneMgr.getPhoneLogs();
         StringBuilder all = new StringBuilder();
 
         List<Call> callList = Tools.getLastElements(arrayList, _settingsMgr.callLogsNumber);
@@ -756,7 +774,7 @@ public class MainService extends Service implements XmppListener {
 
         if (number != null) {
             send("Dial " + contact + " (" + number + ")");
-            if (!PhoneManager.Dial(number)) {
+            if (!_phoneMgr.Dial(number)) {
                 send("Error can't dial.");
             }
         }
