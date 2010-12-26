@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -21,6 +22,7 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.receivers.XmppListener;
+import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class MainScreen extends Activity {
@@ -71,7 +73,7 @@ public class MainScreen extends Activity {
         setContentView(R.layout.main);
 
         TextView label = (TextView) findViewById(R.id.VersionLabel);
-        label.setText("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()));
+        label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()), Typeface.BOLD));
 
         mainService = MainService.getInstance();
         registerListener();
