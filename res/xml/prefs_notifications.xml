@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  android:title="@string/notification_settings"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:title="@string/application_connection"
+        android:key="notifyApplicationConnection"
+        android:summary="Phone reconnect notification"/>
+    <CheckBoxPreference
+        android:key="notifyBattery"
+        android:defaultValue="true"
+        android:title="@string/battery_state"
+        android:summary="Battery state notification"/>
+    <ListPreference
+        android:title="Battery notification interval"
+        android:key="batteryNotificationInterval"
+        android:summary="This preference allows to set the battery notification interval in percents"
+        android:defaultValue="10"
+        android:entries="@array/list_bat_notif_interval"
+        android:entryValues="@array/list_bat_notif_interval"/>
+    <CheckBoxPreference
+        android:key="notifyBatteryInStatus"
+        android:defaultValue="true"
+        android:title="@string/battery_state_in_status"
+        android:summary="Battery state notification in presence status"/>
+    <CheckBoxPreference
+        android:key="notifyIncomingSms"
+        android:defaultValue="true"
+        android:title="@string/incoming_sms"
+        android:summary="Incoming SMS notification"/>
+    <CheckBoxPreference
+        android:key="notifyIncomingCalls"
+        android:defaultValue="true"
+        android:title="@string/incoming_calls"
+        android:summary="Incoming call notification"/>
+    <CheckBoxPreference
+        android:key="notifySmsSent"
+        android:defaultValue="true"
+        android:title="@string/sms_sent"
+        android:summary="SMS sent notification"/>
+    <CheckBoxPreference
+        android:key="notifySmsDelivered"
+        android:defaultValue="true"
+        android:title="@string/sms_delivered"
+        android:summary="SMS delivery notification"/>
+</PreferenceScreen>

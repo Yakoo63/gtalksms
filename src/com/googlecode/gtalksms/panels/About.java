@@ -1,11 +1,14 @@
 package com.googlecode.gtalksms.panels;
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.util.Linkify;
+import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
 import android.widget.TextView;
 
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.tools.Web;
 
@@ -23,18 +26,25 @@ public class About extends Activity {
         setContentView(R.layout.about);
 
         TextView label = (TextView) findViewById(R.id.VersionLabel);
-        label.setText("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()));
+        label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()), Typeface.BOLD));
 
         updateConsole();
     }
     
     public void updateConsole() {
       TextView console = (TextView) findViewById(R.id.Text);
-      console.setAutoLinkMask(Linkify.ALL);
-      console.setText("Website: http://code.google.com/p/gtalksms");
-      console.append("\n\nDonors\n");
+      console.setText("");
+      console.append(StringFmt.Fmt("Website\n", 0xFFFF0000, 1.5, Typeface.BOLD));
+      console.append(StringFmt.Url("http://code.google.com/p/gtalksms"));
+      console.append(StringFmt.Fmt("\n\nDonors\n", 0xFFFF0000, 1.5, Typeface.BOLD));
       console.append(Web.DownloadFromUrl("http://gtalksms.googlecode.com/hg/Donors"));
-      console.append("\n\nChange log\n");
+      console.append(StringFmt.Fmt("\n\nChange log\n", 0xFFFF0000, 1.5, Typeface.BOLD));
       console.append(Web.DownloadFromUrl("http://gtalksms.googlecode.com/hg/Changelog"));
+      
+      MovementMethod m = console.getMovementMethod();
+      if ((m == null) || !(m instanceof LinkMovementMethod))
+      {
+          console.setMovementMethod(LinkMovementMethod.getInstance());
+      }
     }
 }

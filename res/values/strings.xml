@@ -21,9 +21,10 @@
     <string name="application_connection">Application connection</string>
     <string name="sms_sent">SMS sent</string>
     <string name="sms_delivered">SMS delivered</string>
-    <string name="notify_me_on">Notify me on</string>
+    <string name="notification_settings">Notification settings</string>
     <string name="connection_settings">Connection settings</string>
-    <string name="additional_settings">Additional settings</string>
+    <string name="application_settings">Application settings</string>
+    <string name="server_settings">Server settings</string>
     <string name="notified_address">Address to notify</string>
     <string name="use_different_account">Use a different account</string>
     <string name="show_sent_sms">Show sent SMS</string>
