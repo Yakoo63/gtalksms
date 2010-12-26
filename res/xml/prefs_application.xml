@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  android:title="@string/application_settings"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="startAtBoot"
+            android:title="@string/start_at_boot"
+            android:summary="Check if you want TalkMyPhone to start at boot"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="showStatusIcon"
+            android:title="@string/show_status_icon"
+            android:summary="Check if you want to see TalkMyPhone status icon in notification bar"/>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="formatResponses"
+            android:title="@string/format_responses"
+            android:summary="Check if you want to format responses with bold and italic, doesn't work with all Xmpp clients"/>
+        <com.googlecode.gtalksms.tools.EditIntegerPreference
+            android:key="smsNumber"
+            android:numeric="integer"
+            android:defaultValue="5"
+            android:title="@string/sms_number" android:summary="Number of SMS to show"/>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="showSentSms"
+            android:title="@string/show_sent_sms"
+            android:summary="Check if you want to see sent sms"/>
+        <com.googlecode.gtalksms.tools.EditIntegerPreference
+            android:key="callLogsNumber"
+            android:numeric="integer"
+            android:defaultValue="10"
+            android:title="@string/call_logs_number" android:summary="Number of call logs to show"/>
+        <RingtonePreference
+            android:title="@string/ringtone"
+            android:key="ringtone"
+            android:summary="Ringtone to use with the ring command"/>
+</PreferenceScreen>

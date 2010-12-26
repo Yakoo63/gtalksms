@@ -8,6 +8,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -77,7 +80,7 @@ public class MainScreen extends Activity {
         prefBtn.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
-                startActivity(new Intent(getBaseContext(), Preferences.class));
+                openOptionsMenu();
             }
         });
         
@@ -161,4 +164,35 @@ public class MainScreen extends Activity {
             updateStatus(mainService.getConnectionStatus());
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.preferences_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        int prefs_id;
+        switch (item.getItemId()) {
+        case R.id.connection_settings:
+            prefs_id = R.xml.prefs_connection;
+            break;
+        case R.id.notification_settings:
+            prefs_id = R.xml.prefs_notifications;
+            break;
+        case R.id.application_settings:
+            prefs_id = R.xml.prefs_application;
+            break;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+        Intent intent = new Intent(MainScreen.this, Preferences.class);
+        intent.putExtra("panel", prefs_id);
+        startActivity(intent);
+        return true;
+    }
+
 }
