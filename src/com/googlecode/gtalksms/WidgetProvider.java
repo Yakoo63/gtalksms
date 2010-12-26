@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import com.googlecode.gtalksms.R;
+
 public class WidgetProvider extends AppWidgetProvider {
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {

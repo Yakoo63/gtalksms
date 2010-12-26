@@ -184,10 +184,15 @@ public class MainService extends Service implements XmppListener {
             return;
         }
 
-        // Fall back on the old API. Note to cancel BEFORE changing the
-        // foreground state, since we could be killed at that point.
-        mNM.cancel(id);
-        setForeground(false);
+        try {
+            // Fall back on the old API. Note to cancel BEFORE changing the
+            // foreground state, since we could be killed at that point.
+            mNM.cancel(id);
+            setForeground(false);
+        } catch (Exception e) {
+            // Should not happen.
+            Log.w(Tools.LOG_TAG, "Unable to invoke stopForeground", e);
+        }
     }
 
     /**
@@ -273,6 +278,7 @@ public class MainService extends Service implements XmppListener {
             if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
                 Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
                 Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
+                settingsActivity.putExtra("panel", R.xml.prefs_connection);
                 settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(settingsActivity);
                 instance = null;
