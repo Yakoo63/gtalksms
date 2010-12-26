@@ -57,6 +57,8 @@ public class MainService extends Service implements XmppListener {
     
     // last person who sent sms/who we sent an sms to
     public String _lastRecipient = null;
+    
+    private boolean _hasOutgoingAction = false;
 
     // notification stuff
     @SuppressWarnings("unchecked")
@@ -480,11 +482,13 @@ public class MainService extends Service implements XmppListener {
     }
 
     public void geoLocate() {
+        _hasOutgoingAction = true;
         send("Start locating phone");
         _geoMgr.startLocatingPhone();
     }
 
     public void ring() {
+        _hasOutgoingAction = true;
         send("Ringing phone");
         if (!_mediaMgr.ring()) {
             send("Unable to ring, change the ringtone in the options");
@@ -492,7 +496,10 @@ public class MainService extends Service implements XmppListener {
     }
 
     public void stopNotifications() {
-        send("Stopping ongoing actions");
+        if (_hasOutgoingAction) {
+            send("Stopping ongoing actions");
+        }
+        _hasOutgoingAction = false;
         _geoMgr.stopLocatingPhone();
         _mediaMgr.stopRinging();
     }

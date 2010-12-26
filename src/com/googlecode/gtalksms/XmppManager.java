@@ -55,8 +55,6 @@ public class XmppManager {
     public void start() {
         mConnectionConfiguration = new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName);
 
-        updateStatus(DISCONNECTED);
-
         mCurrentRetryCount = 0;
         mReconnectRunnable = new Runnable() {
             public void run() {
@@ -127,7 +125,7 @@ public class XmppManager {
     private void initConnection() {
         updateStatus(CONNECTING);
         NetworkInfo active = ((ConnectivityManager)_context.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        if (active==null || !active.isAvailable()) {
+        if (active == null || !active.isAvailable()) {
             Log.e(Tools.LOG_TAG, "connection request, but no network available");
             Toast.makeText(_context, "Waiting for network to become available.", Toast.LENGTH_SHORT).show();
             // we don't destroy the service here - our network receiver will notify us when
@@ -161,7 +159,7 @@ public class XmppManager {
             // authoritative login errors (ie, bad password).  The only
             // differentiator is the message itself which starts with this
             // hard-coded string.
-            if (e.getMessage().indexOf("SASL authentication")==-1) {
+            if (e.getMessage().indexOf("SASL authentication") == -1) {
                 // doesn't look like a bad username/password, so retry
                 Toast.makeText(_context, "Login failed", Toast.LENGTH_SHORT).show();
                 maybeStartReconnect();

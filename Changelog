@@ -1,6 +1,7 @@
 1.3
 * Add about panel with donors list & change logs
 * Split preferences in three panels
+* Open http links with GTalkSMS by sending urls
 
 1.2
 * Add send clipboard (Phone => PC) by command & main screen button
