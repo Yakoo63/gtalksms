@@ -8,5 +8,6 @@
           android:icon="@drawable/icon_green"
           android:title="@string/application_settings" />
     <item android:id="@+id/notification_settings"
+          android:icon="@android:drawable/ic_menu_info_details"
           android:title="@string/notification_settings" />
 </menu>
