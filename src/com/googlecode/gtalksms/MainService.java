@@ -291,8 +291,10 @@ public class MainService extends Service implements XmppListener {
             _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
             _phoneMgr = new PhoneManager(_settingsMgr, getBaseContext());
             _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext()) {
-                void sendBatteryInfos(int level) {
-                    if (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0) {
+                void sendBatteryInfos(int level, boolean force) {
+                    if (force) {
+                        send("Battery level " + level + "%");
+                    } else if (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0) {
                         send("Battery level " + level + "%");
                     }
                     if (_settings.notifyBatteryInStatus && _xmppMgr != null) {
@@ -402,7 +404,7 @@ public class MainService extends Service implements XmppListener {
             } else if (command.equals("calls")) {
                 readCallLogs();
             } else if (command.equals("battery") || command.equals("batt")) {
-                _batteryMonitor.sendBatteryInfos();
+                _batteryMonitor.sendBatteryInfos(true);
             } else if (command.equals("copy")) {
                 if (args.length() > 0) {
                     copyToClipboard(args);

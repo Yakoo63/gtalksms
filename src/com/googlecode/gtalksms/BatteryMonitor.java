@@ -32,18 +32,18 @@ public abstract class BatteryMonitor {
 
             private void notifyAndSavePercentage(int level) {
                 _lastPercentageNotified = level;                
-                sendBatteryInfos(level);
+                sendBatteryInfos(level, false);
             }
         };
         _context.registerReceiver(_batInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
 
-    void sendBatteryInfos() {
-        sendBatteryInfos(_lastPercentageNotified);
+    void sendBatteryInfos(boolean force) {
+        sendBatteryInfos(_lastPercentageNotified, force);
     }
 
-    abstract void sendBatteryInfos(int level);
+    abstract void sendBatteryInfos(int level, boolean force);
 
     /** clear the battery monitor */
     public void clearBatteryMonitor() {
