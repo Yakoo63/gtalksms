@@ -66,7 +66,8 @@ public class XmppManager {
             }
         };
         
-        mReconnectHandler.postDelayed(mReconnectRunnable, 10);
+        initConnection();
+ //              mReconnectHandler.postDelayed(mReconnectRunnable, 10);
     }
     
     public void stop() {

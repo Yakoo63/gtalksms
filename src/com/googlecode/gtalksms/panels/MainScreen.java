@@ -119,10 +119,11 @@ public class MainScreen extends Activity {
                     try {
                         unbindService(mainServiceConnection);
                     } catch(Exception e) {
-                        Log.w("unbinding service error", e);
-                        mainService = null;
+                        Log.w(Tools.LOG_TAG,"unbinding service error" + e);
                     }
                     stopService(intent);
+                    mainService = null;
+                    statusImg.setImageResource(R.drawable.led_red);
                 }
             }
         });

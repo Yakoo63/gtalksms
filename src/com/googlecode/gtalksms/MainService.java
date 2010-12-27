@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.location.Address;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.text.ClipboardManager;
 import android.util.Log;
@@ -292,9 +291,7 @@ public class MainService extends Service implements XmppListener {
             _phoneMgr = new PhoneManager(_settingsMgr, getBaseContext());
             _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext()) {
                 void sendBatteryInfos(int level, boolean force) {
-                    if (force) {
-                        send("Battery level " + level + "%");
-                    } else if (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0) {
+                    if (force || (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0)) {
                         send("Battery level " + level + "%");
                     }
                     if (_settings.notifyBatteryInStatus && _xmppMgr != null) {
@@ -309,31 +306,25 @@ public class MainService extends Service implements XmppListener {
                 }
             };
             
-            Runnable asyncInit = new Runnable() {
-                public void run() {
-                    initNotificationStuff();
-                    _mediaMgr.initMediaPlayer();
-                    Log.i(Tools.LOG_TAG, "Starting xmpp.");
-                    _xmppMgr.start();
-                }
-            };
-            
-            // Async start to release UI lock
-            new Handler().postDelayed(asyncInit, 50);
+            initNotificationStuff();
+            _mediaMgr.initMediaPlayer();
+            Log.i(Tools.LOG_TAG, "Starting xmpp.");
+            _xmppMgr.start();
         }
     };
 
     @Override
     public void onDestroy() {
         _gAnalytics.stop();
-        stopForegroundCompat(XmppManager.DISCONNECTED);
-
+        
         instance = null;
         Toast.makeText(this, "GTalkSMS stopped", Toast.LENGTH_SHORT).show();
 
         stopNotifications();
         _xmppMgr.stop();
-        
+
+        stopForegroundCompat(XmppManager.DISCONNECTED);
+
         _geoMgr.stopLocatingPhone();
         _mediaMgr.clearMediaPlayer();
         _smsMonitor.clearSmsMonitor();
