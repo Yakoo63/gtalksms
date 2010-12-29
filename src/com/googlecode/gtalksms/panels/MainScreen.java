@@ -10,7 +10,6 @@ import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +33,7 @@ public class MainScreen extends Activity {
     private ServiceConnection mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mainService = ((MainService.LocalBinder)service).getService();
+            updateStatus(mainService.getConnectionStatus());
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -44,9 +44,11 @@ public class MainScreen extends Activity {
     @Override
     public void onPause() {
         super.onPause();
+        unbindService(mainServiceConnection);
         unregisterReceiver(xmppreceiver);
     }
 
+    @Override
     public void onResume() {
         super.onResume();
         xmppreceiver = new BroadcastReceiver() {
@@ -65,9 +67,8 @@ public class MainScreen extends Activity {
         IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_PRESENCE_CHANGED);
         intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
         registerReceiver(xmppreceiver, intentFilter);
-        MainService inst = MainService.getInstance();
-        if (inst != null)
-            updateStatus(inst.getConnectionStatus());
+        Intent intent = new Intent(".GTalkSMS.ACTION");
+        bindService(intent, mainServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     /** Called when the activity is first created. */
@@ -108,30 +109,13 @@ public class MainScreen extends Activity {
         Button startStopButton = (Button) findViewById(R.id.StartStop);
         startStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(".GTalkSMS.ACTION");
-                ImageView statusImg = (ImageView) findViewById(R.id.StatusImage);
-                statusImg.setImageResource(R.drawable.led_orange);
-                
-                if (MainService.getInstance() == null) {
-                    bindService(intent, mainServiceConnection, Context.BIND_AUTO_CREATE);
-                    startService(intent);
-                }
-                else {
-                    try {
-                        unbindService(mainServiceConnection);
-                    } catch(Exception e) {
-                        Log.w(Tools.LOG_TAG,"unbinding service error" + e);
-                    }
-                    stopService(intent);
-                    mainService = null;
-                    statusImg.setImageResource(R.drawable.led_red);
-                }
+                startService(MainService.newSvcIntent(MainScreen.this, ".GTalkSMS.TOGGLE"));
             }
         });
         
         updateConsole();
     }
-    
+
     public void updateConsole() {
 //      TextView console = (TextView) findViewById(R.id.Console);
 //      console.setAutoLinkMask(Linkify.ALL);
@@ -154,6 +138,7 @@ public class MainScreen extends Activity {
                 break;
             case XmppManager.CONNECTING:
             case XmppManager.DISCONNECTING:
+            case XmppManager.WAITING_TO_CONNECT:
                 statusImg.setImageResource(R.drawable.led_orange);
                 break;
             default:

@@ -24,18 +24,15 @@ public class UrlActivity extends Activity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         
-        MainService service = MainService.getInstance();
-        if (service != null) {
-            // To get the data use
-            Uri data = intent.getData();
-            URL url;
-            try {
-                url = new URL(data.getScheme(), data.getHost(), data.getPath());
+        // To get the data use
+        Uri data = intent.getData();
+        URL url;
+        try {
+            url = new URL(data.getScheme(), data.getHost(), data.getPath());
 
-                service.send(url.toString());
-            } catch (Exception e) {
-                service.send("failed");
-            }
+            MainService.send(this, url.toString());
+        } catch (Exception e) {
+            MainService.send(this, "failed: " + e.toString());
         }
         finish();
     }

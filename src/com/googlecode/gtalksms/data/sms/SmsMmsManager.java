@@ -65,7 +65,7 @@ public class SmsMmsManager {
             sms.number = Tools.getString(c, "address");
             sms.message = Tools.getString(c, "body");
             if (sender == null) {
-                sms.sender = ContactsManager.getContactName(Tools.getLong(c, "person"));
+                sms.sender = ContactsManager.getContactName(_context, Tools.getLong(c, "person"));
             } else {
                 sms.sender = sender;
             }

@@ -88,11 +88,7 @@ public class LocationService extends Service {
         builder.append("altitude: " + location.getAltitude() + " ");
         builder.append("speed: " + location.getSpeed() + "m/s ");
         builder.append("provider: " + location.getProvider() + ")");
-        
-        MainService service = MainService.getInstance();
-        if (service != null) {
-            service.send(builder.toString());
-        }
+        MainService.send(this, builder.toString());
     }
 
     public void onStart(final Intent intent, int startId) {
@@ -134,10 +130,7 @@ public class LocationService extends Service {
             if (location != null) {
                 if (isBetterLocation(location, currentBestLocation)) {
                     currentBestLocation = location;
-                    MainService service = MainService.getInstance();
-                    if (service != null) {
-                        service.send("Last known location");
-                    }
+                    MainService.send(this, "Last known location");
                     sendLocationUpdate(currentBestLocation);
                 }
             }

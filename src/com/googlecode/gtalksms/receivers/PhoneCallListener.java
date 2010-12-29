@@ -4,8 +4,14 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.data.contacts.ContactsManager;
 
 public class PhoneCallListener extends PhoneStateListener {
+    public PhoneCallListener(MainService svc) {
+        super();
+        _svc = svc;
+    }
+    private MainService _svc;
     
     static boolean _manageIncoming = true;
     
@@ -18,10 +24,10 @@ public class PhoneCallListener extends PhoneStateListener {
                 _manageIncoming = true;
                 break;
             case TelephonyManager.CALL_STATE_RINGING:
-                MainService service = MainService.getInstance();
-                if (service != null && _manageIncoming) {
+                if (_manageIncoming) {
                     _manageIncoming = false;
-                    service.OnIncomingCall(incomingNumber);
+                    String contact = ContactsManager.getContactName(_svc, incomingNumber);
+                    _svc.send(contact + " is calling");
                 }
                 break;
         }

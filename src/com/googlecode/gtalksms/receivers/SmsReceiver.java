@@ -22,8 +22,7 @@ public class SmsReceiver extends BroadcastReceiver {
         SmsMessage[] msgs = null;
         
         if (bundle != null)  {
-            MainService service = MainService.getInstance();
-            if (service != null) {
+            if (MainService.running) {
                 Object[] pdus = (Object[]) bundle.get("pdus");                
                 int nbrOfpdus = pdus.length;
                 msgs = new SmsMessage[nbrOfpdus];
@@ -43,7 +42,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
                         StringBuilder builder = new StringBuilder();    // Build string  
                         builder.append("SMS from ");
-                        builder.append(ContactsManager.getContactName(msgs[i].getOriginatingAddress()));
+                        builder.append(ContactsManager.getContactName(context, msgs[i].getOriginatingAddress()));
                         builder.append(": ");
                         builder.append(msgs[i].getMessageBody().toString());
                         // Save string into associative array with sendernumber as index
@@ -58,9 +57,10 @@ public class SmsReceiver extends BroadcastReceiver {
 
                 // Finally, send all SMS via XMPP by sender
                 for(String sender : senders) {
-                    service.OnReceivedSms(sender, msg.get(sender) + "\n");
+                    Intent svcintent = MainService.newSvcIntent(context, ".GTalkSMS.SMS_RECEIVED", msg.get(sender) + "\n");
+                    svcintent.putExtra("sender", sender);
+                    context.startService(svcintent);
                 }
-
             }
         }
     }

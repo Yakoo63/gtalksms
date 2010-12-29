@@ -19,7 +19,11 @@ import android.content.IntentFilter;
 import android.location.Address;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.ClipboardManager;
@@ -44,9 +48,10 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class MainService extends Service {
 
-    // Service instance
-    private static MainService instance = null;
-
+    // A bit of a hack to allow global receivers to know whether or not
+    // the service is running, and therefore whether to tell the service
+    // about some events
+    public static boolean running = false;
     private SettingsManager _settingsMgr = new SettingsManager();
 
     private MediaManager _mediaMgr;
@@ -83,17 +88,92 @@ public class MainService extends Service {
 
     GoogleAnalyticsTracker _gAnalytics;
 
-    
+    // some stuff for the async service implementation - borrowed heavily from
+    // the standard IntentService, but that class doesn't offer fine enough
+    // control for "foreground" services.
+    private volatile Looper mServiceLooper;
+    private volatile ServiceHandler mServiceHandler;
+    private final class ServiceHandler extends Handler {
+        public ServiceHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            onHandleIntent((Intent)msg.obj, msg.arg1);
+        }
+    }
+
+    // The IntentService(-like) implementation manages taking the
+    // intents passed to startService and delivering them to
+    // this function which runs in its own thread (so can block 
+    // Pretty-much everything using the _xmppMgr is here...
+    protected void onHandleIntent(final Intent intent, int id) {
+        String a = intent.getAction();
+        Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + getConnectionStatus());
+        if (a.equals(".GTalkSMS.ACTION")) {
+            // a simple 'connect' request.
+            if (_xmppMgr == null) {
+                xmppStart();
+            }
+        } else if (a.equals(".GTalkSMS.TOGGLE")) {
+            switch (getConnectionStatus()) {
+            case XmppManager.CONNECTED:
+            case XmppManager.WAITING_TO_CONNECT:
+                xmppStop();
+                assert getConnectionStatus()==XmppManager.DISCONNECTED;
+                break;
+            case XmppManager.DISCONNECTED:
+                xmppStart();
+                break;
+            default:
+                Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ getConnectionStatus());
+                break;
+            }
+        } else if (a.equals(".GTalkSMS.SEND")) {
+            if (getConnectionStatus()==XmppManager.CONNECTED) {
+                _xmppMgr.send(intent.getStringExtra("message"));
+            }
+        } else if (a.equals(".GTalkSMS.SMS_RECEIVED")) {
+            if (getConnectionStatus()==XmppManager.CONNECTED) {
+                _xmppMgr.send(intent.getStringExtra("message")); 
+                setLastRecipient(intent.getStringExtra("sender"));
+            }
+        } else if (a.equals(".GTalkSMS.NETWORK_CHANGED")) {
+            boolean available = intent.getBooleanExtra("available", true);
+            if (!available && _xmppMgr != null && _xmppMgr.isConnected()) {
+                // tell the manager to disconnect, then enter the WAITING_TO_CONNECT
+                // state instead of DISCONNECTED.
+                xmppStop(XmppManager.WAITING_TO_CONNECT);
+            }
+            if (available && getConnectionStatus()==XmppManager.WAITING_TO_CONNECT) {
+                xmppStart();
+            }
+        } else {
+            Log.w(Tools.LOG_TAG, "Unexpected intent: " + a);
+        }
+        Log.d(Tools.LOG_TAG, "handled action '" + a + "' - state now " + getConnectionStatus());
+        // stop the service if we are disconnected (but stopping the service
+        // doesn't mean the process is terminated - onStart can still happen.)
+        if (getConnectionStatus()==XmppManager.DISCONNECTED) {
+            if (stopSelfResult(id)==true) {
+                Log.d(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
+            } else {
+                Log.d(Tools.LOG_TAG, "more pending intents to be delivered - service will not stop");
+            }
+        }
+    }
+
     /** Updates the status about the service state (and the status bar) */
     public void onConnectionStatusChanged(int oldStatus, int status) {
         // Get the layout for the AppWidget and attach an on-click listener to the button
+        // XXX - note this is now called by a generic broadcast receiver - so the widget
+        // specific stuff below could probably be moved into the widget itself (assuming
+        // that widget is also configured to see the status-changed broadcasts)
         RemoteViews views = new RemoteViews(getPackageName(), R.layout.appwidget);
 
         Notification notification = new Notification();
         switch (status) {
-            case XmppManager.EXIT:
-                onDestroy();
-                return;
             case XmppManager.CONNECTED:
                 notification = new Notification(R.drawable.status_green, "Connected", System.currentTimeMillis());
                 notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Connected", contentIntent);
@@ -112,6 +192,11 @@ public class MainService extends Service {
             case XmppManager.DISCONNECTING:
                 notification = new Notification(R.drawable.status_orange, "Disconnecting...", System.currentTimeMillis());
                 notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Disconnecting...", contentIntent);
+                views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
+                break;
+            case XmppManager.WAITING_TO_CONNECT:
+                notification = new Notification(R.drawable.status_orange, "Waiting...", System.currentTimeMillis());
+                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Waiting to connect...", contentIntent);
                 views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
                 break;
             default:
@@ -202,34 +287,10 @@ public class MainService extends Service {
         contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
     }
 
-    public boolean isConnected() {
-        if (_xmppMgr != null) {
-            return _xmppMgr.isConnected();
-        }
-        
-        return false;
-    }
-
     public int getConnectionStatus() {
-        if (_xmppMgr != null) {
-            return _xmppMgr.getConnectionStatus();
-        }
-        
-        return XmppManager.DISCONNECTED;
+        return _xmppMgr==null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
     }
 
-    public void stopConnection() {
-        stopNotifications();
-        _xmppMgr.stop();
-    }
-
-    public void startConnection() {
-        _xmppMgr.start();
-    }
-    
-    public static MainService getInstance() {
-        return instance;
-    }
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -248,114 +309,167 @@ public class MainService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        HandlerThread thread = new HandlerThread("GTalkSMS.Service");
+        thread.start();
+        mServiceLooper = thread.getLooper();
+        mServiceHandler = new ServiceHandler(mServiceLooper);
+        initNotificationStuff();
+        Log.i(Tools.LOG_TAG, "service created");
+        running = true;
+    }
+
+    @Override
     public void onStart(Intent intent, int startId) {
+        Message msg = mServiceHandler.obtainMessage();
+        msg.arg1 = startId;
+        msg.obj = intent;
+        mServiceHandler.sendMessage(msg);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        onStart(intent, startId);
+        return START_STICKY;
+    }
+
+    private void xmppStart() {
+        _gAnalytics = GoogleAnalyticsTracker.getInstance();
+        _gAnalytics.setProductVersion(
+                Tools.getVersion(getBaseContext(), getClass()), 
+                Tools.getVersionCode(getBaseContext(), getClass()));
+        _gAnalytics.start("UA-20245441-1", this);
+        _gAnalytics.trackEvent(
+                "GTalkSMS",  // Category
+                "Service",  // Action
+                "Start " + Tools.getVersionName(getBaseContext(), getClass()), // Label
+                0);       // Value      
+        _gAnalytics.dispatch();
         
-        // Get configuration
-        if (instance == null) {
-            instance = this;
-
-            _gAnalytics = GoogleAnalyticsTracker.getInstance();
-            _gAnalytics.setProductVersion(
-                    Tools.getVersion(getBaseContext(), getClass()), 
-                    Tools.getVersionCode(getBaseContext(), getClass()));
-            _gAnalytics.start("UA-20245441-1", this);
-            _gAnalytics.trackEvent(
-                    "GTalkSMS",  // Category
-                    "Service",  // Action
-                    "Start " + Tools.getVersionName(getBaseContext(), getClass()), // Label
-                    0);       // Value      
-            _gAnalytics.dispatch();
-            
-            _settingsMgr.importPreferences(getBaseContext());
-            if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
-                Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
-                Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
-                settingsActivity.putExtra("panel", R.xml.prefs_connection);
-                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(settingsActivity);
-                instance = null;
-                return;
-            }
-
-            _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
-            _mediaMgr = new MediaManager(_settingsMgr, getBaseContext());
-            _geoMgr = new GeoManager(_settingsMgr, getBaseContext());
-            _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
-            _phoneMgr = new PhoneManager(_settingsMgr, getBaseContext());
-            _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext()) {
-                void sendBatteryInfos(int level, boolean force) {
-                    if (force || (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0)) {
-                        send("Battery level " + level + "%");
-                    }
-                    if (_settings.notifyBatteryInStatus && _xmppMgr != null) {
-                        _xmppMgr.setStatus(level);
-                    }
-                }
-            };
-            
-            _smsMonitor = new SmsMonitor(_settingsMgr, getBaseContext()) {
-                void sendSmsStatus(String message) {
-                    send(message);
-                }
-            };
-
-            if (_settingsMgr.notifyIncomingCalls) {
-                _phoneListener = new PhoneCallListener();
-                TelephonyManager telephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-                telephony.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
-            }
-                
-            initNotificationStuff();
-            _mediaMgr.initMediaPlayer();
-
-            _xmppreceiver = new BroadcastReceiver() {
-                public void onReceive(Context context, Intent intent) {
-                    String action = intent.getAction();
-                    if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
-                        onMessageReceived(intent.getStringExtra("message"));
-                    } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
-                        onConnectionStatusChanged(intent.getIntExtra("old_state", 0),
-                                                  intent.getIntExtra("new_state", 0));
-                    }
-                }
-            };
-            IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
-            intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
-            registerReceiver(_xmppreceiver, intentFilter);
-            Log.i(Tools.LOG_TAG, "Starting xmpp.");
-            _xmppMgr.start();
+        _settingsMgr.importPreferences(getBaseContext());
+        if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
+            Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
+            Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
+            settingsActivity.putExtra("panel", R.xml.prefs_connection);
+            settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(settingsActivity);
+            return;
         }
+
+        _mediaMgr = new MediaManager(_settingsMgr, getBaseContext());
+        _geoMgr = new GeoManager(_settingsMgr, getBaseContext());
+        _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
+        _phoneMgr = new PhoneManager(_settingsMgr, getBaseContext());
+        _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext()) {
+            void sendBatteryInfos(int level, boolean force) {
+                if (force || (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0)) {
+                    send("Battery level " + level + "%");
+                }
+                if (_settings.notifyBatteryInStatus && _xmppMgr != null) {
+                    _xmppMgr.setStatus(level);
+                }
+            }
+        };
+        
+        _smsMonitor = new SmsMonitor(_settingsMgr, getBaseContext()) {
+            void sendSmsStatus(String message) {
+                send(message);
+            }
+        };
+
+        if (_settingsMgr.notifyIncomingCalls) {
+            _phoneListener = new PhoneCallListener(this);
+            TelephonyManager telephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            telephony.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
+        }
+            
+        _mediaMgr.initMediaPlayer();
+
+        _xmppreceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
+                    onMessageReceived(intent.getStringExtra("message"));
+                } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
+                    onConnectionStatusChanged(intent.getIntExtra("old_state", 0),
+                                              intent.getIntExtra("new_state", 0));
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
+        intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
+        registerReceiver(_xmppreceiver, intentFilter);
+        if (_xmppMgr == null) {
+            _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
+        }
+        _xmppMgr.start();
     };
 
     @Override
     public void onDestroy() {
-        _gAnalytics.stop();
-        
-        instance = null;
-        Toast.makeText(this, "GTalkSMS stopped", Toast.LENGTH_SHORT).show();
+        Log.i(Tools.LOG_TAG, "service destroyed");
+        running = false;
+        xmppStop();
+        mServiceLooper.quit();
+        super.onDestroy();
+    }
+    
+    private void xmppStop() {
+        xmppStop(XmppManager.DISCONNECTED);
+    }
 
+    private void xmppStop(int finalState) {
+        if (_gAnalytics != null) {
+            _gAnalytics.stop();
+            _gAnalytics = null;
+        }
+        
         stopNotifications();
-        _xmppMgr.stop();
-        unregisterReceiver(_xmppreceiver);
+        if (_xmppMgr != null) {
+            Toast.makeText(this, "GTalkSMS stopped", Toast.LENGTH_SHORT).show();
+            _xmppMgr.stop(finalState);
+            if (_xmppMgr.getConnectionStatus()==XmppManager.DISCONNECTED) {
+                _xmppMgr = null;
+            }
+        }
+        if (_xmppreceiver != null) {
+            unregisterReceiver(_xmppreceiver);
+            _xmppreceiver = null;
+        }
 
         stopForegroundCompat(XmppManager.DISCONNECTED);
 
-        _geoMgr.stopLocatingPhone();
-        _mediaMgr.clearMediaPlayer();
-        _smsMonitor.clearSmsMonitor();
+        if (_geoMgr != null) {
+            _geoMgr.stopLocatingPhone();
+            _geoMgr = null;
+        }
+        if (_mediaMgr != null) {
+            _mediaMgr.clearMediaPlayer();
+            _mediaMgr = null;
+        }
+        if (_smsMonitor != null) {
+            _smsMonitor.clearSmsMonitor();
+            _smsMonitor = null;
+        }
         if (_phoneListener != null) {
             TelephonyManager telephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             telephony.listen(_phoneListener, 0);
             _phoneListener = null;
         }
 
-        _batteryMonitor.clearBatteryMonitor();
+        if (_batteryMonitor != null) {
+            _batteryMonitor.clearBatteryMonitor();
+            _batteryMonitor = null;
+        }
+    }
+
+    public static void send(Context ctx, String msg) {
+        ctx.startService(newSvcIntent(ctx, ".GTalkSMS.SEND", msg));
     }
 
     public void send(String msg) {
-        if (_xmppMgr != null) {
-            _xmppMgr.send(msg);
-        }
+        send(this, msg);
     }
 
     /** handles the different commands */
@@ -454,7 +568,7 @@ public class MainService extends Service {
         if (_lastRecipient == null) {
             send("Reply contact is not set");
         } else {
-            String contact = ContactsManager.getContactName(_lastRecipient);
+            String contact = ContactsManager.getContactName(this, _lastRecipient);
             if (Phone.isCellPhoneNumber(_lastRecipient) && contact.compareTo(_lastRecipient) != 0) {
                 contact += " (" + _lastRecipient + ")";
             }
@@ -516,8 +630,10 @@ public class MainService extends Service {
             send("Stopping ongoing actions");
         }
         _hasOutgoingAction = false;
-        _geoMgr.stopLocatingPhone();
-        _mediaMgr.stopRinging();
+        if (_geoMgr != null)
+            _geoMgr.stopLocatingPhone();
+        if (_mediaMgr != null)
+            _mediaMgr.stopRinging();
     }
 
     /** sends a SMS to the last contact */
@@ -530,10 +646,10 @@ public class MainService extends Service {
         setLastRecipient(contact);
 
         if (Phone.isCellPhoneNumber(contact)) {
-            send("Sending sms to " + ContactsManager.getContactName(contact));
+            send("Sending sms to " + ContactsManager.getContactName(this, contact));
             sendSMSByPhoneNumber(message, contact);
         } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(contact);
+            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contact);
             if (mobilePhones.size() > 1) {
                 send("Specify more details:");
 
@@ -560,10 +676,10 @@ public class MainService extends Service {
     public void markSmsAsRead(String contact) {
 
         if (Phone.isCellPhoneNumber(contact)) {
-            send("Mark " + ContactsManager.getContactName(contact) + "'s sms as read");
+            send("Mark " + ContactsManager.getContactName(this, contact) + "'s sms as read");
             _smsMgr.markAsRead(contact);
         } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(contact);
+            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contact);
             if (mobilePhones.size() > 0) {
                 send("Mark " + mobilePhones.get(0).contactName + "'s sms as read");
 
@@ -579,7 +695,7 @@ public class MainService extends Service {
     /** reads (count) SMS from all contacts matching pattern */
     public void readSMS(String searchedText) {
 
-        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(searchedText);
+        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(this, searchedText);
         ArrayList<Sms> sentSms = new ArrayList<Sms>();
         if (_settingsMgr.displaySentSms) {
             sentSms = _smsMgr.getAllSentSms();
@@ -592,7 +708,7 @@ public class MainService extends Service {
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name);
                 if (_settingsMgr.displaySentSms) {
-                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(contact.id), sentSms));
+                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(this, contact.id), sentSms));
                 }
                 Collections.sort(smsArrayList);
 
@@ -644,11 +760,6 @@ public class MainService extends Service {
         send(allSms.toString() + "\r\n");
     }
 
-    public void OnReceivedSms(String sender, String message) {
-        send(message);
-        setLastRecipient(sender);
-    }
-
     /** reads last Call Logs from all contacts */
     public void readCallLogs() {
 
@@ -658,7 +769,7 @@ public class MainService extends Service {
         List<Call> callList = Tools.getLastElements(arrayList, _settingsMgr.callLogsNumber);
         if (callList.size() > 0) {
             for (Call call : callList) {
-                String caller = makeBold(ContactsManager.getContactName(call.phoneNumber));
+                String caller = makeBold(ContactsManager.getContactName(this, call.phoneNumber));
 
                 all.append("\r\n" + makeItalic(call.date.toLocaleString()) + " - " + caller);
                 all.append(" - " + call.type + " of " + call.duration());
@@ -672,7 +783,7 @@ public class MainService extends Service {
     /** reads (count) SMS from all contacts matching pattern */
     public void displayContacts(String searchedText) {
 
-        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(searchedText);
+        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(this, searchedText);
 
         if (contacts.size() > 0) {
 
@@ -688,7 +799,7 @@ public class MainService extends Service {
                 // strContact.append("\r\n" + "Raw Ids : " + TextUtils.join(" ",
                 // contact.rawIds));
 
-                ArrayList<Phone> mobilePhones = ContactsManager.getPhones(contact.id);
+                ArrayList<Phone> mobilePhones = ContactsManager.getPhones(this, contact.id);
                 if (mobilePhones.size() > 0) {
                     strContact.append("\r\n" + makeItalic("Phones"));
                     for (Phone phone : mobilePhones) {
@@ -696,7 +807,7 @@ public class MainService extends Service {
                     }
                 }
 
-                ArrayList<ContactAddress> emails = ContactsManager.getEmailAddresses(contact.id);
+                ArrayList<ContactAddress> emails = ContactsManager.getEmailAddresses(this, contact.id);
                 if (emails.size() > 0) {
                     strContact.append("\r\n" + makeItalic("Emails"));
                     for (ContactAddress email : emails) {
@@ -704,7 +815,7 @@ public class MainService extends Service {
                     }
                 }
 
-                ArrayList<ContactAddress> addresses = ContactsManager.getPostalAddresses(contact.id);
+                ArrayList<ContactAddress> addresses = ContactsManager.getPostalAddresses(this, contact.id);
                 if (addresses.size() > 0) {
                     strContact.append("\r\n" + makeItalic("Addresses"));
                     for (ContactAddress address : addresses) {
@@ -777,9 +888,9 @@ public class MainService extends Service {
 
         if (Phone.isCellPhoneNumber(contactInfo)) {
             number = contactInfo;
-            contact = ContactsManager.getContactName(number);
+            contact = ContactsManager.getContactName(this, number);
         } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(contactInfo);
+            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contactInfo);
             if (mobilePhones.size() > 1) {
                 send("Specify more details:");
 
@@ -802,9 +913,18 @@ public class MainService extends Service {
             }
         }
     }
+    /** Intent helper functions.
+     *  As many of our intent objects use a 'message' extra, we have a helper that
+     *  allows you to provide that too.  Any other extras must be set manually
+     */
+    public static Intent newSvcIntent(Context ctx, String action) {
+        return newSvcIntent(ctx, action, null);
+    }
 
-    public void OnIncomingCall(String incomingNumber) {
-        String contact = ContactsManager.getContactName(incomingNumber);
-        send(contact + " is calling");
+    public static Intent newSvcIntent(Context ctx, String action, String message) {
+        Intent i = new Intent(action, null, ctx, MainService.class);
+        if (message != null)
+            i.putExtra("message", message);
+        return i;
     }
 }

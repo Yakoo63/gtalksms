@@ -22,12 +22,15 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppManager {
 
-    
     public static final int DISCONNECTED = 0;
+    // A "transient" state - will only be CONNECTING *during* a call to start()
     public static final int CONNECTING = 1;
     public static final int CONNECTED = 2;
+    // A "transient" state - will only be DISCONNECTING *during* a call to stop()
     public static final int DISCONNECTING = 3;
-    public static final int EXIT = 4;
+    // This state either means we are waiting for the network to come up,
+    // or waiting for a retry attempt etc.
+    public static final int WAITING_TO_CONNECT = 4;
 
     // A list of intent actions we broadcast.
     static final public String ACTION_MESSAGE_RECEIVED = "com.googlecode.gtalksms.XMPP_MESSAGE_RECEIVED";
@@ -74,6 +77,13 @@ public class XmppManager {
     }
     
     public void stop() {
+        stop(DISCONNECTED);
+    }
+
+    public void stop(int finalState) {
+        if (finalState != DISCONNECTED && finalState != WAITING_TO_CONNECT)
+            throw new IllegalStateException("Invalid State: " + finalState);
+  
         if (isConnected()) {
             updateStatus(DISCONNECTING);
             if (_settings.notifyApplicationConnection) {
@@ -97,7 +107,7 @@ public class XmppManager {
         mConnection = null;
         mPacketListener = null;
         mConnectionConfiguration = null;
-        updateStatus(DISCONNECTED);
+        updateStatus(finalState);
     }
     
     /** Updates the status about the service state (and the statusbar)*/
@@ -115,11 +125,11 @@ public class XmppManager {
         if (mCurrentRetryCount > 5) {
             // we failed after all the retries - just die.
             Log.v(Tools.LOG_TAG, "maybeStartReconnect ran out of retrys");
-            updateStatus(DISCONNECTED);
+            stop();
             Toast.makeText(_context, "Failed to connect.", Toast.LENGTH_SHORT).show();
-            updateStatus(EXIT);
             return;
         } else {
+            updateStatus(WAITING_TO_CONNECT);
             mCurrentRetryCount += 1;
             // a simple linear-backoff strategy.
             int timeout = 5000 * mCurrentRetryCount;
@@ -137,7 +147,7 @@ public class XmppManager {
             Toast.makeText(_context, "Waiting for network to become available.", Toast.LENGTH_SHORT).show();
             // we don't destroy the service here - our network receiver will notify us when
             // the network comes up and we try again then.
-            updateStatus(DISCONNECTED);
+            updateStatus(WAITING_TO_CONNECT);
             return;
         }
         
@@ -172,7 +182,7 @@ public class XmppManager {
                 maybeStartReconnect();
             } else {
                 Toast.makeText(_context, "Invalid username or password", Toast.LENGTH_SHORT).show();
-                updateStatus(EXIT);
+                stop();
             }
             return;
         }
