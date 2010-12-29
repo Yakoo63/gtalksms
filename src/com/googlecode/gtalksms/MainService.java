@@ -72,27 +72,27 @@ public class MainService extends Service {
 
     // notification stuff
     @SuppressWarnings("unchecked")
-    private static final Class[] mStartForegroundSignature = new Class[] { int.class, Notification.class };
+    private static final Class[] _startForegroundSignature = new Class[] { int.class, Notification.class };
     @SuppressWarnings("unchecked")
-    private static final Class[] mStopForegroundSignature = new Class[] { boolean.class };
-    private NotificationManager mNM;
-    private Method mStartForeground;
-    private Method mStopForeground;
-    private Object[] mStartForegroundArgs = new Object[2];
-    private Object[] mStopForegroundArgs = new Object[1];
-    private PendingIntent contentIntent = null;
+    private static final Class[] _stopForegroundSignature = new Class[] { boolean.class };
+    private NotificationManager _notificationMgr;
+    private Method _startForeground;
+    private Method _stopForeground;
+    private Object[] _startForegroundArgs = new Object[2];
+    private Object[] _stopForegroundArgs = new Object[1];
+    private PendingIntent _contentIntent = null;
 
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
-    private final IBinder mBinder = new LocalBinder();
+    private final IBinder _binder = new LocalBinder();
 
     GoogleAnalyticsTracker _gAnalytics;
 
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
     // control for "foreground" services.
-    private volatile Looper mServiceLooper;
-    private volatile ServiceHandler mServiceHandler;
+    private volatile Looper _serviceLooper;
+    private volatile ServiceHandler _serviceHandler;
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
@@ -121,7 +121,7 @@ public class MainService extends Service {
             case XmppManager.CONNECTED:
             case XmppManager.WAITING_TO_CONNECT:
                 xmppStop();
-                assert getConnectionStatus()==XmppManager.DISCONNECTED;
+                assert getConnectionStatus() == XmppManager.DISCONNECTED;
                 break;
             case XmppManager.DISCONNECTED:
                 xmppStart();
@@ -131,11 +131,11 @@ public class MainService extends Service {
                 break;
             }
         } else if (a.equals(".GTalkSMS.SEND")) {
-            if (getConnectionStatus()==XmppManager.CONNECTED) {
+            if (getConnectionStatus() == XmppManager.CONNECTED) {
                 _xmppMgr.send(intent.getStringExtra("message"));
             }
         } else if (a.equals(".GTalkSMS.SMS_RECEIVED")) {
-            if (getConnectionStatus()==XmppManager.CONNECTED) {
+            if (getConnectionStatus() == XmppManager.CONNECTED) {
                 _xmppMgr.send(intent.getStringExtra("message")); 
                 setLastRecipient(intent.getStringExtra("sender"));
             }
@@ -146,7 +146,7 @@ public class MainService extends Service {
                 // state instead of DISCONNECTED.
                 xmppStop(XmppManager.WAITING_TO_CONNECT);
             }
-            if (available && getConnectionStatus()==XmppManager.WAITING_TO_CONNECT) {
+            else if (available && getConnectionStatus() == XmppManager.WAITING_TO_CONNECT) {
                 xmppStart();
             }
         } else {
@@ -155,8 +155,8 @@ public class MainService extends Service {
         Log.d(Tools.LOG_TAG, "handled action '" + a + "' - state now " + getConnectionStatus());
         // stop the service if we are disconnected (but stopping the service
         // doesn't mean the process is terminated - onStart can still happen.)
-        if (getConnectionStatus()==XmppManager.DISCONNECTED) {
-            if (stopSelfResult(id)==true) {
+        if (getConnectionStatus() == XmppManager.DISCONNECTED) {
+            if (stopSelfResult(id) == true) {
                 Log.d(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
             } else {
                 Log.d(Tools.LOG_TAG, "more pending intents to be delivered - service will not stop");
@@ -176,27 +176,27 @@ public class MainService extends Service {
         switch (status) {
             case XmppManager.CONNECTED:
                 notification = new Notification(R.drawable.status_green, "Connected", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Connected", contentIntent);
+                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Connected", _contentIntent);
                 views.setImageViewResource(R.id.Button, R.drawable.icon_green);
                 break;
             case XmppManager.CONNECTING:
                 notification = new Notification(R.drawable.status_orange, "Connecting...", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Connecting...", contentIntent);
+                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Connecting...", _contentIntent);
                 views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
                 break;
             case XmppManager.DISCONNECTED:
                 notification = new Notification(R.drawable.status_red, "Disconnected", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Disconnected", contentIntent);
+                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Disconnected", _contentIntent);
                 views.setImageViewResource(R.id.Button, R.drawable.icon_red);
                 break;
             case XmppManager.DISCONNECTING:
                 notification = new Notification(R.drawable.status_orange, "Disconnecting...", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Disconnecting...", contentIntent);
+                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Disconnecting...", _contentIntent);
                 views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
                 break;
             case XmppManager.WAITING_TO_CONNECT:
                 notification = new Notification(R.drawable.status_orange, "Waiting...", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Waiting to connect...", contentIntent);
+                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Waiting to connect...", _contentIntent);
                 views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
                 break;
             default:
@@ -222,11 +222,11 @@ public class MainService extends Service {
      */
     void startForegroundCompat(int id, Notification notification) {
         // If we have the new startForeground API, then use it.
-        if (mStartForeground != null) {
-            mStartForegroundArgs[0] = Integer.valueOf(id);
-            mStartForegroundArgs[1] = notification;
+        if (_startForeground != null) {
+            _startForegroundArgs[0] = Integer.valueOf(id);
+            _startForegroundArgs[1] = notification;
             try {
-                mStartForeground.invoke(this, mStartForegroundArgs);
+                _startForeground.invoke(this, _startForegroundArgs);
             } catch (InvocationTargetException e) {
                 // Should not happen.
                 Log.w(Tools.LOG_TAG, "Unable to invoke startForeground", e);
@@ -238,7 +238,7 @@ public class MainService extends Service {
         }
         // Fall back on the old API.
         setForeground(true);
-        mNM.notify(id, notification);
+        _notificationMgr.notify(id, notification);
     }
 
     /**
@@ -247,10 +247,10 @@ public class MainService extends Service {
      */
     void stopForegroundCompat(int id) {
         // If we have the new stopForeground API, then use it.
-        if (mStopForeground != null) {
-            mStopForegroundArgs[0] = Boolean.TRUE;
+        if (_stopForeground != null) {
+            _stopForegroundArgs[0] = Boolean.TRUE;
             try {
-                mStopForeground.invoke(this, mStopForegroundArgs);
+                _stopForeground.invoke(this, _stopForegroundArgs);
             } catch (InvocationTargetException e) {
                 // Should not happen.
                 Log.w(Tools.LOG_TAG, "Unable to invoke stopForeground", e);
@@ -264,7 +264,7 @@ public class MainService extends Service {
         try {
             // Fall back on the old API. Note to cancel BEFORE changing the
             // foreground state, since we could be killed at that point.
-            mNM.cancel(id);
+            _notificationMgr.cancel(id);
             setForeground(false);
         } catch (Exception e) {
             // Should not happen.
@@ -276,19 +276,19 @@ public class MainService extends Service {
      * This makes the 2 previous wrappers possible
      */
     private void initNotificationStuff() {
-        mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        _notificationMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         try {
-            mStartForeground = getClass().getMethod("startForeground", mStartForegroundSignature);
-            mStopForeground = getClass().getMethod("stopForeground", mStopForegroundSignature);
+            _startForeground = getClass().getMethod("startForeground", _startForegroundSignature);
+            _stopForeground = getClass().getMethod("stopForeground", _stopForegroundSignature);
         } catch (NoSuchMethodException e) {
             // Running on an older platform.
-            mStartForeground = mStopForeground = null;
+            _startForeground = _stopForeground = null;
         }
-        contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
+        _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
     }
 
     public int getConnectionStatus() {
-        return _xmppMgr==null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
+        return _xmppMgr == null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
     }
 
 
@@ -305,7 +305,7 @@ public class MainService extends Service {
     
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
+        return _binder;
     }
 
     @Override
@@ -313,8 +313,8 @@ public class MainService extends Service {
         super.onCreate();
         HandlerThread thread = new HandlerThread("GTalkSMS.Service");
         thread.start();
-        mServiceLooper = thread.getLooper();
-        mServiceHandler = new ServiceHandler(mServiceLooper);
+        _serviceLooper = thread.getLooper();
+        _serviceHandler = new ServiceHandler(_serviceLooper);
         initNotificationStuff();
         Log.i(Tools.LOG_TAG, "service created");
         running = true;
@@ -322,10 +322,10 @@ public class MainService extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
-        Message msg = mServiceHandler.obtainMessage();
+        Message msg = _serviceHandler.obtainMessage();
         msg.arg1 = startId;
         msg.obj = intent;
-        mServiceHandler.sendMessage(msg);
+        _serviceHandler.sendMessage(msg);
     }
 
     @Override
@@ -404,14 +404,14 @@ public class MainService extends Service {
             _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
         }
         _xmppMgr.start();
-    };
+    }
 
     @Override
     public void onDestroy() {
         Log.i(Tools.LOG_TAG, "service destroyed");
         running = false;
         xmppStop();
-        mServiceLooper.quit();
+        _serviceLooper.quit();
         super.onDestroy();
     }
     
@@ -477,7 +477,7 @@ public class MainService extends Service {
         try {
             String command;
             String args;
-            if (-1 != commandLine.indexOf(":")) {
+            if (commandLine.indexOf(":") != -1) {
                 command = commandLine.substring(0, commandLine.indexOf(":"));
                 args = commandLine.substring(commandLine.indexOf(":") + 1);
             } else {
@@ -594,6 +594,7 @@ public class MainService extends Service {
         StringBuilder builder = new StringBuilder();
         builder.append("Available commands:\n");
         builder.append("- " + makeBold("\"?\"") + ": shows this help.\n");
+        builder.append("- " + makeBold("\"exit\"") + ": stop application on your phone.\n");
         builder.append("- " + makeBold("\"dial:#contact#\"") + ": dial the specified contact.\n");
         builder.append("- " + makeBold("\"reply:#message#\"") + ": send a sms to your last recipient with content message.\n");
         builder.append("- " + makeBold("\"sms\"") + ": display last sent sms from all contact.\n");
@@ -630,10 +631,12 @@ public class MainService extends Service {
             send("Stopping ongoing actions");
         }
         _hasOutgoingAction = false;
-        if (_geoMgr != null)
+        if (_geoMgr != null) {
             _geoMgr.stopLocatingPhone();
-        if (_mediaMgr != null)
+        }
+        if (_mediaMgr != null) {
             _mediaMgr.stopRinging();
+        }
     }
 
     /** sends a SMS to the last contact */
@@ -726,7 +729,7 @@ public class MainService extends Service {
                     }
                     send(smsContact.toString() + "\r\n");
                 } else {
-                    noSms.append(contact.name + " - No sms found\r\n");
+                    noSms.append(makeBold(contact.name) + " - No sms found\r\n");
                 }
             }
             if (!hasMatch) {
@@ -913,6 +916,7 @@ public class MainService extends Service {
             }
         }
     }
+    
     /** Intent helper functions.
      *  As many of our intent objects use a 'message' extra, we have a helper that
      *  allows you to provide that too.  Any other extras must be set manually
@@ -923,8 +927,9 @@ public class MainService extends Service {
 
     public static Intent newSvcIntent(Context ctx, String action, String message) {
         Intent i = new Intent(action, null, ctx, MainService.class);
-        if (message != null)
+        if (message != null) {
             i.putExtra("message", message);
+        }
         return i;
     }
 }

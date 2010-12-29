@@ -38,17 +38,17 @@ public class XmppManager {
     static final public String ACTION_CONNECTION_CHANGED = "com.googlecode.gtalksms.XMPP_CONNECTION_CHANGED";
     
     // Indicates the current state of the service (disconnected/connecting/connected)
-    private int mStatus = DISCONNECTED;
-    private String presenceMessage = "GTalkSMS";
+    private int _status = DISCONNECTED;
+    private String _presenceMessage = "GTalkSMS";
     
-    private ConnectionConfiguration mConnectionConfiguration = null;
-    private XMPPConnection mConnection = null;
-    private PacketListener mPacketListener = null;
+    private ConnectionConfiguration _connectionConfiguration = null;
+    private XMPPConnection _connection = null;
+    private PacketListener _packetListener = null;
     
     // Our current retry attempt, plus a runnable and handler to implement retry
-    private int mCurrentRetryCount = 0;
-    Runnable mReconnectRunnable = null;
-    Handler mReconnectHandler = new Handler();
+    private int _currentRetryCount = 0;
+    Runnable _reconnectRunnable = null;
+    Handler _reconnectHandler = new Handler();
 
     private SettingsManager _settings;
     private Context _context;
@@ -59,12 +59,12 @@ public class XmppManager {
     }
 
     public void start() {
-        mConnectionConfiguration = new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName);
+        _connectionConfiguration = new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName);
 
-        mCurrentRetryCount = 0;
-        mReconnectRunnable = new Runnable() {
+        _currentRetryCount = 0;
+        _reconnectRunnable = new Runnable() {
             public void run() {
-                if (mCurrentRetryCount > 0) {
+                if (_currentRetryCount > 0) {
                     Log.v(Tools.LOG_TAG, "attempting reconnection");
                     Toast.makeText(_context, "Reconnecting", Toast.LENGTH_SHORT).show();
                 }
@@ -73,7 +73,6 @@ public class XmppManager {
         };
         
         initConnection();
- //              mReconnectHandler.postDelayed(mReconnectRunnable, 10);
     }
     
     public void stop() {
@@ -81,9 +80,10 @@ public class XmppManager {
     }
 
     public void stop(int finalState) {
-        if (finalState != DISCONNECTED && finalState != WAITING_TO_CONNECT)
+        if (finalState != DISCONNECTED && finalState != WAITING_TO_CONNECT) {
             throw new IllegalStateException("Invalid State: " + finalState);
-  
+        }
+         
         if (isConnected()) {
             updateStatus(DISCONNECTING);
             if (_settings.notifyApplicationConnection) {
@@ -91,38 +91,38 @@ public class XmppManager {
             }
         }
         
-        if (mReconnectRunnable != null) {
-            mReconnectHandler.removeCallbacks(mReconnectRunnable);
+        if (_reconnectRunnable != null) {
+            _reconnectHandler.removeCallbacks(_reconnectRunnable);
         }
         
-        if (mConnection != null) {
-            if (mPacketListener != null) {
-                mConnection.removePacketListener(mPacketListener);
+        if (_connection != null) {
+            if (_packetListener != null) {
+                _connection.removePacketListener(_packetListener);
             }
             // don't try to disconnect if already disconnected
             if (isConnected()) {
-                mConnection.disconnect();
+                _connection.disconnect();
             }
         }
-        mConnection = null;
-        mPacketListener = null;
-        mConnectionConfiguration = null;
+        _connection = null;
+        _packetListener = null;
+        _connectionConfiguration = null;
         updateStatus(finalState);
     }
     
     /** Updates the status about the service state (and the statusbar)*/
     private void updateStatus(int status) {
-        if (status != mStatus) {
+        if (status != _status) {
             Intent intent = new Intent(ACTION_CONNECTION_CHANGED);
-            intent.putExtra("old_state", mStatus);
+            intent.putExtra("old_state", _status);
             intent.putExtra("new_state", status);
             _context.sendBroadcast(intent);
-            mStatus = status;
+            _status = status;
         }
     }
 
     private void maybeStartReconnect() {
-        if (mCurrentRetryCount > 5) {
+        if (_currentRetryCount > 5) {
             // we failed after all the retries - just die.
             Log.v(Tools.LOG_TAG, "maybeStartReconnect ran out of retrys");
             stop();
@@ -130,11 +130,11 @@ public class XmppManager {
             return;
         } else {
             updateStatus(WAITING_TO_CONNECT);
-            mCurrentRetryCount += 1;
+            _currentRetryCount += 1;
             // a simple linear-backoff strategy.
-            int timeout = 5000 * mCurrentRetryCount;
+            int timeout = 5000 * _currentRetryCount;
             Log.e(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
-            mReconnectHandler.postDelayed(mReconnectRunnable, timeout);
+            _reconnectHandler.postDelayed(_reconnectRunnable, timeout);
         }
     }
 
@@ -151,7 +151,7 @@ public class XmppManager {
             return;
         }
         
-        XMPPConnection connection = new XMPPConnection(mConnectionConfiguration);
+        XMPPConnection connection = new XMPPConnection(_connectionConfiguration);
         try {
             connection.connect();
         } catch (Exception e) {
@@ -187,21 +187,21 @@ public class XmppManager {
             return;
         }
         
-        mConnection = connection;
+        _connection = connection;
         onConnectionComplete();
     }
 
     private void onConnectionComplete() {
         
         Log.v(Tools.LOG_TAG, "connection established");
-        mCurrentRetryCount = 0;
+        _currentRetryCount = 0;
         PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-        mPacketListener = new PacketListener() {
+        _packetListener = new PacketListener() {
             public void processPacket(Packet packet) {
                 Message message = (Message) packet;
 
                 if ( message.getFrom().toLowerCase().startsWith(_settings.mTo.toLowerCase() + "/") && 
-                     !message.getFrom().equals(mConnection.getUser())) {
+                     !message.getFrom().equals(_connection.getUser())) {
                     if (message.getBody() != null) {
                         Intent intent = new Intent(ACTION_MESSAGE_RECEIVED);
                         intent.putExtra("message", message.getBody());
@@ -210,28 +210,28 @@ public class XmppManager {
                 }
             }
         };
-        mConnection.addPacketListener(mPacketListener, filter);
+        _connection.addPacketListener(_packetListener, filter);
         updateStatus(CONNECTED);
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
             send("Welcome to GTalkSMS " + Tools.getVersionName(_context, getClass()) + ". Send \"?\" for getting help");
         }
         Presence presence = new Presence(Presence.Type.available);
-        presence.setStatus(presenceMessage);
+        presence.setStatus(_presenceMessage);
         presence.setPriority(24);                   
-        mConnection.sendPacket(presence);
+        _connection.sendPacket(presence);
     }
     
     /** returns true if the service is correctly connected */
     public boolean isConnected() {
-        return    (mConnection != null
-                && mConnection.isConnected()
-                && mConnection.isAuthenticated());
+        return    (_connection != null
+                && _connection.isConnected()
+                && _connection.isAuthenticated());
     }
 
     /** returns true if the service is correctly connected */
     public int getConnectionStatus() {
-        return mStatus;
+        return _status;
     }
 
     /** sends a message to the user */
@@ -239,18 +239,18 @@ public class XmppManager {
         if (isConnected()) {
             Message msg = new Message(_settings.mTo, Message.Type.chat);
             msg.setBody(message);
-            mConnection.sendPacket(msg);
+            _connection.sendPacket(msg);
         }
     }
     
     public void setStatus(int batteryLevel) {
-        presenceMessage = "GTalkSMS - " + batteryLevel + "%";
+        _presenceMessage = "GTalkSMS - " + batteryLevel + "%";
         
         if (isConnected()) {
             Presence presence = new Presence(Presence.Type.available);
-            presence.setStatus(presenceMessage);
+            presence.setStatus(_presenceMessage);
             presence.setPriority(24);                   
-            mConnection.sendPacket(presence);
+            _connection.sendPacket(presence);
         }
     }
 }

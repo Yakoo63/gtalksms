@@ -6,8 +6,8 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 
 public class MediaManager {
-    private MediaPlayer mMediaPlayer;
-    private boolean canRing;
+    private MediaPlayer _mediaPlayer;
+    private boolean _canRing;
     
     Context _context;
     SettingsManager _settings;
@@ -19,37 +19,37 @@ public class MediaManager {
 
     /** clears the media player */
     public void clearMediaPlayer() {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
+        if (_mediaPlayer != null) {
+            _mediaPlayer.stop();
         }
-        mMediaPlayer = null;
+        _mediaPlayer = null;
     }
 
     /** init the media player */
     public void initMediaPlayer() {
-        canRing = true;
+        _canRing = true;
         Uri alert = Uri.parse(_settings.ringtone);
-        mMediaPlayer = new MediaPlayer();
+        _mediaPlayer = new MediaPlayer();
         try {
-            mMediaPlayer.setDataSource(_context, alert);
+            _mediaPlayer.setDataSource(_context, alert);
         } catch (Exception e) {
-            canRing = false;
+            _canRing = false;
         }
-        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-        mMediaPlayer.setLooping(true);
+        _mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+        _mediaPlayer.setLooping(true);
     }
     
     /** makes the phone ring */
     public boolean ring() {
         boolean res = false;
         final AudioManager audioManager = (AudioManager) _context.getSystemService(Context.AUDIO_SERVICE);
-        if (canRing && audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+        if (_canRing && audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
             try {
-                mMediaPlayer.prepare();
+                _mediaPlayer.prepare();
             } catch (Exception e) {
-                canRing = false;
+                _canRing = false;
             }
-            mMediaPlayer.start();
+            _mediaPlayer.start();
             
             res = true;
         }
@@ -58,9 +58,8 @@ public class MediaManager {
 
     /** Stops the phone from ringing */
     public void stopRinging() {
-        if (canRing) {
-            mMediaPlayer.stop();
+        if (_canRing) {
+            _mediaPlayer.stop();
         }
     }
-
 }

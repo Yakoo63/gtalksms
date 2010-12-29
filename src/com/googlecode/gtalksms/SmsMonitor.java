@@ -12,10 +12,10 @@ import android.telephony.SmsManager;
 
 public abstract class SmsMonitor {
     // intents for sms sending
-    public BroadcastReceiver sentSmsReceiver = null;
-    public BroadcastReceiver deliveredSmsReceiver = null;
-    public PendingIntent sentPI = null;
-    public PendingIntent deliveredPI = null;
+    public BroadcastReceiver _sentSmsReceiver = null;
+    public BroadcastReceiver _deliveredSmsReceiver = null;
+    public PendingIntent _sentPI = null;
+    public PendingIntent _deliveredPI = null;
 
     Context _context;
     SettingsManager _settings;
@@ -26,8 +26,8 @@ public abstract class SmsMonitor {
 
         if (_settings.notifySmsSent) {
             String SENT = "SMS_SENT";
-            sentPI = PendingIntent.getBroadcast(_context, 0, new Intent(SENT), 0);
-            sentSmsReceiver = new BroadcastReceiver() {
+            _sentPI = PendingIntent.getBroadcast(_context, 0, new Intent(SENT), 0);
+            _sentSmsReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
                     switch (getResultCode()) {
@@ -49,13 +49,13 @@ public abstract class SmsMonitor {
                     }
                 }
             };
-            _context.registerReceiver(sentSmsReceiver, new IntentFilter(SENT));
+            _context.registerReceiver(_sentSmsReceiver, new IntentFilter(SENT));
         }
 
         if (_settings.notifySmsDelivered) {
             String DELIVERED = "SMS_DELIVERED";
-            deliveredPI = PendingIntent.getBroadcast(_context, 0, new Intent(DELIVERED), 0);
-            deliveredSmsReceiver = new BroadcastReceiver() {
+            _deliveredPI = PendingIntent.getBroadcast(_context, 0, new Intent(DELIVERED), 0);
+            _deliveredSmsReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
                     switch (getResultCode()) {
@@ -69,7 +69,7 @@ public abstract class SmsMonitor {
                 }
             };
 
-            _context.registerReceiver(deliveredSmsReceiver, new IntentFilter(DELIVERED));
+            _context.registerReceiver(_deliveredSmsReceiver, new IntentFilter(DELIVERED));
         }
     }
 
@@ -80,9 +80,9 @@ public abstract class SmsMonitor {
 
         // création des liste d'instents
         ArrayList<PendingIntent> listOfSentIntents = new ArrayList<PendingIntent>();
-        listOfSentIntents.add(sentPI);
+        listOfSentIntents.add(_sentPI);
         ArrayList<PendingIntent> listOfDelIntents = new ArrayList<PendingIntent>();
-        listOfDelIntents.add(deliveredPI);
+        listOfDelIntents.add(_deliveredPI);
         for (int i = 1; i < messages.size(); i++) {
             listOfSentIntents.add(null);
             listOfDelIntents.add(null);
@@ -93,14 +93,14 @@ public abstract class SmsMonitor {
 
     /** clear the sms monitoring related stuff */
     public void clearSmsMonitor() {
-        if (sentSmsReceiver != null) {
-            _context.unregisterReceiver(sentSmsReceiver);
+        if (_sentSmsReceiver != null) {
+            _context.unregisterReceiver(_sentSmsReceiver);
         }
-        if (deliveredSmsReceiver != null) {
-            _context.unregisterReceiver(deliveredSmsReceiver);
+        if (_deliveredSmsReceiver != null) {
+            _context.unregisterReceiver(_deliveredSmsReceiver);
         }
-        sentSmsReceiver = null;
-        deliveredSmsReceiver = null;
+        _sentSmsReceiver = null;
+        _deliveredSmsReceiver = null;
     }
     
     abstract void sendSmsStatus(String message);

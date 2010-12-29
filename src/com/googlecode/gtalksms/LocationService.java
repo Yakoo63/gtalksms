@@ -19,9 +19,9 @@ import android.provider.Settings;
 
 public class LocationService extends Service {
 
-    private LocationManager mLocationManager = null;
-    private LocationListener mLocationListener = null;
-    private Location currentBestLocation = null;
+    private LocationManager _locationManager = null;
+    private LocationListener _locationListener = null;
+    private Location _currentBestLocation = null;
 
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     public static final String STOP_SERVICE = "STOP_SERVICE";
@@ -34,7 +34,7 @@ public class LocationService extends Service {
 
     @Override
     public void onCreate() {
-        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     }
 
     /*
@@ -68,9 +68,9 @@ public class LocationService extends Service {
         Settings.System.putString(getContentResolver(),
             Settings.System.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
         try {
-            Method m = mLocationManager.getClass().getMethod("updateProviders", new Class[] {});
+            Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
             m.setAccessible(true);
-            m.invoke(mLocationManager, new Object[]{});
+            m.invoke(_locationManager, new Object[]{});
         }
         catch(Exception e) {
         }
@@ -107,11 +107,11 @@ public class LocationService extends Service {
         }
         catch (Exception e) {
         }
-        mLocationListener = new LocationListener() {
+        _locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
-                if (isBetterLocation(location, currentBestLocation)) {
-                    currentBestLocation = location;
-                    sendLocationUpdate(currentBestLocation);
+                if (isBetterLocation(location, _currentBestLocation)) {
+                    _currentBestLocation = location;
+                    sendLocationUpdate(_currentBestLocation);
                 }
             }
             public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
@@ -120,18 +120,18 @@ public class LocationService extends Service {
         };
 
         // We query every available location providers
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
+        _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, _locationListener);
+        _locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, _locationListener);
 
-        Location location = mLocationManager.getLastKnownLocation("gps");
+        Location location = _locationManager.getLastKnownLocation("gps");
         if (location == null)
         {
-            location = mLocationManager.getLastKnownLocation("network");
+            location = _locationManager.getLastKnownLocation("network");
             if (location != null) {
-                if (isBetterLocation(location, currentBestLocation)) {
-                    currentBestLocation = location;
+                if (isBetterLocation(location, _currentBestLocation)) {
+                    _currentBestLocation = location;
                     MainService.send(this, "Last known location");
-                    sendLocationUpdate(currentBestLocation);
+                    sendLocationUpdate(_currentBestLocation);
                 }
             }
         }
@@ -142,10 +142,10 @@ public class LocationService extends Service {
     }
 
     private void destroy() {
-        if (mLocationManager != null && mLocationListener != null) {
-            mLocationManager.removeUpdates(mLocationListener);
-            mLocationManager = null;
-            mLocationListener = null;
+        if (_locationManager != null && _locationListener != null) {
+            _locationManager.removeUpdates(_locationListener);
+            _locationManager = null;
+            _locationListener = null;
         }
     }
 
