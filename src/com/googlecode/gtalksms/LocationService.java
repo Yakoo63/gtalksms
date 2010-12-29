@@ -42,9 +42,7 @@ public class LocationService extends Service {
      */
     private boolean getGPSStatus()
     {
-        String allowedLocationProviders =
-            Settings.System.getString(getContentResolver(),
-            Settings.System.LOCATION_PROVIDERS_ALLOWED);
+        String allowedLocationProviders = Settings.System.getString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED);
         if (allowedLocationProviders == null) {
             allowedLocationProviders = "";
         }
@@ -163,43 +161,26 @@ public class LocationService extends Service {
         long timeDelta = location.getTime() - currentBestLocation.getTime();
         boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
         boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
-        boolean isNewer = timeDelta > 0;
-
+        
         // If it's been more than two minutes since the current location, use the new location
         // because the user has likely moved
-        if (isSignificantlyNewer) {
-            return true;
-        // If the new location is more than two minutes older, it must be worse
-        } else if (isSignificantlyOlder) {
+        if (isSignificantlyOlder) {
             return false;
         }
 
         // Check whether the new location fix is more or less accurate
         int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
-        boolean isLessAccurate = accuracyDelta > 0;
         boolean isMoreAccurate = accuracyDelta < 0;
-        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-        // Check if the old and new location are from the same provider
-        boolean isFromSameProvider = isSameProvider(location.getProvider(),
-                currentBestLocation.getProvider());
+        boolean isSameAccuracy = accuracyDelta == 0;
+        boolean isSame = accuracyDelta == 0 && location.getAltitude() == currentBestLocation.getAltitude() 
+                            && location.getLongitude() == currentBestLocation.getLongitude();
 
         // Determine location quality using a combination of timeliness and accuracy
         if (isMoreAccurate) {
             return true;
-        } else if (isNewer && !isLessAccurate) {
-            return true;
-        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+        } else if ((isSignificantlyNewer || isSameAccuracy) && !isSame) {
             return true;
         }
         return false;
-    }
-
-    /** Checks whether two providers are the same */
-    private boolean isSameProvider(String provider1, String provider2) {
-        if (provider1 == null) {
-          return provider2 == null;
-        }
-        return provider1.equals(provider2);
     }
 }
