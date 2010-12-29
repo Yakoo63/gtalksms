@@ -11,13 +11,13 @@ import org.jivesoftware.smack.packet.Presence;
 
 import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.googlecode.gtalksms.receivers.XmppListener;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppManager {
@@ -29,6 +29,11 @@ public class XmppManager {
     public static final int DISCONNECTING = 3;
     public static final int EXIT = 4;
 
+    // A list of intent actions we broadcast.
+    static final public String ACTION_MESSAGE_RECEIVED = "com.googlecode.gtalksms.XMPP_MESSAGE_RECEIVED";
+    static final public String ACTION_PRESENCE_CHANGED = "com.googlecode.gtalksms.XMPP_PRESENCE_CHANGED";
+    static final public String ACTION_CONNECTION_CHANGED = "com.googlecode.gtalksms.XMPP_CONNECTION_CHANGED";
+    
     // Indicates the current state of the service (disconnected/connecting/connected)
     private int mStatus = DISCONNECTED;
     private String presenceMessage = "GTalkSMS";
@@ -44,12 +49,10 @@ public class XmppManager {
 
     private SettingsManager _settings;
     private Context _context;
-    private XmppListener _listener;
     
-    public XmppManager(XmppListener listener, SettingsManager settings, Context context) {
+    public XmppManager(SettingsManager settings, Context context) {
         _settings = settings;
         _context = context;
-        _listener = listener;
     }
 
     public void start() {
@@ -100,7 +103,10 @@ public class XmppManager {
     /** Updates the status about the service state (and the statusbar)*/
     private void updateStatus(int status) {
         if (status != mStatus) {
-            _listener.onConnectionStatusChanged(mStatus, status);
+            Intent intent = new Intent(ACTION_CONNECTION_CHANGED);
+            intent.putExtra("old_state", mStatus);
+            intent.putExtra("new_state", status);
+            _context.sendBroadcast(intent);
             mStatus = status;
         }
     }
@@ -187,7 +193,9 @@ public class XmppManager {
                 if ( message.getFrom().toLowerCase().startsWith(_settings.mTo.toLowerCase() + "/") && 
                      !message.getFrom().equals(mConnection.getUser())) {
                     if (message.getBody() != null) {
-                        _listener.onMessageReceived(message.getBody());
+                        Intent intent = new Intent(ACTION_MESSAGE_RECEIVED);
+                        intent.putExtra("message", message.getBody());
+                        _context.sendBroadcast(intent);
                     }
                 }
             }

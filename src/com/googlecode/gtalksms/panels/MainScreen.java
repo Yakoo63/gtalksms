@@ -1,9 +1,11 @@
 package com.googlecode.gtalksms.panels;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -20,7 +22,6 @@ import android.widget.TextView;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.XmppManager;
-import com.googlecode.gtalksms.receivers.XmppListener;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.R;
@@ -28,28 +29,11 @@ import com.googlecode.gtalksms.R;
 public class MainScreen extends Activity {
 
     private MainService mainService;
+    private BroadcastReceiver xmppreceiver;
     
-    private XmppListener xmppListener = new XmppListener() {
-        @Override
-        public void onMessageReceived(String message) {
-        }
-        
-        @Override
-        public void onConnectionStatusChanged(int oldStatus, int status) {
-            updateStatus(status);
-        }
-
-        @Override
-        public void onPresenceStatusChanged(String person, String status) {
-//            TextView console = (TextView) findViewById(R.id.Console);
-//            console.append("\n" + person + " : " + status);
-        }
-    };
-
     private ServiceConnection mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mainService = ((MainService.LocalBinder)service).getService();
-            registerListener();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -60,12 +44,32 @@ public class MainScreen extends Activity {
     @Override
     public void onPause() {
         super.onPause();
-        
-        if (MainService.getInstance() != null) {
-            MainService.getInstance().setXmppListener(null);
-        }  
+        unregisterReceiver(xmppreceiver);
     }
-   
+
+    public void onResume() {
+        super.onResume();
+        xmppreceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals(XmppManager.ACTION_PRESENCE_CHANGED)) {
+//                  TextView console = (TextView) findViewById(R.id.Console);
+//                  String person = intent.getStringExtra("person");
+//                  String status = intent.getStringExtra("status");
+//                  console.append("\n" + person + " : " + status);
+                } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
+                        updateStatus(intent.getIntExtra("new_state", 0));
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_PRESENCE_CHANGED);
+        intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
+        registerReceiver(xmppreceiver, intentFilter);
+        MainService inst = MainService.getInstance();
+        if (inst != null)
+            updateStatus(inst.getConnectionStatus());
+    }
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,9 +79,6 @@ public class MainScreen extends Activity {
         TextView label = (TextView) findViewById(R.id.VersionLabel);
         label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()), Typeface.BOLD));
 
-        mainService = MainService.getInstance();
-        registerListener();
-        
         Button prefBtn = (Button) findViewById(R.id.Preferences);
         prefBtn.setOnClickListener(new OnClickListener() {
 
@@ -160,14 +161,6 @@ public class MainScreen extends Activity {
         }
     }
   
-    public void registerListener() {
-        if (mainService != null) {
-            mainService.setXmppListener(xmppListener);
-            //updateConsole();
-            updateStatus(mainService.getConnectionStatus());
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

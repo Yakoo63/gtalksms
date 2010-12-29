@@ -11,8 +11,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Address;
 import android.net.Uri;
 import android.os.Binder;
@@ -34,10 +37,9 @@ import com.googlecode.gtalksms.data.sms.SmsMmsManager;
 import com.googlecode.gtalksms.geo.GeoManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
-import com.googlecode.gtalksms.receivers.XmppListener;
 import com.googlecode.gtalksms.tools.Tools;
 
-public class MainService extends Service implements XmppListener {
+public class MainService extends Service {
 
     // Service instance
     private static MainService instance = null;
@@ -46,7 +48,7 @@ public class MainService extends Service implements XmppListener {
 
     private MediaManager _mediaMgr;
     private XmppManager _xmppMgr;
-    private XmppListener _xmppListener = null;
+    private BroadcastReceiver _xmppreceiver;
     private SmsMmsManager _smsMgr;
     private PhoneManager _phoneMgr;
     private GeoManager _geoMgr;
@@ -78,21 +80,8 @@ public class MainService extends Service implements XmppListener {
     GoogleAnalyticsTracker _gAnalytics;
 
     
-    public void setXmppListener(XmppListener listener) {
-        _xmppListener = listener;
-    }
-    
-    public void onPresenceStatusChanged(String person, String status) {
-        if (_xmppListener != null) {
-            _xmppListener.onPresenceStatusChanged(person, status);
-        }
-    }
-        
     /** Updates the status about the service state (and the status bar) */
     public void onConnectionStatusChanged(int oldStatus, int status) {
-        if (_xmppListener != null) {
-            _xmppListener.onConnectionStatusChanged(oldStatus, status);
-        }
         // Get the layout for the AppWidget and attach an on-click listener to the button
         RemoteViews views = new RemoteViews(getPackageName(), R.layout.appwidget);
 
@@ -284,7 +273,7 @@ public class MainService extends Service implements XmppListener {
                 return;
             }
 
-            _xmppMgr = new XmppManager(instance, _settingsMgr, getBaseContext());
+            _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
             _mediaMgr = new MediaManager(_settingsMgr, getBaseContext());
             _geoMgr = new GeoManager(_settingsMgr, getBaseContext());
             _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
@@ -308,6 +297,21 @@ public class MainService extends Service implements XmppListener {
             
             initNotificationStuff();
             _mediaMgr.initMediaPlayer();
+
+            _xmppreceiver = new BroadcastReceiver() {
+                public void onReceive(Context context, Intent intent) {
+                    String action = intent.getAction();
+                    if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
+                        onMessageReceived(intent.getStringExtra("message"));
+                    } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
+                        onConnectionStatusChanged(intent.getIntExtra("old_state", 0),
+                                                  intent.getIntExtra("new_state", 0));
+                    }
+                }
+            };
+            IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
+            intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
+            registerReceiver(_xmppreceiver, intentFilter);
             Log.i(Tools.LOG_TAG, "Starting xmpp.");
             _xmppMgr.start();
         }
@@ -322,6 +326,7 @@ public class MainService extends Service implements XmppListener {
 
         stopNotifications();
         _xmppMgr.stop();
+        unregisterReceiver(_xmppreceiver);
 
         stopForegroundCompat(XmppManager.DISCONNECTED);
 
@@ -339,10 +344,6 @@ public class MainService extends Service implements XmppListener {
 
     /** handles the different commands */
     public void onMessageReceived(String commandLine) {
-        if (_xmppListener != null) {
-            _xmppListener.onMessageReceived(commandLine);
-        }
-        
         try {
             String command;
             String args;
