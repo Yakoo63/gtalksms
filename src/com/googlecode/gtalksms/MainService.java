@@ -20,6 +20,8 @@ import android.location.Address;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -37,6 +39,7 @@ import com.googlecode.gtalksms.data.sms.SmsMmsManager;
 import com.googlecode.gtalksms.geo.GeoManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
+import com.googlecode.gtalksms.receivers.PhoneCallListener;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class MainService extends Service {
@@ -55,6 +58,7 @@ public class MainService extends Service {
 
     private BatteryMonitor _batteryMonitor;
     private SmsMonitor _smsMonitor;
+    private PhoneCallListener _phoneListener = null;
     
     // last person who sent sms/who we sent an sms to
     public String _lastRecipient = null;
@@ -294,7 +298,13 @@ public class MainService extends Service {
                     send(message);
                 }
             };
-            
+
+            if (_settingsMgr.notifyIncomingCalls) {
+                _phoneListener = new PhoneCallListener();
+                TelephonyManager telephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                telephony.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
+            }
+                
             initNotificationStuff();
             _mediaMgr.initMediaPlayer();
 
@@ -333,6 +343,12 @@ public class MainService extends Service {
         _geoMgr.stopLocatingPhone();
         _mediaMgr.clearMediaPlayer();
         _smsMonitor.clearSmsMonitor();
+        if (_phoneListener != null) {
+            TelephonyManager telephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            telephony.listen(_phoneListener, 0);
+            _phoneListener = null;
+        }
+
         _batteryMonitor.clearBatteryMonitor();
     }
 

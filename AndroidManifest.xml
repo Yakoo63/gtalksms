@@ -55,11 +55,6 @@
                 <data android:scheme="http"/> 
             </intent-filter>
         </activity>
-        <receiver android:name="com.googlecode.gtalksms.receivers.CallReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-        </receiver>
         <receiver android:name="com.googlecode.gtalksms.receivers.NetworkConnectivityReceiver" android:enabled="true">
              <intent-filter>
                  <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />

@@ -33,6 +33,7 @@ public class SettingsManager {
     public boolean displaySentSms;
     public boolean notifySmsSent;
     public boolean notifySmsDelivered;
+    public boolean notifyIncomingCalls;
     
     // calls
     public int callLogsNumber;
@@ -66,5 +67,6 @@ public class SettingsManager {
         smsNumber = prefs.getInt("smsNumber", 5);
         callLogsNumber = prefs.getInt("callLogsNumber", 10);
         formatChatResponses = prefs.getBoolean("formatResponses", false);
+        notifyIncomingCalls = prefs.getBoolean("notifyIncomingCalls", false);
     }
 }
