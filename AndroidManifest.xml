@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.googlecode.gtalksms" android:versionName="1.4" android:versionCode="13">
+    package="com.googlecode.gtalksms" android:versionName="1.5" android:versionCode="14">
     <uses-sdk android:minSdkVersion="5" />
     <application android:icon="@drawable/icon_green" android:label="@string/app_name">
         <activity android:name="com.googlecode.gtalksms.panels.MainScreen"
@@ -66,6 +66,14 @@
                  <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
              </intent-filter>
         </receiver>
+        <service android:name="KeyboardInputMethod"
+            android:label="GTalkSMS Keyboard"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data android:name="android.view.im" android:resource="@xml/method" />
+        </service>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />

@@ -63,7 +63,10 @@ public class MainService extends Service {
 
     private BatteryMonitor _batteryMonitor;
     private SmsMonitor _smsMonitor;
+    
     private PhoneCallListener _phoneListener = null;
+
+    public KeyboardInputMethod _keyboard;
     
     // last person who sent sms/who we sent an sms to
     public String _lastRecipient = null;
@@ -149,8 +152,8 @@ public class MainService extends Service {
             Log.d(Tools.LOG_TAG, "network_changed with available=" + available + 
                                  " and with _xmpp=" + (_xmppMgr != null));
             int st = getConnectionStatus();
-            boolean conn_or_waiting = st==XmppManager.CONNECTED || st==XmppManager.WAITING_TO_CONNECT;
-            if (!available && _xmppMgr != null &&  conn_or_waiting) {
+            boolean conn_or_waiting = st == XmppManager.CONNECTED || st == XmppManager.WAITING_TO_CONNECT;
+            if (!available && _xmppMgr != null && conn_or_waiting) {
                 // tell the manager to disconnect (thereby stopping future 
                 // scheduled login retries etc), then enter the 
                 // WAITING_TO_CONNECT state until we are told a network has come up.
@@ -565,6 +568,8 @@ public class MainService extends Service {
                 } else {
                     sendClipboard();
                 }
+            } else if (command.equals("write") || command.equals("w")) {
+                writeText(args);
             } else if (command.equals("geo")) {
                 geo(args);
             } else if (command.equals("dial")) {
@@ -640,6 +645,7 @@ public class MainService extends Service {
         builder.append("- " + makeBold("\"where\"") + ": sends you google map updates about the location of the phone until you send \"stop\"\n");
         builder.append("- " + makeBold("\"ring\"") + ": rings the phone until you send \"stop\"\n");
         builder.append("- " + makeBold("\"copy:#text#\"") + ": copy text to clipboard or sent phone clipboard if text is empty\n");
+        builder.append("- " + makeBold("\"write:#text#\"") + " or " + makeBold("\"w:#text#\"") + ": write text as virtual keyboard (don't forget to activate keyboard in Android Preferences panel).\n");
         builder.append("and you can paste links and open it with the appropriate app\n");
         send(builder.toString());
     }
@@ -887,6 +893,17 @@ public class MainService extends Service {
         }
     }
 
+    /** copy text as keyboard */
+    private void writeText(String text) {
+        try {
+            if (_keyboard != null) {
+                _keyboard.setText(text);
+            }
+        } catch (Exception ex) {
+            Log.w(Tools.LOG_TAG, "writeText error", ex);
+        }
+    }
+
     /** copy text to clipboard */
     private void copyToClipboard(String text) {
         try {
@@ -894,6 +911,7 @@ public class MainService extends Service {
             clipboard.setText(text);
             send("Text copied");
         } catch (Exception ex) {
+            Log.w(Tools.LOG_TAG, "Clipboard error", ex);
             send("Clipboard access failed");
         }
     }
@@ -903,7 +921,9 @@ public class MainService extends Service {
         try {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Service.CLIPBOARD_SERVICE);
             send("GPhone clipboard: " + clipboard.getText());
+            
         } catch (Exception ex) {
+            Log.w(Tools.LOG_TAG, "Clipboard error", ex);
             send("Clipboard access failed");
         }
     }
