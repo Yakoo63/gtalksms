@@ -2,11 +2,25 @@
 <PreferenceScreen
   android:title="@string/application_settings"
   xmlns:android="http://schemas.android.com/apk/res/android">
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="startAtBoot"
-            android:title="@string/start_at_boot"
-            android:summary="Check if you want TalkMyPhone to start at boot"/>
+        <PreferenceScreen android:title="@string/auto_start_options">
+              <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="startAtBoot"
+                android:title="@string/start_at_boot"
+                android:summary="Check if you want TalkMyPhone to start at boot"/>
+              <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="startOnPowerConnected"
+                android:title="@string/start_on_power_connected"
+                android:summary="Automatically starts TalkMyPhone when a charger is connected"/>
+        </PreferenceScreen>
+        <PreferenceScreen android:title="@string/auto_stop_options">
+              <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="stopOnPowerDisconnected"
+                android:title="@string/stop_on_power_disconnected"
+                android:summary="Automatically stops TalkMyPhone when a charger is disconnected"/>
+        </PreferenceScreen>
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="showStatusIcon"
