@@ -146,9 +146,14 @@ public class MainService extends Service {
             }
         } else if (a.equals(".GTalkSMS.NETWORK_CHANGED")) {
             boolean available = intent.getBooleanExtra("available", true);
-            if (!available && _xmppMgr != null && _xmppMgr.isConnected()) {
-                // tell the manager to disconnect, then enter the WAITING_TO_CONNECT
-                // state instead of DISCONNECTED.
+            Log.d(Tools.LOG_TAG, "network_changed with available=" + available + 
+                                 " and with _xmpp=" + (_xmppMgr != null));
+            int st = getConnectionStatus();
+            boolean conn_or_waiting = st==XmppManager.CONNECTED || st==XmppManager.WAITING_TO_CONNECT;
+            if (!available && _xmppMgr != null &&  conn_or_waiting) {
+                // tell the manager to disconnect (thereby stopping future 
+                // scheduled login retries etc), then enter the 
+                // WAITING_TO_CONNECT state until we are told a network has come up.
                 xmppStop(XmppManager.WAITING_TO_CONNECT);
             }
             else if (available && getConnectionStatus() == XmppManager.WAITING_TO_CONNECT) {
@@ -433,9 +438,31 @@ public class MainService extends Service {
         stopNotifications();
         if (_xmppMgr != null) {
             Toast.makeText(this, "GTalkSMS stopped", Toast.LENGTH_SHORT).show();
-            _xmppMgr.stop(finalState);
-            if (_xmppMgr.getConnectionStatus()==XmppManager.DISCONNECTED) {
-                _xmppMgr = null;
+            // In some cases the 'disconnect' may hang - see
+            // http://code.google.com/p/gtalksms/issues/detail?id=12 for an
+            // example.  We worm around this by leveraging the fact that we 
+            // are going to throw the XmppManager away after disconnecting,
+            // so just spawn a thread to perform the disconnection.  In the
+            // usual good case the thread will terminate very quickly, and 
+            // in the bad case the thread may hang around much longer - but 
+            // at least we are still working and it should go away 
+            // eventually...
+            class DisconnectRunnable implements Runnable {
+                public DisconnectRunnable(XmppManager x) {
+                    _x = x;
+                }
+                private XmppManager _x;
+                public void run() {
+                    _x.stop();
+                }
+            }
+            new Thread(new DisconnectRunnable(_xmppMgr), "xmpp-disconnector").start();
+            _xmppMgr = null;
+            // If we have been asked to go into some state other than
+            // disconnected, create the new _xmppMgr now with that state.
+            if (finalState == XmppManager.WAITING_TO_CONNECT) {
+                _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
+                _xmppMgr.start(finalState);
             }
         }
         if (_xmppreceiver != null) {

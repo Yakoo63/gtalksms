@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -44,6 +45,7 @@ public class XmppManager {
     private ConnectionConfiguration _connectionConfiguration = null;
     private XMPPConnection _connection = null;
     private PacketListener _packetListener = null;
+    private ConnectionListener _connectionListener = null;
     
     // Our current retry attempt, plus a runnable and handler to implement retry
     private int _currentRetryCount = 0;
@@ -59,6 +61,9 @@ public class XmppManager {
     }
 
     public void start() {
+        start(CONNECTED);
+    }
+    public void start(int initialState) {
         _connectionConfiguration = new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName);
 
         _currentRetryCount = 0;
@@ -71,20 +76,20 @@ public class XmppManager {
                 initConnection();
             }
         };
-        
-        initConnection();
+        switch (initialState) {
+            case CONNECTED:
+                initConnection();
+                break;
+            case WAITING_TO_CONNECT:
+                updateStatus(initialState);
+                break;
+            default:
+                throw new IllegalStateException("Invalid State: " + initialState);
+        }
     }
     
     public void stop() {
-        stop(DISCONNECTED);
-    }
-
-    public void stop(int finalState) {
-        if (finalState != DISCONNECTED && finalState != WAITING_TO_CONNECT) {
-            throw new IllegalStateException("Invalid State: " + finalState);
-        }
-         
-        if (isConnected()) {
+        if (_connection != null && _connection.isConnected()) {
             updateStatus(DISCONNECTING);
             if (_settings.notifyApplicationConnection) {
                 send("GTalkSMS stopped.");
@@ -99,6 +104,9 @@ public class XmppManager {
             if (_packetListener != null) {
                 _connection.removePacketListener(_packetListener);
             }
+            if (_connectionListener != null) {
+                _connection.removeConnectionListener(_connectionListener);
+            }
             // don't try to disconnect if already disconnected
             if (isConnected()) {
                 _connection.disconnect();
@@ -106,8 +114,9 @@ public class XmppManager {
         }
         _connection = null;
         _packetListener = null;
+        _connectionListener = null;
         _connectionConfiguration = null;
-        updateStatus(finalState);
+        updateStatus(DISCONNECTED);
     }
     
     /** Updates the status about the service state (and the statusbar)*/
@@ -133,7 +142,7 @@ public class XmppManager {
             _currentRetryCount += 1;
             // a simple linear-backoff strategy.
             int timeout = 5000 * _currentRetryCount;
-            Log.e(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
+            Log.i(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
             _reconnectHandler.postDelayed(_reconnectRunnable, timeout);
         }
     }
@@ -150,7 +159,7 @@ public class XmppManager {
             updateStatus(WAITING_TO_CONNECT);
             return;
         }
-        
+
         XMPPConnection connection = new XMPPConnection(_connectionConfiguration);
         try {
             connection.connect();
@@ -188,6 +197,40 @@ public class XmppManager {
         }
         
         _connection = connection;
+        _connectionListener = new ConnectionListener() {
+            @Override
+            public void connectionClosed() {
+                // This should never happen - we always remove the listener before
+                // actually disconnecting - so something strange would be going on
+                // for this to happen.
+                Log.w(Tools.LOG_TAG, "xmpp got an unexpected normal disconnection");
+                updateStatus(DISCONNECTED);
+            }
+
+            @Override
+            public void connectionClosedOnError(Exception arg0) {
+                // this is "unexpected" - our main service still thinks it has a 
+                // connection.
+                Log.w(Tools.LOG_TAG, "xmpp disconnected due to error: " + arg0.toString());
+                // We update the state to disconnected (mainly to cleanup listeners etc)
+                // then schedule an automatic reconnect.
+                stop();
+                maybeStartReconnect();
+            }
+
+            @Override
+            public void reconnectingIn(int arg0) {
+            }
+
+            @Override
+            public void reconnectionFailed(Exception arg0) {
+            }
+
+            @Override
+            public void reconnectionSuccessful() {
+            }
+        };
+        _connection.addConnectionListener(_connectionListener);
         onConnectionComplete();
     }
 
@@ -223,6 +266,12 @@ public class XmppManager {
     }
     
     /** returns true if the service is correctly connected */
+    // XXX - we should revisit use of this method and/or the use of _status -
+    // there is a possibility _status will be 'CONNECTED' but this method 
+    // returns false.  It *shouldn't* happen as we have a disconnection 
+    // listener and take care to never leave the connection established 
+    // but not authenticated), but if somethingelse we haven't thought 
+    // of happens we could have a tricky bug...
     public boolean isConnected() {
         return    (_connection != null
                 && _connection.isConnected()
