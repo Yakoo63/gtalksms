@@ -1,3 +1,7 @@
+1.5
+* Add remote keyboard feature, with "write" command
+* Autostart/stop GTalkSMS with charger connection
+
 1.4
 * MainService refactoring to avoid UI locks
 * Avoid GPS location notification with the same value
