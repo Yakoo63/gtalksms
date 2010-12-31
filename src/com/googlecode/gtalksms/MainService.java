@@ -441,25 +441,7 @@ public class MainService extends Service {
         stopNotifications();
         if (_xmppMgr != null) {
             Toast.makeText(this, "GTalkSMS stopped", Toast.LENGTH_SHORT).show();
-            // In some cases the 'disconnect' may hang - see
-            // http://code.google.com/p/gtalksms/issues/detail?id=12 for an
-            // example.  We worm around this by leveraging the fact that we 
-            // are going to throw the XmppManager away after disconnecting,
-            // so just spawn a thread to perform the disconnection.  In the
-            // usual good case the thread will terminate very quickly, and 
-            // in the bad case the thread may hang around much longer - but 
-            // at least we are still working and it should go away 
-            // eventually...
-            class DisconnectRunnable implements Runnable {
-                public DisconnectRunnable(XmppManager x) {
-                    _x = x;
-                }
-                private XmppManager _x;
-                public void run() {
-                    _x.stop();
-                }
-            }
-            new Thread(new DisconnectRunnable(_xmppMgr), "xmpp-disconnector").start();
+            _xmppMgr.stop();
             _xmppMgr = null;
             // If we have been asked to go into some state other than
             // disconnected, create the new _xmppMgr now with that state.

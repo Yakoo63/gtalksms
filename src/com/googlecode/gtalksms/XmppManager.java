@@ -109,7 +109,25 @@ public class XmppManager {
             }
             // don't try to disconnect if already disconnected
             if (isConnected()) {
-                _connection.disconnect();
+                // In some cases the 'disconnect' may hang - see
+                // http://code.google.com/p/gtalksms/issues/detail?id=12 for an
+                // example.  We worm around this by leveraging the fact that we 
+                // are going to throw the XmppManager away after disconnecting,
+                // so just spawn a thread to perform the disconnection.  In the
+                // usual good case the thread will terminate very quickly, and 
+                // in the bad case the thread may hang around much longer - but 
+                // at least we are still working and it should go away 
+                // eventually...
+                class DisconnectRunnable implements Runnable {
+                    public DisconnectRunnable(XMPPConnection x) {
+                        _x = x;
+                    }
+                    private XMPPConnection _x;
+                    public void run() {
+                        _x.disconnect();
+                    }
+                }
+                new Thread(new DisconnectRunnable(_connection), "xmpp-disconnector").start();
             }
         }
         _connection = null;
