@@ -1,6 +1,7 @@
 1.5
 * Add remote keyboard feature, with "write" command
 * Autostart/stop GTalkSMS with charger connection
+* Add "cmd" command to execute shell instructions
 
 1.4
 * MainService refactoring to avoid UI locks

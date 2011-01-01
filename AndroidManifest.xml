@@ -28,13 +28,14 @@
 		    <intent-filter>
 		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
-                       android:resource="@xml/appwidget_info" />
-        </receiver>
-        <receiver android:name="com.googlecode.gtalksms.WidgetActivator">
+            <intent-filter>
+                <action android:name="com.googlecode.gtalksms.XMPP_CONNECTION_CHANGED"/>
+            </intent-filter>
             <intent-filter>
                 <action android:name=".WidgetGTalkSMS.ACTION" />
-            </intent-filter>
+            </intent-filter>            
+            <meta-data android:name="android.appwidget.provider"
+                       android:resource="@xml/appwidget_info" />
         </receiver>
         <service android:enabled="true" android:name="com.googlecode.gtalksms.LocationService" />
         <receiver android:name="com.googlecode.gtalksms.receivers.BootReceiver">

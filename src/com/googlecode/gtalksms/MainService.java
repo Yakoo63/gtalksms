@@ -13,9 +13,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -31,7 +29,6 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.ClipboardManager;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.googlecode.gtalksms.data.contacts.Contact;
@@ -114,6 +111,10 @@ public class MainService extends Service {
     // this function which runs in its own thread (so can block 
     // Pretty-much everything using the _xmppMgr is here...
     protected void onHandleIntent(final Intent intent, int id) {
+        if (intent == null) {
+            Log.e(Tools.LOG_TAG, "onHandleIntent: Intent null");
+            return;
+        }
         String a = intent.getAction();
         Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + getConnectionStatus());
         if (a.equals(".GTalkSMS.ACTION")) {
@@ -140,6 +141,10 @@ public class MainService extends Service {
                 Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ getConnectionStatus());
                 break;
             }
+        } else if (a.equals(".GTalkSMS.BROADCAST_STATUS")) {
+            // A request to broadcast our current status.
+            int state = _xmppMgr == null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
+            XmppManager.broadcastStatus(this, state, state);
         } else if (a.equals(".GTalkSMS.SEND")) {
             if (getConnectionStatus() == XmppManager.CONNECTED) {
                 _xmppMgr.send(intent.getStringExtra("message"));
@@ -181,47 +186,31 @@ public class MainService extends Service {
 
     /** Updates the status about the service state (and the status bar) */
     public void onConnectionStatusChanged(int oldStatus, int status) {
-        // Get the layout for the AppWidget and attach an on-click listener to the button
-        // XXX - note this is now called by a generic broadcast receiver - so the widget
-        // specific stuff below could probably be moved into the widget itself (assuming
-        // that widget is also configured to see the status-changed broadcasts)
-        RemoteViews views = new RemoteViews(getPackageName(), R.layout.appwidget);
-
         Notification notification = new Notification();
         switch (status) {
             case XmppManager.CONNECTED:
                 notification = new Notification(R.drawable.status_green, "Connected", System.currentTimeMillis());
                 notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Connected", _contentIntent);
-                views.setImageViewResource(R.id.Button, R.drawable.icon_green);
                 break;
             case XmppManager.CONNECTING:
                 notification = new Notification(R.drawable.status_orange, "Connecting...", System.currentTimeMillis());
                 notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Connecting...", _contentIntent);
-                views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
                 break;
             case XmppManager.DISCONNECTED:
                 notification = new Notification(R.drawable.status_red, "Disconnected", System.currentTimeMillis());
                 notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Disconnected", _contentIntent);
-                views.setImageViewResource(R.id.Button, R.drawable.icon_red);
                 break;
             case XmppManager.DISCONNECTING:
                 notification = new Notification(R.drawable.status_orange, "Disconnecting...", System.currentTimeMillis());
                 notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Disconnecting...", _contentIntent);
-                views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
                 break;
             case XmppManager.WAITING_TO_CONNECT:
                 notification = new Notification(R.drawable.status_orange, "Waiting...", System.currentTimeMillis());
                 notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Waiting to connect...", _contentIntent);
-                views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
                 break;
             default:
                 break;
         }
-
-        // Update all AppWidget with current status
-        AppWidgetManager manager = AppWidgetManager.getInstance(this);
-        ComponentName component = new ComponentName(getBaseContext().getPackageName(), WidgetProvider.class.getName());
-        manager.updateAppWidget(manager.getAppWidgetIds(component), views);
 
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
         notification.flags |= Notification.FLAG_NO_CLEAR;
@@ -683,6 +672,7 @@ public class MainService extends Service {
         builder.append("- " + makeBold("\"where\"") + ": sends you google map updates about the location of the phone until you send \"stop\"\n");
         builder.append("- " + makeBold("\"ring\"") + ": rings the phone until you send \"stop\"\n");
         builder.append("- " + makeBold("\"copy:#text#\"") + ": copy text to clipboard or sent phone clipboard if text is empty\n");
+        builder.append("- " + makeBold("\"cmd:#command#\"") + ": execute shell instuction with root access if possible.\n");
         builder.append("- " + makeBold("\"write:#text#\"") + " or " + makeBold("\"w:#text#\"") + ": write text as virtual keyboard (don't forget to activate keyboard in Android Preferences panel).\n");
         builder.append("and you can paste links and open it with the appropriate app\n");
         send(builder.toString());

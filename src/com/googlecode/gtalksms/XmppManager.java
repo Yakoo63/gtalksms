@@ -138,12 +138,16 @@ public class XmppManager {
     }
     
     /** Updates the status about the service state (and the statusbar)*/
+    public static void broadcastStatus(Context ctx, int old_state, int new_state) {
+        Intent intent = new Intent(ACTION_CONNECTION_CHANGED);
+        intent.putExtra("old_state", old_state);
+        intent.putExtra("new_state", new_state);
+        ctx.sendBroadcast(intent);
+    }
+
     private void updateStatus(int status) {
         if (status != _status) {
-            Intent intent = new Intent(ACTION_CONNECTION_CHANGED);
-            intent.putExtra("old_state", _status);
-            intent.putExtra("new_state", status);
-            _context.sendBroadcast(intent);
+            broadcastStatus(_context, _status, status);
             _status = status;
         }
     }
