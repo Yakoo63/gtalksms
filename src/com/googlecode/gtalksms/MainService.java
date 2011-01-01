@@ -1,5 +1,8 @@
 package com.googlecode.gtalksms;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -29,7 +32,6 @@ import android.telephony.TelephonyManager;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.googlecode.gtalksms.data.contacts.Contact;
@@ -440,7 +442,7 @@ public class MainService extends Service {
         
         stopNotifications();
         if (_xmppMgr != null) {
-            Toast.makeText(this, "GTalkSMS stopped", Toast.LENGTH_SHORT).show();
+            Tools.toastMessage(this, "GTalkSMS stopped");
             _xmppMgr.stop();
             _xmppMgr = null;
             // If we have been asked to go into some state other than
@@ -564,6 +566,8 @@ public class MainService extends Service {
                 stopNotifications();
             } else if (command.equals("ring")) {
                 ring();
+            } else if (command.equals("cmd")) {
+                shellCmd(args);
             } else if (command.equals("http")) {
                 openLink("http:" + args);
             } else if (command.equals("https")) {
@@ -583,6 +587,58 @@ public class MainService extends Service {
         }
     }
 
+    private boolean askRootAccess() {
+        try {
+            Process p = Runtime.getRuntime().exec("su");
+
+            // Attempt to write a file to a root-only
+            DataOutputStream os = new DataOutputStream(p.getOutputStream());
+            os.writeBytes("echo \"Do I have root?\" >/system/sd/temporary.txt\n");
+            os.writeBytes("exit\n");
+            os.flush();
+            p.waitFor();
+            if (p.exitValue() != 255) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    private void shellCmd(String cmd) {
+        final StringBuilder sb = new StringBuilder();
+        String separator = System.getProperty("line.separator");
+        sb.append(cmd);
+        sb.append(separator);
+        
+        if (!askRootAccess()) {
+            sb.append("Can't have root acess!" + separator);
+        }
+            
+        Process myproc = null;
+        BufferedReader reader = null;
+        try {
+            myproc = Runtime.getRuntime().exec(new String[] {"/system/bin/sh", "-c", cmd});
+           
+            String line;
+            reader = new BufferedReader(new InputStreamReader(myproc.getInputStream()));
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+                sb.append(separator);
+            }
+            reader = new BufferedReader(new InputStreamReader(myproc.getErrorStream()));
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+                sb.append(separator);
+            }
+            send(sb.toString());
+        }
+        catch (Exception ex) {
+            Log.w(Tools.LOG_TAG, "Shell command error", ex);
+        }
+    }
+    
     public void displayLastRecipient() {
         if (_lastRecipient == null) {
             send("Reply contact is not set");

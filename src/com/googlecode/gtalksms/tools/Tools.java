@@ -8,10 +8,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
+import android.widget.Toast;
 
 public class Tools {
     public final static String LOG_TAG = "gtalksms";
 
+    public static void toastMessage(Context ctx, String msg) {
+        Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
+    }
     
     public static String getVersionName(Context context, Class<?> cls) {
 
