@@ -44,6 +44,7 @@ import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.receivers.PhoneCallListener;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.R;
 
 public class MainService extends Service {
 
@@ -158,15 +159,10 @@ public class MainService extends Service {
             boolean available = intent.getBooleanExtra("available", true);
             Log.d(Tools.LOG_TAG, "network_changed with available=" + available + 
                                  " and with _xmpp=" + (_xmppMgr != null));
-            int st = getConnectionStatus();
-            boolean conn_or_waiting = st == XmppManager.CONNECTED || st == XmppManager.WAITING_TO_CONNECT;
-            if (!available && _xmppMgr != null && conn_or_waiting) {
-                // tell the manager to disconnect (thereby stopping future 
-                // scheduled login retries etc), then enter the 
-                // WAITING_TO_CONNECT state until we are told a network has come up.
+
+            if (available && getConnectionStatus() != XmppManager.CONNECTED 
+                          && getConnectionStatus() != XmppManager.CONNECTING) {
                 xmppStop(XmppManager.WAITING_TO_CONNECT);
-            }
-            else if (available && getConnectionStatus() == XmppManager.WAITING_TO_CONNECT) {
                 xmppStart();
             }
         } else {

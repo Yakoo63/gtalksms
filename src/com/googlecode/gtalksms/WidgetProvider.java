@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.R;
 
 public class WidgetProvider extends AppWidgetProvider {
 

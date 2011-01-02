@@ -42,7 +42,6 @@ public class XmppManager {
     private int _status = DISCONNECTED;
     private String _presenceMessage = "GTalkSMS";
     
-    private ConnectionConfiguration _connectionConfiguration = null;
     private XMPPConnection _connection = null;
     private PacketListener _packetListener = null;
     private ConnectionListener _connectionListener = null;
@@ -63,9 +62,8 @@ public class XmppManager {
     public void start() {
         start(CONNECTED);
     }
+    
     public void start(int initialState) {
-        _connectionConfiguration = new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName);
-
         _currentRetryCount = 0;
         _reconnectRunnable = new Runnable() {
             public void run() {
@@ -133,7 +131,6 @@ public class XmppManager {
         _connection = null;
         _packetListener = null;
         _connectionListener = null;
-        _connectionConfiguration = null;
         updateStatus(DISCONNECTED);
     }
     
@@ -158,10 +155,11 @@ public class XmppManager {
             Log.v(Tools.LOG_TAG, "maybeStartReconnect ran out of retrys");
             stop();
             Toast.makeText(_context, "Failed to connect.", Toast.LENGTH_SHORT).show();
+            updateStatus(WAITING_TO_CONNECT);
             return;
         } else {
-            updateStatus(WAITING_TO_CONNECT);
             _currentRetryCount += 1;
+            updateStatus(CONNECTING);
             // a simple linear-backoff strategy.
             int timeout = 5000 * _currentRetryCount;
             Log.i(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
@@ -171,6 +169,10 @@ public class XmppManager {
 
     /** init the XMPP connection */
     private void initConnection() {
+        if (_connection != null) {
+            return;
+        }
+        
         updateStatus(CONNECTING);
         NetworkInfo active = ((ConnectivityManager)_context.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (active == null || !active.isAvailable()) {
@@ -182,7 +184,7 @@ public class XmppManager {
             return;
         }
 
-        XMPPConnection connection = new XMPPConnection(_connectionConfiguration);
+        XMPPConnection connection = new XMPPConnection(new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName));
         try {
             connection.connect();
         } catch (Exception e) {
