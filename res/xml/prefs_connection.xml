@@ -1,49 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
-  android:title="@string/connection_settings"
+  android:title="@string/pref_con"
   xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="@string/notified_address" android:key="Recipient">
+        android:title="@string/pref_con_notified_address_cat" 
+        android:key="Recipient">
         <EditTextPreference
-            android:title="@string/notified_address"
             android:key="notifiedAddress"
             android:defaultValue="your.login@gmail.com"
-            android:summary="Enter your gmail address"/>
+            android:title="@string/pref_con_notified_address"
+            android:summary="@string/pref_con_notified_address_help"/>
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/connection_settings" android:key="ConnectionSettings">
+    <PreferenceCategory 
+        android:title="@string/pref_con_cat" 
+        android:key="ConnectionSettings">
         <CheckBoxPreference
             android:key="useDifferentAccount"
-            android:title="@string/use_different_account"
             android:defaultValue="false"
-            android:summary="Check if you want the phone to connect from a different account" />
+            android:title="@string/pref_con_use_different_account"
+            android:summary="@string/pref_con_use_different_account_help" />
         <EditTextPreference
             android:key="login"
-            android:title="@string/login"
             android:defaultValue="your.login"
             android:dependency="useDifferentAccount"
-            android:summary="Login used by the phone"/>
+            android:title="@string/pref_con_login"
+            android:summary="@string/pref_con_login_help"/>
         <EditTextPreference
             android:key="password"
             android:password="true"
-            android:title="@string/password"
-            android:summary="Enter your gmail password or the password used by the phone to connect"/>
+            android:title="@string/pref_con_password"
+            android:summary="@string/pref_con_password_help"/>
     </PreferenceCategory>
     <PreferenceScreen
-        android:title="@string/server_settings">
+        android:title="@string/pref_con_server_settings">
         <EditTextPreference
-            android:title="@string/server_host"
             android:key="serverHost"
-            android:summary="Server host used by the phone"
-            android:defaultValue="talk.google.com"/>
+            android:defaultValue="talk.google.com"
+            android:title="@string/pref_con_server_host"
+            android:summary="@string/pref_con_server_host_help"/>
         <com.googlecode.gtalksms.tools.EditIntegerPreference
             android:key="serverPort"
             android:numeric="integer"
             android:defaultValue="5222"
-            android:title="@string/server_port" android:summary="Server port used by the phone"/>
+            android:title="@string/pref_con_server_port" 
+            android:summary="@string/pref_con_server_port_help"/>
         <EditTextPreference
-            android:title="@string/service_name"
             android:key="serviceName"
-            android:defaultValue="gmail.com" android:summary="Service name used by the phone"/>
+            android:defaultValue="gmail.com" 
+            android:title="@string/pref_con_service_name"
+            android:summary="@string/pref_con_service_name_help"/>
     </PreferenceScreen>
 </PreferenceScreen>

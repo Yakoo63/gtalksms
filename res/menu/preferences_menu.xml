@@ -3,11 +3,11 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/connection_settings"
           android:icon="@drawable/ic_menu_preferences"
-          android:title="@string/connection_settings" />
+          android:title="@string/pref_con" />
     <item android:id="@+id/application_settings"
           android:icon="@drawable/icon_green"
-          android:title="@string/application_settings" />
+          android:title="@string/pref_app" />
     <item android:id="@+id/notification_settings"
           android:icon="@drawable/ic_menu_info_details"
-          android:title="@string/notification_settings" />
+          android:title="@string/pref_notif" />
 </menu>

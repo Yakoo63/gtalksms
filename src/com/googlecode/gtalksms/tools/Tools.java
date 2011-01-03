@@ -23,7 +23,7 @@ public class Tools {
             ComponentName comp = new ComponentName(context, cls);
             PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
 
-            return "v" + pinfo.versionName + " by Yakoo";
+            return "v" + pinfo.versionName + " @ Yakoo";
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {
             return "";
         }

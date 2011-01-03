@@ -1,53 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
-  android:title="@string/application_settings"
+  android:title="@string/pref_app"
   xmlns:android="http://schemas.android.com/apk/res/android">
-        <PreferenceScreen android:title="@string/auto_start_options">
+        <PreferenceScreen android:title="@string/pref_app_auto_start_options">
               <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="startAtBoot"
-                android:title="@string/start_at_boot"
-                android:summary="Check if you want TalkMyPhone to start at boot"/>
+                android:title="@string/pref_app_start_at_boot"
+                android:summary="@string/pref_app_start_at_boot_help"/>
               <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="startOnPowerConnected"
-                android:title="@string/start_on_power_connected"
-                android:summary="Automatically starts TalkMyPhone when a charger is connected"/>
+                android:title="@string/pref_app_start_on_power_connected"
+                android:summary="@string/pref_app_start_on_power_connected_help"/>
         </PreferenceScreen>
-        <PreferenceScreen android:title="@string/auto_stop_options">
+        <PreferenceScreen android:title="@string/pref_app_auto_stop_options">
               <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="stopOnPowerDisconnected"
-                android:title="@string/stop_on_power_disconnected"
-                android:summary="Automatically stops TalkMyPhone when a charger is disconnected"/>
+                android:title="@string/pref_app_stop_on_power_disconnected"
+                android:summary="@string/pref_app_stop_on_power_disconnected_help"/>
         </PreferenceScreen>
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="showStatusIcon"
-            android:title="@string/show_status_icon"
-            android:summary="Check if you want to see TalkMyPhone status icon in notification bar"/>
+            android:title="@string/pref_app_show_status_icon"
+            android:summary="@string/pref_app_show_status_icon_help"/>
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="formatResponses"
-            android:title="@string/format_responses"
-            android:summary="Check if you want to format responses with bold and italic, doesn't work with all Xmpp clients"/>
+            android:title="@string/pref_app_format_responses"
+            android:summary="@string/pref_app_format_responses_help"/>
         <com.googlecode.gtalksms.tools.EditIntegerPreference
             android:key="smsNumber"
             android:numeric="integer"
             android:defaultValue="5"
-            android:title="@string/sms_number" android:summary="Number of SMS to show"/>
+            android:title="@string/pref_app_sms_number" 
+            android:summary="@string/pref_app_sms_number_help"/>
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="showSentSms"
-            android:title="@string/show_sent_sms"
-            android:summary="Check if you want to see sent sms"/>
+            android:title="@string/pref_app_show_sent_sms"
+            android:summary="@string/pref_app_show_sent_sms_help"/>
         <com.googlecode.gtalksms.tools.EditIntegerPreference
             android:key="callLogsNumber"
             android:numeric="integer"
             android:defaultValue="10"
-            android:title="@string/call_logs_number" android:summary="Number of call logs to show"/>
+            android:title="@string/pref_app_call_logs_number" 
+            android:summary="@string/pref_app_call_logs_number_help"/>
         <RingtonePreference
-            android:title="@string/ringtone"
             android:key="ringtone"
-            android:summary="Ringtone to use with the ring command"/>
+            android:title="@string/pref_app_ringtone"
+            android:summary="@string/pref_app_ringtone_help"/>
 </PreferenceScreen>
