@@ -14,7 +14,7 @@ public class PowerReceiver extends BroadcastReceiver {
         boolean connected = intent.getAction().equals("android.intent.action.ACTION_POWER_CONNECTED");
         String prefName = connected ? "startOnPowerConnected" : "stopOnPowerDisconnected";
         if (prefs.getBoolean(prefName, false)) {
-            Intent serviceIntent = new Intent(".GTalkSMS.ACTION");
+            Intent serviceIntent = new Intent(".GTalkSMS.CONNECT");
             if (!connected) {
                 serviceIntent.putExtra("disconnect", true);
             }

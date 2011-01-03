@@ -67,7 +67,7 @@ public class MainScreen extends Activity {
         IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_PRESENCE_CHANGED);
         intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
         registerReceiver(xmppreceiver, intentFilter);
-        Intent intent = new Intent(".GTalkSMS.ACTION");
+        Intent intent = new Intent(".GTalkSMS.CONNECT");
         bindService(intent, mainServiceConnection, Context.BIND_AUTO_CREATE);
     }
 

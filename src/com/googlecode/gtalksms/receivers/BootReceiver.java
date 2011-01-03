@@ -12,7 +12,7 @@ public class BootReceiver extends BroadcastReceiver {
         SharedPreferences prefs = context.getSharedPreferences("GTalkSMS", 0);
         boolean startAtBoot = prefs.getBoolean("startAtBoot", false);
         if (startAtBoot) {
-            Intent serviceIntent = new Intent(".GTalkSMS.ACTION");
+            Intent serviceIntent = new Intent(".GTalkSMS.CONNECT");
             context.startService(serviceIntent);
         }
     }

@@ -118,7 +118,7 @@ public class MainService extends Service {
         }
         String a = intent.getAction();
         Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + getConnectionStatus());
-        if (a.equals(".GTalkSMS.ACTION")) {
+        if (a.equals(".GTalkSMS.CONNECT")) {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // request to disconnect.
                 xmppStop();
@@ -495,7 +495,7 @@ public class MainService extends Service {
             if (command.equals("?")) {
                 showHelp();
             } else if (command.equals("exit")) {
-                stopService(new Intent(".GTalkSMS.ACTION"));
+                stopService(new Intent(".GTalkSMS.CONNECT"));
             } else if (command.equals("sms")) {
                 int separatorPos = args.indexOf(":");
                 String contact = null;
