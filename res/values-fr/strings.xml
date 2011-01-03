@@ -64,4 +64,23 @@
     <string name="about_panel">A propos de GTalkSMS</string>
     <string name="main_panel">GTalkSMS</string>
     <string name="preference_panel">Préférences</string>
+    <string name="log_panel_acquiring">Acquisition des logs</string>
+    <string name="log_panel_collect">Récupère les logs de GTalkSMS et compose un nouveau message. Vous pouvez vous envoyer ce message et le joindre à un bug décrivant votre problème.</string>
+    <string name="main_service_connected">Connecté</string>
+    <string name="main_service_connecting">Connexion…</string>
+    <string name="main_service_disconnected">Déconnecté</string>
+    <string name="main_service_disconnecting">Déconnexion…</string>
+    <string name="main_service_waiting">En attente…</string>
+    <string name="main_service_waiting_to_connect">En attente de connexion…</string>
+    <string name="main_service_stop">Arrêt de GTalkSMS</string>
+    <string name="xmpp_manager_reconnecting">Reconnexion…</string>
+    <string name="xmpp_manager_failed_max_attempts">Echec de la connexion.</string>
+    <string name="xmpp_manager_waiting">En attente d\'un réseau disponible…</string>
+    <string name="xmpp_manager_connection_failed">Echec de la connexion.</string>
+    <string name="xmpp_manager_login_failed">Echec lors de l\'identification.</string>
+    <string name="xmpp_manager_invalid_credentials">Nom d\'utilisateur ou mot de passe incorrect.</string>
+    <string name="about_website">Site Web</string>
+    <string name="about_authors">Auteurs</string>
+    <string name="about_donors">Doneurs</string>
+    <string name="about_change_log">Liste des changements</string>
 </resources>

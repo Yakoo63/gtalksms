@@ -19,6 +19,7 @@
         <activity android:name="com.googlecode.gtalksms.panels.About"
                   android:label="@string/about_panel">
         </activity>
+        <activity android:name="com.googlecode.gtalksms.LogCollectorActivity"/>
         <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService">
             <intent-filter>
                 <action android:name=".GTalkSMS.CONNECT" />
@@ -89,4 +90,5 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
 </manifest>

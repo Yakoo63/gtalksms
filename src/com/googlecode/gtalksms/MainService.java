@@ -183,29 +183,36 @@ public class MainService extends Service {
     /** Updates the status about the service state (and the status bar) */
     public void onConnectionStatusChanged(int oldStatus, int status) {
         Notification notification = new Notification();
+        String appName = getString(R.string.app_name);
+        String msg = null;
         switch (status) {
             case XmppManager.CONNECTED:
-                notification = new Notification(R.drawable.status_green, "Connected", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Connected", _contentIntent);
+                msg = getString(R.string.main_service_connected);
+                notification = new Notification(R.drawable.status_green, msg, System.currentTimeMillis());
                 break;
             case XmppManager.CONNECTING:
-                notification = new Notification(R.drawable.status_orange, "Connecting...", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Connecting...", _contentIntent);
+                msg = getString(R.string.main_service_connecting);
+                notification = new Notification(R.drawable.status_orange, msg, System.currentTimeMillis());
                 break;
             case XmppManager.DISCONNECTED:
-                notification = new Notification(R.drawable.status_red, "Disconnected", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Disconnected", _contentIntent);
+                msg = getString(R.string.main_service_disconnected);
+                notification = new Notification(R.drawable.status_red, msg, System.currentTimeMillis());
                 break;
             case XmppManager.DISCONNECTING:
-                notification = new Notification(R.drawable.status_orange, "Disconnecting...", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Disconnecting...", _contentIntent);
+                msg = getString(R.string.main_service_disconnecting);
+                notification = new Notification(R.drawable.status_orange, msg, System.currentTimeMillis());
                 break;
             case XmppManager.WAITING_TO_CONNECT:
-                notification = new Notification(R.drawable.status_orange, "Waiting...", System.currentTimeMillis());
-                notification.setLatestEventInfo(getApplicationContext(), "GTalkSMS", "Waiting to connect...", _contentIntent);
+                String msgNotif = getString(R.string.main_service_waiting);
+                msg = getString(R.string.main_service_waiting_to_connect);
+                notification = new Notification(R.drawable.status_orange, msgNotif, System.currentTimeMillis());
                 break;
             default:
                 break;
+        }
+        
+        if (msg != null) {
+            notification.setLatestEventInfo(getApplicationContext(), appName, msg, _contentIntent);
         }
 
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
@@ -427,7 +434,7 @@ public class MainService extends Service {
         
         stopNotifications();
         if (_xmppMgr != null) {
-            Tools.toastMessage(this, "GTalkSMS stopped");
+            Tools.toastMessage(this, getString(R.string.main_service_stop));
             _xmppMgr.stop();
             _xmppMgr = null;
             // If we have been asked to go into some state other than

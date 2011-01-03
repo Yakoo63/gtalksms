@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.googlecode.gtalksms.LogCollectorActivity;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.StringFmt;
@@ -176,4 +178,19 @@ public class MainScreen extends Activity {
         return true;
     }
 
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        // Note: KEYCODE_MENU was my first preference, but I failed to make
+        // that work.
+        // Also: once we have more diagnostic features, it probably makes
+        // sense to create a new panel and have the log collector called from
+        // there - but now, just jumping directly to the collector should be
+        // fine.
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent i = new Intent(this, LogCollectorActivity.class);
+            startActivity(i);            
+            return true;
+        }
+        return super.onKeyLongPress(keyCode, event);
+    }
 }

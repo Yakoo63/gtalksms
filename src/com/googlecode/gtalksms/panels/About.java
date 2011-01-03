@@ -34,13 +34,13 @@ public class About extends Activity {
     public void updateConsole() {
       TextView console = (TextView) findViewById(R.id.Text);
       console.setText("");
-      console.append(StringFmt.Fmt("Website\n", 0xFFFF0000, 1.5, Typeface.BOLD));
+      console.append(StringFmt.Fmt(getString(R.string.about_website) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
       console.append(StringFmt.Url("http://code.google.com/p/gtalksms"));
-      console.append(StringFmt.Fmt("\n\nAuthors\n", 0xFFFF0000, 1.5, Typeface.BOLD));
+      console.append(StringFmt.Fmt("\n\n" + getString(R.string.about_authors) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
       console.append(Web.DownloadFromUrl("http://gtalksms.googlecode.com/hg/AUTHORS"));
-      console.append(StringFmt.Fmt("\nDonors\n", 0xFFFF0000, 1.5, Typeface.BOLD));
+      console.append(StringFmt.Fmt("\n" + getString(R.string.about_donors) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
       console.append(Web.DownloadFromUrl("http://gtalksms.googlecode.com/hg/Donors"));
-      console.append(StringFmt.Fmt("\nChange log\n", 0xFFFF0000, 1.5, Typeface.BOLD));
+      console.append(StringFmt.Fmt("\n" + getString(R.string.about_change_log) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
       console.append(Web.DownloadFromUrl("http://gtalksms.googlecode.com/hg/Changelog"));
       
       MovementMethod m = console.getMovementMethod();
