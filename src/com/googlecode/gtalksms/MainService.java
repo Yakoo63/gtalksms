@@ -503,7 +503,6 @@ public class MainService extends Service {
                 if (-1 != separatorPos) {
                     contact = args.substring(0, separatorPos);
                     message = args.substring(separatorPos + 1);
-                    setLastRecipient(contact);
                     sendSMS(message, contact);
                 } else if (args.length() > 0) {
                     readSMS(args);
@@ -708,8 +707,6 @@ public class MainService extends Service {
 
     /** sends a SMS to the specified contact */
     public void sendSMS(String message, String contact) {
-        setLastRecipient(contact);
-
         if (Phone.isCellPhoneNumber(contact)) {
             send("Sending sms to " + ContactsManager.getContactName(this, contact));
             sendSMSByPhoneNumber(message, contact);
@@ -724,6 +721,7 @@ public class MainService extends Service {
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 send("Sending sms to " + phone.contactName + " (" + phone.cleanNumber + ")");
+                setLastRecipient(phone.cleanNumber);
                 sendSMSByPhoneNumber(message, phone.cleanNumber);
             } else {
                 send("No match for \"" + contact + "\"");
