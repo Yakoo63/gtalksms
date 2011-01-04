@@ -2,10 +2,13 @@ package com.googlecode.gtalksms.data.phone;
 
 import java.util.Date;
 
+import android.content.Context;
+
+import com.googlecode.gtalksms.R;
+
 public class Call {
-    final static public String [] Type = {"Unknown", "Incoming", "Outgoing", "Missed"};
     public String phoneNumber;
-    public String type;
+    public int type;
     public long duration;
     public Date date;
     public boolean isNew;
@@ -20,5 +23,24 @@ public class Call {
         }
         
         return res + seconds + "s";
+    }
+    
+    public String type(Context context) {
+        int key;
+        switch (type) {
+            case 1:
+                key = R.string.chat_call_incoming;
+                break;
+            case 2:
+                key = R.string.chat_call_outgoing;
+                break;
+            case 3:
+                key = R.string.chat_call_missed;
+                break;
+            default:
+                key = R.string.chat_call_unknown;
+        }
+        
+        return context.getString(key);
     }
 }

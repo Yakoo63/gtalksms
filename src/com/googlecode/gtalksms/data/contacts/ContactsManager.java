@@ -13,6 +13,7 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.PhoneLookup;
 import android.provider.ContactsContract.RawContacts;
 
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -34,7 +35,7 @@ public class ContactsManager {
                 res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
             }
         } else {
-            res = "[hidden number]";
+            res = ctx.getString(R.string.chat_call_hidden);
         }
         return res;
     }
@@ -43,7 +44,7 @@ public class ContactsManager {
      * Returns a ArrayList of <Contact> where the names/company match the argument
      */
     public static String getContactName(Context ctx, long rawId) {
-        String res = "Unknown";
+        String res = ctx.getString(R.string.chat_call_unknown);
         
         ContentResolver resolver = ctx.getContentResolver();
         Cursor c = resolver.query(RawContacts.CONTENT_URI,

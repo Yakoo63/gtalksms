@@ -150,7 +150,7 @@ public class LogCollectorActivity extends Activity {
             }
             else{
                 dismissProgressDialog();
-                showErrorDialog("failed to get log message");
+                showErrorDialog(getString(R.string.chat_log_failed));
             }
         }
     }
@@ -246,22 +246,16 @@ public class LogCollectorActivity extends Activity {
 
             if (!m.matches()) {
                 Log.e(Tools.LOG_TAG, "Regex did not match on /proc/version: " + procVersionStr);
-                return "Unavailable";
             } else if (m.groupCount() < 4) {
-                Log.e(Tools.LOG_TAG, "Regex match on /proc/version only returned " + m.groupCount()
-                        + " groups");
-                return "Unavailable";
+                Log.e(Tools.LOG_TAG, "Regex match on /proc/version only returned " + m.groupCount() + " groups");
             } else {
                 return (new StringBuilder(m.group(1)).append("\n").append(
                         m.group(2)).append(" ").append(m.group(3)).append("\n")
                         .append(m.group(4))).toString();
             }
         } catch (IOException e) {  
-            Log.e(Tools.LOG_TAG,
-                "IO Exception when getting kernel version for Device Info screen",
-                e);
-
-            return "Unavailable";
+            Log.e(Tools.LOG_TAG, "IO Exception when getting kernel version for Device Info screen", e);
         }
+        return getString(R.string.chat_log_unavailable);
     }
 }

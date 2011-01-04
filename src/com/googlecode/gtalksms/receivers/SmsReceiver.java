@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.data.contacts.ContactsManager;
 
 
 public class SmsReceiver extends BroadcastReceiver {
@@ -38,15 +37,11 @@ public class SmsReceiver extends BroadcastReceiver {
                     String msgString = msg.get(msgs[i].getOriginatingAddress()); // Check if index with number exists
                     
                     if(msgString == null) { // Index with number doesn't exist                                               
-                        senders.add(msgs[i].getOriginatingAddress());  // Save sender for accessing associative array later
-
-                        StringBuilder builder = new StringBuilder();    // Build string  
-                        builder.append("SMS from ");
-                        builder.append(ContactsManager.getContactName(context, msgs[i].getOriginatingAddress()));
-                        builder.append(": ");
-                        builder.append(msgs[i].getMessageBody().toString());
-                        // Save string into associative array with sendernumber as index
-                        msg.put(msgs[i].getOriginatingAddress(), builder.toString()); 
+                        // Save sender for accessing associative array later
+                        senders.add(msgs[i].getOriginatingAddress());  
+                        
+                        // Save string into associative array with sender number as index
+                        msg.put(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString()); 
                         
                     } else {    // Number has been there, add content
                         // msgString already contains sms:sndrNbr:previousparts of SMS, just add this part

@@ -161,8 +161,11 @@ public class MainService extends Service {
             }
         } else if (a.equals(ACTION_SMS_RECEIVED)) {
             if (getConnectionStatus() == XmppManager.CONNECTED) {
-                _xmppMgr.send(intent.getStringExtra("message")); 
-                setLastRecipient(intent.getStringExtra("sender"));
+                String number = intent.getStringExtra("sender");
+                String sender = makeBold(getString(R.string.chat_sms_from, 
+                        ContactsManager.getContactName(this, number)));
+                _xmppMgr.send(sender + intent.getStringExtra("message")); 
+                setLastRecipient(number);
             }
         } else if (a.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
@@ -380,7 +383,7 @@ public class MainService extends Service {
         _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext()) {
             void sendBatteryInfos(int level, boolean force) {
                 if (force || (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0)) {
-                    send("Battery level " + level + "%");
+                    send(getString(R.string.chat_battery_level, level));
                 }
                 if (_settings.notifyBatteryInStatus && _xmppMgr != null) {
                     _xmppMgr.setStatus(level);
@@ -529,7 +532,7 @@ public class MainService extends Service {
                 if (args.length() == 0) {
                     displayLastRecipient();
                 } else if (_lastRecipient == null) {
-                    send("Error: no recipient registered.");
+                    send(getString(R.string.chat_error_no_recipient));
                 } else {
                     _smsMgr.markAsRead(_lastRecipient);
                     sendSMS(args, _lastRecipient);
@@ -538,7 +541,7 @@ public class MainService extends Service {
                 if (args.length() > 0) {
                     markSmsAsRead(args);
                 } else if (_lastRecipient == null) {
-                    send("Error: no recipient registered.");
+                    send(getString(R.string.chat_error_no_recipient));
                 } else {
                     markSmsAsRead(_lastRecipient);
                 }
@@ -573,10 +576,10 @@ public class MainService extends Service {
             } else if (command.equals("https")) {
                 openLink("https:" + args);
             } else {
-                send('"' + commandLine + '"' + ": unknown command. Send \"?\" for getting help");
+                send(getString(R.string.chat_error_unknown_cmd, commandLine));
             }
         } catch (Exception ex) {
-            send("Error : " + ex);
+            send(getString(R.string.chat_error, ex));
         }
     }
 
@@ -608,14 +611,13 @@ public class MainService extends Service {
     
     private void shellCmd(String cmd) {
         final StringBuilder sb = new StringBuilder();
-        String separator = System.getProperty("line.separator");
         sb.append(cmd);
-        sb.append(separator);
+        sb.append(Tools.LineSep);
         
         if (!askRootAccess()) {
-            sb.append("Can't have root acess!" + separator);
+            sb.append(getString(R.string.chat_error_root) + Tools.LineSep);
         }
-            
+
         Process myproc = null;
         BufferedReader reader = null;
         try {
@@ -625,12 +627,12 @@ public class MainService extends Service {
             reader = new BufferedReader(new InputStreamReader(myproc.getInputStream()));
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
-                sb.append(separator);
+                sb.append(Tools.LineSep);
             }
             reader = new BufferedReader(new InputStreamReader(myproc.getErrorStream()));
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
-                sb.append(separator);
+                sb.append(Tools.LineSep);
             }
             send(sb.toString());
         }
@@ -641,13 +643,13 @@ public class MainService extends Service {
     
     public void displayLastRecipient() {
         if (_lastRecipient == null) {
-            send("Reply contact is not set");
+            send(getString(R.string.chat_error_no_recipient));
         } else {
             String contact = ContactsManager.getContactName(this, _lastRecipient);
             if (Phone.isCellPhoneNumber(_lastRecipient) && contact.compareTo(_lastRecipient) != 0) {
                 contact += " (" + _lastRecipient + ")";
             }
-            send("Reply contact is " + contact);
+            send(getString(R.string.chat_reply_contact, contact));
         }
     }
 
@@ -667,45 +669,45 @@ public class MainService extends Service {
 
     public void showHelp() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Available commands:\n");
-        builder.append("- " + makeBold("\"?\"") + ": shows this help.\n");
-        builder.append("- " + makeBold("\"exit\"") + ": stop application on your phone.\n");
-        builder.append("- " + makeBold("\"dial:#contact#\"") + ": dial the specified contact.\n");
-        builder.append("- " + makeBold("\"reply:#message#\"") + ": send a sms to your last recipient with content message.\n");
-        builder.append("- " + makeBold("\"sms\"") + ": display last sent sms from all contact.\n");
-        builder.append("- " + makeBold("\"sms:#contact#\"") + ": display last sent sms from searched contacts.\n");
-        builder.append("- " + makeBold("\"sms:#contact#:#message#\"") + ": sends a sms to number with content message.\n");
-        builder.append("- " + makeBold("\"markAsRead:#contact#\"") + " or " + makeBold("\"mar\"") + ": mark sms as read for last recipient or given contact.\n");
-        builder.append("- " + makeBold("\"battery\"") + " or " + makeBold("\"batt\"") + ": show battery level in percent.\n");
-        builder.append("- " + makeBold("\"calls\"") + ": display call log.\n");
-        builder.append("- " + makeBold("\"contact:#contact#\"") + ": display informations of a searched contact.\n");
-        builder.append("- " + makeBold("\"geo:#address#\"") + ": Open Maps or Navigation or Street view on specific address\n");
-        builder.append("- " + makeBold("\"where\"") + ": sends you google map updates about the location of the phone until you send \"stop\"\n");
-        builder.append("- " + makeBold("\"ring\"") + ": rings the phone until you send \"stop\"\n");
-        builder.append("- " + makeBold("\"copy:#text#\"") + ": copy text to clipboard or sent phone clipboard if text is empty\n");
-        builder.append("- " + makeBold("\"cmd:#command#\"") + ": execute shell instuction with root access if possible.\n");
-        builder.append("- " + makeBold("\"write:#text#\"") + " or " + makeBold("\"w:#text#\"") + ": write text as virtual keyboard (don't forget to activate keyboard in Android Preferences panel).\n");
-        builder.append("and you can paste links and open it with the appropriate app\n");
+        builder.append(getString(R.string.chat_help_title)).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_help, makeBold("\"?\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_stop, makeBold("\"exit\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_dial, makeBold("\"dial:#contact#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_sms_reply, makeBold("\"reply:#message#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_sms_show_all, makeBold("\"sms\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_sms_show_contact, makeBold("\"sms:#contact#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_sms_send, makeBold("\"sms:#contact#:#message#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_mark_as_read, makeBold("\"markAsRead:#contact#\""), makeBold("\"mar\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_battery, makeBold("\"battery\""), makeBold("\"batt\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_calls, makeBold("\"calls\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_contact, makeBold("\"contact:#contact#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_geo, makeBold("\"geo:#address#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_where, makeBold("\"where\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_ring, makeBold("\"ring\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_copy, makeBold("\"copy:#text#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_cmd, makeBold("\"cmd:#command#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_write, makeBold("\"write:#text#\""), makeBold("\"w:#text#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_urls)).append(Tools.LineSep);
         send(builder.toString());
     }
 
     public void geoLocate() {
         _hasOutgoingAction = true;
-        send("Start locating phone");
+        send(getString(R.string.chat_start_locating));
         _geoMgr.startLocatingPhone();
     }
 
     public void ring() {
         _hasOutgoingAction = true;
-        send("Ringing phone");
+        send(getString(R.string.chat_start_ringing));
         if (!_mediaMgr.ring()) {
-            send("Unable to ring, change the ringtone in the options");
+            send(getString(R.string.chat_error_ringing));
         }
     }
 
     public void stopNotifications() {
         if (_hasOutgoingAction) {
-            send("Stopping ongoing actions");
+            send(getString(R.string.chat_stop_actions));
         }
         _hasOutgoingAction = false;
         if (_geoMgr != null) {
@@ -724,23 +726,23 @@ public class MainService extends Service {
     /** sends a SMS to the specified contact */
     public void sendSMS(String message, String contact) {
         if (Phone.isCellPhoneNumber(contact)) {
-            send("Sending sms to " + ContactsManager.getContactName(this, contact));
+            send(getString(R.string.chat_send_sms, ContactsManager.getContactName(this, contact)));
             sendSMSByPhoneNumber(message, contact);
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contact);
             if (mobilePhones.size() > 1) {
-                send("Specify more details:");
+                send(getString(R.string.chat_specify_details));
 
                 for (Phone phone : mobilePhones) {
                     send(phone.contactName + " - " + phone.cleanNumber);
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
-                send("Sending sms to " + phone.contactName + " (" + phone.cleanNumber + ")");
+                send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")"));
                 setLastRecipient(phone.cleanNumber);
                 sendSMSByPhoneNumber(message, phone.cleanNumber);
             } else {
-                send("No match for \"" + contact + "\"");
+                send(getString(R.string.chat_no_match_for, contact));
             }
         }
     }
@@ -755,18 +757,18 @@ public class MainService extends Service {
     public void markSmsAsRead(String contact) {
 
         if (Phone.isCellPhoneNumber(contact)) {
-            send("Mark " + ContactsManager.getContactName(this, contact) + "'s sms as read");
+            send(getString(R.string.chat_mark_as_read, ContactsManager.getContactName(this, contact)));
             _smsMgr.markAsRead(contact);
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contact);
             if (mobilePhones.size() > 0) {
-                send("Mark " + mobilePhones.get(0).contactName + "'s sms as read");
+                send(getString(R.string.chat_mark_as_read, mobilePhones.get(0).contactName));
 
                 for (Phone phone : mobilePhones) {
                     _smsMgr.markAsRead(phone.number);
                 }
             } else {
-                send("No match for \"" + contact + "\"");
+                send(getString(R.string.chat_no_match_for, contact));
             }
         }
     }
@@ -797,22 +799,22 @@ public class MainService extends Service {
                     StringBuilder smsContact = new StringBuilder();
                     smsContact.append(makeBold(contact.name));
                     for (Sms sms : smsList) {
-                        smsContact.append("\r\n" + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
-                        smsContact.append("\r\n" + sms.message);
+                        smsContact.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
+                        smsContact.append(Tools.LineSep + sms.message);
                     }
                     if (smsList.size() < _settingsMgr.smsNumber) {
-                        smsContact.append("\r\n" + makeItalic("Only got " + smsList.size() + " sms"));
+                        smsContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_only_got_n_sms, smsList.size())));
                     }
-                    send(smsContact.toString() + "\r\n");
+                    send(smsContact.toString() + Tools.LineSep);
                 } else {
-                    noSms.append(makeBold(contact.name) + " - No sms found\r\n");
+                    noSms.append(makeBold(contact.name) + getString(R.string.chat_no_sms) + Tools.LineSep);
                 }
             }
             if (!hasMatch) {
                 send(noSms.toString());
             }
         } else {
-            send("No match for \"" + searchedText + "\"");
+            send(getString(R.string.chat_no_match_for, searchedText));
         }
     }
 
@@ -830,13 +832,13 @@ public class MainService extends Service {
         List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
         if (smsList.size() > 0) {
             for (Sms sms : smsList) {
-                allSms.append("\r\n" + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
-                allSms.append("\r\n" + sms.message);
+                allSms.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
+                allSms.append(Tools.LineSep + sms.message);
             }
         } else {
-            allSms.append("No sms found");
+            allSms.append(getString(R.string.chat_no_sms));
         }
-        send(allSms.toString() + "\r\n");
+        send(allSms.toString() + Tools.LineSep);
     }
 
     /** reads last Call Logs from all contacts */
@@ -850,13 +852,14 @@ public class MainService extends Service {
             for (Call call : callList) {
                 String caller = makeBold(ContactsManager.getContactName(this, call.phoneNumber));
 
-                all.append("\r\n" + makeItalic(call.date.toLocaleString()) + " - " + caller);
-                all.append(" - " + call.type + " of " + call.duration());
+                all.append(Tools.LineSep + makeItalic(call.date.toLocaleString()) + " - " + caller);
+                // TODO of
+                all.append(" - " + call.type(this) + getString(R.string.chat_call_duration) + call.duration());
             }
         } else {
-            all.append("No sms found");
+            all.append(getString(R.string.chat_no_call));
         }
-        send(all.toString() + "\r\n");
+        send(all.toString() + Tools.LineSep);
     }
 
     /** reads (count) SMS from all contacts matching pattern */
@@ -867,44 +870,44 @@ public class MainService extends Service {
         if (contacts.size() > 0) {
 
             if (contacts.size() > 1) {
-                send(contacts.size() + " contacts found for \"" + searchedText + "\"");
+                send(getString(R.string.chat_contact_found, contacts.size(), searchedText));
             }
 
             for (Contact contact : contacts) {
                 StringBuilder strContact = new StringBuilder();
                 strContact.append(makeBold(contact.name));
 
-                // strContact.append("\r\n" + "Id : " + contact.id);
-                // strContact.append("\r\n" + "Raw Ids : " + TextUtils.join(" ",
+                // strContact.append(Tools.LineSep + "Id : " + contact.id);
+                // strContact.append(Tools.LineSep + "Raw Ids : " + TextUtils.join(" ",
                 // contact.rawIds));
 
                 ArrayList<Phone> mobilePhones = ContactsManager.getPhones(this, contact.id);
                 if (mobilePhones.size() > 0) {
-                    strContact.append("\r\n" + makeItalic("Phones"));
+                    strContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_phones)));
                     for (Phone phone : mobilePhones) {
-                        strContact.append("\r\n" + phone.label + " - " + phone.cleanNumber);
+                        strContact.append(Tools.LineSep + phone.label + " - " + phone.cleanNumber);
                     }
                 }
 
                 ArrayList<ContactAddress> emails = ContactsManager.getEmailAddresses(this, contact.id);
                 if (emails.size() > 0) {
-                    strContact.append("\r\n" + makeItalic("Emails"));
+                    strContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_emails)));
                     for (ContactAddress email : emails) {
-                        strContact.append("\r\n" + email.label + " - " + email.address);
+                        strContact.append(Tools.LineSep + email.label + " - " + email.address);
                     }
                 }
 
                 ArrayList<ContactAddress> addresses = ContactsManager.getPostalAddresses(this, contact.id);
                 if (addresses.size() > 0) {
-                    strContact.append("\r\n" + makeItalic("Addresses"));
+                    strContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_addresses)));
                     for (ContactAddress address : addresses) {
-                        strContact.append("\r\n" + address.label + " - " + address.address);
+                        strContact.append(Tools.LineSep + address.label + " - " + address.address);
                     }
                 }
-                send(strContact.toString() + "\r\n");
+                send(strContact.toString() + Tools.LineSep);
             }
         } else {
-            send("No match for \"" + searchedText + "\"");
+            send(getString(R.string.chat_no_match_for, searchedText));
         }
     }
 
@@ -913,11 +916,11 @@ public class MainService extends Service {
         List<Address> addresses = _geoMgr.geoDecode(text);
         if (addresses != null) {
             if (addresses.size() > 1) {
-                send("Specify more details:");
+                send(getString(R.string.chat_specify_details));
                 for (Address address : addresses) {
                     StringBuilder addr = new StringBuilder();
                     for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-                        addr.append(address.getAddressLine(i) + "\n");
+                        addr.append(address.getAddressLine(i) + Tools.LineSep);
                     }
                     send(addr.toString());
                 }
@@ -925,7 +928,7 @@ public class MainService extends Service {
                 _geoMgr.launchExternal(addresses.get(0).getLatitude() + "," + addresses.get(0).getLongitude());
             }
         } else {
-            send("No match for \"" + text + "\"");
+            send(getString(R.string.chat_no_match_for, text));
             // For emulation testing
             // GeoManager.launchExternal("48.833199,2.362232");
         }
@@ -947,10 +950,10 @@ public class MainService extends Service {
         try {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Service.CLIPBOARD_SERVICE);
             clipboard.setText(text);
-            send("Text copied");
+            send(getString(R.string.chat_text_copied));
         } catch (Exception ex) {
             Log.w(Tools.LOG_TAG, "Clipboard error", ex);
-            send("Clipboard access failed");
+            send(getString(R.string.chat_error_clipboard));
         }
     }
 
@@ -958,18 +961,18 @@ public class MainService extends Service {
     public void sendClipboard() {
         try {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Service.CLIPBOARD_SERVICE);
-            send("GPhone clipboard: " + clipboard.getText());
+            send(getString(R.string.chat_clipboard, clipboard.getText()));
             
         } catch (Exception ex) {
             Log.w(Tools.LOG_TAG, "Clipboard error", ex);
-            send("Clipboard access failed");
+            send(getString(R.string.chat_error_clipboard));
         }
     }
 
     /** lets the user choose an activity compatible with the url */
     private void openLink(String url) {
         Intent target = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        Intent intent = Intent.createChooser(target, "GTalkSMS: choose an activity");
+        Intent intent = Intent.createChooser(target, getString(R.string.chat_choose_activity));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
@@ -985,7 +988,7 @@ public class MainService extends Service {
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contactInfo);
             if (mobilePhones.size() > 1) {
-                send("Specify more details:");
+                send(getString(R.string.chat_specify_details));
 
                 for (Phone phone : mobilePhones) {
                     send(phone.contactName + " - " + phone.cleanNumber);
@@ -995,14 +998,14 @@ public class MainService extends Service {
                 contact = phone.contactName;
                 number = phone.cleanNumber;
             } else {
-                send("No match for \"" + contactInfo + "\"");
+                send(getString(R.string.chat_no_match_for, contactInfo));
             }
         }
 
         if (number != null) {
-            send("Dial " + contact + " (" + number + ")");
+            send(getString(R.string.chat_dial, contact + " (" + number + ")"));
             if (!_phoneMgr.Dial(number)) {
-                send("Error can't dial.");
+                send(getString(R.string.chat_error_dial));
             }
         }
     }

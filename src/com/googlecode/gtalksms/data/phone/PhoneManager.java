@@ -55,7 +55,7 @@ public class PhoneManager {
             }
             call.duration = Tools.getLong(c, CallLog.Calls.DURATION);
             call.date = Tools.getDateMilliSeconds(c, CallLog.Calls.DATE);
-            call.type = Call.Type[Tools.getInt(c,CallLog.Calls.TYPE)];
+            call.type = Tools.getInt(c,CallLog.Calls.TYPE);
             
             res.add(call);
         }

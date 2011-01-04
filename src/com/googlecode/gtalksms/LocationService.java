@@ -82,10 +82,10 @@ public class LocationService extends Service {
     public void sendLocationUpdate(Location location) {
         StringBuilder builder = new StringBuilder();
         builder.append("http://maps.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude() + " (");
-        builder.append("accuracy: " + location.getAccuracy() + "m ");
-        builder.append("altitude: " + location.getAltitude() + " ");
-        builder.append("speed: " + location.getSpeed() + "m/s ");
-        builder.append("provider: " + location.getProvider() + ")");
+        builder.append(getString(R.string.chat_geo_accuracy, location.getAccuracy()));
+        builder.append(getString(R.string.chat_geo_altitude, location.getAltitude()));
+        builder.append(getString(R.string.chat_geo_speed, location.getSpeed()));
+        builder.append(getString(R.string.chat_geo_provider, location.getProvider()));
         MainService.send(this, builder.toString());
     }
 

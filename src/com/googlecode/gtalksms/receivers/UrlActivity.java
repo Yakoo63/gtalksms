@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 
 public class UrlActivity extends Activity {
     Handler _handler = new Handler();
@@ -32,7 +33,7 @@ public class UrlActivity extends Activity {
 
             MainService.send(this, url.toString());
         } catch (Exception e) {
-            MainService.send(this, "failed: " + e.toString());
+            MainService.send(this, getString(R.string.chat_error, e.toString()));
         }
         finish();
     }

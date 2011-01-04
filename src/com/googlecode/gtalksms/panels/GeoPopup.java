@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms.panels;
 
+import com.googlecode.gtalksms.R;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -21,7 +23,7 @@ public class GeoPopup extends Activity {
             final Activity popup = this;
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Choose Geo App");
+            builder.setTitle(getString(R.string.chat_choose_activity));
             builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
                     dialog.cancel();

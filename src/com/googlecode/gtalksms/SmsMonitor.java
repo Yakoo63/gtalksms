@@ -32,19 +32,19 @@ public abstract class SmsMonitor {
                 public void onReceive(Context arg0, Intent arg1) {
                     switch (getResultCode()) {
                         case Activity.RESULT_OK:
-                            sendSmsStatus("SMS sent");
+                            sendSmsStatus(_context.getString(R.string.chat_sms_sent));
                             break;
                         case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                            sendSmsStatus("Generic failure");
+                            sendSmsStatus(_context.getString(R.string.chat_sms_failure));
                             break;
                         case SmsManager.RESULT_ERROR_NO_SERVICE:
-                            sendSmsStatus("No service");
+                            sendSmsStatus(_context.getString(R.string.chat_sms_no_service));
                             break;
                         case SmsManager.RESULT_ERROR_NULL_PDU:
-                            sendSmsStatus("Null PDU");
+                            sendSmsStatus(_context.getString(R.string.chat_sms_null_pdu));
                             break;
                         case SmsManager.RESULT_ERROR_RADIO_OFF:
-                            sendSmsStatus("Radio off");
+                            sendSmsStatus(_context.getString(R.string.chat_sms_radio_off));
                             break;
                     }
                 }
@@ -60,10 +60,10 @@ public abstract class SmsMonitor {
                 public void onReceive(Context arg0, Intent arg1) {
                     switch (getResultCode()) {
                         case Activity.RESULT_OK:
-                            sendSmsStatus("SMS delivered");
+                            sendSmsStatus(_context.getString(R.string.chat_sms_delivered));
                             break;
                         case Activity.RESULT_CANCELED:
-                            sendSmsStatus("SMS not delivered");
+                            sendSmsStatus(_context.getString(R.string.chat_sms_not_delivered));
                             break;
                     }
                 }

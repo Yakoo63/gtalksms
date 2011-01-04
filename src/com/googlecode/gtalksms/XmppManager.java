@@ -89,7 +89,7 @@ public class XmppManager {
         if (_connection != null && _connection.isConnected()) {
             updateStatus(DISCONNECTING);
             if (_settings.notifyApplicationConnection) {
-                send("GTalkSMS stopped.");
+                send(_context.getString(R.string.chat_app_stop));
             }
         }
         
@@ -280,7 +280,7 @@ public class XmppManager {
         updateStatus(CONNECTED);
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
-            send("Welcome to GTalkSMS " + Tools.getVersionName(_context, getClass()) + ". Send \"?\" for getting help");
+            send(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context, getClass())));
         }
         Presence presence = new Presence(Presence.Type.available);
         presence.setStatus(_presenceMessage);
