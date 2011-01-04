@@ -22,9 +22,9 @@
         <activity android:name="com.googlecode.gtalksms.LogCollectorActivity"/>
         <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService">
             <intent-filter>
-                <action android:name=".GTalkSMS.CONNECT" />
-                <action android:name=".GTalkSMS.TOGGLE" />
-                <action android:name=".GTalkSMS.SEND" />
+                <action android:name="com.googlecode.gtalksms.action.CONNECT" />
+                <action android:name="com.googlecode.gtalksms.action.TOGGLE" />
+                <action android:name="com.googlecode.gtalksms.action.SEND" />
             </intent-filter>
         </service>
         <receiver android:name="com.googlecode.gtalksms.WidgetProvider" >

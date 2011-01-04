@@ -48,6 +48,15 @@ import com.googlecode.gtalksms.R;
 
 public class MainService extends Service {
 
+    // The following actions are documented and registered in our manifest
+    public final static String ACTION_CONNECT = "com.googlecode.gtalksms.action.CONNECT";
+    public final static String ACTION_TOGGLE = "com.googlecode.gtalksms.action.TOGGLE";
+    public final static String ACTION_SEND = "com.googlecode.gtalksms.action.SEND";
+    // The following actions are undocumented and internal to our implementation.
+    public final static String ACTION_BROADCAST_STATUS = "com.googlecode.gtalksms.action.BROADCAST_STATUS";
+    public final static String ACTION_SMS_RECEIVED = "com.googlecode.gtalksms.action.SMS_RECEIVED";
+    public final static String ACTION_NETWORK_CHANGED = "com.googlecode.gtalksms.action.NETWORK_CHANGED";
+
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
     // about some events
@@ -118,7 +127,7 @@ public class MainService extends Service {
         }
         String a = intent.getAction();
         Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + getConnectionStatus());
-        if (a.equals(".GTalkSMS.CONNECT")) {
+        if (a.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // request to disconnect.
                 xmppStop();
@@ -128,7 +137,7 @@ public class MainService extends Service {
                     xmppStart();
                 }
             }
-        } else if (a.equals(".GTalkSMS.TOGGLE")) {
+        } else if (a.equals(ACTION_TOGGLE)) {
             switch (getConnectionStatus()) {
             case XmppManager.CONNECTED:
             case XmppManager.WAITING_TO_CONNECT:
@@ -142,20 +151,20 @@ public class MainService extends Service {
                 Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ getConnectionStatus());
                 break;
             }
-        } else if (a.equals(".GTalkSMS.BROADCAST_STATUS")) {
+        } else if (a.equals(ACTION_BROADCAST_STATUS)) {
             // A request to broadcast our current status.
             int state = _xmppMgr == null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
             XmppManager.broadcastStatus(this, state, state);
-        } else if (a.equals(".GTalkSMS.SEND")) {
+        } else if (a.equals(ACTION_SEND)) {
             if (getConnectionStatus() == XmppManager.CONNECTED) {
                 _xmppMgr.send(intent.getStringExtra("message"));
             }
-        } else if (a.equals(".GTalkSMS.SMS_RECEIVED")) {
+        } else if (a.equals(ACTION_SMS_RECEIVED)) {
             if (getConnectionStatus() == XmppManager.CONNECTED) {
                 _xmppMgr.send(intent.getStringExtra("message")); 
                 setLastRecipient(intent.getStringExtra("sender"));
             }
-        } else if (a.equals(".GTalkSMS.NETWORK_CHANGED")) {
+        } else if (a.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
             Log.d(Tools.LOG_TAG, "network_changed with available=" + available + 
                                  " and with _xmpp=" + (_xmppMgr != null));
@@ -476,7 +485,7 @@ public class MainService extends Service {
     }
 
     public static void send(Context ctx, String msg) {
-        ctx.startService(newSvcIntent(ctx, ".GTalkSMS.SEND", msg));
+        ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg));
     }
 
     public void send(String msg) {
@@ -502,7 +511,7 @@ public class MainService extends Service {
             if (command.equals("?")) {
                 showHelp();
             } else if (command.equals("exit")) {
-                stopService(new Intent(".GTalkSMS.CONNECT"));
+                stopService(new Intent(ACTION_CONNECT));
             } else if (command.equals("sms")) {
                 int separatorPos = args.indexOf(":");
                 String contact = null;

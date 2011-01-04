@@ -70,7 +70,7 @@ public class KeyboardInputMethod extends InputMethodService {
     public void onCreate() {
         super.onCreate();
 
-        if (this.bindService(new Intent(".GTalkSMS.CONNECT"), mainServiceConnection, BIND_AUTO_CREATE) == false) {
+        if (this.bindService(new Intent(MainService.ACTION_CONNECT), mainServiceConnection, BIND_AUTO_CREATE) == false) {
             throw new RuntimeException("failed to connect to mainService");
         }
     }

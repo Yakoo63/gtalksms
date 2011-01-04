@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms.receivers;
 
+import com.googlecode.gtalksms.MainService;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +14,7 @@ public class BootReceiver extends BroadcastReceiver {
         SharedPreferences prefs = context.getSharedPreferences("GTalkSMS", 0);
         boolean startAtBoot = prefs.getBoolean("startAtBoot", false);
         if (startAtBoot) {
-            Intent serviceIntent = new Intent(".GTalkSMS.CONNECT");
+            Intent serviceIntent = new Intent(MainService.ACTION_CONNECT);
             context.startService(serviceIntent);
         }
     }

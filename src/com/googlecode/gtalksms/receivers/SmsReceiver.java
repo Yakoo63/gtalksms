@@ -57,7 +57,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
                 // Finally, send all SMS via XMPP by sender
                 for(String sender : senders) {
-                    Intent svcintent = MainService.newSvcIntent(context, ".GTalkSMS.SMS_RECEIVED", msg.get(sender) + "\n");
+                    Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender) + "\n");
                     svcintent.putExtra("sender", sender);
                     context.startService(svcintent);
                 }

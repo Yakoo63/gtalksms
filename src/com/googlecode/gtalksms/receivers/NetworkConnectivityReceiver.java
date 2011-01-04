@@ -26,14 +26,14 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
             // and we are connected , we must disconnect.
             if (network == null || !network.isConnected() || failover) {
                 Log.i(Tools.LOG_TAG, "notifying that the network is unavailable");
-                Intent svcintent = MainService.newSvcIntent(context, ".GTalkSMS.NETWORK_CHANGED");
+                Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_NETWORK_CHANGED);
                 svcintent.putExtra("available", false);
                 context.startService(svcintent);
             }
             // connect if not already connected (eg, if we disconnected above) and we have connectivity
             if (!nocon) {
                 Log.i(Tools.LOG_TAG, "notifying that a network is available...");
-                Intent svcintent = MainService.newSvcIntent(context, ".GTalkSMS.NETWORK_CHANGED");
+                Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_NETWORK_CHANGED);
                 svcintent.putExtra("available", true);
                 context.startService(svcintent);
             }

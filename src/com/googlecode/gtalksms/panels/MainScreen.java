@@ -69,7 +69,7 @@ public class MainScreen extends Activity {
         IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_PRESENCE_CHANGED);
         intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
         registerReceiver(xmppreceiver, intentFilter);
-        Intent intent = new Intent(".GTalkSMS.CONNECT");
+        Intent intent = new Intent(MainService.ACTION_CONNECT);
         bindService(intent, mainServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -111,7 +111,7 @@ public class MainScreen extends Activity {
         Button startStopButton = (Button) findViewById(R.id.StartStop);
         startStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                startService(MainService.newSvcIntent(MainScreen.this, ".GTalkSMS.TOGGLE"));
+                startService(MainService.newSvcIntent(MainScreen.this, MainService.ACTION_TOGGLE));
             }
         });
         

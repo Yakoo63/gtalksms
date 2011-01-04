@@ -18,7 +18,7 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // The widget needs to be updated - just ask the service to broadcast it's current
         // status - the actual update happens when we receive that...
-        Intent intent = MainService.newSvcIntent(context, ".GTalkSMS.BROADCAST_STATUS");
+        Intent intent = MainService.newSvcIntent(context, MainService.ACTION_BROADCAST_STATUS);
         context.startService(intent);
     }
 
@@ -68,7 +68,7 @@ public class WidgetProvider extends AppWidgetProvider {
         String action = intent.getAction();
         Log.d(Tools.LOG_TAG, "widget onReceive " + action);
         if (action.equals(".WidgetGTalkSMS.ACTION")) {
-            Intent svcintent = MainService.newSvcIntent(context, ".GTalkSMS.TOGGLE");
+            Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_TOGGLE);
             context.startService(svcintent);
         } else if (action.equals("com.googlecode.gtalksms.XMPP_CONNECTION_CHANGED")) {
             int state = intent.getIntExtra("new_state", 0);

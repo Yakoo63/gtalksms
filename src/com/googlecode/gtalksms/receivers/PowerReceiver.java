@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms.receivers;
 
+import com.googlecode.gtalksms.MainService;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +16,7 @@ public class PowerReceiver extends BroadcastReceiver {
         boolean connected = intent.getAction().equals("android.intent.action.ACTION_POWER_CONNECTED");
         String prefName = connected ? "startOnPowerConnected" : "stopOnPowerDisconnected";
         if (prefs.getBoolean(prefName, false)) {
-            Intent serviceIntent = new Intent(".GTalkSMS.CONNECT");
+            Intent serviceIntent = new Intent(MainService.ACTION_CONNECT);
             if (!connected) {
                 serviceIntent.putExtra("disconnect", true);
             }
