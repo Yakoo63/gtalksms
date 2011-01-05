@@ -22,10 +22,10 @@ import android.widget.TextView;
 
 import com.googlecode.gtalksms.LogCollectorActivity;
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
-import com.googlecode.gtalksms.R;
 
 public class MainScreen extends Activity {
 

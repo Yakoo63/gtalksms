@@ -21,7 +21,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 
 // From android-log-collector - http://code.google.com/p/android-log-collector

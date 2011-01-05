@@ -44,7 +44,6 @@ import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.receivers.PhoneCallListener;
 import com.googlecode.gtalksms.tools.Tools;
-import com.googlecode.gtalksms.R;
 
 public class MainService extends Service {
 

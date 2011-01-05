@@ -7,10 +7,10 @@ import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
 import android.widget.TextView;
 
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.tools.Web;
-import com.googlecode.gtalksms.R;
 
 public class About extends Activity {
 

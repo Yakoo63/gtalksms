@@ -1,11 +1,11 @@
 package com.googlecode.gtalksms.receivers;
 
-import com.googlecode.gtalksms.MainService;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
+import com.googlecode.gtalksms.MainService;
 
 public class PowerReceiver extends BroadcastReceiver {
 

@@ -12,6 +12,7 @@ import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.PhoneLookup;
 import android.provider.ContactsContract.RawContacts;
+import android.util.Log;
 
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.data.phone.Phone;
@@ -26,13 +27,18 @@ public class ContactsManager {
     public static String getContactName (Context ctx, String phoneNumber) {
         String res;
         if (phoneNumber != null) {
-            res = phoneNumber;
-            ContentResolver resolver = ctx.getContentResolver();
-            Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-            Cursor c = resolver.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
-
-            if (c.moveToFirst()) {
-                res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
+            try {
+                res = phoneNumber;
+                ContentResolver resolver = ctx.getContentResolver();
+                Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+                Cursor c = resolver.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
+    
+                if (c.moveToFirst()) {
+                    res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
+                }
+            } catch (Exception ex) {
+              Log.e(Tools.LOG_TAG, "getContactName error: Phone number = " + phoneNumber, ex);  
+              res = ctx.getString(R.string.chat_call_hidden);
             }
         } else {
             res = ctx.getString(R.string.chat_call_hidden);
