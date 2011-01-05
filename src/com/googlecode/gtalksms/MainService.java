@@ -55,6 +55,7 @@ public class MainService extends Service {
     public final static String ACTION_BROADCAST_STATUS = "com.googlecode.gtalksms.action.BROADCAST_STATUS";
     public final static String ACTION_SMS_RECEIVED = "com.googlecode.gtalksms.action.SMS_RECEIVED";
     public final static String ACTION_NETWORK_CHANGED = "com.googlecode.gtalksms.action.NETWORK_CHANGED";
+    public final static String ACTION_HANDLE_XMPP_NOTIFY = "com.googlecode.gtalksms.action.HANDLE_XMPP_NOTIFY";
 
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
@@ -124,42 +125,49 @@ public class MainService extends Service {
             Log.e(Tools.LOG_TAG, "onHandleIntent: Intent null");
             return;
         }
+        // We need to handle xmpp state changes which happened "externally" - eg,
+        // due to a connection error, or running out of retries, or a retry
+        // handler actually succeeding etc.
+        int initialState = getConnectionStatus(); 
+        updateListenersToCurrentState(initialState);
+        
         String a = intent.getAction();
-        Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + getConnectionStatus());
+        Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + initialState);
         if (a.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // request to disconnect.
-                xmppStop();
+                xmppRequestStateChange(XmppManager.DISCONNECTED);
             } else {
                 // a simple 'connect' request.
-                if (_xmppMgr == null) {
-                    xmppStart();
-                }
+                xmppRequestStateChange(XmppManager.CONNECTED);
             }
         } else if (a.equals(ACTION_TOGGLE)) {
-            switch (getConnectionStatus()) {
+            switch (initialState) {
             case XmppManager.CONNECTED:
             case XmppManager.WAITING_TO_CONNECT:
-                xmppStop();
-                assert getConnectionStatus() == XmppManager.DISCONNECTED;
+                xmppRequestStateChange(XmppManager.DISCONNECTED);
                 break;
             case XmppManager.DISCONNECTED:
-                xmppStart();
+                xmppRequestStateChange(XmppManager.CONNECTED);
                 break;
             default:
-                Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ getConnectionStatus());
+                Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ initialState);
                 break;
             }
-        } else if (a.equals(ACTION_BROADCAST_STATUS)) {
-            // A request to broadcast our current status.
-            int state = _xmppMgr == null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
-            XmppManager.broadcastStatus(this, state, state);
         } else if (a.equals(ACTION_SEND)) {
-            if (getConnectionStatus() == XmppManager.CONNECTED) {
+            if (initialState == XmppManager.CONNECTED) {
                 _xmppMgr.send(intent.getStringExtra("message"));
             }
+        } else if (a.equals(ACTION_HANDLE_XMPP_NOTIFY)) {
+            // If there is a message, then it is what we received.
+            // If there is no message, it just means the xmpp connection state
+            // changed - and we already handled that earlier in this method.
+            String message = intent.getStringExtra("message");
+            if (message != null) {
+                onMessageReceived(intent.getStringExtra("message"));
+            }
         } else if (a.equals(ACTION_SMS_RECEIVED)) {
-            if (getConnectionStatus() == XmppManager.CONNECTED) {
+            if (initialState == XmppManager.CONNECTED) {
                 String number = intent.getStringExtra("sender");
                 String sender = makeBold(getString(R.string.chat_sms_from, 
                         ContactsManager.getContactName(this, number)));
@@ -169,12 +177,15 @@ public class MainService extends Service {
         } else if (a.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
             Log.d(Tools.LOG_TAG, "network_changed with available=" + available + 
-                                 " and with _xmpp=" + (_xmppMgr != null));
-
-            if (available && getConnectionStatus() != XmppManager.CONNECTED 
-                          && getConnectionStatus() != XmppManager.CONNECTING) {
-                xmppStop(XmppManager.WAITING_TO_CONNECT);
-                xmppStart();
+                                 " and with state=" + initialState);
+            if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
+                // We are in a waiting state and have a network - try to connect.
+                xmppRequestStateChange(XmppManager.CONNECTED);
+            } else if (!available && initialState==XmppManager.CONNECTED) {
+                // We are connected but the network has gone down - disconnect and go
+                // into WAITING state so we auto-connect when we get a future 
+                // notification that a network is available.
+                xmppRequestStateChange(XmppManager.WAITING_TO_CONNECT);
             }
         } else {
             Log.w(Tools.LOG_TAG, "Unexpected intent: " + a);
@@ -340,6 +351,48 @@ public class MainService extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
+        // A special case for the 'broadcast status' intent - we avoid setting up
+        // the _xmppMgr etc
+        if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
+            // A request to broadcast our current status.
+            int state = getConnectionStatus();
+            XmppManager.broadcastStatus(this, state, state);
+            return;
+        }
+        // OK - a real action request - ensure xmpp is setup (but not yet connected)
+        // in preparation for the worker thread performing the request.
+        if (_xmppMgr == null) {
+            _settingsMgr.importPreferences(getBaseContext());
+            if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
+                Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
+                Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
+                settingsActivity.putExtra("panel", R.xml.prefs_connection);
+                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(settingsActivity);
+                return;
+            }
+
+            _xmppreceiver = new BroadcastReceiver() {
+                public void onReceive(Context context, Intent intent) {
+                    String action = intent.getAction();
+                    if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
+                        // as this comes in on the main thread and not the worker thread,
+                        // we just push the message onto the worker thread queue.
+                        startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY, intent.getStringExtra("message")));
+                    } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
+                        onConnectionStatusChanged(intent.getIntExtra("old_state", 0),
+                                                  intent.getIntExtra("new_state", 0));
+                        startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY));
+                    }
+                }
+            };
+            IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
+            intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
+            registerReceiver(_xmppreceiver, intentFilter);
+            
+            _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
+        }
+
         Message msg = _serviceHandler.obtainMessage();
         msg.arg1 = startId;
         msg.obj = intent;
@@ -352,7 +405,77 @@ public class MainService extends Service {
         return START_STICKY;
     }
 
-    private void xmppStart() {
+    // This method *requests* a state change - what state things actually
+    // wind up in is impossible to know (eg, a request to connect may wind up
+    // with a state of CONNECTED, DISCONNECTED or WAITING_TO_CONNECT...
+    private void xmppRequestStateChange(int newState) {
+        int currentState = _xmppMgr.getConnectionStatus();
+        switch (newState) {
+        case XmppManager.CONNECTED:
+            switch (currentState) {
+            case XmppManager.CONNECTED:
+                break;
+            case XmppManager.DISCONNECTED:
+            case XmppManager.WAITING_TO_CONNECT:
+                _xmppMgr.stop();
+                _xmppMgr.start();
+                break;
+            default:
+                throw new IllegalStateException("unexpected current state when moving to connected: "+currentState);
+            }
+            break;
+        case XmppManager.DISCONNECTED:
+            _xmppMgr.stop();
+            break;
+        case XmppManager.WAITING_TO_CONNECT:
+            switch (currentState) {
+            case XmppManager.CONNECTED:
+                _xmppMgr.stop();
+                _xmppMgr.start(XmppManager.WAITING_TO_CONNECT);
+                break;
+            case XmppManager.DISCONNECTED:
+                _xmppMgr.start(XmppManager.WAITING_TO_CONNECT);
+                break;
+            case XmppManager.WAITING_TO_CONNECT:
+                break;
+            default:
+                throw new IllegalStateException("unexpected current state when moving to waiting: "+currentState);
+            }
+            break;
+        default:
+            throw new IllegalStateException("invalid state to switch to: "+newState);
+        }
+        // Now we have requested a new state, our state receiver will see when
+        // the state actually changes and update everything accordingly.
+    }
+
+    private int updateListenersToCurrentState(int currentState) {
+        boolean wantListeners;
+        switch (currentState) {
+        case XmppManager.CONNECTED:
+            wantListeners = true;
+            break;
+        case XmppManager.CONNECTING:
+        case XmppManager.DISCONNECTED:
+        case XmppManager.DISCONNECTING:
+        case XmppManager.WAITING_TO_CONNECT:
+            wantListeners = false;
+            break;
+        default:
+            throw new IllegalStateException("updateListeners found invalid state: "+currentState);
+        }
+        // We use the fact _batteryMonitor is null or not as a flag to say
+        // if we previously setup the stuff we need while connected.
+        if (wantListeners && _batteryMonitor == null) {
+            setupListenersForConnection();
+        } else if (!wantListeners && _batteryMonitor != null) {
+            teardownListenersForConnection();
+        }
+        return currentState;
+    }
+
+    private void setupListenersForConnection() {
+        Log.d(Tools.LOG_TAG, "setupListenersForConnection");
         _gAnalytics = GoogleAnalyticsTracker.getInstance();
         _gAnalytics.setProductVersion(
                 Tools.getVersion(getBaseContext(), getClass()), 
@@ -365,16 +488,6 @@ public class MainService extends Service {
                 0);       // Value      
         _gAnalytics.dispatch();
         
-        _settingsMgr.importPreferences(getBaseContext());
-        if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
-            Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
-            Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
-            settingsActivity.putExtra("panel", R.xml.prefs_connection);
-            settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(settingsActivity);
-            return;
-        }
-
         _mediaMgr = new MediaManager(_settingsMgr, getBaseContext());
         _geoMgr = new GeoManager(_settingsMgr, getBaseContext());
         _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
@@ -384,7 +497,7 @@ public class MainService extends Service {
                 if (force || (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0)) {
                     send(getString(R.string.chat_battery_level, level));
                 }
-                if (_settings.notifyBatteryInStatus && _xmppMgr != null) {
+                if (_settings.notifyBatteryInStatus) {
                     _xmppMgr.setStatus(level);
                 }
             }
@@ -403,64 +516,37 @@ public class MainService extends Service {
         }
             
         _mediaMgr.initMediaPlayer();
-
-        _xmppreceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
-                    onMessageReceived(intent.getStringExtra("message"));
-                } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
-                    onConnectionStatusChanged(intent.getIntExtra("old_state", 0),
-                                              intent.getIntExtra("new_state", 0));
-                }
-            }
-        };
-        IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
-        intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
-        registerReceiver(_xmppreceiver, intentFilter);
-        if (_xmppMgr == null) {
-            _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
-        }
-        _xmppMgr.start();
     }
 
     @Override
     public void onDestroy() {
         Log.i(Tools.LOG_TAG, "service destroyed");
         running = false;
-        xmppStop();
+        // If the _xmppManager is non-null, then our service was "started" (as
+        // opposed to simply "created" - so tell the user it has stopped.
+        if (_xmppMgr != null) {
+            unregisterReceiver(_xmppreceiver);
+            _xmppreceiver = null;
+            
+            Tools.toastMessage(this, getString(R.string.main_service_stop));
+            _xmppMgr.stop();
+            _xmppMgr = null;
+        }
+        teardownListenersForConnection();
         _serviceLooper.quit();
         super.onDestroy();
     }
     
-    private void xmppStop() {
-        xmppStop(XmppManager.DISCONNECTED);
-    }
-
-    private void xmppStop(int finalState) {
+    private void teardownListenersForConnection() {
+        Log.d(Tools.LOG_TAG, "teardownListenersForConnection");
         if (_gAnalytics != null) {
             _gAnalytics.stop();
             _gAnalytics = null;
         }
         
         stopNotifications();
-        if (_xmppMgr != null) {
-            Tools.toastMessage(this, getString(R.string.main_service_stop));
-            _xmppMgr.stop();
-            _xmppMgr = null;
-            // If we have been asked to go into some state other than
-            // disconnected, create the new _xmppMgr now with that state.
-            if (finalState == XmppManager.WAITING_TO_CONNECT) {
-                _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
-                _xmppMgr.start(finalState);
-            }
-        }
-        if (_xmppreceiver != null) {
-            unregisterReceiver(_xmppreceiver);
-            _xmppreceiver = null;
-        }
 
-        stopForegroundCompat(XmppManager.DISCONNECTED);
+        stopForegroundCompat(getConnectionStatus());
 
         if (_geoMgr != null) {
             _geoMgr.stopLocatingPhone();
@@ -496,6 +582,7 @@ public class MainService extends Service {
 
     /** handles the different commands */
     public void onMessageReceived(String commandLine) {
+        Log.v(Tools.LOG_TAG, "onMessageReceived: " + commandLine);
         try {
             String command;
             String args;

@@ -47,7 +47,16 @@ public class XmppManager {
     
     // Our current retry attempt, plus a runnable and handler to implement retry
     private int _currentRetryCount = 0;
-    Runnable _reconnectRunnable = null;
+    Runnable _reconnectRunnable = new Runnable() {
+        public void run() {
+            if (_currentRetryCount > 0) {
+                Log.v(Tools.LOG_TAG, "attempting reconnection");
+                Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_reconnecting));
+            }
+            initConnection();
+        }
+    };
+
     Handler _reconnectHandler = new Handler();
 
     private SettingsManager _settings;
@@ -64,15 +73,6 @@ public class XmppManager {
     
     public void start(int initialState) {
         _currentRetryCount = 0;
-        _reconnectRunnable = new Runnable() {
-            public void run() {
-                if (_currentRetryCount > 0) {
-                    Log.v(Tools.LOG_TAG, "attempting reconnection");
-                    Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_reconnecting));
-                }
-                initConnection();
-            }
-        };
         switch (initialState) {
             case CONNECTED:
                 initConnection();
@@ -93,9 +93,7 @@ public class XmppManager {
             }
         }
         
-        if (_reconnectRunnable != null) {
-            _reconnectHandler.removeCallbacks(_reconnectRunnable);
-        }
+        _reconnectHandler.removeCallbacks(_reconnectRunnable);
         
         if (_connection != null) {
             if (_packetListener != null) {
@@ -124,7 +122,10 @@ public class XmppManager {
                         _x.disconnect();
                     }
                 }
-                new Thread(new DisconnectRunnable(_connection), "xmpp-disconnector").start();
+                Thread t = new Thread(new DisconnectRunnable(_connection), "xmpp-disconnector");
+                // we don't want this thread to hold up process shutdown so mark as daemonic.
+                t.setDaemon(true);
+                t.start();
             }
         }
         _connection = null;
@@ -143,8 +144,13 @@ public class XmppManager {
 
     private void updateStatus(int status) {
         if (status != _status) {
-            broadcastStatus(_context, _status, status);
+            // ensure _status is set before broadcast, just in-case
+            // a receiver happens to wind up querying the state on
+            // delivery.
+            int old = _status;
             _status = status;
+            Log.v(Tools.LOG_TAG, "broadcasting state transition from "+old+" to "+status);
+            broadcastStatus(_context, old, status);
         }
     }
 
@@ -152,13 +158,12 @@ public class XmppManager {
         if (_currentRetryCount > 5) {
             // we failed after all the retries - just die.
             Log.v(Tools.LOG_TAG, "maybeStartReconnect ran out of retrys");
-            stop();
+            stop(); // will set state to DISCONNECTED.
             Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_failed_max_attempts));
-            updateStatus(WAITING_TO_CONNECT);
             return;
         } else {
             _currentRetryCount += 1;
-            updateStatus(CONNECTING);
+            updateStatus(WAITING_TO_CONNECT);
             // a simple linear-backoff strategy.
             int timeout = 5000 * _currentRetryCount;
             Log.i(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
@@ -227,7 +232,7 @@ public class XmppManager {
                 // actually disconnecting - so something strange would be going on
                 // for this to happen.
                 Log.w(Tools.LOG_TAG, "xmpp got an unexpected normal disconnection");
-                updateStatus(DISCONNECTED);
+                stop();
             }
 
             @Override
@@ -289,19 +294,13 @@ public class XmppManager {
     }
     
     /** returns true if the service is correctly connected */
-    // XXX - we should revisit use of this method and/or the use of _status -
-    // there is a possibility _status will be 'CONNECTED' but this method 
-    // returns false.  It *shouldn't* happen as we have a disconnection 
-    // listener and take care to never leave the connection established 
-    // but not authenticated), but if somethingelse we haven't thought 
-    // of happens we could have a tricky bug...
-    public boolean isConnected() {
+    private boolean isConnected() {
         return    (_connection != null
                 && _connection.isConnected()
                 && _connection.isAuthenticated());
     }
 
-    /** returns true if the service is correctly connected */
+    /** returns the current connection state */
     public int getConnectionStatus() {
         return _status;
     }
