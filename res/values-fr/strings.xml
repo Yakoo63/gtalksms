@@ -124,12 +124,12 @@
     <string name="chat_help_calls">- %s: afficher l\'historique d\'appels.</string>
     <string name="chat_help_contact">- %s: afficher les informations des contacts spécifiés.</string>
     <string name="chat_help_geo">- %s: ouvrir Gmap, Navigtion ou Street View pour l\'adresse spécifiée.</string>
-    <string name="chat_help_where">- %s: envoie continue de liens Gmap pour localiser le téléphone jusqu\'à l\'envoie de la commande \"stop\".</string>
-    <string name="chat_help_ring">- %s: faire sonner le téléphone jusqu\'à l\'envoie de la commande \"stop\".</string>
+    <string name="chat_help_where">- %1$s: envoie continue de liens Gmap pour localiser le téléphone jusqu\'à l\'envoie de la commande %2$s.</string>
+    <string name="chat_help_ring">- %1$s: faire sonner le téléphone jusqu\'à l\'envoie de la commande %2$s.</string>
     <string name="chat_help_copy">- %s: copier le texte dans le presse-papier du téléphone ou récupérer celui du téléphone si vide.</string>
     <string name="chat_help_cmd">- %s: exécuter une commande shell avec les droits super administrateur si possible.</string>
     <string name="chat_help_write">- %1$s or %2$s: écrit le texte comme un clavier virtuel dans les autres applications (Ne pas oublier d\'activer le clavier GTalkSMS dans les paramètres d\'Android).</string>
-    <string name="chat_help_urls">et coller les liens http pour les ouvrir dans le navigateur du téléphone.</string>
+    <string name="chat_help_urls">et coller les liens %s pour les ouvrir dans le navigateur du téléphone.</string>
     <string name="chat_call_unknown">Inconnu</string>
     <string name="chat_call_incoming">Entrant</string>
     <string name="chat_call_outgoing">Sortant</string>

@@ -351,6 +351,11 @@ public class MainService extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
+        if (intent == null) {
+            Log.e(Tools.LOG_TAG, "onStart: Intent null");
+            return;
+        }
+        
         // A special case for the 'broadcast status' intent - we avoid setting up
         // the _xmppMgr etc
         if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
@@ -768,12 +773,12 @@ public class MainService extends Service {
         builder.append(getString(R.string.chat_help_calls, makeBold("\"calls\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_contact, makeBold("\"contact:#contact#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_geo, makeBold("\"geo:#address#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_where, makeBold("\"where\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_ring, makeBold("\"ring\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_where, makeBold("\"where\""), makeBold("\"stop\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_ring, makeBold("\"ring\""), makeBold("\"stop\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_copy, makeBold("\"copy:#text#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_cmd, makeBold("\"cmd:#command#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_write, makeBold("\"write:#text#\""), makeBold("\"w:#text#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_urls)).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_urls, makeBold("\"http\""))).append(Tools.LineSep);
         send(builder.toString());
     }
 

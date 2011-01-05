@@ -124,12 +124,12 @@
     <string name="chat_help_calls">- %s: display call log.</string>
     <string name="chat_help_contact">- %s: display informations of a searched contact.</string>
     <string name="chat_help_geo">- %s: Open Maps or Navigation or Street view on specific address.</string>
-    <string name="chat_help_where">- %s: sends you google map updates about the location of the phone until you send \"stop\".</string>
-    <string name="chat_help_ring">- %s: rings the phone until you send \"stop\".</string>
+    <string name="chat_help_where">- %1$s: sends you google map updates about the location of the phone until you send %2$s.</string>
+    <string name="chat_help_ring">- %1$s: rings the phone until you send %2$s.</string>
     <string name="chat_help_copy">- %s: copy text to clipboard or sent phone clipboard if text is empty.</string>
     <string name="chat_help_cmd">- %s: execute shell instuction with root access if possible.</string>
     <string name="chat_help_write">- %1$s or %2$s: write text as virtual keyboard (don\'t forget to activate keyboard in Android Preferences panel).</string>
-    <string name="chat_help_urls">and you can paste links and open it with the appropriate application.</string>
+    <string name="chat_help_urls">and you can paste %s links and open it with the appropriate application.</string>
     <string name="chat_call_unknown">Unknown</string>
     <string name="chat_call_incoming">Incoming</string>
     <string name="chat_call_outgoing">Outgoing</string>
