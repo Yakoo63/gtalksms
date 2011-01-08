@@ -40,6 +40,8 @@ public class SettingsManager {
     public boolean notifySmsSent;
     public boolean notifySmsDelivered;
     public boolean notifyIncomingCalls;
+    public boolean notifySmsInChatRooms;
+    public boolean notifySmsInSameConversation;
     
     // calls
     public int callLogsNumber;
@@ -105,6 +107,22 @@ public class SettingsManager {
             locale = Locale.getDefault();
         } else {
             locale = new Locale(localeStr);
-        }   
+        }
+        
+        String smsNotificationType = _sharedPreferences.getString("notificationIncomingSmsType", "same");
+        
+        if (smsNotificationType.equals("both")) {
+            notifySmsInChatRooms = true;
+            notifySmsInSameConversation = true;
+        } else if (smsNotificationType.equals("no")) {
+            notifySmsInChatRooms = false;
+            notifySmsInSameConversation = false;
+        } else if (smsNotificationType.equals("separate")) {
+            notifySmsInChatRooms = true;
+            notifySmsInSameConversation = false;
+        } else {
+            notifySmsInSameConversation = true;
+            notifySmsInChatRooms = false;
+        }
     }
 }

@@ -169,12 +169,14 @@ public class MainService extends Service {
         } else if (a.equals(ACTION_SMS_RECEIVED)) {
             if (initialState == XmppManager.CONNECTED) {
                 String number = intent.getStringExtra("sender");
-                // TODO parameter to choose how to notify
-                String sender = makeBold(getString(R.string.chat_sms_from, ContactsManager.getContactName(this, number)));
-                _xmppMgr.send(sender + intent.getStringExtra("message"));
                 
-                // TODO enable the feature when working
-                //_xmppMgr.writeRoom(number, ContactsManager.getContactName(this, number), intent.getStringExtra("message"));
+                if (_settingsMgr.notifySmsInSameConversation) {
+                    String sender = makeBold(getString(R.string.chat_sms_from, ContactsManager.getContactName(this, number)));
+                    _xmppMgr.send(sender + intent.getStringExtra("message"));
+                }
+                if (_settingsMgr.notifySmsInChatRooms) {
+                    _xmppMgr.writeRoom(number, ContactsManager.getContactName(this, number), intent.getStringExtra("message"));
+                }
                 setLastRecipient(number);
             }
         } else if (a.equals(ACTION_NETWORK_CHANGED)) {

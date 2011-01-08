@@ -3,7 +3,15 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry exported="true" kind="lib" path="lib/smack.jar"/>
-	<classpathentry kind="lib" path="lib/libGoogleAnalytics.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smack.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.igniterealtime.org/builds/smack/docs/latest/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/libGoogleAnalytics.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://code.google.com/intl/fr-FR/apis/gdata/javadoc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

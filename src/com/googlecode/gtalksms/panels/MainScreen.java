@@ -60,6 +60,7 @@ public class MainScreen extends Activity {
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if (action.equals(XmppManager.ACTION_PRESENCE_CHANGED)) {
+                    // Presence notifications for next features
 //                  TextView console = (TextView) findViewById(R.id.Console);
 //                  String person = intent.getStringExtra("person");
 //                  String status = intent.getStringExtra("status");
@@ -143,13 +144,6 @@ public class MainScreen extends Activity {
 
     public void updateConsole() {
 //      TextView console = (TextView) findViewById(R.id.Console);
-//      console.setAutoLinkMask(Linkify.ALL);
-//      console.append("\n" + MainService.getInstance().getContactsList());
-//      console.setText("http://code.google.com/p/gtalksms");
-//      console.append("\n\nDonors\n");
-//      console.append(Web.DownloadFromUrl("http://gtalksms.googlecode.com/hg/Donors"));
-//      console.append("\n\nChange log\n");
-//      console.append(Web.DownloadFromUrl("http://gtalksms.googlecode.com/hg/Changelog"));
     }
   
     public void updateStatus(int status) {
@@ -207,12 +201,10 @@ public class MainScreen extends Activity {
 
     @Override
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
-        // Note: KEYCODE_MENU was my first preference, but I failed to make
-        // that work.
+        // Note: KEYCODE_MENU was my first preference, but I failed to make that work.
         // Also: once we have more diagnostic features, it probably makes
         // sense to create a new panel and have the log collector called from
-        // there - but now, just jumping directly to the collector should be
-        // fine.
+        // there - but now, just jumping directly to the collector should be fine.
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             Intent i = new Intent(this, LogCollectorActivity.class);
             startActivity(i);            

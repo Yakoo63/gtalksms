@@ -1,7 +1,9 @@
 package com.googlecode.gtalksms;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -312,7 +314,7 @@ public class XmppManager {
             public void processPacket(Packet packet) {
                 Message message = (Message) packet;
                 
-                Log.d(Tools.LOG_TAG, "got xmpp packet");
+                Log.d(Tools.LOG_TAG, "Xmpp packet received");
                 
                 if ( message.getFrom().toLowerCase().startsWith(_settings.mTo.toLowerCase() + "/") && 
                      !message.getFrom().equals(_connection.getUser())) {
@@ -398,7 +400,10 @@ public class XmppManager {
     public MultiUserChat createRoom(String number, String room, String sender) {
         
         MultiUserChat multiUserChat = null;
-        String cnx = "GTalkSMS_" + _rand + "_" + _settings.mLogin.replaceAll("@", "_") + "@conference.jabber.org";
+        
+        // With "@conference.jabber.org" messages are sent several times... Jwchat seems to work fine
+        String cnx = "GTalkSMS_" + _rand + "_" + _settings.mLogin.replaceAll("@", "_") 
+            + "@conference.jwchat.org"; 
         try {
             // Create the room
             multiUserChat = new MultiUserChat(_connection, cnx);
@@ -411,26 +416,30 @@ public class XmppManager {
                     submitForm.setAnswer("muc#roomconfig_publicroom", false);
                     submitForm.setAnswer("muc#roomconfig_roomname", room);
 
-                    // TODO doesn't work, to fix
-//                    List owners = new ArrayList();
-//                    owners.add(_settings.mLogin);
-//                    owners.add(_settings.mTo);
-//                    submitForm.setAnswer("muc#roomconfig_roomowners", owners);
-
+                    try {
+                        // TODO doesn't work, to fix but maybe not useful
+                        List<String> owners = new ArrayList<String>();
+                        owners.add(_settings.mLogin);
+                        owners.add(_settings.mTo);
+                        submitForm.setAnswer("muc#roomconfig_roomowners", owners);
+                    }
+                    catch (Exception ex) {
+                        Log.e(Tools.LOG_TAG, "Unable to configure room owners.", ex);
+                    }
+                    
                     multiUserChat.sendConfigurationForm(submitForm);
                 }
                 catch (XMPPException e1) {
                     Log.e(Tools.LOG_TAG, "Unable to send conference room chat configuration form.", e1);
                 }
                 
-                //multiUserChat.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
                 multiUserChat.invite(_settings.mTo, "SMS conversation with " + sender);
             } catch (Exception ex) {
                 Log.e(Tools.LOG_TAG, "Error on creating room: room = " + room, ex);
                 multiUserChat.join(room);
             }
 
-            ChatPacketListener chatListener = new ChatPacketListener(multiUserChat, number);
+            ChatPacketListener chatListener = new ChatPacketListener(number);
             multiUserChat.addMessageListener(chatListener);
         } catch (Exception ex) {
             Log.e(Tools.LOG_TAG, "createRoom: room = " + room, ex);
@@ -441,18 +450,18 @@ public class XmppManager {
     class ChatPacketListener implements PacketListener {
         private String _number;
         private Date _lastDate;
-        private MultiUserChat _multiUserChat;
         
-        public ChatPacketListener(MultiUserChat multiUserChat, String number) {
+        public ChatPacketListener(String number) {
             _number = number;
             _lastDate = new Date(0);
-            _multiUserChat = multiUserChat;
         }
         
         @Override
         public void processPacket(Packet packet) {
             Message message = (Message) packet;
         
+            Log.d(Tools.LOG_TAG, "Xmpp chat room packet received");
+            
             // TODO To correct, a lot of notifications are sent, a message is displayed several times
             
             if (!message.getFrom().contains(_number)) {
@@ -466,17 +475,12 @@ public class XmppManager {
                     }
                     
                     if (sentDate.compareTo(_lastDate) > 0 ) {
-//                        Intent intent = new Intent(ACTION_MESSAGE_RECEIVED);
-//                        intent.putExtra("message", "sms:" + _number + ":" + message.getBody());
-//                        _context.sendBroadcast(intent);
+                        Intent intent = new Intent(ACTION_MESSAGE_RECEIVED);
+                        intent.putExtra("message", "sms:" + _number + ":" + message.getBody());
+                        _context.sendBroadcast(intent);
                         _lastDate = sentDate;
                     } else {
                         Log.w(Tools.LOG_TAG, "Receive old message: date=" + sentDate.toLocaleString() + " ; message=" + message.getBody());
-                    }
-                    try {
-                        _multiUserChat.sendMessage(sentDate.toLocaleString() + " - " + message.getBody());
-                    } catch (XMPPException e) {
-                        e.printStackTrace();
                     }
                 }
             }

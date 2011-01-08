@@ -14,18 +14,18 @@
     <string name="pref_app_format_responses">Formatiere Chat Nachrichten</string>
     <string name="pref_app_format_responses_help">Formatiere Antworten mit Fett- und Kursivschrift, funktioniert nicht mit allen XMPP Clients</string>
     <string name="pref_app_sms_number">Anzahl der SMS</string>
-    <string name="pref_app_sms_number_help">Anzahl der SMS gezeigt werden </string>
+    <string name="pref_app_sms_number_help">Anzahl der SMS die ausgegeben werden</string>
     <string name="pref_app_show_sent_sms">Zeige gesendete SMS</string>
     <string name="pref_app_show_sent_sms_help">Gibt die gerade gesendete SMS aus</string>
     <string name="pref_app_call_logs_number">Größe des Anruf Logs</string>
     <string name="pref_app_call_logs_number_help">Anzahl der angezeigeten Anrufe</string>
     <string name="pref_app_ringtone">Klingelton</string>
-    <string name="pref_app_ringtone_help">Klingelton der durch den ring Befehl abgespielt wird</string>
+    <string name="pref_app_ringtone_help">Klingelton der durch den \"ring\" Befehl abgespielt wird</string>
     <string name="pref_con">Verbindungseinstellungen</string>
     <string name="pref_con_notified_address_cat">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address_help">Eigene GMail (oder XMPP JID) eingeben</string>
-    <string name="pref_con_cat">Verbindungseinstellungen</string>
+    <string name="pref_con_cat">Verbindungsoptionen</string>
     <string name="pref_con_use_different_account">Benutze anderen Account</string>
     <string name="pref_con_use_different_account_help">Aktivieren um anderen Account für GTalkSMS zu verwenden</string>
     <string name="pref_con_login">Login</string>
@@ -39,7 +39,7 @@
     <string name="pref_con_server_port_help">Portnummer des XMPP Servers</string>
     <string name="pref_con_service_name">Service Name</string>
     <string name="pref_con_service_name_help">Service Name (rechte Teil der JID)</string>
-    <string name="pref_notif">Benachrichtigungseinstellungen</string>
+    <string name="pref_notif">Benachrichtigungsoptionen</string>
     <string name="pref_notif_application_connection">Bei erfolgreicher Verbindung</string>
     <string name="pref_notif_application_connection_help">Benachrichtigung bei erfolgreicher XMPP Verbindung durch GTalkSMS</string>
     <string name="pref_notif_battery_state">Akkuladezustandsänderung</string>
@@ -63,14 +63,14 @@
     <string name="app_name">GTalkSMS</string>
     <string name="about_panel">Über GTalkSMS</string>
     <string name="main_panel">GTalkSMS</string>
-    <string name="preference_panel">Einstellungen</string>
+    <string name="preference_panel">Anwendungsoptionen</string>
     <string name="log_panel_acquiring">Erstelle Log</string>
     <string name="log_panel_collect">Erstellt eine E-Mail mit GTalkSMS Log-Informationen. Die Informationen in der E-Mail können zur Problembehebung verwendet werden und z.B. an einen Bugreport angehängt werden.</string>
     <string name="main_service_connected">Verbunden</string>
     <string name="main_service_connecting">Verbinde...</string>
     <string name="main_service_disconnected">Getrennt</string>
     <string name="main_service_disconnecting">Trenne...</string>
-    <string name="main_service_waiting">Warte...</string>
+    <string name="main_service_waiting">Wartend...</string>
     <string name="main_service_waiting_to_connect">Warte auf Verbindung...</string>
     <string name="main_service_stop">GTalkSMS Dienst angehalten</string>
     <string name="xmpp_manager_reconnecting">Erneuter Verbindungsversuch…</string>
@@ -152,6 +152,6 @@
     <string name="chat_geo_altitude">Höhe: %f </string>
     <string name="chat_geo_speed">Geschwindigkeit: %fm/s </string>
     <string name="chat_geo_provider">Quelle: %s</string>
-	<string name="pref_app_locale">Sprache</string>
+    <string name="pref_app_locale">Sprache</string>
     <string name="pref_app_locale_help">Sprachumgebung der Anwendung festlegen</string>
 </resources>

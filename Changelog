@@ -1,3 +1,8 @@
+1.7
+* Add german language
+* Add localization preference
+* GTalkSMS can manage SMS thread as conversation per contact 
+
 1.6
 * Add french language
 * Add integration with Tasker

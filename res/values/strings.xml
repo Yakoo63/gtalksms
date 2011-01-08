@@ -94,12 +94,12 @@
     <string name="chat_start_ringing">Ringing phone</string>
     <string name="chat_error_ringing">Unable to ring, change the ringtone in the options</string>
     <string name="chat_stop_actions">Stopping ongoing actions</string>
-    <string name="chat_send_sms">Sending sms to %s</string>
+    <string name="chat_send_sms">Sending SMS to %s</string>
     <string name="chat_specify_details">Specify more details:</string>
     <string name="chat_no_match_for">No match for \"%s\"</string>
-    <string name="chat_mark_as_read">Mark %s\'s sms as read</string>
-    <string name="chat_only_got_n_sms">Only got %d sms</string>
-    <string name="chat_no_sms">No sms found</string>
+    <string name="chat_mark_as_read">Mark %s\'s SMS as read</string>
+    <string name="chat_only_got_n_sms">Only got %d SMS</string>
+    <string name="chat_no_sms">No SMS found</string>
     <string name="chat_no_call">No phone call found</string>
     <string name="chat_contact_found">%1$d contacts found for \"%2$s\"</string>
     <string name="chat_phones">Phones</string>
@@ -115,11 +115,11 @@
     <string name="chat_help_help">- %s: shows this help.</string>
     <string name="chat_help_stop">- %s: stop application on your phone.</string>
     <string name="chat_help_dial">- %s: dial the specified contact.</string>
-    <string name="chat_help_sms_reply">- %s: send a sms to your last recipient with content message.</string>
-    <string name="chat_help_sms_show_all">- %s: display last sent sms from all contact.</string>
-    <string name="chat_help_sms_show_contact">- %s: display last sent sms from searched contacts.</string>
-    <string name="chat_help_sms_send">- %s: sends a sms to number with content message.</string>
-    <string name="chat_help_mark_as_read">- %1$s or %2$s: mark sms as read for last recipient or given contact.</string>
+    <string name="chat_help_sms_reply">- %s: send a SMS to your last recipient with content message.</string>
+    <string name="chat_help_sms_show_all">- %s: display last sent SMS from all contact.</string>
+    <string name="chat_help_sms_show_contact">- %s: display last sent SMS from searched contacts.</string>
+    <string name="chat_help_sms_send">- %s: sends a SMS to number with content message.</string>
+    <string name="chat_help_mark_as_read">- %1$s or %2$s: mark SMS as read for last recipient or given contact.</string>
     <string name="chat_help_battery">- %1$s or %2$s: show battery level in percent.</string>
     <string name="chat_help_calls">- %s: display call log.</string>
     <string name="chat_help_contact">- %s: display informations of a searched contact.</string>
@@ -152,6 +152,6 @@
     <string name="chat_geo_altitude">altitude: %f&#xA0;</string>
     <string name="chat_geo_speed">speed: %fm/s&#xA0;</string>
     <string name="chat_geo_provider">provider: %s</string>
-    <string name="pref_app_locale">Localization</string>
-    <string name="pref_app_locale_help">Choose the application localization</string>
+    <string name="pref_app_locale">Choose the application localization</string>
+    <string name="pref_app_locale_help">Localization</string>
 </resources>

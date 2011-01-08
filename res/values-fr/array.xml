@@ -6,4 +6,10 @@
 		<item>Allemand</item>
 		<item>Anglais</item>
 	</string-array>
+    <string-array name="list_smsNotificationType_entries">
+        <item>Aucune notification</item>
+        <item>Dans des conversations séparées par contact</item>
+        <item>Dans la fenêtre de GTalkSMS</item>
+        <item>Les 2 types de notifications</item>
+    </string-array>
 </resources>

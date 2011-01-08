@@ -24,11 +24,13 @@
         android:defaultValue="true"
         android:title="@string/pref_notif_battery_state_in_status"
         android:summary="@string/pref_notif_battery_state_in_status_help"/>
-    <CheckBoxPreference
-        android:key="notifyIncomingSms"
-        android:defaultValue="true"
-        android:title="@string/pref_notif_incoming_sms"
-        android:summary="@string/pref_notif_incoming_sms_help"/>
+    <ListPreference 
+        android:key="notificationIncomingSmsType" 
+        android:title="@string/pref_notif_incoming_sms" 
+        android:summary="@string/pref_notif_incoming_sms_help" 
+        android:entryValues="@array/list_smsNotificationType_entryValues" 
+        android:entries="@array/list_smsNotificationType_entries" 
+        android:defaultValue="same"/>
     <CheckBoxPreference
         android:key="notifyIncomingCalls"
         android:defaultValue="true"
