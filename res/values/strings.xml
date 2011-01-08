@@ -88,7 +88,7 @@
     <string name="chat_error_no_recipient">Reply contact is not set.</string>
     <string name="chat_error_unknown_cmd">\'%s\': unknown command. Send \"?\" for getting help.</string>
     <string name="chat_error">Error: %s</string>
-    <string name="chat_error_root">Can\'t have root acess!</string>
+    <string name="chat_error_root">Can\'t have root access!</string>
     <string name="chat_reply_contact">Reply contact is %s</string>
     <string name="chat_start_locating">Start locating phone</string>
     <string name="chat_start_ringing">Ringing phone</string>
@@ -127,7 +127,7 @@
     <string name="chat_help_where">- %1$s: sends you google map updates about the location of the phone until you send %2$s.</string>
     <string name="chat_help_ring">- %1$s: rings the phone until you send %2$s.</string>
     <string name="chat_help_copy">- %s: copy text to clipboard or sent phone clipboard if text is empty.</string>
-    <string name="chat_help_cmd">- %s: execute shell instuction with root access if possible.</string>
+    <string name="chat_help_cmd">- %s: execute shell instruction with root access if possible.</string>
     <string name="chat_help_write">- %1$s or %2$s: write text as virtual keyboard (don\'t forget to activate keyboard in Android Preferences panel).</string>
     <string name="chat_help_urls">and you can paste %s links and open it with the appropriate application.</string>
     <string name="chat_call_unknown">Unknown</string>
