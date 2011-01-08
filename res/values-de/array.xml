@@ -6,10 +6,10 @@
         <item>10</item>
 	    <item>20</item>
 	</string-array>
-<string-array name="list_locale_entries"><item>System Default</item>
-<item>French</item>
-<item>German</item>
-<item>English</item>
+<string-array name="list_locale_entries"><item>Systemstandard</item>
+<item>Französisch</item>
+<item>Deutsch</item>
+<item>Englisch</item>
 </string-array>
 <string-array name="list_locale_entryValues"><item>default</item>
 <item>fr</item>

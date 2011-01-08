@@ -342,7 +342,8 @@ public class MainService extends Service {
 
     @Override
     public void onCreate() {
-        super.onCreate();
+    	super.onCreate();
+        Tools.setLocale(getBaseContext());
         HandlerThread thread = new HandlerThread("GTalkSMS.Service");
         thread.start();
         _serviceLooper = thread.getLooper();

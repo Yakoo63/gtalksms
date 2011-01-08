@@ -1,7 +1,10 @@
 package com.googlecode.gtalksms;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.provider.Settings;
 
 public class SettingsManager {
@@ -38,6 +41,9 @@ public class SettingsManager {
     // calls
     public int callLogsNumber;
     
+    // locale
+    public Locale locale;
+    
     /** imports the preferences */
     public void importPreferences(Context c) {
         
@@ -68,5 +74,18 @@ public class SettingsManager {
         callLogsNumber = prefs.getInt("callLogsNumber", 10);
         formatChatResponses = prefs.getBoolean("formatResponses", false);
         notifyIncomingCalls = prefs.getBoolean("notifyIncomingCalls", false);
+        
+        String localeStr = prefs.getString("locale", "default");
+        if (localeStr.equals("de")) {
+        	locale = new Locale(localeStr);
+        } else if (localeStr.equals("fr")) {
+        	locale = new Locale(localeStr);
+        } else if (localeStr.equals("en")) {
+        	locale = new Locale(localeStr);
+        } else {
+        	Configuration configuration = new Configuration();
+        	configuration.setToDefaults();
+        	locale = configuration.locale;
+        }   
     }
 }

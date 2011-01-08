@@ -79,6 +79,8 @@ public class MainScreen extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        Tools.setLocale(getBaseContext());
+        
         TextView label = (TextView) findViewById(R.id.VersionLabel);
         label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()), Typeface.BOLD));
 

@@ -3,10 +3,14 @@ package com.googlecode.gtalksms.tools;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import com.googlecode.gtalksms.SettingsManager;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.widget.Toast;
 
@@ -81,4 +85,18 @@ public class Tools {
     public static Date getDateMilliSeconds(Cursor c, String col) {
         return new Date(Long.parseLong(Tools.getString(c, col)));
     }
+    
+    public static void setLocale(Context c) {
+    	SettingsManager settingsMgr = new SettingsManager();
+    	settingsMgr.importPreferences(c);
+    	Locale l = settingsMgr.locale;
+
+    	//Locale.setDefault(l);
+    	
+    	Configuration config = new Configuration();
+    	config.setToDefaults();
+        config.locale = l;
+        c.getResources().updateConfiguration(config, c.getResources().getDisplayMetrics());
+    }
+    
 }

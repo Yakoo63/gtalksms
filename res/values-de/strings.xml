@@ -152,4 +152,6 @@
     <string name="chat_geo_altitude">Höhe: %f </string>
     <string name="chat_geo_speed">Geschwindigkeit: %fm/s </string>
     <string name="chat_geo_provider">Quelle: %s</string>
+<string name="pref_app_locale_help">Sprachumgebung der Anwendung festlegen</string>
+<string name="pref_app_locale">Sprache</string>
 </resources>

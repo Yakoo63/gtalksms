@@ -32,24 +32,17 @@
             android:title="@string/pref_app_format_responses"
             android:summary="@string/pref_app_format_responses_help"/>
         <com.googlecode.gtalksms.tools.EditIntegerPreference
-            android:key="smsNumber"
-            android:numeric="integer"
-            android:defaultValue="5"
-            android:title="@string/pref_app_sms_number" 
-            android:summary="@string/pref_app_sms_number_help"/>
+            android:defaultValue="5" android:numeric="integer" android:summary="@string/pref_app_sms_number_help" android:key="smsNumber" android:title="@string/pref_app_sms_number"/>
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="showSentSms"
             android:title="@string/pref_app_show_sent_sms"
             android:summary="@string/pref_app_show_sent_sms_help"/>
         <com.googlecode.gtalksms.tools.EditIntegerPreference
-            android:key="callLogsNumber"
-            android:numeric="integer"
-            android:defaultValue="10"
-            android:title="@string/pref_app_call_logs_number" 
-            android:summary="@string/pref_app_call_logs_number_help"/>
+            android:numeric="integer" android:summary="@string/pref_app_call_logs_number_help" android:defaultValue="10" android:key="callLogsNumber" android:title="@string/pref_app_call_logs_number"/>
         <RingtonePreference
             android:key="ringtone"
             android:title="@string/pref_app_ringtone"
             android:summary="@string/pref_app_ringtone_help"/>
+<ListPreference android:key="locale" android:title="@string/pref_app_locale" android:summary="@string/pref_app_locale_help" android:entryValues="@array/list_locale_entryValues" android:entries="@array/list_locale_entries" android:defaultValue="default"></ListPreference>
 </PreferenceScreen>
