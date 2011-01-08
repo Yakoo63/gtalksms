@@ -44,5 +44,11 @@
             android:key="ringtone"
             android:title="@string/pref_app_ringtone"
             android:summary="@string/pref_app_ringtone_help"/>
-<ListPreference android:key="locale" android:title="@string/pref_app_locale" android:summary="@string/pref_app_locale_help" android:entryValues="@array/list_locale_entryValues" android:entries="@array/list_locale_entries" android:defaultValue="default"></ListPreference>
+        <ListPreference 
+            android:key="locale" 
+            android:title="@string/pref_app_locale" 
+            android:summary="@string/pref_app_locale_help" 
+            android:entryValues="@array/list_locale_entryValues" 
+            android:entries="@array/list_locale_entries" 
+            android:defaultValue="default"/>
 </PreferenceScreen>

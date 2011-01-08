@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="list_bat_notif_interval">
-	    <item>1</item>
-        <item>5</item>
-        <item>10</item>
-	    <item>20</item>
+	<string-array name="list_bat_notif_interval">
+		<item>1</item>
+		<item>5</item>
+		<item>10</item>
+		<item>20</item>
 	</string-array>
-<string-array name="list_locale_entries"><item>System Default</item>
-<item>French</item>
-<item>German</item>
-<item>English</item>
-</string-array>
-<string-array name="list_locale_entryValues"><item>default</item>
-<item>fr</item>
-<item>de</item>
-<item>en</item>
-</string-array>
+	<string-array name="list_locale_entries">
+		<item>System Default</item>
+		<item>French</item>
+		<item>German</item>
+		<item>English</item>
+	</string-array>
+	<string-array name="list_locale_entryValues">
+		<item>default</item>
+		<item>fr</item>
+		<item>de</item>
+		<item>en</item>
+	</string-array>
 </resources>

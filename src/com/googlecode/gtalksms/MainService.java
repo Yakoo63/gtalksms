@@ -61,7 +61,7 @@ public class MainService extends Service {
     // the service is running, and therefore whether to tell the service
     // about some events
     public static boolean running = false;
-    private SettingsManager _settingsMgr = new SettingsManager();
+    private SettingsManager _settingsMgr;
 
     private MediaManager _mediaMgr;
     private XmppManager _xmppMgr;
@@ -343,7 +343,14 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
     	super.onCreate();
-        Tools.setLocale(getBaseContext());
+    	
+    	_settingsMgr = new SettingsManager(this) {
+            @Override  public void OnPreferencesUpdated() {
+                Tools.setLocale(_settingsMgr, getBaseContext());
+            }
+        };
+        
+    	Tools.setLocale(_settingsMgr, this);
         HandlerThread thread = new HandlerThread("GTalkSMS.Service");
         thread.start();
         _serviceLooper = thread.getLooper();
@@ -373,7 +380,6 @@ public class MainService extends Service {
         // OK - a real action request - ensure xmpp is setup (but not yet connected)
         // in preparation for the worker thread performing the request.
         if (_xmppMgr == null) {
-            _settingsMgr.importPreferences(getBaseContext());
             if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
                 Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
                 Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);

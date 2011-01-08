@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pref_app_locale_help">Choose the application locale</string>
-    <string name="pref_app_locale">Locale</string>
     <string name="pref_app">Application settings</string>
     <string name="pref_app_auto_start_options">Auto-start options</string>
     <string name="pref_app_auto_stop_options">Auto-stop options</string>
@@ -154,4 +152,6 @@
     <string name="chat_geo_altitude">altitude: %f&#xA0;</string>
     <string name="chat_geo_speed">speed: %fm/s&#xA0;</string>
     <string name="chat_geo_provider">provider: %s</string>
+    <string name="pref_app_locale">Localization</string>
+    <string name="pref_app_locale_help">Choose the application localization</string>
 </resources>

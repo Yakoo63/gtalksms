@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.googlecode.gtalksms.LogCollectorActivity;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
@@ -30,6 +31,8 @@ import com.googlecode.gtalksms.tools.Tools;
 public class MainScreen extends Activity {
 
     private MainService mainService;
+    private SettingsManager _settingsMgr;
+    
     private BroadcastReceiver xmppreceiver;
     
     private ServiceConnection mainServiceConnection = new ServiceConnection() {
@@ -77,10 +80,28 @@ public class MainScreen extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        _settingsMgr = new SettingsManager(this) {
+            @Override  public void OnPreferencesUpdated() {
+                createView();
+            }
+        };
+        
+        createView();
+    }
+    
+    /** Called when the activity is first created. */
+    @Override
+    public void onDestroy() {
+        _settingsMgr.Destroy();
+        super.onDestroy();
+    }
+    
+    private void createView() {
+        Tools.setLocale(_settingsMgr, this);
+        
         setContentView(R.layout.main);
 
-        Tools.setLocale(getBaseContext());
-        
         TextView label = (TextView) findViewById(R.id.VersionLabel);
         label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()), Typeface.BOLD));
 
@@ -151,9 +172,13 @@ public class MainScreen extends Activity {
     }
   
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Force menu update on each opening for localization issue
+        menu.clear();
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.preferences_menu, menu);
+        
+        super.onPrepareOptionsMenu(menu);
         return true;
     }
 

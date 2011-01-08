@@ -3,9 +3,6 @@ package com.googlecode.gtalksms.tools;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-
-import com.googlecode.gtalksms.SettingsManager;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,6 +10,8 @@ import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.widget.Toast;
+
+import com.googlecode.gtalksms.SettingsManager;
 
 public class Tools {
     public final static String LOG_TAG = "gtalksms";
@@ -86,17 +85,12 @@ public class Tools {
         return new Date(Long.parseLong(Tools.getString(c, col)));
     }
     
-    public static void setLocale(Context c) {
-    	SettingsManager settingsMgr = new SettingsManager();
-    	settingsMgr.importPreferences(c);
-    	Locale l = settingsMgr.locale;
+    public static void setLocale(SettingsManager setting, Context context) {
 
-    	//Locale.setDefault(l);
-    	
-    	Configuration config = new Configuration();
+        Configuration config = new Configuration();
     	config.setToDefaults();
-        config.locale = l;
-        c.getResources().updateConfiguration(config, c.getResources().getDisplayMetrics());
+        config.locale = setting.locale;
+        context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
     }
     
 }

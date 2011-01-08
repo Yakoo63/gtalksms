@@ -4,8 +4,11 @@ import java.util.Locale;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.provider.Settings;
+import android.util.Log;
+
+import com.googlecode.gtalksms.tools.Tools;
 
 public class SettingsManager {
     // XMPP connection
@@ -44,48 +47,64 @@ public class SettingsManager {
     // locale
     public Locale locale;
     
+    private SharedPreferences _sharedPreferences;
+    private Context _context;
+    private OnSharedPreferenceChangeListener _changeListener = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            Log.d(Tools.LOG_TAG,"Preferences updated: key=" + key);
+            importPreferences();
+            OnPreferencesUpdated();
+        }
+    };
+    
+    public SettingsManager(Context context) {
+        _context = context;
+        _sharedPreferences = _context.getSharedPreferences("GTalkSMS", 0);
+        _sharedPreferences.registerOnSharedPreferenceChangeListener(_changeListener);
+        
+        importPreferences();
+    }
+    
+    public void Destroy() {
+        _sharedPreferences.unregisterOnSharedPreferenceChangeListener(_changeListener);
+    }
+
+    public void OnPreferencesUpdated() {}
+    
     /** imports the preferences */
-    public void importPreferences(Context c) {
-        
-        SharedPreferences prefs = c.getSharedPreferences("GTalkSMS", 0);
-        
-        serverHost = prefs.getString("serverHost", "");
-        serverPort = prefs.getInt("serverPort", 0);
-        serviceName = prefs.getString("serviceName", "");
-        mTo = prefs.getString("notifiedAddress", "");
-        mPassword =  prefs.getString("password", "");
-        useDifferentAccount = prefs.getBoolean("useDifferentAccount", false);
+    private void importPreferences() {
+        serverHost = _sharedPreferences.getString("serverHost", "");
+        serverPort = _sharedPreferences.getInt("serverPort", 0);
+        serviceName = _sharedPreferences.getString("serviceName", "");
+        mTo = _sharedPreferences.getString("notifiedAddress", "");
+        mPassword =  _sharedPreferences.getString("password", "");
+        useDifferentAccount = _sharedPreferences.getBoolean("useDifferentAccount", false);
         if (useDifferentAccount) {
-            mLogin = prefs.getString("login", "");
+            mLogin = _sharedPreferences.getString("login", "");
         } else{
             mLogin = mTo;
         }
         
-        showStatusIcon = prefs.getBoolean("showStatusIcon", true);
-        notifyApplicationConnection = prefs.getBoolean("notifyApplicationConnection", true);
-        notifyBattery = prefs.getBoolean("notifyBattery", true);
-        notifyBatteryInStatus = prefs.getBoolean("notifyBatteryInStatus", true);
-        batteryNotificationInterval = Integer.valueOf(prefs.getString("batteryNotificationInterval", "10"));
-        notifySmsSent = prefs.getBoolean("notifySmsSent", true);
-        notifySmsDelivered = prefs.getBoolean("notifySmsDelivered", true);
-        ringtone = prefs.getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
-        displaySentSms = prefs.getBoolean("showSentSms", false);
-        smsNumber = prefs.getInt("smsNumber", 5);
-        callLogsNumber = prefs.getInt("callLogsNumber", 10);
-        formatChatResponses = prefs.getBoolean("formatResponses", false);
-        notifyIncomingCalls = prefs.getBoolean("notifyIncomingCalls", false);
-        
-        String localeStr = prefs.getString("locale", "default");
-        if (localeStr.equals("de")) {
-        	locale = new Locale(localeStr);
-        } else if (localeStr.equals("fr")) {
-        	locale = new Locale(localeStr);
-        } else if (localeStr.equals("en")) {
-        	locale = new Locale(localeStr);
+        showStatusIcon = _sharedPreferences.getBoolean("showStatusIcon", true);
+        notifyApplicationConnection = _sharedPreferences.getBoolean("notifyApplicationConnection", true);
+        notifyBattery = _sharedPreferences.getBoolean("notifyBattery", true);
+        notifyBatteryInStatus = _sharedPreferences.getBoolean("notifyBatteryInStatus", true);
+        batteryNotificationInterval = Integer.valueOf(_sharedPreferences.getString("batteryNotificationInterval", "10"));
+        notifySmsSent = _sharedPreferences.getBoolean("notifySmsSent", true);
+        notifySmsDelivered = _sharedPreferences.getBoolean("notifySmsDelivered", true);
+        ringtone = _sharedPreferences.getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
+        displaySentSms = _sharedPreferences.getBoolean("showSentSms", false);
+        smsNumber = _sharedPreferences.getInt("smsNumber", 5);
+        callLogsNumber = _sharedPreferences.getInt("callLogsNumber", 10);
+        formatChatResponses = _sharedPreferences.getBoolean("formatResponses", false);
+        notifyIncomingCalls = _sharedPreferences.getBoolean("notifyIncomingCalls", false);
+
+        String localeStr = _sharedPreferences.getString("locale", "default");
+        if (localeStr.equals("default")) {
+            locale = Locale.getDefault();
         } else {
-        	Configuration configuration = new Configuration();
-        	configuration.setToDefaults();
-        	locale = configuration.locale;
+            locale = new Locale(localeStr);
         }   
     }
 }

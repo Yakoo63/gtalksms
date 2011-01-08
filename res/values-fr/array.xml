@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string-array name="list_locale_entries">
-		<item>Systemstandard</item>
-		<item>Französisch</item>
-		<item>Deutsch</item>
-		<item>Englisch</item>
+		<item>Langue par défaut</item>
+		<item>Français</item>
+		<item>Allemand</item>
+		<item>Anglais</item>
 	</string-array>
 </resources>
