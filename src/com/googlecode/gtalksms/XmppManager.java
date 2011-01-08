@@ -140,28 +140,7 @@ public class XmppManager {
             }
             // don't try to disconnect if already disconnected
             if (isConnected()) {
-                // In some cases the 'disconnect' may hang - see
-                // http://code.google.com/p/gtalksms/issues/detail?id=12 for an
-                // example.  We worm around this by leveraging the fact that we 
-                // are going to throw the XmppManager away after disconnecting,
-                // so just spawn a thread to perform the disconnection.  In the
-                // usual good case the thread will terminate very quickly, and 
-                // in the bad case the thread may hang around much longer - but 
-                // at least we are still working and it should go away 
-                // eventually...
-                class DisconnectRunnable implements Runnable {
-                    public DisconnectRunnable(XMPPConnection x) {
-                        _x = x;
-                    }
-                    private XMPPConnection _x;
-                    public void run() {
-                        _x.disconnect();
-                    }
-                }
-                Thread t = new Thread(new DisconnectRunnable(_connection), "xmpp-disconnector");
-                // we don't want this thread to hold up process shutdown so mark as daemonic.
-                t.setDaemon(true);
-                t.start();
+                xmppDisconnect(_connection);
             }
         }
         _connection = null;
@@ -169,7 +148,36 @@ public class XmppManager {
         _connectionListener = null;
         updateStatus(DISCONNECTED);
     }
-    
+
+    private static void xmppDisconnect(XMPPConnection connection) {
+        // In some cases the 'disconnect' may hang - see
+        // http://code.google.com/p/gtalksms/issues/detail?id=12 for an
+        // example.  We worm around this by leveraging the fact that we 
+        // are going to throw the XmppConnection away after disconnecting,
+        // so just spawn a thread to perform the disconnection.  In the
+        // usual good case the thread will terminate very quickly, and 
+        // in the bad case the thread may hang around much longer - but 
+        // at least we are still working and it should go away 
+        // eventually...
+        class DisconnectRunnable implements Runnable {
+            public DisconnectRunnable(XMPPConnection x) {
+                _x = x;
+            }
+            private XMPPConnection _x;
+            public void run() {
+                try {
+                    _x.disconnect();
+                } catch (Exception e2) {
+                    Log.e(Tools.LOG_TAG, "xmpp disconnect failed: " + e2);
+                }
+            }
+        }
+        Thread t = new Thread(new DisconnectRunnable(connection), "xmpp-disconnector");
+        // we don't want this thread to hold up process shutdown so mark as daemonic.
+        t.setDaemon(true);
+        t.start();
+    }
+
     /** Updates the status about the service state (and the statusbar)*/
     public static void broadcastStatus(Context ctx, int old_state, int new_state) {
         Intent intent = new Intent(ACTION_CONNECTION_CHANGED);
@@ -237,12 +245,7 @@ public class XmppManager {
         try {
             connection.login(_settings.mLogin, _settings.mPassword, "GTalkSMS");
         } catch (Exception e) {
-            try {
-                connection.disconnect();
-            } catch (Exception e2) {
-                Log.e(Tools.LOG_TAG, "xmpp disconnect failed: " + e2);
-            }
-            
+            xmppDisconnect(connection);
             Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
             // sadly, smack throws the same generic XMPPException for network
             // related messages (eg "no response from the server") as for
