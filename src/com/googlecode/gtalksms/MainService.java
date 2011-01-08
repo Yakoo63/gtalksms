@@ -169,9 +169,12 @@ public class MainService extends Service {
         } else if (a.equals(ACTION_SMS_RECEIVED)) {
             if (initialState == XmppManager.CONNECTED) {
                 String number = intent.getStringExtra("sender");
-                String sender = makeBold(getString(R.string.chat_sms_from, 
-                        ContactsManager.getContactName(this, number)));
-                _xmppMgr.send(sender + intent.getStringExtra("message")); 
+                // TODO parameter to choose how to notify
+                String sender = makeBold(getString(R.string.chat_sms_from, ContactsManager.getContactName(this, number)));
+                _xmppMgr.send(sender + intent.getStringExtra("message"));
+                
+                // TODO enable the feature when working
+                //_xmppMgr.writeRoom(number, ContactsManager.getContactName(this, number), intent.getStringExtra("message"));
                 setLastRecipient(number);
             }
         } else if (a.equals(ACTION_NETWORK_CHANGED)) {
@@ -359,6 +362,8 @@ public class MainService extends Service {
         // A special case for the 'broadcast status' intent - we avoid setting up
         // the _xmppMgr etc
         if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
+            Log.d(Tools.LOG_TAG, "onStart: ACTION_BROADCAST_STATUS");
+            
             // A request to broadcast our current status.
             int state = getConnectionStatus();
             XmppManager.broadcastStatus(this, state, state);
@@ -391,6 +396,7 @@ public class MainService extends Service {
                     }
                 }
             };
+            Log.d(Tools.LOG_TAG, "onStart: ACTION_MESSAGE_RECEIVED");
             IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
             intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
             registerReceiver(_xmppreceiver, intentFilter);
@@ -398,6 +404,7 @@ public class MainService extends Service {
             _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
         }
 
+        Log.d(Tools.LOG_TAG, "onStart: _serviceHandler.sendMessage");
         Message msg = _serviceHandler.obtainMessage();
         msg.arg1 = startId;
         msg.obj = intent;
