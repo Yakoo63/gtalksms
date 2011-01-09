@@ -509,8 +509,9 @@ public class XmppManager {
         pm.addExtensionProvider("paused","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
         pm.addExtensionProvider("inactive","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
         pm.addExtensionProvider("gone","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
+        //  GTalkSMS already manages its own html message packets
         //  XHTML
-        pm.addExtensionProvider("html","http://jabber.org/protocol/xhtml-im", new XHTMLExtensionProvider());
+        //pm.addExtensionProvider("html","http://jabber.org/protocol/xhtml-im", new XHTMLExtensionProvider());
         //  Group Chat Invitations
         pm.addExtensionProvider("x","jabber:x:conference", new GroupChatInvitation.Provider());
         //  Service Discovery # Items    
