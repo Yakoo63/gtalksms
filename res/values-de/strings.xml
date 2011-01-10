@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pref_app">Einstellungen</string>
+    <string name="pref_app">GTalkSMS Einstellungen</string>
     <string name="pref_app_auto_start_options">Auto-Start Optionen</string>
     <string name="pref_app_auto_stop_options">Auto-Stop Optionen</string>
     <string name="pref_app_start_at_boot">Bei Systemstart</string>
@@ -82,13 +82,13 @@
     <string name="about_website">Website</string>
     <string name="about_authors">Autoren</string>
     <string name="about_donors">Unterstützer - Donors</string>
-    <string name="about_change_log">Änderungen</string>
+    <string name="about_change_log">Änderungen - Changelog</string>
     <string name="chat_sms_from">SMS von %s: </string>
     <string name="chat_battery_level">Akkuladestand %d%%</string>
     <string name="chat_error_no_recipient">Empfänger/Reply Kontakt ist nicht gesetzt.</string>
     <string name="chat_error_unknown_cmd">\'%s\': unbekannter Befehl. \&quot;?\&quot; für Hilfe.</string>
     <string name="chat_error">Fehler: %s</string>
-    <string name="chat_error_root">Root nicht möglich!</string>
+    <string name="chat_error_root">Fehler: Root nicht möglich!</string>
     <string name="chat_reply_contact">Nachrichten gehen an %s</string>
     <string name="chat_start_locating">Telefon wird lokalisiert</string>
     <string name="chat_start_ringing">Telefon klingelt</string>
@@ -116,8 +116,8 @@
     <string name="chat_help_stop">- %s: Beendet Anwendung auf den Telefon</string>
     <string name="chat_help_dial">- %s: Ruft den angegebenen Kontakt an.</string>
     <string name="chat_help_sms_reply">- %s: Sendet eine SMS an den Kontakt der letzten emfangenen SMS</string>
-    <string name="chat_help_sms_show_all">- %s: Zeigt die letzten SMS von allen Kontakten an.</string>
-    <string name="chat_help_sms_show_contact">- %s: Zeigt die letzten SMS des angegebenen Kontaktes an.</string>
+    <string name="chat_help_sms_show_all">- %s: Zeigt die letzten SMS Nachrichten von allen Kontakten an.</string>
+    <string name="chat_help_sms_show_contact">- %s: Zeigt die letzten SMS Nachrichten des angegebenen Kontaktes an.</string>
     <string name="chat_help_sms_send">- %s: Sende eine SMS an den angegebenen Kontakt mit den Inahlt &lt;message&gt;.</string>
     <string name="chat_help_mark_as_read">- %1$s oder %2$s: Markiert die Nachricht des angegebenen oder des letzten Kontaktes als gelesen.</string>
     <string name="chat_help_battery">- %1$s oder %2$s: Zeigt den Akkuladezustand in Prozent an.</string>
@@ -126,10 +126,10 @@
     <string name="chat_help_geo">- %s: Öffnet Googe Maps oder Navigation mit der angegebenen Adresse.</string>
     <string name="chat_help_where">- %1$s: Sendet die aktuelle Position des Telefons solange bis %2$s gesendet wird.</string>
     <string name="chat_help_ring">- %1$s: Lässt das Telefon klingeln bis %2$s gesendet wird.</string>
-    <string name="chat_help_copy">- %s: Kopiert &lt;text&gt; in das Clipboard des Telefons oder sendet den Telefonclipboard Inahlt, wenn &lt;text&gt; leer ist.</string>
+    <string name="chat_help_copy">- %s: Kopiert &lt;text&gt; in das Clipboard des Telefons oder sendet den Inahlt des Clipboards, wenn &lt;text&gt; leer ist.</string>
     <string name="chat_help_cmd">- %s: Für Shell Befehl (wenn möglich mit root Rechten) aus.</string>
     <string name="chat_help_write">- %1$s oder %2$s: Schreibt &lt;text&gt; in die virtuelle Tastatur (dazu muss die GTalkSMS Tastatur in den Android Einstellungen aktiviert sein).</string>
-    <string name="chat_help_urls">%s öffne Links auf den Telefon mit der entsprechenden Anwendung</string>
+    <string name="chat_help_urls">%s öffnet Links auf den Telefon mit der entsprechenden Anwendung</string>
     <string name="chat_call_unknown">Unbekannt</string>
     <string name="chat_call_incoming">Eingehender Anruf</string>
     <string name="chat_call_outgoing">Ausgehender Anruf</string>
