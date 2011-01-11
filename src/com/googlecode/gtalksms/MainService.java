@@ -364,14 +364,12 @@ public class MainService extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
+        // The application has been killed by Android and then restart
         if (intent == null) {
-            Log.e(Tools.LOG_TAG, "onStart: Intent null");
-            return;
+            Log.e(Tools.LOG_TAG, "onStart start connection: Intent null");
         }
-        
-        // A special case for the 'broadcast status' intent - we avoid setting up
-        // the _xmppMgr etc
-        if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
+        // A special case for the 'broadcast status' intent - we avoid setting up the _xmppMgr etc
+        else if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
             Log.d(Tools.LOG_TAG, "onStart: ACTION_BROADCAST_STATUS");
             
             // A request to broadcast our current status.
@@ -413,11 +411,13 @@ public class MainService extends Service {
             _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
         }
 
-        Log.d(Tools.LOG_TAG, "onStart: _serviceHandler.sendMessage");
-        Message msg = _serviceHandler.obtainMessage();
-        msg.arg1 = startId;
-        msg.obj = intent;
-        _serviceHandler.sendMessage(msg);
+        if (intent != null) {
+            Log.d(Tools.LOG_TAG, "onStart: _serviceHandler.sendMessage");
+            Message msg = _serviceHandler.obtainMessage();
+            msg.arg1 = startId;
+            msg.obj = intent;
+            _serviceHandler.sendMessage(msg);
+        }
     }
 
     @Override
