@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -98,6 +99,8 @@ public class MainService extends Service {
     // RemoteService for a more complete example.
     private final IBinder _binder = new LocalBinder();
 
+    private final ReentrantLock _lock = new ReentrantLock();
+    
     GoogleAnalyticsTracker _gAnalytics;
 
     // some stuff for the async service implementation - borrowed heavily from
@@ -125,85 +128,91 @@ public class MainService extends Service {
             Log.e(Tools.LOG_TAG, "onHandleIntent: Intent null");
             return;
         }
-        // We need to handle xmpp state changes which happened "externally" - eg,
-        // due to a connection error, or running out of retries, or a retry
-        // handler actually succeeding etc.
-        int initialState = getConnectionStatus(); 
-        updateListenersToCurrentState(initialState);
         
-        String a = intent.getAction();
-        Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + initialState);
-        if (a.equals(ACTION_CONNECT)) {
-            if (intent.getBooleanExtra("disconnect", false)) {
-                // request to disconnect.
-                xmppRequestStateChange(XmppManager.DISCONNECTED);
-            } else {
-                // a simple 'connect' request.
-                xmppRequestStateChange(XmppManager.CONNECTED);
-            }
-        } else if (a.equals(ACTION_TOGGLE)) {
-            switch (initialState) {
-            case XmppManager.CONNECTED:
-            case XmppManager.WAITING_TO_CONNECT:
-                xmppRequestStateChange(XmppManager.DISCONNECTED);
-                break;
-            case XmppManager.DISCONNECTED:
-                xmppRequestStateChange(XmppManager.CONNECTED);
-                break;
-            default:
-                Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ initialState);
-                break;
-            }
-        } else if (a.equals(ACTION_SEND)) {
-            if (initialState == XmppManager.CONNECTED) {
-                _xmppMgr.send(intent.getStringExtra("message"));
-            }
-        } else if (a.equals(ACTION_HANDLE_XMPP_NOTIFY)) {
-            // If there is a message, then it is what we received.
-            // If there is no message, it just means the xmpp connection state
-            // changed - and we already handled that earlier in this method.
-            String message = intent.getStringExtra("message");
-            if (message != null) {
-                onMessageReceived(intent.getStringExtra("message"));
-            }
-        } else if (a.equals(ACTION_SMS_RECEIVED)) {
-            if (initialState == XmppManager.CONNECTED) {
-                String number = intent.getStringExtra("sender");
-                
-                if (_settingsMgr.notifySmsInSameConversation) {
-                    String sender = makeBold(getString(R.string.chat_sms_from, ContactsManager.getContactName(this, number)));
-                    _xmppMgr.send(sender + intent.getStringExtra("message"));
+        _lock.lock();
+        try {
+            // We need to handle xmpp state changes which happened "externally" - eg,
+            // due to a connection error, or running out of retries, or a retry
+            // handler actually succeeding etc.
+            int initialState = getConnectionStatus(); 
+            updateListenersToCurrentState(initialState);
+            
+            String a = intent.getAction();
+            Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + initialState);
+            if (a.equals(ACTION_CONNECT)) {
+                if (intent.getBooleanExtra("disconnect", false)) {
+                    // request to disconnect.
+                    xmppRequestStateChange(XmppManager.DISCONNECTED);
+                } else {
+                    // a simple 'connect' request.
+                    xmppRequestStateChange(XmppManager.CONNECTED);
                 }
-                if (_settingsMgr.notifySmsInChatRooms) {
-                    _xmppMgr.writeRoom(number, ContactsManager.getContactName(this, number), intent.getStringExtra("message"));
+            } else if (a.equals(ACTION_TOGGLE)) {
+                switch (initialState) {
+                case XmppManager.CONNECTED:
+                case XmppManager.WAITING_TO_CONNECT:
+                    xmppRequestStateChange(XmppManager.DISCONNECTED);
+                    break;
+                case XmppManager.DISCONNECTED:
+                    xmppRequestStateChange(XmppManager.CONNECTED);
+                    break;
+                default:
+                    Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ initialState);
+                    break;
                 }
-                setLastRecipient(number);
-            }
-        } else if (a.equals(ACTION_NETWORK_CHANGED)) {
-            boolean available = intent.getBooleanExtra("available", true);
-            Log.d(Tools.LOG_TAG, "network_changed with available=" + available + 
-                                 " and with state=" + initialState);
-            if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
-                // We are in a waiting state and have a network - try to connect.
-                xmppRequestStateChange(XmppManager.CONNECTED);
-            } else if (!available && initialState==XmppManager.CONNECTED) {
-                // We are connected but the network has gone down - disconnect and go
-                // into WAITING state so we auto-connect when we get a future 
-                // notification that a network is available.
-                xmppRequestStateChange(XmppManager.WAITING_TO_CONNECT);
-            }
-        } else {
-            Log.w(Tools.LOG_TAG, "Unexpected intent: " + a);
-        }
-        Log.d(Tools.LOG_TAG, "handled action '" + a + "' - state now " + getConnectionStatus());
-        // stop the service if we are disconnected (but stopping the service
-        // doesn't mean the process is terminated - onStart can still happen.)
-        if (getConnectionStatus() == XmppManager.DISCONNECTED) {
-            if (stopSelfResult(id) == true) {
-                Log.d(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
+            } else if (a.equals(ACTION_SEND)) {
+                if (initialState == XmppManager.CONNECTED) {
+                    _xmppMgr.send(intent.getStringExtra("message"));
+                }
+            } else if (a.equals(ACTION_HANDLE_XMPP_NOTIFY)) {
+                // If there is a message, then it is what we received.
+                // If there is no message, it just means the xmpp connection state
+                // changed - and we already handled that earlier in this method.
+                String message = intent.getStringExtra("message");
+                if (message != null) {
+                    onMessageReceived(intent.getStringExtra("message"));
+                }
+            } else if (a.equals(ACTION_SMS_RECEIVED)) {
+                if (initialState == XmppManager.CONNECTED) {
+                    String number = intent.getStringExtra("sender");
+                    
+                    if (_settingsMgr.notifySmsInSameConversation) {
+                        String sender = makeBold(getString(R.string.chat_sms_from, ContactsManager.getContactName(this, number)));
+                        _xmppMgr.send(sender + intent.getStringExtra("message"));
+                    }
+                    if (_settingsMgr.notifySmsInChatRooms) {
+                        _xmppMgr.writeRoom(number, ContactsManager.getContactName(this, number), intent.getStringExtra("message"));
+                    }
+                    setLastRecipient(number);
+                }
+            } else if (a.equals(ACTION_NETWORK_CHANGED)) {
+                boolean available = intent.getBooleanExtra("available", true);
+                Log.d(Tools.LOG_TAG, "network_changed with available=" + available + 
+                                     " and with state=" + initialState);
+                if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
+                    // We are in a waiting state and have a network - try to connect.
+                    xmppRequestStateChange(XmppManager.CONNECTED);
+                } else if (!available && initialState==XmppManager.CONNECTED) {
+                    // We are connected but the network has gone down - disconnect and go
+                    // into WAITING state so we auto-connect when we get a future 
+                    // notification that a network is available.
+                    xmppRequestStateChange(XmppManager.WAITING_TO_CONNECT);
+                }
             } else {
-                Log.d(Tools.LOG_TAG, "more pending intents to be delivered - service will not stop");
+                Log.w(Tools.LOG_TAG, "Unexpected intent: " + a);
             }
+            Log.d(Tools.LOG_TAG, "handled action '" + a + "' - state now " + getConnectionStatus());
+            // stop the service if we are disconnected (but stopping the service
+            // doesn't mean the process is terminated - onStart can still happen.)
+            if (getConnectionStatus() == XmppManager.DISCONNECTED) {
+                if (stopSelfResult(id) == true) {
+                    Log.d(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
+                } else {
+                    Log.d(Tools.LOG_TAG, "more pending intents to be delivered - service will not stop");
+                }
+            }
+        } finally {
+            _lock.unlock();
         }
     }
 

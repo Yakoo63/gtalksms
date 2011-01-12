@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
@@ -194,7 +195,7 @@ public class XmppManager {
             // delivery.
             int old = _status;
             _status = status;
-            Log.v(Tools.LOG_TAG, "broadcasting state transition from "+old+" to "+status);
+            Log.v(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status);
             broadcastStatus(_context, old, status);
         }
     }
@@ -215,94 +216,104 @@ public class XmppManager {
             _reconnectHandler.postDelayed(_reconnectRunnable, timeout);
         }
     }
+    
+    private final ReentrantLock _lock = new ReentrantLock();
+    
 
     /** init the XMPP connection */
     private void initConnection() {
-        if (_connection != null) {
-            return;
-        }
-        
-        updateStatus(CONNECTING);
-        NetworkInfo active = ((ConnectivityManager)_context.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        if (active == null || !active.isAvailable()) {
-            Log.e(Tools.LOG_TAG, "connection request, but no network available");
-            Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_waiting));
-            // we don't destroy the service here - our network receiver will notify us when
-            // the network comes up and we try again then.
-            updateStatus(WAITING_TO_CONNECT);
-            return;
-        }
-
-        XMPPConnection connection = new XMPPConnection(new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName));
+       
+        _lock.lock();
         try {
-            connection.connect();
-        } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "xmpp connection failed: " + e);
-            Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_connection_failed));
-            maybeStartReconnect();
-            return;
+            if (_connection != null) {
+                return;
+            }
+            
+            updateStatus(CONNECTING);
+            NetworkInfo active = ((ConnectivityManager)_context.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+            if (active == null || !active.isAvailable()) {
+                Log.e(Tools.LOG_TAG, "connection request, but no network available");
+                Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_waiting));
+                // we don't destroy the service here - our network receiver will notify us when
+                // the network comes up and we try again then.
+                updateStatus(WAITING_TO_CONNECT);
+                return;
+            }
+    
+            XMPPConnection connection = new XMPPConnection(new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName));
+            try {
+                connection.connect();
+            } catch (Exception e) {
+                Log.e(Tools.LOG_TAG, "xmpp connection failed: " + e);
+                Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_connection_failed));
+                maybeStartReconnect();
+                return;
+            }
+            
+            try {
+                connection.login(_settings.mLogin, _settings.mPassword, "GTalkSMS");
+            } catch (Exception e) {
+                xmppDisconnect(connection);
+                Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
+                // sadly, smack throws the same generic XMPPException for network
+                // related messages (eg "no response from the server") as for
+                // authoritative login errors (ie, bad password).  The only
+                // differentiator is the message itself which starts with this
+                // hard-coded string.
+                if (e.getMessage().indexOf("SASL authentication") == -1) {
+                    // doesn't look like a bad username/password, so retry
+                    Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_login_failed));
+                    maybeStartReconnect();
+                } else {
+                    Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_invalid_credentials));
+                    stop();
+                }
+                return;
+            }
+            
+            _connection = connection;
+            _connectionListener = new ConnectionListener() {
+                @Override
+                public void connectionClosed() {
+                    // This should never happen - we always remove the listener before
+                    // actually disconnecting - so something strange would be going on
+                    // for this to happen - but sure enough, something strange can go on :)
+                    // See issue 37 for one report where we see this - so we attempt
+                    // auto-reconnect just like in an explicit error case.
+                    Log.w(Tools.LOG_TAG, "xmpp got an unexpected normal disconnection");
+                    stop();
+                    maybeStartReconnect();
+                }
+    
+                @Override
+                public void connectionClosedOnError(Exception arg0) {
+                    // this is "unexpected" - our main service still thinks it has a 
+                    // connection.
+                    Log.w(Tools.LOG_TAG, "xmpp disconnected due to error: " + arg0.toString());
+                    // We update the state to disconnected (mainly to cleanup listeners etc)
+                    // then schedule an automatic reconnect.
+                    stop();
+                    maybeStartReconnect();
+                }
+    
+                @Override
+                public void reconnectingIn(int arg0) {
+                }
+    
+                @Override
+                public void reconnectionFailed(Exception arg0) {
+                }
+    
+                @Override
+                public void reconnectionSuccessful() {
+                }
+            };
+            _connection.addConnectionListener(_connectionListener);
+            onConnectionComplete();
+            
+        } finally {
+            _lock.unlock();
         }
-        
-        try {
-            connection.login(_settings.mLogin, _settings.mPassword, "GTalkSMS");
-        } catch (Exception e) {
-            xmppDisconnect(connection);
-            Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
-            // sadly, smack throws the same generic XMPPException for network
-            // related messages (eg "no response from the server") as for
-            // authoritative login errors (ie, bad password).  The only
-            // differentiator is the message itself which starts with this
-            // hard-coded string.
-            if (e.getMessage().indexOf("SASL authentication") == -1) {
-                // doesn't look like a bad username/password, so retry
-                Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_login_failed));
-                maybeStartReconnect();
-            } else {
-                Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_invalid_credentials));
-                stop();
-            }
-            return;
-        }
-        
-        _connection = connection;
-        _connectionListener = new ConnectionListener() {
-            @Override
-            public void connectionClosed() {
-                // This should never happen - we always remove the listener before
-                // actually disconnecting - so something strange would be going on
-                // for this to happen - but sure enough, something strange can go on :)
-                // See issue 37 for one report where we see this - so we attempt
-                // auto-reconnect just like in an explicit error case.
-                Log.w(Tools.LOG_TAG, "xmpp got an unexpected normal disconnection");
-                stop();
-                maybeStartReconnect();
-            }
-
-            @Override
-            public void connectionClosedOnError(Exception arg0) {
-                // this is "unexpected" - our main service still thinks it has a 
-                // connection.
-                Log.w(Tools.LOG_TAG, "xmpp disconnected due to error: " + arg0.toString());
-                // We update the state to disconnected (mainly to cleanup listeners etc)
-                // then schedule an automatic reconnect.
-                stop();
-                maybeStartReconnect();
-            }
-
-            @Override
-            public void reconnectingIn(int arg0) {
-            }
-
-            @Override
-            public void reconnectionFailed(Exception arg0) {
-            }
-
-            @Override
-            public void reconnectionSuccessful() {
-            }
-        };
-        _connection.addConnectionListener(_connectionListener);
-        onConnectionComplete();
     }
 
     private void onConnectionComplete() {
