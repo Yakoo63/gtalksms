@@ -389,7 +389,7 @@ public class MainService extends Service {
         // OK - a real action request - ensure xmpp is setup (but not yet connected)
         // in preparation for the worker thread performing the request.
         if (_xmppMgr == null) {
-            if (_settingsMgr.mTo == null || _settingsMgr.mTo.equals("") || _settingsMgr.mTo.equals("your.login@gmail.com")) {
+            if (_settingsMgr.notifiedAddress == null || _settingsMgr.notifiedAddress.equals("") || _settingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
                 Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
                 Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
                 settingsActivity.putExtra("panel", R.xml.prefs_connection);

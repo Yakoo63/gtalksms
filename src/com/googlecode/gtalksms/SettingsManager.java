@@ -16,10 +16,11 @@ public class SettingsManager {
     public String serviceName;
     public int serverPort;
     
-    public String mLogin;
-    public String mPassword;
-    public String mTo;
+    public String login;
+    public String password;
+    public String notifiedAddress;
     public boolean useDifferentAccount;
+    public String roomsPassword;
     
     // notifications
     public boolean notifyApplicationConnection;
@@ -79,13 +80,13 @@ public class SettingsManager {
         serverHost = _sharedPreferences.getString("serverHost", "");
         serverPort = _sharedPreferences.getInt("serverPort", 0);
         serviceName = _sharedPreferences.getString("serviceName", "");
-        mTo = _sharedPreferences.getString("notifiedAddress", "");
-        mPassword =  _sharedPreferences.getString("password", "");
+        notifiedAddress = _sharedPreferences.getString("notifiedAddress", "");
+        password =  _sharedPreferences.getString("password", "");
         useDifferentAccount = _sharedPreferences.getBoolean("useDifferentAccount", false);
         if (useDifferentAccount) {
-            mLogin = _sharedPreferences.getString("login", "");
+            login = _sharedPreferences.getString("login", "");
         } else{
-            mLogin = mTo;
+            login = notifiedAddress;
         }
         
         showStatusIcon = _sharedPreferences.getBoolean("showStatusIcon", true);
@@ -109,6 +110,7 @@ public class SettingsManager {
             locale = new Locale(localeStr);
         }
         
+        roomsPassword = _sharedPreferences.getString("roomPassword", "gtalksms");
         String smsNotificationType = _sharedPreferences.getString("notificationIncomingSmsType", "same");
         
         if (smsNotificationType.equals("both")) {

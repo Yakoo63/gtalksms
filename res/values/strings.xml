@@ -39,6 +39,8 @@
     <string name="pref_con_server_port_help">Server port used by the phone</string>
     <string name="pref_con_service_name">Service name</string>
     <string name="pref_con_service_name_help">Service name used by the phone</string>
+    <string name="pref_con_room_password">Room password</string>
+    <string name="pref_con_room_password_help">Room password for SMS notifications</string>
     <string name="pref_notif">Notification settings</string>
     <string name="pref_notif_application_connection">Application connection</string>
     <string name="pref_notif_application_connection_help">Phone reconnect notification</string>

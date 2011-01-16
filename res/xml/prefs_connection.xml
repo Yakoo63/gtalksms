@@ -31,6 +31,11 @@
             android:password="true"
             android:title="@string/pref_con_password"
             android:summary="@string/pref_con_password_help"/>
+        <EditTextPreference
+            android:key="roomPassword"
+            android:defaultValue="gtalksms"
+            android:title="@string/pref_con_room_password"
+            android:summary="@string/pref_con_room_password_help"/>
     </PreferenceCategory>
     <PreferenceScreen
         android:title="@string/pref_con_server_settings">

@@ -251,7 +251,7 @@ public class XmppManager {
             }
             
             try {
-                connection.login(_settings.mLogin, _settings.mPassword, "GTalkSMS");
+                connection.login(_settings.login, _settings.password, "GTalkSMS");
             } catch (Exception e) {
                 xmppDisconnect(connection);
                 Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
@@ -326,7 +326,7 @@ public class XmppManager {
                 
                 Log.d(Tools.LOG_TAG, "Xmpp packet received");
                 
-                if ( message.getFrom().toLowerCase().startsWith(_settings.mTo.toLowerCase() + "/") && 
+                if ( message.getFrom().toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") && 
                      !message.getFrom().equals(_connection.getUser())) {
                     if (message.getBody() != null) {
                         Intent intent = new Intent(ACTION_MESSAGE_RECEIVED);
@@ -363,7 +363,7 @@ public class XmppManager {
     /** sends a message to the user */
     public void send(String message) {
         if (isConnected()) {
-            Message msg = new Message(_settings.mTo, Message.Type.chat);
+            Message msg = new Message(_settings.notifiedAddress, Message.Type.chat);
             msg.setBody(message);
             _connection.sendPacket(msg);
         }
@@ -395,7 +395,7 @@ public class XmppManager {
                 muc = rooms.get(room);
                 
                 if (muc != null&& muc.getOccupantsCount() < 2) {
-                    muc.invite(_settings.mTo, "SMS conversation with " + sender);
+                    muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
                 }
             }
             
@@ -412,7 +412,7 @@ public class XmppManager {
         MultiUserChat multiUserChat = null;
         
         // With "@conference.jabber.org" messages are sent several times... Jwchat seems to work fine
-        String cnx = "GTalkSMS_" + _rand + "_" + _settings.mLogin.replaceAll("@", "_") 
+        String cnx = "GTalkSMS_" + _rand + "_" + _settings.login.replaceAll("@", "_") 
             + "@conference.jwchat.org"; 
         try {
             // Create the room
@@ -425,12 +425,14 @@ public class XmppManager {
                     Form submitForm = multiUserChat.getConfigurationForm().createAnswerForm();
                     submitForm.setAnswer("muc#roomconfig_publicroom", false);
                     submitForm.setAnswer("muc#roomconfig_roomname", room);
-
+                    submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
+                    submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomsPassword);
+                    
                     try {
                         // TODO doesn't work, to fix but maybe not useful
                         List<String> owners = new ArrayList<String>();
-                        owners.add(_settings.mLogin);
-                        owners.add(_settings.mTo);
+                        owners.add(_settings.login);
+                        owners.add(_settings.notifiedAddress);
                         submitForm.setAnswer("muc#roomconfig_roomowners", owners);
                     }
                     catch (Exception ex) {
@@ -443,10 +445,10 @@ public class XmppManager {
                     Log.e(Tools.LOG_TAG, "Unable to send conference room chat configuration form.", e1);
                 }
                 
-                multiUserChat.invite(_settings.mTo, "SMS conversation with " + sender);
+                multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
             } catch (Exception ex) {
                 Log.e(Tools.LOG_TAG, "Error on creating room: room = " + room, ex);
-                multiUserChat.join(room);
+                multiUserChat.join(room, _settings.roomsPassword);
             }
 
             ChatPacketListener chatListener = new ChatPacketListener(number);
