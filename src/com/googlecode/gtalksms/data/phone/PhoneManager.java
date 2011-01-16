@@ -46,20 +46,21 @@ public class PhoneManager {
 
         Cursor c = resolver.query(CallLog.Calls.CONTENT_URI, projection, null, null, sortOrder);
         
-        for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
-            
-            Call call = new Call();
-            call.phoneNumber = Tools.getString(c, CallLog.Calls.NUMBER);
-            if (call.phoneNumber.equals("-1")) {
-                call.phoneNumber = null;
+        if (c != null) {
+            for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
+                Call call = new Call();
+                call.phoneNumber = Tools.getString(c, CallLog.Calls.NUMBER);
+                if (call.phoneNumber.equals("-1")) {
+                    call.phoneNumber = null;
+                }
+                call.duration = Tools.getLong(c, CallLog.Calls.DURATION);
+                call.date = Tools.getDateMilliSeconds(c, CallLog.Calls.DATE);
+                call.type = Tools.getInt(c,CallLog.Calls.TYPE);
+                
+                res.add(call);
             }
-            call.duration = Tools.getLong(c, CallLog.Calls.DURATION);
-            call.date = Tools.getDateMilliSeconds(c, CallLog.Calls.DATE);
-            call.type = Tools.getInt(c,CallLog.Calls.TYPE);
-            
-            res.add(call);
+            c.close();
         }
-        
         return res;
     }
 }

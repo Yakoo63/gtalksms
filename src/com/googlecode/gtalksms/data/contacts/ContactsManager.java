@@ -33,8 +33,9 @@ public class ContactsManager {
                 Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
                 Cursor c = resolver.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
     
-                if (c.moveToFirst()) {
+                if (c != null && c.moveToFirst()) {
                     res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
+                    c.close();
                 }
             } catch (Exception ex) {
               Log.e(Tools.LOG_TAG, "getContactName error: Phone number = " + phoneNumber, ex);  
@@ -59,21 +60,21 @@ public class ContactsManager {
                 new String[]{String.valueOf(rawId)}, null);
         
         long id = -1;
-        if (c.moveToFirst()) {
+        if (c != null && c.moveToFirst()) {
             id = Tools.getLong(c, RawContacts.CONTACT_ID);
+            c.close();
         }
-        c.close();
         
         c = resolver.query(Contacts.CONTENT_URI,
                 new String[]{Contacts.DISPLAY_NAME},
                 RawContacts._ID + "=?",
                 new String[]{String.valueOf(id)}, null);
         
-        if (c.moveToFirst()) {
+        if (c != null && c.moveToFirst()) {
             res = Tools.getString(c, Contacts.DISPLAY_NAME);
+            c.close();
         }
-        c.close();
-       
+        
         return res;
     }
 
@@ -93,30 +94,33 @@ public class ContactsManager {
 
             Uri contactUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI, Uri.encode(searchedName));
             Cursor c = resolver.query(contactUri, projection, null, null, sortOrder);
-            for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
-                Long id = Tools.getLong(c, Contacts._ID);
-                if (null != id) {
-                    
-                    String contactName = Tools.getString(c, Contacts.DISPLAY_NAME);
-                    if(null != contactName) {
-                        Contact contact = new Contact();
-                        contact.id = id;
-                        contact.name = contactName;
+            if (c != null) {
+                for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
+                    Long id = Tools.getLong(c, Contacts._ID);
+                    if (null != id) {
                         
-                        Cursor c1 = resolver.query(RawContacts.CONTENT_URI,
-                                new String[]{RawContacts._ID},
-                                RawContacts.CONTACT_ID + "=?",
-                                new String[]{String.valueOf(id)}, null);
-                        
-                        for (boolean hasData1 = c1.moveToFirst() ; hasData1 ; hasData1 = c1.moveToNext()) {
-                            contact.rawIds.add(Tools.getLong(c1, RawContacts._ID));
-                        }
-                        
-                        res.add(contact);
-                    }   
+                        String contactName = Tools.getString(c, Contacts.DISPLAY_NAME);
+                        if(null != contactName) {
+                            Contact contact = new Contact();
+                            contact.id = id;
+                            contact.name = contactName;
+                            
+                            Cursor c1 = resolver.query(RawContacts.CONTENT_URI,
+                                    new String[]{RawContacts._ID},
+                                    RawContacts.CONTACT_ID + "=?",
+                                    new String[]{String.valueOf(id)}, null);
+                            if (c1 != null) {
+                                for (boolean hasData1 = c1.moveToFirst() ; hasData1 ; hasData1 = c1.moveToNext()) {
+                                    contact.rawIds.add(Tools.getLong(c1, RawContacts._ID));
+                                }
+                                c1.close();
+                            }
+                            res.add(contact);
+                        }   
+                    }
                 }
+                c.close();
             }
-            c.close();
         }
         Collections.sort(res);
         return res;
@@ -247,7 +251,7 @@ public class ContactsManager {
                 for (Contact contact : contacts) {
                     ArrayList<Phone> phones = getPhones(ctx, contact.id);
                     for (Phone phone : phones) {
-                        phone.contactName = getContactName(ctx, contact.name);
+                        phone.contactName = contact.name;
                         res.add(phone);
                     }
                 }

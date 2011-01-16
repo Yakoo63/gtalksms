@@ -59,21 +59,24 @@ public class SmsMmsManager {
         int maxSms = _settings.smsNumber;
         int nbSms = 0;
 
-        for (boolean hasData = c.moveToFirst(); hasData && nbSms < maxSms; hasData = c.moveToNext(), ++nbSms) {
-            Sms sms = new Sms();
-            sms.date = Tools.getDateMilliSeconds(c, "date");
-            sms.number = Tools.getString(c, "address");
-            sms.message = Tools.getString(c, "body");
-            if (sender == null) {
-                sms.sender = ContactsManager.getContactName(_context, Tools.getLong(c, "person"));
-            } else {
-                sms.sender = sender;
+        if (c != null) {
+            for (boolean hasData = c.moveToFirst(); hasData && nbSms < maxSms; hasData = c.moveToNext(), ++nbSms) {
+                Sms sms = new Sms();
+                sms.date = Tools.getDateMilliSeconds(c, "date");
+                sms.number = Tools.getString(c, "address");
+                sms.message = Tools.getString(c, "body");
+                if (sender == null) {
+                    sms.sender = ContactsManager.getContactName(_context, Tools.getLong(c, "person"));
+                } else {
+                    sms.sender = sender;
+                }
+                res.add(sms);
+    
             }
-            res.add(sms);
-
+            
+            c.close();
         }
-        c.close();
-
+        
         return res;
     }
 
