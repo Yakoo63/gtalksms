@@ -375,7 +375,9 @@ public class MainService extends Service {
     public void onStart(Intent intent, int startId) {
         // The application has been killed by Android and then restart
         if (intent == null) {
-            Log.e(Tools.LOG_TAG, "onStart start connection: Intent null");
+            Log.e(Tools.LOG_TAG, "onStart start connection: Intent null, force connection");
+            startService(new Intent(MainService.ACTION_CONNECT));
+            return;
         }
         // A special case for the 'broadcast status' intent - we avoid setting up the _xmppMgr etc
         else if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
