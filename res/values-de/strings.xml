@@ -39,6 +39,8 @@
     <string name="pref_con_server_port_help">Portnummer des XMPP Servers</string>
     <string name="pref_con_service_name">Service Name</string>
     <string name="pref_con_service_name_help">Service Name (rechte Teil der JID)</string>
+    <string name="pref_con_room_password">Group Chat Passwort</string>
+    <string name="pref_con_room_password_help">Passwort des Group Chats für SMS Benachrichtigungen</string>
     <string name="pref_notif">Benachrichtigungsoptionen</string>
     <string name="pref_notif_application_connection">Bei erfolgreicher Verbindung</string>
     <string name="pref_notif_application_connection_help">Benachrichtigung bei erfolgreicher XMPP Verbindung durch GTalkSMS</string>
