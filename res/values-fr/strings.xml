@@ -112,15 +112,15 @@
     <string name="chat_dial">%s a été composé</string>
     <string name="chat_error_dial">Erreur, impossible de composer le numéro.</string>
     <string name="chat_help_title">Commandes disponibles :</string>
-    <string name="chat_help_help">- %s: afficher cette aide.</string>
+    <string name="chat_help_help">- %1$s ou %2$s: afficher cette aide.</string>
     <string name="chat_help_stop">- %s: stopper l\'application sur le téléphone.</string>
     <string name="chat_help_dial">- %s: composer le numéro du contact spécifié.</string>
     <string name="chat_help_sms_reply">- %s: envoyer un SMS au dernier destinataire entrant ou sortant.</string>
     <string name="chat_help_sms_show_all">- %s: afficher les SMS de tous les contacts.</string>
     <string name="chat_help_sms_show_contact">- %s: afficher les SMS des contacts spécifiés.</string>
     <string name="chat_help_sms_send">- %s: envoyer un SMS au contact/numéro spécifié.</string>
-    <string name="chat_help_mark_as_read">- %1$s or %2$s: marquer comme lu les SMS du dernier destinataire ou du contact spécifié.</string>
-    <string name="chat_help_battery">- %1$s or %2$s: afficher l\'état de la batterie.</string>
+    <string name="chat_help_mark_as_read">- %1$s ou %2$s: marquer comme lu les SMS du dernier destinataire ou du contact spécifié.</string>
+    <string name="chat_help_battery">- %1$s ou %2$s: afficher l\'état de la batterie.</string>
     <string name="chat_help_calls">- %s: afficher l\'historique d\'appels.</string>
     <string name="chat_help_contact">- %s: afficher les informations des contacts spécifiés.</string>
     <string name="chat_help_geo">- %s: ouvrir Gmap, Navigtion ou Street View pour l\'adresse spécifiée.</string>
@@ -128,7 +128,7 @@
     <string name="chat_help_ring">- %1$s: faire sonner le téléphone jusqu\'à l\'envoie de la commande %2$s.</string>
     <string name="chat_help_copy">- %s: copier le texte dans le presse-papier du téléphone ou récupérer celui du téléphone si vide.</string>
     <string name="chat_help_cmd">- %s: exécuter une commande shell avec les droits super administrateur si possible.</string>
-    <string name="chat_help_write">- %1$s or %2$s: écrit le texte comme un clavier virtuel dans les autres applications (Ne pas oublier d\'activer le clavier GTalkSMS dans les paramètres d\'Android).</string>
+    <string name="chat_help_write">- %1$s ou %2$s: écrit le texte comme un clavier virtuel dans les autres applications (Ne pas oublier d\'activer le clavier GTalkSMS dans les paramètres d\'Android).</string>
     <string name="chat_help_urls">et coller les liens %s pour les ouvrir dans le navigateur du téléphone.</string>
     <string name="chat_call_unknown">Inconnu</string>
     <string name="chat_call_incoming">Entrant</string>

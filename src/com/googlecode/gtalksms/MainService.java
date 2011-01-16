@@ -627,7 +627,7 @@ public class MainService extends Service {
             // Not case sensitive commands
             command = command.toLowerCase();
 
-            if (command.equals("?")) {
+            if (command.equals("?") || command.equals("help")) {
                 showHelp();
             } else if (command.equals("exit")) {
                 stopService(new Intent(ACTION_CONNECT));
@@ -786,7 +786,7 @@ public class MainService extends Service {
     public void showHelp() {
         StringBuilder builder = new StringBuilder();
         builder.append(getString(R.string.chat_help_title)).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_help, makeBold("\"?\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_help, makeBold("\"?\""), makeBold("\"help\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_stop, makeBold("\"exit\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_dial, makeBold("\"dial:#contact#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_sms_reply, makeBold("\"reply:#message#\""))).append(Tools.LineSep);

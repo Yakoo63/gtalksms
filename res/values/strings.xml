@@ -112,7 +112,7 @@
     <string name="chat_dial">Dial %s</string>
     <string name="chat_error_dial">Error can\'t dial.</string>
     <string name="chat_help_title">Available commands:</string>
-    <string name="chat_help_help">- %s: shows this help.</string>
+    <string name="chat_help_help">- %1$s or %2$s: shows this help.</string>
     <string name="chat_help_stop">- %s: stop application on your phone.</string>
     <string name="chat_help_dial">- %s: dial the specified contact.</string>
     <string name="chat_help_sms_reply">- %s: send a SMS to your last recipient with content message.</string>

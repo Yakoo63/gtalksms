@@ -112,7 +112,7 @@
     <string name="chat_dial">Wähle %s</string>
     <string name="chat_error_dial">Fehler: Kein Anruf möglich.</string>
     <string name="chat_help_title">Verfügbare Befehle:</string>
-    <string name="chat_help_help">- %s: zeigt diese Hilfe.</string>
+    <string name="chat_help_help">- %1$s oder %2$s: zeigt diese Hilfe.</string>
     <string name="chat_help_stop">- %s: Beendet Anwendung auf den Telefon</string>
     <string name="chat_help_dial">- %s: Ruft den angegebenen Kontakt an.</string>
     <string name="chat_help_sms_reply">- %s: Sendet eine SMS an den Kontakt der letzten emfangenen SMS</string>
