@@ -46,5 +46,4 @@
         android:defaultValue="true"
         android:title="@string/pref_notif_sms_delivered"
         android:summary="@string/pref_notif_sms_delivered_help"/>
-<EditTextPreference android:key="mucServer" android:title="@string/pref_notif_muc_server" android:defaultValue="conference.jwchat.org" android:summary="@string/pref_notif_muc_server_help"></EditTextPreference>
 </PreferenceScreen>

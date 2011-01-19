@@ -39,8 +39,10 @@
     <string name="pref_con_server_port_help">Port du serveur pour le compte utilisé pour le téléphone</string>
     <string name="pref_con_service_name">Nom du service de messagerie</string>
     <string name="pref_con_service_name_help">Nom du service pour le compte utilisé pour le téléphone</string>
-    <string name="pref_con_room_password">Mot de passe des salons de discussion</string>
-    <string name="pref_con_room_password_help">Mot de passe des salons de discussion pour les notifications SMS</string>
+    <string name="pref_con_muc_password">Mot de passe des salons de discussion</string>
+    <string name="pref_con_muc_password_help">Mot de passe des salons de discussion pour les notifications SMS</string>
+    <string name="pref_con_muc_server">Serveur de salons de discussion</string>
+    <string name="pref_con_muc_server_help">Serveur XMPP Groupchat (A modifier en connaissance de cause !)</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_application_connection">Connexion de l\'application</string>
     <string name="pref_notif_application_connection_help">Notification pour les connexions au service de messagerie</string>
