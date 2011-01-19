@@ -58,6 +58,8 @@
     <string name="pref_notif_sms_sent_help">Benachrichtigung bei versendeter SMS</string>
     <string name="pref_notif_sms_delivered">Zugestellte SMS</string>
     <string name="pref_notif_sms_delivered_help">Benachrichtigung bei Zustellung der SMS</string>
+    <string name="pref_notif_muc_server">MUC Server</string>
+    <string name="pref_notif_muc_server_help">Server für XMPP Groupchat (für erfahrene Benutzer)</string>
     <string name="main_but_start_stop">Start/Stop</string>
     <string name="main_but_preferences">Einstellungen</string>
     <string name="main_but_send_clipboard">Sende Clipboard</string>

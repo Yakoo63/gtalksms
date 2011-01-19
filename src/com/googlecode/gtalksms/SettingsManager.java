@@ -21,6 +21,7 @@ public class SettingsManager {
     public String notifiedAddress;
     public boolean useDifferentAccount;
     public String roomsPassword;
+    public String mucServer;
     
     // notifications
     public boolean notifyApplicationConnection;
@@ -111,6 +112,7 @@ public class SettingsManager {
         }
         
         roomsPassword = _sharedPreferences.getString("roomPassword", "gtalksms");
+        mucServer = _sharedPreferences.getString("mucServer", "conference.jwchat.org");
         String smsNotificationType = _sharedPreferences.getString("notificationIncomingSmsType", "same");
         
         if (smsNotificationType.equals("both")) {

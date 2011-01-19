@@ -413,7 +413,7 @@ public class XmppManager {
         
         // With "@conference.jabber.org" messages are sent several times... Jwchat seems to work fine
         String cnx = "GTalkSMS_" + _rand + "_" + _settings.login.replaceAll("@", "_") 
-            + "@conference.jwchat.org"; 
+            + "@" + _settings.mucServer; 
         try {
             // Create the room
             multiUserChat = new MultiUserChat(_connection, cnx);
