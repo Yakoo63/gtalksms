@@ -390,11 +390,12 @@ public class XmppManager {
             MultiUserChat muc;
             if (!rooms.containsKey(room)) {
                 muc = createRoom(number, room, sender);
+                if(muc == null) return;  //room creation failed
                 rooms.put(room, muc);
             } else {
                 muc = rooms.get(room);
                 
-                if (muc != null&& muc.getOccupantsCount() < 2) {
+                if (muc != null && muc.getOccupantsCount() < 2) {
                     muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
                 }
             }
@@ -410,8 +411,9 @@ public class XmppManager {
     public MultiUserChat createRoom(String number, String room, String sender) {
         
         MultiUserChat multiUserChat = null;
+        boolean passwordMode = false;
         
-        // With "@conference.jabber.org" messages are sent several times... Jwchat seems to work fine
+        // With "@conference.jabber.org" messages are sent several times... Jwchat seems to work fine and is the default
         String cnx = "GTalkSMS_" + _rand + "_" + _settings.login.replaceAll("@", "_") 
             + "@" + _settings.mucServer; 
         try {
@@ -425,8 +427,7 @@ public class XmppManager {
                     Form submitForm = multiUserChat.getConfigurationForm().createAnswerForm();
                     submitForm.setAnswer("muc#roomconfig_publicroom", false);
                     submitForm.setAnswer("muc#roomconfig_roomname", room);
-                    submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
-                    submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomsPassword);
+
                     
                     try {
                         // TODO doesn't work, to fix but maybe not useful
@@ -434,27 +435,38 @@ public class XmppManager {
                         owners.add(_settings.login);
                         owners.add(_settings.notifiedAddress);
                         submitForm.setAnswer("muc#roomconfig_roomowners", owners);
+                        //submitForm.setAnswer("muc#roomconfig_roomadmins", owners);  //throws exception (at least on my server)
+
                     }
                     catch (Exception ex) {
-                        Log.e(Tools.LOG_TAG, "Unable to configure room owners.", ex);
+                        Log.e(Tools.LOG_TAG, "Unable to configure room owners. Falling back to room passwords", ex);
+                        submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
+                        submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomsPassword);
+                        passwordMode = true;
                     }
+                    if (!passwordMode) {
+                    	submitForm.setAnswer("muc#roomconfig_membersonly", true);
+                    }
+                
                     
                     multiUserChat.sendConfigurationForm(submitForm);
                 }
                 catch (XMPPException e1) {
-                    Log.e(Tools.LOG_TAG, "Unable to send conference room chat configuration form.", e1);
+                    Log.e(Tools.LOG_TAG, "Unable to send conference room configuration form.", e1);
+                    return null; //then we also should not send an invite as the room will be locked
                 }
                 
                 multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
             } catch (Exception ex) {
                 Log.e(Tools.LOG_TAG, "Error on creating room: room = " + room, ex);
-                multiUserChat.join(room, _settings.roomsPassword);
+                return null;
             }
 
             ChatPacketListener chatListener = new ChatPacketListener(number);
             multiUserChat.addMessageListener(chatListener);
         } catch (Exception ex) {
             Log.e(Tools.LOG_TAG, "createRoom: room = " + room, ex);
+            return null;
         }
         return multiUserChat;
     }

@@ -40,7 +40,7 @@
     <string name="pref_con_service_name">Service name</string>
     <string name="pref_con_service_name_help">Service name used by the phone</string>
     <string name="pref_con_muc_password">Room password</string>
-    <string name="pref_con_muc_password_help">Room password for SMS notifications</string>
+    <string name="pref_con_muc_password_help">Room password for SMS notifications (used only, if making the room private failes for some reason)</string>
     <string name="pref_con_muc_server">MUC Server</string>
     <string name="pref_con_muc_server_help">Server used for XMPP Groupchat (Leave Default if you don\'t know that this means!)</string>
     <string name="pref_notif">Notification settings</string>

@@ -40,7 +40,7 @@
     <string name="pref_con_service_name">Service Name</string>
     <string name="pref_con_service_name_help">Service Name (rechte Teil der JID)</string>
     <string name="pref_con_muc_password">Group Chat Passwort</string>
-    <string name="pref_con_muc_password_help">Passwort des Group Chats für SMS Benachrichtigungen</string>
+    <string name="pref_con_muc_password_help">Passwort des Group Chats für SMS Benachrichtigungen (Ein Passwort wird nur gesetzt, wenn der Group Chat nicht als privat konfiguriert werden kann)</string>
     <string name="pref_con_muc_server">MUC Server</string>
     <string name="pref_con_muc_server_help">Server für XMPP Groupchat (für erfahrene Benutzer)</string>
     <string name="pref_notif">Benachrichtigungsoptionen</string>
