@@ -462,7 +462,7 @@ public class XmppManager {
                 return null;
             }
 
-            ChatPacketListener chatListener = new ChatPacketListener(number);
+            ChatPacketListener chatListener = new ChatPacketListener(number, multiUserChat);
             multiUserChat.addMessageListener(chatListener);
         } catch (Exception ex) {
             Log.e(Tools.LOG_TAG, "createRoom: room = " + room, ex);
@@ -474,21 +474,24 @@ public class XmppManager {
     class ChatPacketListener implements PacketListener {
         private String _number;
         private Date _lastDate;
+        private MultiUserChat _muc;
         
-        public ChatPacketListener(String number) {
+        public ChatPacketListener(String number, MultiUserChat muc) {
             _number = number;
             _lastDate = new Date(0);
+            _muc = muc;
         }
         
         @Override
         public void processPacket(Packet packet) {
             Message message = (Message) packet;
+            String from = message.getFrom();
         
             Log.d(Tools.LOG_TAG, "Xmpp chat room packet received");
             
             // TODO To correct, a lot of notifications are sent, a message is displayed several times
             
-            if (!message.getFrom().contains(_number)) {
+            if (!from.contains(_number)) {
                 if (message.getBody() != null) {
                     DelayInformation inf = (DelayInformation)message.getExtension("x", "jabber:x:delay");
                     Date sentDate;
@@ -500,7 +503,12 @@ public class XmppManager {
                     
                     if (sentDate.compareTo(_lastDate) > 0 ) {
                         Intent intent = new Intent(ACTION_MESSAGE_RECEIVED);
-                        intent.putExtra("message", "sms:" + _number + ":" + message.getBody());
+                        if(_muc.getOccupantsCount() > 2) {
+                        	intent.putExtra("message", "sms:" + _number + ":" + from + ": " + message.getBody());
+                        } else {
+                        	intent.putExtra("message", "sms:" + _number + ":" + message.getBody());
+                        }
+                        
                         _context.sendBroadcast(intent);
                         _lastDate = sentDate;
                     } else {
