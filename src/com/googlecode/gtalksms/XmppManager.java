@@ -96,13 +96,11 @@ public class XmppManager {
 
     private SettingsManager _settings;
     private Context _context;
-    private int _rand;
     
     public XmppManager(SettingsManager settings, Context context) {
         _settings = settings;
         _context = context;
         configure(ProviderManager.getInstance());
-        _rand = new Random().nextInt();
     }
 
     public void start() {
@@ -414,7 +412,7 @@ public class XmppManager {
         boolean passwordMode = false;
         
         // With "@conference.jabber.org" messages are sent several times... Jwchat seems to work fine and is the default
-        String cnx = "GTalkSMS_" + _rand + "_" + _settings.login.replaceAll("@", "_") 
+        String cnx = "GTalkSMS_" + (new Random()).nextInt() + "_" + _settings.login.replaceAll("@", "_") 
             + "@" + _settings.mucServer; 
         try {
             // Create the room
