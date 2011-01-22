@@ -5,7 +5,7 @@
     <string name="pref_app_auto_stop_options">Auto-Stop Optionen</string>
     <string name="pref_app_start_at_boot">Bei Systemstart</string>
     <string name="pref_app_start_at_boot_help">Aktivieren um GTalkSMS bei Systemstart zu starten</string>
-    <string name="pref_app_start_on_power_connected">Externe Stromversorgung</string>
+    <string name="pref_app_start_on_power_connected">Wenn Ladegerät eingesteckt</string>
     <string name="pref_app_start_on_power_connected_help">Startet GTalkSMS automatisch wenn ein Ladegerät angeschlossen wird</string>
     <string name="pref_app_stop_on_power_disconnected">Wenn Ladegerät entfernt wird</string>
     <string name="pref_app_stop_on_power_disconnected_help">Stop GTalkSMS wenn das Ladegerät entfernt wird</string>
@@ -14,16 +14,16 @@
     <string name="pref_app_format_responses">Formatiere Chat Nachrichten</string>
     <string name="pref_app_format_responses_help">Formatiere Antworten mit Fett- und Kursivschrift, funktioniert nicht mit allen XMPP Clients</string>
     <string name="pref_app_sms_number">Anzahl der SMS</string>
-    <string name="pref_app_sms_number_help">Anzahl der SMS die ausgegeben werden</string>
+    <string name="pref_app_sms_number_help">Anzahl der SMS die auf Befehl ausgegeben werden</string>
     <string name="pref_app_show_sent_sms">Zeige gesendete SMS</string>
     <string name="pref_app_show_sent_sms_help">Gibt die gerade gesendete SMS aus</string>
     <string name="pref_app_call_logs_number">Größe des Anruf Logs</string>
-    <string name="pref_app_call_logs_number_help">Anzahl der angezeigeten Anrufe</string>
+    <string name="pref_app_call_logs_number_help">Anzahl der auf Befehl angezeigeten Anrufe</string>
     <string name="pref_app_ringtone">Klingelton</string>
     <string name="pref_app_ringtone_help">Klingelton der durch den \"ring\" Befehl abgespielt wird</string>
     <string name="pref_app_locale">Sprache</string>
     <string name="pref_app_locale_help">Sprachumgebung der Anwendung festlegen</string>
-    <string name="pref_con">Verbindungseinstellungen</string>
+    <string name="pref_con">Verbindungsoptionen</string>
     <string name="pref_con_notified_address_cat">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address_help">Eigene GMail (oder XMPP JID) eingeben</string>
@@ -61,7 +61,7 @@
     <string name="pref_notif_sms_sent">Versendete SMS</string>
     <string name="pref_notif_sms_sent_help">Benachrichtigung bei versendeter SMS</string>
     <string name="pref_notif_sms_delivered">Zugestellte SMS</string>
-    <string name="pref_notif_sms_delivered_help">Benachrichtigung bei Zustellung der SMS</string>
+    <string name="pref_notif_sms_delivered_help">Benachrichtigung bei erfolgreicher Zustellung der SMS</string>
     <string name="main_but_start_stop">Start/Stop</string>
     <string name="main_but_preferences">Einstellungen</string>
     <string name="main_but_send_clipboard">Sende Clipboard</string>
@@ -123,7 +123,7 @@
     <string name="chat_help_dial">- %s: Ruft den angegebenen Kontakt an.</string>
     <string name="chat_help_sms_reply">- %s: Sendet eine SMS an den Kontakt der letzten emfangenen SMS</string>
     <string name="chat_help_sms_show_all">- %s: Zeigt die letzten SMS Nachrichten von allen Kontakten an.</string>
-    <string name="chat_help_sms_show_unread">- %s: Zeigt die letzten ungelesene SMS Nachrichten von allen Kontakten an.</string>
+    <string name="chat_help_sms_show_unread">- %s: Zeigt ungelesene SMS Nachrichten von allen Kontakten an.</string>
     <string name="chat_help_sms_show_contact">- %s: Zeigt die letzten SMS Nachrichten des angegebenen Kontaktes an.</string>
     <string name="chat_help_sms_send">- %s: Sende eine SMS an den angegebenen Kontakt mit den Inahlt &lt;message&gt;.</string>
     <string name="chat_help_mark_as_read">- %1$s oder %2$s: Markiert die Nachricht des angegebenen oder des letzten Kontaktes als gelesen.</string>
@@ -153,6 +153,8 @@
     <string name="chat_sms_radio_off">Telefon deaktiviert (ERROR_RADIO_OFF)</string>
     <string name="chat_sms_delivered">SMS zugestellt</string>
     <string name="chat_sms_not_delivered">SMS nicht zugestellt</string>
+    <string name="chat_sms_muc_conf_error">Empfangene SMS: Senden der MUC Chat Konfiguration fehlgeschlagen. Ex: %s</string>
+    <string name="chat_sms_muc_error">Empfangene SMS: Fehler beim erstellen des MUC Chat. Ex: %s</string>
     <string name="chat_log_failed">Fehler bei sammeln der Log Meldungen</string>
     <string name="chat_log_unavailable">Nicht verfügbar</string>
     <string name="chat_geo_accuracy">Genauigkeit: %fm </string>
