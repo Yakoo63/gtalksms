@@ -121,6 +121,7 @@
     <string name="chat_help_dial">- %s: Ruft den angegebenen Kontakt an.</string>
     <string name="chat_help_sms_reply">- %s: Sendet eine SMS an den Kontakt der letzten emfangenen SMS</string>
     <string name="chat_help_sms_show_all">- %s: Zeigt die letzten SMS Nachrichten von allen Kontakten an.</string>
+    <string name="chat_help_sms_show_unread">- %s: Zeigt die letzten ungelesene SMS Nachrichten von allen Kontakten an.</string>
     <string name="chat_help_sms_show_contact">- %s: Zeigt die letzten SMS Nachrichten des angegebenen Kontaktes an.</string>
     <string name="chat_help_sms_send">- %s: Sende eine SMS an den angegebenen Kontakt mit den Inahlt &lt;message&gt;.</string>
     <string name="chat_help_mark_as_read">- %1$s oder %2$s: Markiert die Nachricht des angegebenen oder des letzten Kontaktes als gelesen.</string>

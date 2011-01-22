@@ -642,7 +642,11 @@ public class MainService extends Service {
                     message = args.substring(separatorPos + 1);
                     sendSMS(message, contact);
                 } else if (args.length() > 0) {
-                    readSMS(args);
+                    if (args.equals("unread")) {
+                        readUnreadSMS();
+                    } else {
+                        readSMS(args);
+                    }
                 } else {
                     readLastSMS();
                 }
@@ -793,6 +797,7 @@ public class MainService extends Service {
         builder.append(getString(R.string.chat_help_dial, makeBold("\"dial:#contact#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_sms_reply, makeBold("\"reply:#message#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_sms_show_all, makeBold("\"sms\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_sms_show_unread, makeBold("\"sms:unread\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_sms_show_contact, makeBold("\"sms:#contact#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_sms_send, makeBold("\"sms:#contact#:#message#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_mark_as_read, makeBold("\"markAsRead:#contact#\""), makeBold("\"mar\""))).append(Tools.LineSep);
@@ -936,6 +941,24 @@ public class MainService extends Service {
         }
     }
 
+    /** reads unread SMS from all contacts */
+    public void readUnreadSMS() {
+
+        ArrayList<Sms> smsArrayList = _smsMgr.getAllUnreadSms();
+        StringBuilder allSms = new StringBuilder();
+
+        List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
+        if (smsList.size() > 0) {
+            for (Sms sms : smsList) {
+                allSms.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
+                allSms.append(Tools.LineSep + sms.message);
+            }
+        } else {
+            allSms.append(getString(R.string.chat_no_sms));
+        }
+        send(allSms.toString() + Tools.LineSep);
+    }
+    
     /** reads last (count) SMS from all contacts */
     public void readLastSMS() {
 
@@ -971,7 +994,6 @@ public class MainService extends Service {
                 String caller = makeBold(ContactsManager.getContactName(this, call.phoneNumber));
 
                 all.append(Tools.LineSep + makeItalic(call.date.toLocaleString()) + " - " + caller);
-                // TODO of
                 all.append(" - " + call.type(this) + getString(R.string.chat_call_duration) + call.duration());
             }
         } else {

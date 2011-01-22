@@ -31,7 +31,7 @@ public class SmsMmsManager {
      */
     public ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName) {
         if (rawIds.size() > 0) {
-            return getAllSms("content://sms/inbox", contactName, "person IN (" + TextUtils.join(", ", rawIds) + ")");
+            return getAllSms("content://sms/inbox", contactName, "person IN (" + TextUtils.join(", ", rawIds) + ")", false);
         }
         return new ArrayList<Sms>();
     }
@@ -41,14 +41,18 @@ public class SmsMmsManager {
      * argument
      */
     public ArrayList<Sms> getAllSentSms() {
-        return getAllSms("content://sms/sent", "Me", null);
+        return getAllSms("content://sms/sent", "Me", null, true);
     }
 
     public ArrayList<Sms> getAllReceivedSms() {
-        return getAllSms("content://sms/inbox", null, null);
+        return getAllSms("content://sms/inbox", null, null, false);
     }
 
-    private ArrayList<Sms> getAllSms(String folder, String sender, String where) {
+    public ArrayList<Sms> getAllUnreadSms() {
+        return getAllSms("content://sms/inbox", null, "read = 0", false);
+    }
+    
+    private ArrayList<Sms> getAllSms(String folder, String sender, String where, Boolean getMax) {
         ArrayList<Sms> res = new ArrayList<Sms>();
 
         Uri mSmsQueryUri = Uri.parse(folder);
@@ -60,7 +64,7 @@ public class SmsMmsManager {
         int nbSms = 0;
 
         if (c != null) {
-            for (boolean hasData = c.moveToFirst(); hasData && nbSms < maxSms; hasData = c.moveToNext(), ++nbSms) {
+            for (boolean hasData = c.moveToFirst(); hasData && (getMax || nbSms < maxSms); hasData = c.moveToNext(), ++nbSms) {
                 Sms sms = new Sms();
                 sms.date = Tools.getDateMilliSeconds(c, "date");
                 sms.number = Tools.getString(c, "address");
