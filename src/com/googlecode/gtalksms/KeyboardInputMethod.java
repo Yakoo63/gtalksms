@@ -4,15 +4,22 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.inputmethodservice.InputMethodService;
+import android.inputmethodservice.Keyboard;
+import android.inputmethodservice.KeyboardView;
 import android.os.IBinder;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 
-public class KeyboardInputMethod extends InputMethodService {
+public class KeyboardInputMethod extends InputMethodService
+    implements KeyboardView.OnKeyboardActionListener {
 
     private MainService mainService;
-
+    private KeyboardView _inputView;
+    private int _lastDisplayWidth;
+    private Keyboard _keyboard;
+    
     private ServiceConnection mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mainService = ((MainService.LocalBinder) service).getService();
@@ -27,6 +34,25 @@ public class KeyboardInputMethod extends InputMethodService {
         if (mainService != null) {
             mainService.send(msg);
         }
+    }
+    
+    @Override public View onCreateInputView() {
+        _inputView = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
+        _inputView.setOnKeyboardActionListener(this);
+        _inputView.setKeyboard(_keyboard);
+        return _inputView;
+    }
+    
+    @Override public void onInitializeInterface() {
+        if (_keyboard != null) {
+            // Configuration changes can happen after the keyboard gets recreated,
+            // so we need to be able to re-build the keyboards if the available
+            // space has changed.
+            int displayWidth = getMaxWidth();
+            if (displayWidth == _lastDisplayWidth) return;
+            _lastDisplayWidth = displayWidth;
+        }
+        _keyboard = new Keyboard(this, R.xml.keyboard);
     }
 
     @Override
@@ -47,12 +73,23 @@ public class KeyboardInputMethod extends InputMethodService {
             }
         }
     }
+    
+    @Override public void onStartInputView(EditorInfo attribute, boolean restarting) {
+        super.onStartInputView(attribute, restarting);
+        // Apply the selected keyboard to the input view.
+        _inputView.setKeyboard(_keyboard);
+        _inputView.closing();
+    }
 
     @Override
     public void onFinishInput() {
         super.onFinishInput();
         if (mainService != null) {
             mainService._keyboard = null;
+        }
+        
+        if (_inputView != null) {
+            _inputView.closing();
         }
     }
 
@@ -100,5 +137,53 @@ public class KeyboardInputMethod extends InputMethodService {
         } catch (Throwable t) {
         }
         return text;
+    }
+
+    @Override
+    public void onKey(int arg0, int[] arg1) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void onPress(int primaryCode) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void onRelease(int primaryCode) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void onText(CharSequence text) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void swipeDown() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void swipeLeft() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void swipeRight() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void swipeUp() {
+        // TODO Auto-generated method stub
+        
     }
 }
