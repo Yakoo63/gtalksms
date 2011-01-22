@@ -388,8 +388,11 @@ public class XmppManager {
             MultiUserChat muc;
             if (!rooms.containsKey(room)) {
                 muc = createRoom(number, room, sender);
-                if(muc == null) return;  //room creation failed
-                rooms.put(room, muc);
+                
+                if (muc != null) {
+                    rooms.put(room, muc);
+                }
+                
             } else {
                 muc = rooms.get(room);
                 
@@ -428,13 +431,11 @@ public class XmppManager {
 
                     
                     try {
-                        // TODO doesn't work, to fix but maybe not useful
                         List<String> owners = new ArrayList<String>();
                         owners.add(_settings.login);
                         owners.add(_settings.notifiedAddress);
                         submitForm.setAnswer("muc#roomconfig_roomowners", owners);
                         //submitForm.setAnswer("muc#roomconfig_roomadmins", owners);  //throws exception (at least on my server)
-
                     }
                     catch (Exception ex) {
                         Log.e(Tools.LOG_TAG, "Unable to configure room owners. Falling back to room passwords", ex);
@@ -442,28 +443,30 @@ public class XmppManager {
                         submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomsPassword);
                         passwordMode = true;
                     }
+                    
                     if (!passwordMode) {
                     	submitForm.setAnswer("muc#roomconfig_membersonly", true);
                     }
-                
-                    
+                                    
                     multiUserChat.sendConfigurationForm(submitForm);
                 }
                 catch (XMPPException e1) {
                     Log.e(Tools.LOG_TAG, "Unable to send conference room configuration form.", e1);
+                    send(_context.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
                     return null; //then we also should not send an invite as the room will be locked
                 }
                 
                 multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
             } catch (Exception ex) {
                 Log.e(Tools.LOG_TAG, "Error on creating room: room = " + room, ex);
-                return null;
+                throw ex;
             }
 
             ChatPacketListener chatListener = new ChatPacketListener(number, multiUserChat);
             multiUserChat.addMessageListener(chatListener);
         } catch (Exception ex) {
             Log.e(Tools.LOG_TAG, "createRoom: room = " + room, ex);
+            send(_context.getString(R.string.chat_sms_muc_error, ex.getMessage()));
             return null;
         }
         return multiUserChat;
@@ -486,8 +489,6 @@ public class XmppManager {
             String from = message.getFrom();
         
             Log.d(Tools.LOG_TAG, "Xmpp chat room packet received");
-            
-            // TODO To correct, a lot of notifications are sent, a message is displayed several times
             
             if (!from.contains(_number)) {
                 if (message.getBody() != null) {
@@ -539,9 +540,11 @@ public class XmppManager {
         pm.addExtensionProvider("paused","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
         pm.addExtensionProvider("inactive","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
         pm.addExtensionProvider("gone","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
+        
         //  GTalkSMS already manages its own html message packets
         //  XHTML
         //pm.addExtensionProvider("html","http://jabber.org/protocol/xhtml-im", new XHTMLExtensionProvider());
+        
         //  Group Chat Invitations
         pm.addExtensionProvider("x","jabber:x:conference", new GroupChatInvitation.Provider());
         //  Service Discovery # Items    

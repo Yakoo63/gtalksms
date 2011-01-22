@@ -21,6 +21,8 @@
     <string name="pref_app_call_logs_number_help">Number of call logs to show</string>
     <string name="pref_app_ringtone">Ring with</string>
     <string name="pref_app_ringtone_help">Ringtone to use with the ring command</string>
+    <string name="pref_app_locale">Choose the application localization</string>
+    <string name="pref_app_locale_help">Localization</string>
     <string name="pref_con">Connection settings</string>
     <string name="pref_con_notified_address_cat">Address to notify</string>
     <string name="pref_con_notified_address">Address to notify</string>
@@ -151,12 +153,12 @@
     <string name="chat_sms_radio_off">Radio off</string>
     <string name="chat_sms_delivered">SMS delivered</string>
     <string name="chat_sms_not_delivered">SMS not delivered</string>
+    <string name="chat_sms_muc_conf_error">Incoming SMS: Unable to send conference room configuration form. Ex: %s</string>
+    <string name="chat_sms_muc_error">Incoming SMS: Error on creating conference room. Ex: %s</string>
     <string name="chat_log_failed">Failed to get log message</string>
     <string name="chat_log_unavailable">Unavailable</string>
     <string name="chat_geo_accuracy">accuracy: %fm&#xA0;</string>
     <string name="chat_geo_altitude">altitude: %f&#xA0;</string>
     <string name="chat_geo_speed">speed: %fm/s&#xA0;</string>
     <string name="chat_geo_provider">provider: %s</string>
-    <string name="pref_app_locale">Choose the application localization</string>
-    <string name="pref_app_locale_help">Localization</string>
 </resources>

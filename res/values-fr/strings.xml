@@ -21,6 +21,8 @@
     <string name="pref_app_call_logs_number_help">Nombre d\'appel à afficher dans l\'historique</string>
     <string name="pref_app_ringtone">Sonner avec</string>
     <string name="pref_app_ringtone_help">Sonnerie pour la commande ring</string>
+    <string name="pref_app_locale">Langue</string>
+    <string name="pref_app_locale_help">Choisir la langue</string>
     <string name="pref_con">Connexion</string>
     <string name="pref_con_notified_address_cat">Adresse de notification</string>
     <string name="pref_con_notified_address">Adresse de notification</string>
@@ -150,6 +152,8 @@
     <string name="chat_sms_null_pdu">Erreur</string>
     <string name="chat_sms_radio_off">Radio éteinte</string>
     <string name="chat_sms_delivered">SMS délivré</string>
+    <string name="chat_sms_muc_conf_error">SMS entrant: Impossible de configurer la salle de conférence. Ex: %s</string>
+    <string name="chat_sms_muc_error">SMS entrant: Erreur lors de la création de la salle de conférence. Ex: %s</string>
     <string name="chat_sms_not_delivered">SMS non délivré</string>
     <string name="chat_log_failed">Erreur lors de la récupération des logs.</string>
     <string name="chat_log_unavailable">Non disponible</string>
@@ -157,6 +161,4 @@
     <string name="chat_geo_altitude">Altitude : %f&#xA0;</string>
     <string name="chat_geo_speed">Vitesse : %fm/s&#xA0;</string>
     <string name="chat_geo_provider">Source : %s</string>
-    <string name="pref_app_locale">Langue</string>
-    <string name="pref_app_locale_help">Choisir la langue</string>
 </resources>

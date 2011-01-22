@@ -21,6 +21,8 @@
     <string name="pref_app_call_logs_number_help">Anzahl der angezeigeten Anrufe</string>
     <string name="pref_app_ringtone">Klingelton</string>
     <string name="pref_app_ringtone_help">Klingelton der durch den \"ring\" Befehl abgespielt wird</string>
+    <string name="pref_app_locale">Sprache</string>
+    <string name="pref_app_locale_help">Sprachumgebung der Anwendung festlegen</string>
     <string name="pref_con">Verbindungseinstellungen</string>
     <string name="pref_con_notified_address_cat">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address">Benachrichtigungs- / Steueradresse</string>
@@ -157,6 +159,4 @@
     <string name="chat_geo_altitude">Höhe: %f </string>
     <string name="chat_geo_speed">Geschwindigkeit: %fm/s </string>
     <string name="chat_geo_provider">Quelle: %s</string>
-    <string name="pref_app_locale">Sprache</string>
-    <string name="pref_app_locale_help">Sprachumgebung der Anwendung festlegen</string>
 </resources>
