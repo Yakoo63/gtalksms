@@ -690,7 +690,13 @@ public class MainService extends Service {
             } else if (command.equals("stop")) {
                 stopNotifications();
             } else if (command.equals("ring")) {
-                ring();
+                Integer volume = Tools.parseInt(args);
+                
+                if (volume != null) {
+                    ring(volume);
+                } else {
+                    ring(100);
+                }
             } else if (command.equals("cmd")) {
                 shellCmd(args);
             } else if (command.equals("http")) {
@@ -777,14 +783,14 @@ public class MainService extends Service {
 
     public String makeBold(String in) {
         if (_settingsMgr.formatChatResponses) {
-            return " *" + in + "* ";
+            return " *" + in + " * ";
         }
         return in;
     }
 
     public String makeItalic(String in) {
         if (_settingsMgr.formatChatResponses) {
-            return " _" + in + "_ ";
+            return " _" + in + " _ ";
         }
         return in;
     }
@@ -806,7 +812,7 @@ public class MainService extends Service {
         builder.append(getString(R.string.chat_help_contact, makeBold("\"contact:#contact#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_geo, makeBold("\"geo:#address#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_where, makeBold("\"where\""), makeBold("\"stop\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_ring, makeBold("\"ring\""), makeBold("\"stop\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_ring, makeBold("\"ring\""), makeBold("\"ring:[0-100]\""), makeBold("\"stop\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_copy, makeBold("\"copy:#text#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_cmd, makeBold("\"cmd:#command#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_write, makeBold("\"write:#text#\""), makeBold("\"w:#text#\""))).append(Tools.LineSep);
@@ -820,10 +826,10 @@ public class MainService extends Service {
         _geoMgr.startLocatingPhone();
     }
 
-    public void ring() {
+    public void ring(int volume) {
         _hasOutgoingAction = true;
         send(getString(R.string.chat_start_ringing));
-        if (!_mediaMgr.ring()) {
+        if (!_mediaMgr.ring(volume)) {
             send(getString(R.string.chat_error_ringing));
         }
     }

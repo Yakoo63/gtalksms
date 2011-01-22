@@ -132,7 +132,7 @@
     <string name="chat_help_contact">- %s: Liefert Informationen über den angegebenen Kontakt.</string>
     <string name="chat_help_geo">- %s: Öffnet Googe Maps oder Navigation mit der angegebenen Adresse.</string>
     <string name="chat_help_where">- %1$s: Sendet die aktuelle Position des Telefons solange bis %2$s gesendet wird.</string>
-    <string name="chat_help_ring">- %1$s: Lässt das Telefon klingeln bis %2$s gesendet wird.</string>
+    <string name="chat_help_ring">- %1$s oder %2$s: Lässt das Telefon klingeln bis %3$s gesendet wird.</string>
     <string name="chat_help_copy">- %s: Kopiert &lt;text&gt; in das Clipboard des Telefons oder sendet den Inahlt des Clipboards, wenn &lt;text&gt; leer ist.</string>
     <string name="chat_help_cmd">- %s: Für Shell Befehl (wenn möglich mit root Rechten) aus.</string>
     <string name="chat_help_write">- %1$s oder %2$s: Schreibt &lt;text&gt; in die virtuelle Tastatur (dazu muss die GTalkSMS Tastatur in den Android Einstellungen aktiviert sein).</string>

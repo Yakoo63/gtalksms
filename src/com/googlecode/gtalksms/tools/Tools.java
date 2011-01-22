@@ -93,4 +93,12 @@ public class Tools {
         context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
     }
     
+    public static Integer parseInt(String value) {
+        Integer res = null;
+        try { 
+            res = Integer.parseInt(value); 
+        } catch(Exception e) {}
+        
+        return res;
+    }
 }
