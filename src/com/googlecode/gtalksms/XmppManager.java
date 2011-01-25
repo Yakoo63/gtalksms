@@ -269,6 +269,7 @@ public class XmppManager {
                     stop();
                 }
                 roomNumbers.clear();
+                rooms.clear();
                 return;
             }
             
