@@ -783,14 +783,14 @@ public class MainService extends Service {
 
     public String makeBold(String in) {
         if (_settingsMgr.formatChatResponses) {
-            return " *" + in + " * ";
+            return " *" + in + "* ";
         }
         return in;
     }
 
     public String makeItalic(String in) {
         if (_settingsMgr.formatChatResponses) {
-            return " _" + in + " _ ";
+            return " _" + in + "_ ";
         }
         return in;
     }
