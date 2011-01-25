@@ -400,6 +400,7 @@ public class XmppManager {
             } else {
                 muc = rooms.get(room);
                 
+                // TODO: test if occupants content sender (in case we invite other people)
                 if (muc != null && muc.getOccupantsCount() < 2) {
                     muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
                 }
@@ -421,13 +422,8 @@ public class XmppManager {
         boolean passwordMode = false;
         Integer randomInt;
         
-        int i = 0;
         do {
-        	if (i++ > 5) {
-        		Log.e(Tools.LOG_TAG, "Error on creating room: Could not find unused random number");
-        		return null;
-        	}
-        	randomInt = (new Random()).nextInt();
+            randomInt = (new Random()).nextInt();
         } while (roomNumbers.contains(randomInt));
         roomNumbers.add(randomInt);
         

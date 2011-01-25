@@ -189,10 +189,12 @@ public class MainService extends Service {
                 boolean available = intent.getBooleanExtra("available", true);
                 Log.d(Tools.LOG_TAG, "network_changed with available=" + available + 
                                      " and with state=" + initialState);
+                
+                // TODO wait few seconds if network not available ? to avoid multiple reconnections
                 if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
                     // We are in a waiting state and have a network - try to connect.
                     xmppRequestStateChange(XmppManager.CONNECTED);
-                } else if (!available && initialState==XmppManager.CONNECTED) {
+                } else if (!available && initialState == XmppManager.CONNECTED) {
                     // We are connected but the network has gone down - disconnect and go
                     // into WAITING state so we auto-connect when we get a future 
                     // notification that a network is available.
