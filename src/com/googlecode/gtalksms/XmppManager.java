@@ -3,9 +3,11 @@ package com.googlecode.gtalksms;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -266,6 +268,7 @@ public class XmppManager {
                     Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_invalid_credentials));
                     stop();
                 }
+                roomNumbers.clear();
                 return;
             }
             
@@ -409,13 +412,26 @@ public class XmppManager {
         }
     }
     
+    Set<Integer> roomNumbers = new HashSet<Integer>();
+    
     public MultiUserChat createRoom(String number, String room, String sender) {
         
         MultiUserChat multiUserChat = null;
         boolean passwordMode = false;
+        Integer randomInt;
+        
+        int i = 0;
+        do {
+        	if (i++ > 5) {
+        		Log.e(Tools.LOG_TAG, "Error on creating room: Could not find unused random number");
+        		return null;
+        	}
+        	randomInt = (new Random()).nextInt();
+        } while (roomNumbers.contains(randomInt));
+        roomNumbers.add(randomInt);
         
         // With "@conference.jabber.org" messages are sent several times... Jwchat seems to work fine and is the default
-        String cnx = "GTalkSMS_" + (new Random()).nextInt() + "_" + _settings.login.replaceAll("@", "_") 
+        String cnx = "GTalkSMS_" + randomInt + "_" + _settings.login.replaceAll("@", "_") 
             + "@" + _settings.mucServer; 
         try {
             // Create the room
