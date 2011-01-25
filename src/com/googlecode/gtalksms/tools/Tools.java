@@ -11,6 +11,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.widget.Toast;
 
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 
 public class Tools {
@@ -18,7 +19,8 @@ public class Tools {
     public final static String LineSep = System.getProperty("line.separator");
     
     public static void toastMessage(Context ctx, String msg) {
-        Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
+    	String toastMsg  = ctx.getString(R.string.app_name) + ": " + msg;
+        Toast.makeText(ctx, toastMsg, Toast.LENGTH_SHORT).show();
     }
     
     public static String getVersionName(Context context, Class<?> cls) {
