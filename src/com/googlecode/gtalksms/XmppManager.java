@@ -3,9 +3,11 @@ package com.googlecode.gtalksms;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -266,6 +268,8 @@ public class XmppManager {
                     Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_invalid_credentials));
                     stop();
                 }
+                roomNumbers.clear();
+                rooms.clear();
                 return;
             }
             
@@ -409,63 +413,71 @@ public class XmppManager {
         }
     }
     
+    Set<Integer> roomNumbers = new HashSet<Integer>();
+    
     public MultiUserChat createRoom(String number, String room, String sender) {
         
         MultiUserChat multiUserChat = null;
         boolean passwordMode = false;
+        Integer randomInt;
+        
+        int i = 0;
+        do {
+        	if (i++ > 5) {
+        		Log.e(Tools.LOG_TAG, "Error on creating room: Could not find unused random number");
+        		return null;
+        	}
+        	randomInt = (new Random()).nextInt();
+        } while (roomNumbers.contains(randomInt));
+        roomNumbers.add(randomInt);
         
         // With "@conference.jabber.org" messages are sent several times... Jwchat seems to work fine and is the default
-        String cnx = "GTalkSMS_" + (new Random()).nextInt() + "_" + _settings.login.replaceAll("@", "_") 
+        String cnx = "GTalkSMS_" + randomInt + "_" + _settings.login.replaceAll("@", "_") 
             + "@" + _settings.mucServer; 
         try {
             // Create the room
             multiUserChat = new MultiUserChat(_connection, cnx);
-            try {
-                multiUserChat.create(room);
+            multiUserChat.create(room);
                 
-                try {
-                    // Since this is a private room, make the room not public and set user as owner of the room.
-                    Form submitForm = multiUserChat.getConfigurationForm().createAnswerForm();
-                    submitForm.setAnswer("muc#roomconfig_publicroom", false);
-                    submitForm.setAnswer("muc#roomconfig_roomname", room);
+            try {
+                // Since this is a private room, make the room not public and set user as owner of the room.
+                Form submitForm = multiUserChat.getConfigurationForm().createAnswerForm();
+                submitForm.setAnswer("muc#roomconfig_publicroom", false);
+                submitForm.setAnswer("muc#roomconfig_roomname", room);
 
                     
-                    try {
-                        List<String> owners = new ArrayList<String>();
-                        owners.add(_settings.login);
-                        owners.add(_settings.notifiedAddress);
-                        submitForm.setAnswer("muc#roomconfig_roomowners", owners);
-                        //submitForm.setAnswer("muc#roomconfig_roomadmins", owners);  //throws exception (at least on my server)
-                    }
-                    catch (Exception ex) {
-                        Log.e(Tools.LOG_TAG, "Unable to configure room owners. Falling back to room passwords", ex);
-                        submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
-                        submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomsPassword);
-                        passwordMode = true;
-                    }
+                try {
+                    List<String> owners = new ArrayList<String>();
+                    owners.add(_settings.login);
+                    owners.add(_settings.notifiedAddress);
+                    submitForm.setAnswer("muc#roomconfig_roomowners", owners);
+                    //submitForm.setAnswer("muc#roomconfig_roomadmins", owners);  //throws exception (at least on my server)
+                }
+                catch (Exception ex) {
+                    Log.e(Tools.LOG_TAG, "Unable to configure room owners. Falling back to room passwords", ex);
+                    submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
+                    submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomsPassword);
+                    passwordMode = true;
+                }
                     
-                    if (!passwordMode) {
-                    	submitForm.setAnswer("muc#roomconfig_membersonly", true);
-                    }
+                if (!passwordMode) {
+                 	submitForm.setAnswer("muc#roomconfig_membersonly", true);
+                }
                                     
-                    multiUserChat.sendConfigurationForm(submitForm);
-                }
-                catch (XMPPException e1) {
-                    Log.e(Tools.LOG_TAG, "Unable to send conference room configuration form.", e1);
-                    send(_context.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
-                    return null; //then we also should not send an invite as the room will be locked
-                }
-                
-                multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
-            } catch (Exception ex) {
-                Log.e(Tools.LOG_TAG, "Error on creating room: room = " + room, ex);
-                throw ex;
+                multiUserChat.sendConfigurationForm(submitForm);
             }
+            catch (XMPPException e1) {
+                Log.e(Tools.LOG_TAG, "Unable to send conference room configuration form.", e1);
+                send(_context.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
+                return null; //then we also should not send an invite as the room will be locked
+            }
+               
+            multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
 
             ChatPacketListener chatListener = new ChatPacketListener(number, multiUserChat);
             multiUserChat.addMessageListener(chatListener);
         } catch (Exception ex) {
-            Log.e(Tools.LOG_TAG, "createRoom: room = " + room, ex);
+            Log.e(Tools.LOG_TAG, "createRoom() - Error creating room: " + room, ex);
             send(_context.getString(R.string.chat_sms_muc_error, ex.getMessage()));
             return null;
         }
