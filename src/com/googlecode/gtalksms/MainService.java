@@ -160,7 +160,11 @@ public class MainService extends Service {
                 }
             } else if (a.equals(ACTION_SEND)) {
                 if (initialState == XmppManager.CONNECTED) {
-                    _xmppMgr.send(intent.getStringExtra("message"));
+                    if (intent.hasExtra("xhtml")) {
+                        _xmppMgr.sendXHTML(intent.getStringExtra("message"));
+                    } else {
+                        _xmppMgr.send(intent.getStringExtra("message"));
+                    }
                 }
             } else if (a.equals(ACTION_HANDLE_XMPP_NOTIFY)) {
                 // If there is a message, then it is what we received.
@@ -536,7 +540,11 @@ public class MainService extends Service {
         };
         _cmdMgr = new CmdManager(_settingsMgr, getBaseContext()) {
             void sendResults(String message) {
-                send(message);
+                if (_settings.formatChatResponses) {
+                    sendXHTML(message);
+                } else {
+                    send(message);
+                }
             }
         };
         _smsMonitor = new SmsMonitor(_settingsMgr, getBaseContext()) {
@@ -611,9 +619,15 @@ public class MainService extends Service {
     public static void send(Context ctx, String msg) {
         ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg));
     }
-
+    
     public void send(String msg) {
         send(this, msg);
+    }
+
+    public void sendXHTML(String msg) {
+        Intent i = newSvcIntent(this, ACTION_SEND, msg);
+        i.putExtra("xhtml", true);
+        startService(i);
     }
 
     /** handles the different commands */

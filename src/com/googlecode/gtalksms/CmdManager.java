@@ -81,10 +81,13 @@ public abstract class CmdManager {
                 _cmdResults.append(Tools.LineSep);
                 
                 Date end = new Date();
-                if ((end.getTime() - start.getTime()) / 1000 > 10 ) {
+                if ((end.getTime() - start.getTime()) / 1000 > 10 || _cmdResults.length() > 5000 ) {
                     start = end;
-                    sendResults(_cmdResults.toString());
-                    _cmdResults.setLength(0);
+                    int last = _cmdResults.lastIndexOf("\n");
+                    if (last != -1) {
+                        sendResults(_cmdResults.substring(0, last + 1));
+                        _cmdResults.delete(0, last + 1);
+                    }
                 }
             }
         }

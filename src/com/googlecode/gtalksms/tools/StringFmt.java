@@ -9,6 +9,19 @@ import android.text.style.URLSpan;
 
 public class StringFmt {
     
+    public static String encodeHTML(String s) {
+        StringBuffer out = new StringBuffer();
+        for (int i = 0 ; i < s.length() ; i++) {
+            char c = s.charAt(i);
+            if (c > 127 || c == '"' || c == '<' || c == '>') {
+                out.append("&#" + (int)c + ";");
+            } else {
+                out.append(c);
+            }
+        }
+        return out.toString();
+    }
+
     public static CharSequence Fmt(CharSequence str, int color, Double size, int style) {
         return format(str, new ForegroundColorSpan(color), new RelativeSizeSpan(size.floatValue()), 
                 new StyleSpan(style));

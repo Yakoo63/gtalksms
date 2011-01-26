@@ -24,6 +24,7 @@ import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.GroupChatInvitation;
 import org.jivesoftware.smackx.PrivateDataManager;
+import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
 import org.jivesoftware.smackx.packet.DelayInformation;
@@ -55,7 +56,9 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.util.Log;
 
+import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.xmpp.XHTMLExtensionProvider;
 
 public class XmppManager {
 
@@ -367,6 +370,21 @@ public class XmppManager {
         if (isConnected()) {
             Message msg = new Message(_settings.notifiedAddress, Message.Type.chat);
             msg.setBody(message);
+            
+            _connection.sendPacket(msg);
+        }
+    }
+
+    /** sends a message to the user */
+    public void sendXHTML(String message) {
+        if (isConnected()) {
+            Message msg = new Message(_settings.notifiedAddress, Message.Type.chat);
+            msg.setBody(message);
+            
+            // TODO add parameters to configure XHTML layout: font color style size...
+            XHTMLManager.addBody(msg, "<body><font face=\"consolas\" color=\"blue\">" + 
+                    StringFmt.encodeHTML(message).replaceAll("\n", "<br/>") + "</font></body>");
+
             _connection.sendPacket(msg);
         }
     }
@@ -538,6 +556,9 @@ public class XmppManager {
             Log.w("TestClient", "Can't load class for org.jivesoftware.smackx.packet.Time");
         }
  
+        //  XHTML
+        pm.addExtensionProvider("html","http://jabber.org/protocol/xhtml-im", new XHTMLExtensionProvider());
+
         //  Roster Exchange
         pm.addExtensionProvider("x","jabber:x:roster", new RosterExchangeProvider());
         //  Message Events
@@ -548,10 +569,6 @@ public class XmppManager {
         pm.addExtensionProvider("paused","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
         pm.addExtensionProvider("inactive","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
         pm.addExtensionProvider("gone","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
-        
-        //  GTalkSMS already manages its own html message packets
-        //  XHTML
-        //pm.addExtensionProvider("html","http://jabber.org/protocol/xhtml-im", new XHTMLExtensionProvider());
         
         //  Group Chat Invitations
         pm.addExtensionProvider("x","jabber:x:conference", new GroupChatInvitation.Provider());
