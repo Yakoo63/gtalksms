@@ -1,8 +1,5 @@
 package com.googlecode.gtalksms;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -64,6 +61,7 @@ public class MainService extends Service {
     public static boolean running = false;
     private SettingsManager _settingsMgr;
 
+    private CmdManager _cmdMgr;
     private MediaManager _mediaMgr;
     private XmppManager _xmppMgr;
     private BroadcastReceiver _xmppreceiver;
@@ -536,7 +534,11 @@ public class MainService extends Service {
                 }
             }
         };
-        
+        _cmdMgr = new CmdManager(_settingsMgr, getBaseContext()) {
+            void sendResults(String message) {
+                send(message);
+            }
+        };
         _smsMonitor = new SmsMonitor(_settingsMgr, getBaseContext()) {
             void sendSmsStatus(String message) {
                 send(message);
@@ -720,51 +722,9 @@ public class MainService extends Service {
         }
     }
 
-    private boolean askRootAccess() {
-        try {
-            Process p = Runtime.getRuntime().exec("su");
-
-            // Attempt to write a file to a root-only
-            DataOutputStream os = new DataOutputStream(p.getOutputStream());
-            os.writeBytes("echo \"Do I have root?\" >/system/sd/temporary.txt\n");
-            os.writeBytes("exit\n");
-            os.flush();
-            p.waitFor();
-            if (p.exitValue() != 255) {
-                return true;
-            }
-            return false;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    
     private void shellCmd(String cmd) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(cmd);
-        sb.append(Tools.LineSep);
-        
-        if (!askRootAccess()) {
-            sb.append(getString(R.string.chat_error_root) + Tools.LineSep);
-        }
-
-        Process myproc = null;
-        BufferedReader reader = null;
         try {
-            myproc = Runtime.getRuntime().exec(new String[] {"/system/bin/sh", "-c", cmd});
-           
-            String line;
-            reader = new BufferedReader(new InputStreamReader(myproc.getInputStream()));
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-                sb.append(Tools.LineSep);
-            }
-            reader = new BufferedReader(new InputStreamReader(myproc.getErrorStream()));
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-                sb.append(Tools.LineSep);
-            }
-            send(sb.toString());
+            _cmdMgr.shellCmd(cmd);
         }
         catch (Exception ex) {
             Log.w(Tools.LOG_TAG, "Shell command error", ex);
