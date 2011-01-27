@@ -29,7 +29,7 @@ public abstract class SmsMonitor {
             _sentPI = PendingIntent.getBroadcast(_context, 0, new Intent(SENT), 0);
             _sentSmsReceiver = new BroadcastReceiver() {
                 @Override
-                public void onReceive(Context arg0, Intent arg1) {
+                public void onReceive(Context context, Intent intent) {
                     switch (getResultCode()) {
                         case Activity.RESULT_OK:
                             sendSmsStatus(_context.getString(R.string.chat_sms_sent));
@@ -57,7 +57,7 @@ public abstract class SmsMonitor {
             _deliveredPI = PendingIntent.getBroadcast(_context, 0, new Intent(DELIVERED), 0);
             _deliveredSmsReceiver = new BroadcastReceiver() {
                 @Override
-                public void onReceive(Context arg0, Intent arg1) {
+                public void onReceive(Context context, Intent intent) {
                     switch (getResultCode()) {
                         case Activity.RESULT_OK:
                             sendSmsStatus(_context.getString(R.string.chat_sms_delivered));
@@ -103,5 +103,5 @@ public abstract class SmsMonitor {
         _deliveredSmsReceiver = null;
     }
     
-    abstract void sendSmsStatus(String message);
+    abstract void sendSmsStatus(String status);
 }

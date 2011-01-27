@@ -1,6 +1,5 @@
 package com.googlecode.gtalksms.receivers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,21 +14,17 @@ import com.googlecode.gtalksms.MainService;
 
 public class SmsReceiver extends BroadcastReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
+    public static Map<String, String> RetrieveMessages(Intent intent) {
+        Map<String, String> msg = new HashMap<String, String>();
         Bundle bundle = intent.getExtras();
         SmsMessage[] msgs = null;
         
-        if (bundle != null)  {
-            if (MainService.running) {
-                Object[] pdus = (Object[]) bundle.get("pdus");                
+        if (bundle != null && MainService.running && bundle.containsKey("pdus")) {
+            Object[] pdus = (Object[]) bundle.get("pdus");
+           
+            if (pdus != null) {
                 int nbrOfpdus = pdus.length;
                 msgs = new SmsMessage[nbrOfpdus];
-                
-                // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
-                // However, send long SMS of same sender in one message
-                ArrayList<String> senders = new ArrayList<String>();
-                Map<String, String> msg = new HashMap<String, String>();
                 
                 for (int i = 0; i < nbrOfpdus; i++) {
                     msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
@@ -37,9 +32,6 @@ public class SmsReceiver extends BroadcastReceiver {
                     String msgString = msg.get(msgs[i].getOriginatingAddress()); // Check if index with number exists
                     
                     if(msgString == null) { // Index with number doesn't exist                                               
-                        // Save sender for accessing associative array later
-                        senders.add(msgs[i].getOriginatingAddress());  
-                        
                         // Save string into associative array with sender number as index
                         msg.put(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString()); 
                         
@@ -49,14 +41,23 @@ public class SmsReceiver extends BroadcastReceiver {
                         msg.put(msgs[i].getOriginatingAddress(), msgString);
                     }
                 }
-
-                // Finally, send all SMS via XMPP by sender
-                for(String sender : senders) {
-                    Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender) + "\n");
-                    svcintent.putExtra("sender", sender);
-                    context.startService(svcintent);
-                }
             }
+        }
+        
+        return msg;
+    }
+    
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
+        // However, send long SMS of same sender in one message
+        Map<String, String> msg = RetrieveMessages(intent);
+        
+        // Finally, send all SMS via XMPP by sender
+        for(String sender : msg.keySet()) {
+            Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender) + "\n");
+            svcintent.putExtra("sender", sender);
+            context.startService(svcintent);
         }
     }
 }

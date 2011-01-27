@@ -548,8 +548,9 @@ public class MainService extends Service {
             }
         };
         _smsMonitor = new SmsMonitor(_settingsMgr, getBaseContext()) {
-            void sendSmsStatus(String message) {
-                send(message);
+            
+            void sendSmsStatus(String status) {
+                send(status);
             }
         };
 
