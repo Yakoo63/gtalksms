@@ -1,10 +1,16 @@
 package com.googlecode.gtalksms;
 
+import java.io.IOException;
+
+import com.googlecode.gtalksms.tools.Tools;
+
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
+import android.util.Log;
 
 public class MediaManager {
     private MediaPlayer _mediaPlayer;
@@ -36,6 +42,13 @@ public class MediaManager {
         _mediaPlayer = new MediaPlayer();
         try {
             _mediaPlayer.setDataSource(_context, alert);
+        } catch (IOException ioe) {
+        	try {
+        		Log.w(Tools.LOG_TAG, "Could not set choosen ringtone, falling back to system default ringtone");
+				_mediaPlayer.setDataSource(_context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)); //the emulator wont find the default ringtone as he has none
+			} catch (Exception e) {
+				_canRing = false;
+			}
         } catch (Exception e) {
             _canRing = false;
         }
