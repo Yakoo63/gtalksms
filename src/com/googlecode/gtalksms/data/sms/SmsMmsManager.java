@@ -10,9 +10,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
+import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class SmsMmsManager {
@@ -35,13 +37,26 @@ public class SmsMmsManager {
         }
         return new ArrayList<Sms>();
     }
+    
+    public ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName, String message) {
+        if (rawIds.size() > 0) {
+            return getAllSms("content://sms/inbox", contactName, 
+                    "person IN (" + TextUtils.join(", ", rawIds) + ") and body LIKE '%" + StringFmt.encodeSQL(message) + "%'", false);
+        }
+        return new ArrayList<Sms>();
+    }
 
     /**
      * Returns a ArrayList of <Sms> with count sms where the contactId match the
      * argument
      */
     public ArrayList<Sms> getAllSentSms() {
-        return getAllSms("content://sms/sent", "Me", null, true);
+        return getAllSms("content://sms/sent", _context.getString(R.string.chat_me), null, true);
+    }
+    
+    public ArrayList<Sms> getAllSentSms(String message) {
+        return getAllSms("content://sms/sent", _context.getString(R.string.chat_me), 
+                         "body LIKE '%" + StringFmt.encodeSQL(message) + "%'", true);
     }
 
     public ArrayList<Sms> getAllReceivedSms() {

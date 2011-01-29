@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.data.phone.Phone;
+import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class ContactsManager {
@@ -92,7 +93,7 @@ public class ContactsManager {
             String[] projection = new String[] { Contacts._ID, Contacts.DISPLAY_NAME };
             String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
 
-            Uri contactUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI, Uri.encode(searchedName));
+            Uri contactUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI, StringFmt.encodeSQL(searchedName));
             Cursor c = resolver.query(contactUri, projection, null, null, sortOrder);
             if (c != null) {
                 for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {

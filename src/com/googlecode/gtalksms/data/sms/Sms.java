@@ -21,16 +21,6 @@ public class Sms implements Comparable<Sms> {
     	this.date = date;
     }
     
-    public Sms(String phoneNumber, String shortendMessage, int numParts) {
-        this.resSentIntent = -1;
-        this.resDelIntent = -1;
-        
-        sentIntents = new boolean[numParts];
-        delIntents = new boolean[numParts];
-        this.number = phoneNumber;
-        this.shortendMessage = shortendMessage;
-    }
-    
     public Sms(String phoneNumber, String toName, String shortendMessage, int numParts) {
         this.resSentIntent = -1;
         this.resDelIntent = -1;

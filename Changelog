@@ -1,6 +1,14 @@
+1.8
+* Xmpp lib updated
+* New "findsms"/"fs" command
+* XHTML formatting added
+* Add consolas font for shell commands results
+* Execute shell commands in new threads
+* Enhance sent/delivered SMS notifications
+
 1.7
-* Add german language
-* Add localization preference
+* German language added
+* Localization preference added
 * GTalkSMS can manage SMS thread as conversation per contact 
 
 1.6

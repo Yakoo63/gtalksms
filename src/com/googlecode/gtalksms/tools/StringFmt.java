@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.tools;
 
+import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
@@ -20,6 +21,10 @@ public class StringFmt {
             }
         }
         return out.toString();
+    }
+
+    public static String encodeSQL(String s) {
+        return Uri.encode(s).replaceAll("'", "''");
     }
 
     public static CharSequence Fmt(CharSequence str, int color, Double size, int style) {

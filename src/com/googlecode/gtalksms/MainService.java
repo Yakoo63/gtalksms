@@ -680,6 +680,17 @@ public class MainService extends Service {
                     _smsMgr.markAsRead(_lastRecipient);
                     sendSMS(args, _lastRecipient);
                 }
+            } else if (command.equals("findsms") || command.equals("fs")) {
+                int separatorPos = args.indexOf(":");
+                String contact = null;
+                String message = null;
+                if (-1 != separatorPos) {
+                    contact = args.substring(0, separatorPos);
+                    message = args.substring(separatorPos + 1);
+                    searchSMS(message, contact);
+                } else if (args.length() > 0) {
+                    searchSMS(args, null);
+                }
             } else if (command.equals("markasread") || command.equals("mar")) {
                 if (args.length() > 0) {
                     markSmsAsRead(args);
@@ -785,6 +796,8 @@ public class MainService extends Service {
         builder.append(getString(R.string.chat_help_sms_show_unread, makeBold("\"sms:unread\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_sms_show_contact, makeBold("\"sms:#contact#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_sms_send, makeBold("\"sms:#contact#:#message#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_find_sms_all, makeBold("\"findsms:#message#\""), makeBold("\"fs:#message#\""))).append(Tools.LineSep);
+        builder.append(getString(R.string.chat_help_find_sms, makeBold("\"findsms:#contact#:#message#\""), makeBold("\"fs:#contact#:#message#\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_mark_as_read, makeBold("\"markAsRead:#contact#\""), makeBold("\"mar\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_battery, makeBold("\"battery\""), makeBold("\"batt\""))).append(Tools.LineSep);
         builder.append(getString(R.string.chat_help_calls, makeBold("\"calls\""))).append(Tools.LineSep);
@@ -826,6 +839,73 @@ public class MainService extends Service {
         }
     }
 
+    /** search SMS */
+    public void searchSMS(String message, String contactName) {
+        ArrayList<Contact> contacts = new ArrayList<Contact>();
+        ArrayList<Sms> sentSms = null;
+        
+        if (contactName != null) {
+            contacts = ContactsManager.getMatchingContacts(this, contactName);
+        } else {
+            contacts = ContactsManager.getMatchingContacts(this, "*");
+        }
+
+        if (_settingsMgr.displaySentSms) {
+            sentSms = _smsMgr.getAllSentSms(message);
+        }
+        
+        int nbResults = 0;
+        if (contacts.size() > 0) {
+            send(getString(R.string.chat_sms_search, message, contacts.size()) + Tools.LineSep);
+            
+            StringBuilder noSms = new StringBuilder();
+            Boolean hasMatch = false;
+            for (Contact contact : contacts) {
+                ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name, message);
+                if (_settingsMgr.displaySentSms) {
+                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(this, contact.id), sentSms));
+                }
+                Collections.sort(smsArrayList);
+
+                List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
+                if (smsList.size() > 0) {
+                    hasMatch = true;
+                    StringBuilder smsContact = new StringBuilder();
+                    smsContact.append(makeBold(contact.name));
+                    for (Sms sms : smsList) {
+                        smsContact.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
+                        smsContact.append(Tools.LineSep + sms.message);
+                        nbResults++;
+                    }
+                    if (smsList.size() < _settingsMgr.smsNumber) {
+                        smsContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_sms_search_results, smsList.size())));
+                    }
+                    send(smsContact.toString() + Tools.LineSep);
+                }
+            }
+            if (!hasMatch) {
+                send(noSms.toString());
+            }
+        } else if (sentSms.size() > 0) {
+            StringBuilder smsContact = new StringBuilder();
+            smsContact.append(makeBold(getString(R.string.chat_me)));
+            for (Sms sms : sentSms) {
+                smsContact.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
+                smsContact.append(Tools.LineSep + sms.message);
+                nbResults++;
+            }
+            if (sentSms.size() < _settingsMgr.smsNumber) {
+                smsContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_sms_search_results, sentSms.size())));
+            }
+            send(smsContact.toString() + Tools.LineSep);
+        } 
+        if (nbResults > 0) {
+            send(getString(R.string.chat_sms_search_results, nbResults));
+        } else {
+            send(getString(R.string.chat_no_match_for, message));
+        }
+    }
+
     /** sends a SMS to the last contact */
     public void sendSMS(String message) {
         sendSMS(message, _lastRecipient);
@@ -835,7 +915,7 @@ public class MainService extends Service {
     public void sendSMS(String message, String contact) {
         if (Phone.isCellPhoneNumber(contact)) {
             send(getString(R.string.chat_send_sms, ContactsManager.getContactName(this, contact)));
-            sendSMSByPhoneNumber(message, contact);
+            sendSMSByPhoneNumber(message, contact, null);
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contact);
             if (mobilePhones.size() > 1) {
@@ -853,12 +933,6 @@ public class MainService extends Service {
                 send(getString(R.string.chat_no_match_for, contact));
             }
         }
-    }
-    
-    /** Sends a sms to the specified phone number */
-    public void sendSMSByPhoneNumber(String message, String phoneNumber) {
-        _smsMonitor.sendSMSByPhoneNumber(message, phoneNumber);
-        _smsMgr.addSmsToSentBox(message, phoneNumber);
     }
     
     /** Sends a sms to the specified phone number */
