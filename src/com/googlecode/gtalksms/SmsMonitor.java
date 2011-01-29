@@ -69,7 +69,9 @@ public abstract class SmsMonitor {
                             s.resSentIntent = res;
                         }
                         //TODO needs to be synchronized?
-                        if(_settings.notifySmsDelivered == false && sentIntComplete) smsMap.remove(SmsID);  
+                        if (_settings.notifySmsDelivered == false && sentIntComplete) {
+                            smsMap.remove(SmsID);  
+                        }
                         
                     } else { // we could NOT find the sms in the smsMap - fall back to old behavior
                         Log.d(Tools.LOG_TAG, "sms in smsMap missing");
@@ -125,7 +127,9 @@ public abstract class SmsMonitor {
                             }
                             s.resSentIntent = res;
                         }
-                        if (delIntComplete)    smsMap.remove(SmsID); //TODO needs to be synchronized?
+                        if (delIntComplete) {
+                            smsMap.remove(SmsID); //TODO needs to be synchronized?
+                        }
 
                     } else { // we could NOT find the sms in the smsMap - fall back to old the behavior
                         Log.d(Tools.LOG_TAG, "sms in smsMap missing");
