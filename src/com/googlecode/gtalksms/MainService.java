@@ -54,6 +54,8 @@ public class MainService extends Service {
     public final static String ACTION_SMS_RECEIVED = "com.googlecode.gtalksms.action.SMS_RECEIVED";
     public final static String ACTION_NETWORK_CHANGED = "com.googlecode.gtalksms.action.NETWORK_CHANGED";
     public final static String ACTION_HANDLE_XMPP_NOTIFY = "com.googlecode.gtalksms.action.HANDLE_XMPP_NOTIFY";
+    public final static String ACTION_SMS_SENT = "com.googlecode.gtalksms.action.SMS_SENT";
+    public final static String ACTION_SMS_DELIVERED = "com.googlecode.gtalksms.action.SMS_DELIVERED";
 
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
@@ -846,7 +848,7 @@ public class MainService extends Service {
                 Phone phone = mobilePhones.get(0);
                 send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")"));
                 setLastRecipient(phone.cleanNumber);
-                sendSMSByPhoneNumber(message, phone.cleanNumber);
+                sendSMSByPhoneNumber(message, phone.cleanNumber, phone.contactName);
             } else {
                 send(getString(R.string.chat_no_match_for, contact));
             }
@@ -855,8 +857,13 @@ public class MainService extends Service {
     
     /** Sends a sms to the specified phone number */
     public void sendSMSByPhoneNumber(String message, String phoneNumber) {
-
         _smsMonitor.sendSMSByPhoneNumber(message, phoneNumber);
+        _smsMgr.addSmsToSentBox(message, phoneNumber);
+    }
+    
+    /** Sends a sms to the specified phone number */
+    public void sendSMSByPhoneNumber(String message, String phoneNumber, String toName) {
+        _smsMonitor.sendSMSByPhoneNumber(message, phoneNumber, toName);
         _smsMgr.addSmsToSentBox(message, phoneNumber);
     }
 

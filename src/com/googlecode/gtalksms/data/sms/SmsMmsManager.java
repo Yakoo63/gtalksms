@@ -65,10 +65,7 @@ public class SmsMmsManager {
 
         if (c != null) {
             for (boolean hasData = c.moveToFirst(); hasData && (getMax || nbSms < maxSms); hasData = c.moveToNext(), ++nbSms) {
-                Sms sms = new Sms();
-                sms.date = Tools.getDateMilliSeconds(c, "date");
-                sms.number = Tools.getString(c, "address");
-                sms.message = Tools.getString(c, "body");
+                Sms sms = new Sms(Tools.getString(c, "address"), Tools.getString(c, "body"),  Tools.getDateMilliSeconds(c, "date"));
                 if (sender == null) {
                     sms.sender = ContactsManager.getContactName(_context, Tools.getLong(c, "person"));
                 } else {
