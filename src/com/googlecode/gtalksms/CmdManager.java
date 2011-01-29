@@ -31,7 +31,6 @@ public abstract class CmdManager {
 
             // Attempt to write a file to a root-only
             DataOutputStream os = new DataOutputStream(p.getOutputStream());
-            os.writeBytes("echo \"Do I have root?\" >/system/sd/temporary.txt\n");
             os.writeBytes("exit\n");
             os.flush();
             p.waitFor();
