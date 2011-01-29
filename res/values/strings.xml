@@ -8,9 +8,9 @@
     <string name="pref_app_start_on_power_connected">When charging</string>
     <string name="pref_app_start_on_power_connected_help">Automatically starts GTalkSMS when a charger is connected</string>
     <string name="pref_app_start_on_wifi_connected">Wifi is on</string>
-    <string name="pref_app_start_on_wifi_connected_help">Automatically starts GTalkSMS when Wifi is on</string>
+    <string name="pref_app_start_on_wifi_connected_help">Automatically starts GTalkSMS when Wifi is connected</string>
     <string name="pref_app_stop_on_wifi_disconnected">Wifi is off</string>
-    <string name="pref_app_stop_on_wifi_disconnected_help">Automatically stops GTalkSMS when Wifi is off</string>
+    <string name="pref_app_stop_on_wifi_disconnected_help">Automatically stops GTalkSMS when Wifi is disconnected</string>
     <string name="pref_app_stop_on_power_disconnected">When charger disconnected</string>
     <string name="pref_app_stop_on_power_disconnected_help">Automatically stops GTalkSMS when a charger is disconnected</string>
     <string name="pref_app_show_status_icon">Status notification icon</string>
@@ -154,9 +154,10 @@
     <string name="chat_call_hidden">[hidden number]</string>
     <string name="chat_me">Me</string>
     <string name="chat_sms_search">Search \"%1$s\" for %2$d contacts.</string>
+    <string name="chat_sms_search_start">Search in progress...</string>
     <string name="chat_sms_search_results">%d SMS found.</string>
     <string name="chat_sms_sent">SMS sent</string>
-    <string name="chat_sms_sent_to">SMS \"%1$s...\" sent to %2$s</string>
+    <string name="chat_sms_sent_to">SMS \"%1$s\" sent to %2$s</string>
     <string name="chat_sms_failure">Generic failure</string>
     <string name="chat_sms_failure_to">Generic failure. SMS \"%1$s\" to %2$s</string>  
     <string name="chat_sms_no_service">No service</string>

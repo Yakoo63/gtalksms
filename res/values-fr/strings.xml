@@ -8,9 +8,9 @@
     <string name="pref_app_start_on_power_connected">Sur secteur</string>
     <string name="pref_app_start_on_power_connected_help">Démarre GTalkSMS au branchement du chargeur</string>
     <string name="pref_app_start_on_wifi_connected">Wifi actif</string>
-    <string name="pref_app_start_on_wifi_connected_help">Démarre GTalkSMS quand le Wifi est actif</string>
+    <string name="pref_app_start_on_wifi_connected_help">Démarre GTalkSMS quand le Wifi est connecté</string>
     <string name="pref_app_stop_on_wifi_disconnected">Wifi inactif</string>
-    <string name="pref_app_stop_on_wifi_disconnected_help">Arrête GTalkSMS quand le Wifi est éteint</string>
+    <string name="pref_app_stop_on_wifi_disconnected_help">Arrête GTalkSMS quand le Wifi est déconnecté</string>
     <string name="pref_app_stop_on_power_disconnected">Sur batterie</string>
     <string name="pref_app_stop_on_power_disconnected_help">Arrête GTalkSMS au débranchement du chargeur</string>
     <string name="pref_app_show_status_icon">Icône de notification de l\'état de connexion</string>
@@ -154,9 +154,10 @@
     <string name="chat_call_hidden">[Appel Masqué]</string>
     <string name="chat_me">Moi</string>
     <string name="chat_sms_search">Recherche \"%1$s\" pour %2$d contacts...</string>
+    <string name="chat_sms_search_start">Recherche en cours...</string>
     <string name="chat_sms_search_results">%d SMS trouvé(s).</string>
     <string name="chat_sms_sent">SMS envoyé</string>
-    <string name="chat_sms_sent_to">SMS \"%1$s...\" envoyé à %2$s</string>
+    <string name="chat_sms_sent_to">SMS \"%1$s\" envoyé à %2$s</string>
     <string name="chat_sms_failure">Erreur</string>
     <string name="chat_sms_failure_to">SMS \"%1$s\" pour %2$s non envoyé.</string>  
     <string name="chat_sms_no_service">Pas de service</string>

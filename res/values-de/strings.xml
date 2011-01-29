@@ -154,6 +154,7 @@
     <string name="chat_call_hidden">[verborgene Telefonnummer]</string>
     <string name="chat_me">Ich</string>
     <string name="chat_sms_search">Suche nach \"%1$s\" in den SMS Nachrichten von %2$d Kontakten.</string>
+    <string name="chat_sms_search_start">Suchen...</string>
     <string name="chat_sms_search_results">Insgesammt %d SMS gefunden.</string>
     <string name="chat_sms_sent">SMS gesendet</string>
     <string name="chat_sms_sent_to">SMS \"%1$s\" wurde an %2$s gesendet</string>

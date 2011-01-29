@@ -630,13 +630,15 @@ public class MainService extends Service {
     }
     
     public void send(String msg) {
-        send(this, msg);
+        if (_xmppMgr != null) {
+            _xmppMgr.send(msg);
+        }
     }
-
+    
     public void sendXHTML(String msg) {
-        Intent i = newSvcIntent(this, ACTION_SEND, msg);
-        i.putExtra("xhtml", true);
-        startService(i);
+        if (_xmppMgr != null) {
+            _xmppMgr.sendXHTML(msg);
+        }
     }
 
     /** handles the different commands */
@@ -850,6 +852,8 @@ public class MainService extends Service {
         ArrayList<Contact> contacts = new ArrayList<Contact>();
         ArrayList<Sms> sentSms = null;
         
+        send(getString(R.string.chat_sms_search_start));
+        
         if (contactName != null) {
             contacts = ContactsManager.getMatchingContacts(this, contactName);
         } else {
@@ -862,7 +866,7 @@ public class MainService extends Service {
         
         int nbResults = 0;
         if (contacts.size() > 0) {
-            send(getString(R.string.chat_sms_search, message, contacts.size()) + Tools.LineSep);
+            send(getString(R.string.chat_sms_search, message, contacts.size()));
             
             StringBuilder noSms = new StringBuilder();
             Boolean hasMatch = false;

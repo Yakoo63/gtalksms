@@ -123,7 +123,7 @@ public abstract class SmsMonitor {
                         }
 
                         if (res == Activity.RESULT_OK && delIntComplete) {
-                            sendSmsStatus(_context.getString(R.string.chat_sms_sent_to, s.shortendMessage, to));
+                            sendSmsStatus(_context.getString(R.string.chat_sms_delivered_to, s.shortendMessage, to));
                         } else if (s.resSentIntent == -1) {
                             if(res == Activity.RESULT_CANCELED) {
                                 sendSmsStatus(_context.getString(R.string.chat_sms_not_delivered_to, s.shortendMessage, to));
