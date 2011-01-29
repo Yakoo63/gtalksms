@@ -1,11 +1,9 @@
 package com.googlecode.gtalksms;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.googlecode.gtalksms.data.sms.Sms;
-import com.googlecode.gtalksms.tools.Tools;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -16,6 +14,9 @@ import android.content.IntentFilter;
 import android.telephony.SmsManager;
 import android.util.Log;
 
+import com.googlecode.gtalksms.data.sms.Sms;
+import com.googlecode.gtalksms.tools.Tools;
+
 public abstract class SmsMonitor {
 	public BroadcastReceiver _sentSmsReceiver = null;
 	public BroadcastReceiver _deliveredSmsReceiver = null;
@@ -23,7 +24,7 @@ public abstract class SmsMonitor {
 	Context _context;
 	SettingsManager _settings;
 	int smsCount;
-	Map<Integer, Sms> smsMap = new HashMap<Integer, Sms>();
+	Map<Integer, Sms> smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
 
 	public SmsMonitor(SettingsManager settings, Context baseContext) {
 		_settings = settings;
@@ -68,7 +69,6 @@ public abstract class SmsMonitor {
                             }
                             s.resSentIntent = res;
                         }
-                        //TODO needs to be synchronized?
                         if (_settings.notifySmsDelivered == false && sentIntComplete) {
                             smsMap.remove(SmsID);  
                         }
@@ -128,7 +128,7 @@ public abstract class SmsMonitor {
                             s.resSentIntent = res;
                         }
                         if (delIntComplete) {
-                            smsMap.remove(SmsID); //TODO needs to be synchronized?
+                            smsMap.remove(SmsID);
                         }
 
                     } else { // we could NOT find the sms in the smsMap - fall back to old the behavior

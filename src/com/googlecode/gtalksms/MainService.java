@@ -60,7 +60,7 @@ public class MainService extends Service {
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
     // about some events
-    public static boolean running = false;
+    public static boolean IsRunning = false;
     private SettingsManager _settingsMgr;
 
     private CmdManager _cmdMgr;
@@ -127,6 +127,12 @@ public class MainService extends Service {
         if (intent == null) {
             Log.e(Tools.LOG_TAG, "onHandleIntent: Intent null");
             return;
+        }
+        
+        // Set Disconnected state by force to manage pending tasks
+        if (intent.getBooleanExtra("force", false) && intent.getBooleanExtra("disconnect", false)) {
+            // request to disconnect.
+            xmppRequestStateChange(XmppManager.DISCONNECTED);
         }
         
         _lock.lock();
@@ -374,7 +380,7 @@ public class MainService extends Service {
         _serviceHandler = new ServiceHandler(_serviceLooper);
         initNotificationStuff();
         Log.i(Tools.LOG_TAG, "service created");
-        running = true;
+        IsRunning = true;
     }
 
     @Override
@@ -459,7 +465,7 @@ public class MainService extends Service {
                 _xmppMgr.start();
                 break;
             default:
-                throw new IllegalStateException("unexpected current state when moving to connected: "+currentState);
+                throw new IllegalStateException("unexpected current state when moving to connected: " + currentState);
             }
             break;
         case XmppManager.DISCONNECTED:
@@ -477,7 +483,7 @@ public class MainService extends Service {
             case XmppManager.WAITING_TO_CONNECT:
                 break;
             default:
-                throw new IllegalStateException("unexpected current state when moving to waiting: "+currentState);
+                throw new IllegalStateException("unexpected current state when moving to waiting: " + currentState);
             }
             break;
         default:
@@ -568,7 +574,7 @@ public class MainService extends Service {
     @Override
     public void onDestroy() {
         Log.i(Tools.LOG_TAG, "service destroyed");
-        running = false;
+        IsRunning = false;
         // If the _xmppManager is non-null, then our service was "started" (as
         // opposed to simply "created" - so tell the user it has stopped.
         if (_xmppMgr != null) {

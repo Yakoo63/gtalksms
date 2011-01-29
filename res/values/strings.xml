@@ -7,6 +7,10 @@
     <string name="pref_app_start_at_boot_help">Check if you want GTalkSMS to start at boot</string>
     <string name="pref_app_start_on_power_connected">When charging</string>
     <string name="pref_app_start_on_power_connected_help">Automatically starts GTalkSMS when a charger is connected</string>
+    <string name="pref_app_start_on_wifi_connected">Wifi is on</string>
+    <string name="pref_app_start_on_wifi_connected_help">Automatically starts GTalkSMS when Wifi is on</string>
+    <string name="pref_app_stop_on_wifi_disconnected">Wifi is off</string>
+    <string name="pref_app_stop_on_wifi_disconnected_help">Automatically stops GTalkSMS when Wifi is off</string>
     <string name="pref_app_stop_on_power_disconnected">When charger disconnected</string>
     <string name="pref_app_stop_on_power_disconnected_help">Automatically stops GTalkSMS when a charger is disconnected</string>
     <string name="pref_app_show_status_icon">Status notification icon</string>

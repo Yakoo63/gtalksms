@@ -13,6 +13,11 @@
                 android:key="startOnPowerConnected"
                 android:title="@string/pref_app_start_on_power_connected"
                 android:summary="@string/pref_app_start_on_power_connected_help"/>
+              <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="startOnWifiConnected"
+                android:title="@string/pref_app_start_on_wifi_connected"
+                android:summary="@string/pref_app_start_on_wifi_connected_help"/>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/pref_app_auto_stop_options">
               <CheckBoxPreference
@@ -20,6 +25,11 @@
                 android:key="stopOnPowerDisconnected"
                 android:title="@string/pref_app_stop_on_power_disconnected"
                 android:summary="@string/pref_app_stop_on_power_disconnected_help"/>
+              <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="stopOnWifiDisconnected"
+                android:title="@string/pref_app_stop_on_wifi_disconnected"
+                android:summary="@string/pref_app_stop_on_wifi_disconnected_help"/>
         </PreferenceScreen>
         <CheckBoxPreference
             android:defaultValue="true"

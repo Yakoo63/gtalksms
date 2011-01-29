@@ -5,6 +5,7 @@
 * Add consolas font for shell commands results
 * Execute shell commands in new threads
 * Enhance sent/delivered SMS notifications
+* Option added to start/stop GTalkSMS according to Wifi state
 
 1.7
 * German language added

@@ -7,6 +7,10 @@
     <string name="pref_app_start_at_boot_help">Cocher pour lancer GTalkSMS au démarrage du téléphone</string>
     <string name="pref_app_start_on_power_connected">Sur secteur</string>
     <string name="pref_app_start_on_power_connected_help">Démarre GTalkSMS au branchement du chargeur</string>
+    <string name="pref_app_start_on_wifi_connected">Wifi actif</string>
+    <string name="pref_app_start_on_wifi_connected_help">Démarre GTalkSMS quand le Wifi est actif</string>
+    <string name="pref_app_stop_on_wifi_disconnected">Wifi inactif</string>
+    <string name="pref_app_stop_on_wifi_disconnected_help">Arrête GTalkSMS quand le Wifi est éteint</string>
     <string name="pref_app_stop_on_power_disconnected">Sur batterie</string>
     <string name="pref_app_stop_on_power_disconnected_help">Arrête GTalkSMS au débranchement du chargeur</string>
     <string name="pref_app_show_status_icon">Icône de notification de l\'état de connexion</string>

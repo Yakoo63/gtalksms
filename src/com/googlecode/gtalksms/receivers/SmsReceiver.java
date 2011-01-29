@@ -19,7 +19,7 @@ public class SmsReceiver extends BroadcastReceiver {
         Bundle bundle = intent.getExtras();
         SmsMessage[] msgs = null;
         
-        if (bundle != null && MainService.running && bundle.containsKey("pdus")) {
+        if (bundle != null && MainService.IsRunning && bundle.containsKey("pdus")) {
             Object[] pdus = (Object[]) bundle.get("pdus");
            
             if (pdus != null) {
