@@ -24,6 +24,9 @@ public abstract class SmsMonitor {
 	Context _context;
 	SettingsManager _settings;
 	int smsCount;
+	
+	// Id used to distinguish the PendingIntents
+	int penIntentCount; 
 	Map<Integer, Sms> smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
 
 	public SmsMonitor(SettingsManager settings, Context baseContext) {
@@ -180,15 +183,17 @@ public abstract class SmsMonitor {
     
     private void createPendingIntents(ArrayList<PendingIntent> SentPenIntents, ArrayList<PendingIntent> DelPenIntents, ArrayList<String> messages, int smsID) {
         for (int i = 0; i < messages.size(); i++) {
+            int p = penIntentCount++;
+            
             Intent sentIntent = new Intent(MainService.ACTION_SMS_SENT);
             sentIntent.putExtra("partNum", i);
             sentIntent.putExtra("smsID", smsID);
-            PendingIntent sentPenIntent = PendingIntent.getBroadcast(_context, 0, sentIntent, PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent sentPenIntent = PendingIntent.getBroadcast(_context, p, sentIntent, PendingIntent.FLAG_ONE_SHOT);
 
             Intent deliveredIntent = new Intent(MainService.ACTION_SMS_DELIVERED);
             deliveredIntent.putExtra("partNum", i);
             deliveredIntent.putExtra("smsID", smsID);
-            PendingIntent deliveredPenIntent = PendingIntent.getBroadcast(_context, 0, deliveredIntent, PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent deliveredPenIntent = PendingIntent.getBroadcast(_context, p, deliveredIntent, PendingIntent.FLAG_ONE_SHOT);
 
             SentPenIntents.add(sentPenIntent);
             DelPenIntents.add(deliveredPenIntent);
