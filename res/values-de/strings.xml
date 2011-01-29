@@ -126,6 +126,8 @@
     <string name="chat_help_sms_show_unread">- %s: Zeigt ungelesene SMS Nachrichten von allen Kontakten an.</string>
     <string name="chat_help_sms_show_contact">- %s: Zeigt die letzten SMS Nachrichten des angegebenen Kontaktes an.</string>
     <string name="chat_help_sms_send">- %s: Sende eine SMS an den angegebenen Kontakt mit den Inahlt &lt;message&gt;.</string>
+    <string name="chat_help_find_sms_all">- %1$s oder %2$s: Suche nach SMS Nachrichten.</string>
+    <string name="chat_help_find_sms">- %1$s oder %2$s: Suche nach SMS Nachrichten von bestimmten Kontakt.</string>
     <string name="chat_help_mark_as_read">- %1$s oder %2$s: Markiert die Nachricht des angegebenen oder des letzten Kontaktes als gelesen.</string>
     <string name="chat_help_battery">- %1$s oder %2$s: Zeigt den Akkuladezustand in Prozent an.</string>
     <string name="chat_help_calls">- %s: Zeigt die Anrufeliste an.</string>
@@ -146,6 +148,9 @@
     <string name="chat_app_stop">GTalkSMS angehalten.</string>
     <string name="chat_is_calling">%s ruft an.</string>
     <string name="chat_call_hidden">[verborgene Telefonnummer]</string>
+    <string name="chat_me">Ich</string>
+    <string name="chat_sms_search">Suche nach \"%1$s\" in den SMS Nachrichten von %2$d Kontakten.</string>
+    <string name="chat_sms_search_results">Insgesammt %d SMS gefunden.</string>
     <string name="chat_sms_sent">SMS gesendet</string>
     <string name="chat_sms_sent_to">SMS \"%1$s\" wurde an %2$s gesendet</string>
     <string name="chat_sms_failure">SMS Fehler</string>
