@@ -42,6 +42,8 @@ import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.receivers.PhoneCallListener;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.xmpp.XmppFont;
+import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MainService extends Service {
 
@@ -168,10 +170,11 @@ public class MainService extends Service {
                 }
             } else if (a.equals(ACTION_SEND)) {
                 if (initialState == XmppManager.CONNECTED) {
+                    XmppMsg msg = new XmppMsg(intent.getStringExtra("message"));
                     if (intent.hasExtra("xhtml")) {
-                        _xmppMgr.sendXHTML(intent.getStringExtra("message"));
+                        _xmppMgr.sendXHTML(msg);
                     } else {
-                        _xmppMgr.send(intent.getStringExtra("message"));
+                        _xmppMgr.send(msg);
                     }
                 }
             } else if (a.equals(ACTION_HANDLE_XMPP_NOTIFY)) {
@@ -187,8 +190,10 @@ public class MainService extends Service {
                     String number = intent.getStringExtra("sender");
                     
                     if (_settingsMgr.notifySmsInSameConversation) {
-                        String sender = makeBold(getString(R.string.chat_sms_from, ContactsManager.getContactName(this, number)));
-                        _xmppMgr.send(sender + intent.getStringExtra("message"));
+                        XmppMsg msg = new XmppMsg();
+                        msg.appendBold(getString(R.string.chat_sms_from, ContactsManager.getContactName(this, number)));
+                        msg.append(intent.getStringExtra("message"));
+                        _xmppMgr.send(msg);
                     }
                     if (_settingsMgr.notifySmsInChatRooms) {
                         _xmppMgr.writeRoom(number, ContactsManager.getContactName(this, number), intent.getStringExtra("message"));
@@ -553,7 +558,9 @@ public class MainService extends Service {
         _cmdMgr = new CmdManager(_settingsMgr, getBaseContext()) {
             void sendResults(String message) {
                 if (_settings.formatChatResponses) {
-                    sendXHTML(message);
+                    XmppMsg msg = new XmppMsg(new XmppFont("consolas", "red"));
+                    msg.append(message);
+                    sendXHTML(msg);
                 } else {
                     send(message);
                 }
@@ -632,14 +639,20 @@ public class MainService extends Service {
     public static void send(Context ctx, String msg) {
         ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg));
     }
-    
+
     public void send(String msg) {
+        if (_xmppMgr != null) {
+            _xmppMgr.send(new XmppMsg(msg));
+        }
+    }
+
+    public void send(XmppMsg msg) {
         if (_xmppMgr != null) {
             _xmppMgr.send(msg);
         }
     }
     
-    public void sendXHTML(String msg) {
+    public void sendXHTML(XmppMsg msg) {
         if (_xmppMgr != null) {
             _xmppMgr.sendXHTML(msg);
         }
@@ -783,45 +796,31 @@ public class MainService extends Service {
         }
     }
 
-    public String makeBold(String in) {
-        if (_settingsMgr.formatChatResponses) {
-            return " *" + in + "* ";
-        }
-        return in;
-    }
-
-    public String makeItalic(String in) {
-        if (_settingsMgr.formatChatResponses) {
-            return " _" + in + "_ ";
-        }
-        return in;
-    }
-
     public void showHelp() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(getString(R.string.chat_help_title)).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_help, makeBold("\"?\""), makeBold("\"help\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_stop, makeBold("\"exit\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_dial, makeBold("\"dial:#contact#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_sms_reply, makeBold("\"reply:#message#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_sms_show_all, makeBold("\"sms\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_sms_show_unread, makeBold("\"sms:unread\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_sms_show_contact, makeBold("\"sms:#contact#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_sms_send, makeBold("\"sms:#contact#:#message#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_find_sms_all, makeBold("\"findsms:#message#\""), makeBold("\"fs:#message#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_find_sms, makeBold("\"findsms:#contact#:#message#\""), makeBold("\"fs:#contact#:#message#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_mark_as_read, makeBold("\"markAsRead:#contact#\""), makeBold("\"mar\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_battery, makeBold("\"battery\""), makeBold("\"batt\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_calls, makeBold("\"calls\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_contact, makeBold("\"contact:#contact#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_geo, makeBold("\"geo:#address#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_where, makeBold("\"where\""), makeBold("\"stop\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_ring, makeBold("\"ring\""), makeBold("\"ring:[0-100]\""), makeBold("\"stop\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_copy, makeBold("\"copy:#text#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_cmd, makeBold("\"cmd:#command#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_write, makeBold("\"write:#text#\""), makeBold("\"w:#text#\""))).append(Tools.LineSep);
-        builder.append(getString(R.string.chat_help_urls, makeBold("\"http\""))).append(Tools.LineSep);
-        send(builder.toString());
+        XmppMsg msg = new XmppMsg();
+        msg.appendLine(getString(R.string.chat_help_title));
+        msg.appendLine(getString(R.string.chat_help_help, XmppMsg.makeBold("\"?\""), XmppMsg.makeBold("\"help\"")));
+        msg.appendLine(getString(R.string.chat_help_stop, XmppMsg.makeBold("\"exit\"")));
+        msg.appendLine(getString(R.string.chat_help_dial, XmppMsg.makeBold("\"dial:#contact#\"")));
+        msg.appendLine(getString(R.string.chat_help_sms_reply, XmppMsg.makeBold("\"reply:#message#\"")));
+        msg.appendLine(getString(R.string.chat_help_sms_show_all, XmppMsg.makeBold("\"sms\"")));
+        msg.appendLine(getString(R.string.chat_help_sms_show_unread, XmppMsg.makeBold("\"sms:unread\"")));
+        msg.appendLine(getString(R.string.chat_help_sms_show_contact, XmppMsg.makeBold("\"sms:#contact#\"")));
+        msg.appendLine(getString(R.string.chat_help_sms_send, XmppMsg.makeBold("\"sms:#contact#:#message#\"")));
+        msg.appendLine(getString(R.string.chat_help_find_sms_all, XmppMsg.makeBold("\"findsms:#message#\""), XmppMsg.makeBold("\"fs:#message#\"")));
+        msg.appendLine(getString(R.string.chat_help_find_sms, XmppMsg.makeBold("\"findsms:#contact#:#message#\""), XmppMsg.makeBold("\"fs:#contact#:#message#\"")));
+        msg.appendLine(getString(R.string.chat_help_mark_as_read, XmppMsg.makeBold("\"markAsRead:#contact#\""), XmppMsg.makeBold("\"mar\"")));
+        msg.appendLine(getString(R.string.chat_help_battery, XmppMsg.makeBold("\"battery\""), XmppMsg.makeBold("\"batt\"")));
+        msg.appendLine(getString(R.string.chat_help_calls, XmppMsg.makeBold("\"calls\"")));
+        msg.appendLine(getString(R.string.chat_help_contact, XmppMsg.makeBold("\"contact:#contact#\"")));
+        msg.appendLine(getString(R.string.chat_help_geo, XmppMsg.makeBold("\"geo:#address#\"")));
+        msg.appendLine(getString(R.string.chat_help_where, XmppMsg.makeBold("\"where\""), XmppMsg.makeBold("\"stop\"")));
+        msg.appendLine(getString(R.string.chat_help_ring, XmppMsg.makeBold("\"ring\""), XmppMsg.makeBold("\"ring:[0-100]\""), XmppMsg.makeBold("\"stop\"")));
+        msg.appendLine(getString(R.string.chat_help_copy, XmppMsg.makeBold("\"copy:#text#\"")));
+        msg.appendLine(getString(R.string.chat_help_cmd, XmppMsg.makeBold("\"cmd:#command#\"")));
+        msg.appendLine(getString(R.string.chat_help_write, XmppMsg.makeBold("\"write:#text#\""), XmppMsg.makeBold("\"w:#text#\"")));
+        msg.appendLine(getString(R.string.chat_help_urls, XmppMsg.makeBold("\"http\"")));
+        send(msg);
     }
 
     public void geoLocate() {
@@ -880,28 +879,33 @@ public class MainService extends Service {
                 Collections.sort(smsArrayList);
 
                 if (smsArrayList.size() > 0) {
-                    StringBuilder smsContact = new StringBuilder();
-                    smsContact.append(makeBold(contact.name) + " - " + makeItalic(getString(R.string.chat_sms_search_results, smsArrayList.size())));
+                    XmppMsg smsContact = new XmppMsg();
+                    smsContact.appendBold(contact.name);
+                    smsContact.append(" - ");
+                    smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, smsArrayList.size()));
                     
                     for (Sms sms : smsArrayList) {
-                        smsContact.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
-                        smsContact.append(Tools.LineSep + sms.message);
+                        smsContact.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
+                        smsContact.appendLine(sms.message);
                         nbResults++;
                     }
                     
-                    send(smsContact.toString() + Tools.LineSep);
+                    send(smsContact);
                 }
             }
         } else if (sentSms.size() > 0) {
-            StringBuilder smsContact = new StringBuilder();
-            smsContact.append(makeBold(getString(R.string.chat_me)) + " - " + makeItalic(getString(R.string.chat_sms_search_results, sentSms.size())));
+            XmppMsg smsContact = new XmppMsg();
+            smsContact.appendBold(getString(R.string.chat_me));
+            smsContact.append(" - ");
+            smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, sentSms.size()));
+            
             for (Sms sms : sentSms) {
-                smsContact.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
-                smsContact.append(Tools.LineSep + sms.message);
+                smsContact.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
+                smsContact.appendLine(sms.message);
                 nbResults++;
             }
             
-            send(smsContact.toString() + Tools.LineSep);
+            send(smsContact);
         } 
         
         if (nbResults > 0) {
@@ -976,7 +980,7 @@ public class MainService extends Service {
 
         if (contacts.size() > 0) {
 
-            StringBuilder noSms = new StringBuilder();
+            XmppMsg noSms = new XmppMsg();
             Boolean hasMatch = false;
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name);
@@ -988,22 +992,26 @@ public class MainService extends Service {
                 List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
                 if (smsList.size() > 0) {
                     hasMatch = true;
-                    StringBuilder smsContact = new StringBuilder();
-                    smsContact.append(makeBold(contact.name));
+                    XmppMsg smsContact = new XmppMsg();
+                    smsContact.append(contact.name);
+                    smsContact.append(" - ");
+                    smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, smsArrayList.size()));
+                    
                     for (Sms sms : smsList) {
-                        smsContact.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
-                        smsContact.append(Tools.LineSep + sms.message);
+                        smsContact.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
+                        smsContact.appendLine(sms.message);
                     }
                     if (smsList.size() < _settingsMgr.smsNumber) {
-                        smsContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_only_got_n_sms, smsList.size())));
+                        smsContact.appendItalicLine(getString(R.string.chat_only_got_n_sms, smsList.size()));
                     }
-                    send(smsContact.toString() + Tools.LineSep);
+                    send(smsContact);
                 } else {
-                    noSms.append(makeBold(contact.name) + getString(R.string.chat_no_sms) + Tools.LineSep);
+                    noSms.appendBold(contact.name);
+                    noSms.appendLine(getString(R.string.chat_no_sms));
                 }
             }
             if (!hasMatch) {
-                send(noSms.toString());
+                send(noSms);
             }
         } else {
             send(getString(R.string.chat_no_match_for, searchedText));
@@ -1014,25 +1022,25 @@ public class MainService extends Service {
     public void readUnreadSMS() {
 
         ArrayList<Sms> smsArrayList = _smsMgr.getAllUnreadSms();
-        StringBuilder allSms = new StringBuilder();
+        XmppMsg allSms = new XmppMsg();
 
         List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
         if (smsList.size() > 0) {
             for (Sms sms : smsList) {
-                allSms.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
-                allSms.append(Tools.LineSep + sms.message);
+                allSms.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
+                allSms.appendLine(sms.message);
             }
         } else {
-            allSms.append(getString(R.string.chat_no_sms));
+            allSms.appendLine(getString(R.string.chat_no_sms));
         }
-        send(allSms.toString() + Tools.LineSep);
+        send(allSms);
     }
     
     /** reads last (count) SMS from all contacts */
     public void readLastSMS() {
 
         ArrayList<Sms> smsArrayList = _smsMgr.getAllReceivedSms();
-        StringBuilder allSms = new StringBuilder();
+        XmppMsg allSms = new XmppMsg();
 
         if (_settingsMgr.displaySentSms) {
             smsArrayList.addAll(_smsMgr.getAllSentSms());
@@ -1042,33 +1050,33 @@ public class MainService extends Service {
         List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
         if (smsList.size() > 0) {
             for (Sms sms : smsList) {
-                allSms.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
-                allSms.append(Tools.LineSep + sms.message);
+                allSms.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
+                allSms.appendLine(sms.message);
             }
         } else {
-            allSms.append(getString(R.string.chat_no_sms));
+            allSms.appendLine(getString(R.string.chat_no_sms));
         }
-        send(allSms.toString() + Tools.LineSep);
+        send(allSms);
     }
 
     /** reads last Call Logs from all contacts */
     public void readCallLogs() {
 
         ArrayList<Call> arrayList = _phoneMgr.getPhoneLogs();
-        StringBuilder all = new StringBuilder();
+        XmppMsg all = new XmppMsg();
 
         List<Call> callList = Tools.getLastElements(arrayList, _settingsMgr.callLogsNumber);
         if (callList.size() > 0) {
             for (Call call : callList) {
-                String caller = makeBold(ContactsManager.getContactName(this, call.phoneNumber));
-
-                all.append(Tools.LineSep + makeItalic(call.date.toLocaleString()) + " - " + caller);
-                all.append(" - " + call.type(this) + getString(R.string.chat_call_duration) + call.duration());
+                all.appendItalic(call.date.toLocaleString());
+                all.append(" - ");
+                all.appendBold(ContactsManager.getContactName(this, call.phoneNumber));
+                all.appendLine(" - " + call.type(this) + getString(R.string.chat_call_duration) + call.duration());
             }
         } else {
-            all.append(getString(R.string.chat_no_call));
+            all.appendLine(getString(R.string.chat_no_call));
         }
-        send(all.toString() + Tools.LineSep);
+        send(all);
     }
 
     /** reads (count) SMS from all contacts matching pattern */
@@ -1083,8 +1091,8 @@ public class MainService extends Service {
             }
 
             for (Contact contact : contacts) {
-                StringBuilder strContact = new StringBuilder();
-                strContact.append(makeBold(contact.name));
+                XmppMsg strContact = new XmppMsg();
+                strContact.appendBoldLine(contact.name);
 
                 // strContact.append(Tools.LineSep + "Id : " + contact.id);
                 // strContact.append(Tools.LineSep + "Raw Ids : " + TextUtils.join(" ",
@@ -1092,28 +1100,28 @@ public class MainService extends Service {
 
                 ArrayList<Phone> mobilePhones = ContactsManager.getPhones(this, contact.id);
                 if (mobilePhones.size() > 0) {
-                    strContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_phones)));
+                    strContact.appendItalicLine(getString(R.string.chat_phones));
                     for (Phone phone : mobilePhones) {
-                        strContact.append(Tools.LineSep + phone.label + " - " + phone.cleanNumber);
+                        strContact.appendLine(phone.label + " - " + phone.cleanNumber);
                     }
                 }
 
                 ArrayList<ContactAddress> emails = ContactsManager.getEmailAddresses(this, contact.id);
                 if (emails.size() > 0) {
-                    strContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_emails)));
+                    strContact.appendItalicLine(getString(R.string.chat_emails));
                     for (ContactAddress email : emails) {
-                        strContact.append(Tools.LineSep + email.label + " - " + email.address);
+                        strContact.appendLine(email.label + " - " + email.address);
                     }
                 }
 
                 ArrayList<ContactAddress> addresses = ContactsManager.getPostalAddresses(this, contact.id);
                 if (addresses.size() > 0) {
-                    strContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_addresses)));
+                    strContact.appendItalicLine(getString(R.string.chat_addresses));
                     for (ContactAddress address : addresses) {
-                        strContact.append(Tools.LineSep + address.label + " - " + address.address);
+                        strContact.appendLine(address.label + " - " + address.address);
                     }
                 }
-                send(strContact.toString() + Tools.LineSep);
+                send(strContact);
             }
         } else {
             send(getString(R.string.chat_no_match_for, searchedText));
@@ -1125,14 +1133,14 @@ public class MainService extends Service {
         List<Address> addresses = _geoMgr.geoDecode(text);
         if (addresses != null) {
             if (addresses.size() > 1) {
-                send(getString(R.string.chat_specify_details));
+                XmppMsg addr = new XmppMsg(getString(R.string.chat_specify_details));
+                addr.newLine();
                 for (Address address : addresses) {
-                    StringBuilder addr = new StringBuilder();
                     for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-                        addr.append(address.getAddressLine(i) + Tools.LineSep);
+                        addr.appendLine(address.getAddressLine(i));
                     }
-                    send(addr.toString());
                 }
+                send(addr);
             } else if (addresses.size() == 1) {
                 _geoMgr.launchExternal(addresses.get(0).getLatitude() + "," + addresses.get(0).getLongitude());
             }
@@ -1197,11 +1205,12 @@ public class MainService extends Service {
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contactInfo);
             if (mobilePhones.size() > 1) {
-                send(getString(R.string.chat_specify_details));
-
+                XmppMsg phones = new XmppMsg(getString(R.string.chat_specify_details));
+                phones.newLine();
                 for (Phone phone : mobilePhones) {
-                    send(phone.contactName + " - " + phone.cleanNumber);
+                    phones.appendLine(phone.contactName + " - " + phone.cleanNumber);
                 }
+                send(phones);
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 contact = phone.contactName;

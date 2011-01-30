@@ -56,9 +56,9 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.util.Log;
 
-import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XHTMLExtensionProvider;
+import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class XmppManager {
 
@@ -373,24 +373,37 @@ public class XmppManager {
     }
 
     /** sends a message to the user */
-    public void send(String message) {
+    private void send(String message) {
+        send(new XmppMsg(message));
+    }
+    
+    /** sends a message to the user */
+    public void send(XmppMsg message) {
         if (isConnected()) {
             Message msg = new Message(_settings.notifiedAddress, Message.Type.chat);
-            msg.setBody(message);
+            
+            if (_settings.formatChatResponses) {
+                msg.setBody(message.generateFmtTxt());
+            } else {
+                msg.setBody(message.generateTxt());
+            }
             
             _connection.sendPacket(msg);
         }
     }
 
     /** sends a message to the user */
-    public void sendXHTML(String message) {
+    public void sendXHTML(XmppMsg message) {
         if (isConnected()) {
             Message msg = new Message(_settings.notifiedAddress, Message.Type.chat);
-            msg.setBody(message);
             
-            // TODO add parameters to configure XHTML layout: font color style size...
-            XHTMLManager.addBody(msg, "<body><font face=\"consolas\" color=\"blue\">" + 
-                    StringFmt.encodeHTML(message).replaceAll("\n", "<br/>") + "</font></body>");
+            if (_settings.formatChatResponses) {
+                msg.setBody(message.generateFmtTxt());
+            } else {
+                msg.setBody(message.generateTxt());
+            }
+            
+            XHTMLManager.addBody(msg, message.generateXhtml());
 
             _connection.sendPacket(msg);
         }
