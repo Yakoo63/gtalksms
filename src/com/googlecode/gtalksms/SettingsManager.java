@@ -41,6 +41,7 @@ public class SettingsManager {
     public boolean displaySentSms;
     public boolean notifySmsSent;
     public boolean notifySmsDelivered;
+    public boolean notifySmsSentDelivered;
     public boolean notifyIncomingCalls;
     public boolean notifySmsInChatRooms;
     public boolean notifySmsInSameConversation;
@@ -97,6 +98,7 @@ public class SettingsManager {
         batteryNotificationInterval = Integer.valueOf(_sharedPreferences.getString("batteryNotificationInterval", "10"));
         notifySmsSent = _sharedPreferences.getBoolean("notifySmsSent", true);
         notifySmsDelivered = _sharedPreferences.getBoolean("notifySmsDelivered", true);
+        notifySmsSentDelivered = notifySmsSent || notifySmsDelivered;
         ringtone = _sharedPreferences.getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
         displaySentSms = _sharedPreferences.getBoolean("showSentSms", false);
         smsNumber = _sharedPreferences.getInt("smsNumber", 5);

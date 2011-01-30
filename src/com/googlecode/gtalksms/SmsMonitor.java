@@ -21,13 +21,14 @@ public abstract class SmsMonitor {
 	public BroadcastReceiver _sentSmsReceiver = null;
 	public BroadcastReceiver _deliveredSmsReceiver = null;
 
-	Context _context;
-	SettingsManager _settings;
-	int smsCount;
+	private Context _context;
+	private SettingsManager _settings;
+	private int smsCount;
 	
 	// Id used to distinguish the PendingIntents
-	int penIntentCount; 
-	Map<Integer, Sms> smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
+	private int penSIntentCount;
+	private int penDIntentCount;
+	private Map<Integer, Sms> smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
 
 	public SmsMonitor(SettingsManager settings, Context baseContext) {
 		_settings = settings;
@@ -154,17 +155,23 @@ public abstract class SmsMonitor {
 
     /** Sends a sms to the specified phone number with a receiver name */
     public void sendSMSByPhoneNumber(String message, String phoneNumber, String toName) {
-        ArrayList<PendingIntent> SentPenIntents = new ArrayList<PendingIntent>();
-        ArrayList<PendingIntent> DelPenIntents = new ArrayList<PendingIntent>();
+        ArrayList<PendingIntent> SentPenIntents = null;
+        ArrayList<PendingIntent> DelPenIntents = null;
         SmsManager sms = SmsManager.getDefault();
         ArrayList<String> messages = sms.divideMessage(message);
-        String shortendMessage = shortenMessage(message);
 
-        int smsID = smsCount++;
-        Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size());
-        smsMap.put(new Integer(smsID), s);
-
-        createPendingIntents(SentPenIntents, DelPenIntents, messages, smsID);
+        if(_settings.notifySmsSentDelivered) {
+            String shortendMessage = shortenMessage(message);
+            int smsID = smsCount++;
+            Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size());
+            smsMap.put(new Integer(smsID), s);
+            if(_settings.notifySmsSent) {
+                SentPenIntents = createSPendingIntents(messages.size(), smsID);
+            }
+            if(_settings.notifySmsDelivered) {
+                DelPenIntents = createDPendingIntents(messages.size(), smsID);
+            }
+        }
 
         sms.sendMultipartTextMessage(phoneNumber, null, messages, SentPenIntents, DelPenIntents);
     }
@@ -181,26 +188,33 @@ public abstract class SmsMonitor {
         _deliveredSmsReceiver = null;
     }
     
-    private void createPendingIntents(ArrayList<PendingIntent> SentPenIntents, ArrayList<PendingIntent> DelPenIntents, ArrayList<String> messages, int smsID) {
-        for (int i = 0; i < messages.size(); i++) {
-            int p = penIntentCount++;
-            
-            Intent sentIntent = new Intent(MainService.ACTION_SMS_SENT);
-            sentIntent.putExtra("partNum", i);
-            sentIntent.putExtra("smsID", smsID);
-            PendingIntent sentPenIntent = PendingIntent.getBroadcast(_context, p, sentIntent, PendingIntent.FLAG_ONE_SHOT);
-
+    private ArrayList<PendingIntent> createSPendingIntents(int size, int smsID) {
+        ArrayList<PendingIntent> SentPenIntents = new ArrayList<PendingIntent>();
+        for (int i = 0; i < size; i++) {
+            int p = penSIntentCount++;
+                Intent sentIntent = new Intent(MainService.ACTION_SMS_SENT);
+                sentIntent.putExtra("partNum", i);
+                sentIntent.putExtra("smsID", smsID);
+                PendingIntent sentPenIntent = PendingIntent.getBroadcast(_context, p, sentIntent, PendingIntent.FLAG_ONE_SHOT);
+                SentPenIntents.add(sentPenIntent);
+        }
+        return SentPenIntents;
+    }
+    
+    private ArrayList<PendingIntent> createDPendingIntents(int size, int smsID) {
+        ArrayList<PendingIntent> DelPenIntents = new ArrayList<PendingIntent>();
+        for (int i = 0; i < size; i++) {
+            int p = penDIntentCount++;
             Intent deliveredIntent = new Intent(MainService.ACTION_SMS_DELIVERED);
             deliveredIntent.putExtra("partNum", i);
             deliveredIntent.putExtra("smsID", smsID);
             PendingIntent deliveredPenIntent = PendingIntent.getBroadcast(_context, p, deliveredIntent, PendingIntent.FLAG_ONE_SHOT);
-
-            SentPenIntents.add(sentPenIntent);
             DelPenIntents.add(deliveredPenIntent);
         }
+        return DelPenIntents;
     }
     
-    private String shortenMessage(String message) {
+    private static String shortenMessage(String message) {
         final int shortenTo = 20;
         String shortendMessage;
         if (message.length() < shortenTo) {
