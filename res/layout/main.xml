@@ -36,10 +36,11 @@
                   android:orientation="horizontal"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content">                  
-        <ImageView android:id="@+id/StatusImage" android:layout_width="50px" android:src="@drawable/led_red" android:scaleType="centerCrop" android:layout_height="50px"></ImageView>                                    
-        <TextView android:text="TLS" android:id="@+id/TLSsecured" android:layout_width="wrap_content" android:layout_height="wrap_content" 
-        android:gravity="center_vertical" android:visibility="invisible"></TextView>
-        <ImageView android:id="@+id/ImageView01" android:layout_width="wrap_content" android:layout_height="wrap_content"></ImageView>
+        <ImageView android:id="@+id/StatusImage" android:layout_width="40px" android:src="@drawable/led_red" 
+                   android:scaleType="centerCrop" android:layout_height="40px" />                                    
+        <ImageView android:id="@+id/TLSsecured" android:layout_width="wrap_content" android:src="@drawable/ic_lock_lock"
+                   android:scaleType="centerCrop" android:layout_height="40px" 
+                   android:gravity="center_vertical" android:visibility="invisible" />
         <TextView android:text="Version X.X.X" android:id="@+id/VersionLabel"
                   android:layout_height="fill_parent" android:layout_width="fill_parent" 
                   android:gravity="bottom|right" />

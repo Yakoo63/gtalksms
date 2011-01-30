@@ -399,9 +399,9 @@ public class MainService extends Service {
         else if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
             Log.d(Tools.LOG_TAG, "onStart: ACTION_BROADCAST_STATUS");
             
-            // A request to broadcast our current status.
+            // A request to broadcast our current status evenif _xmpp is null.
             int state = getConnectionStatus();
-            _xmppMgr.broadcastStatus(this, state, state);
+            XmppManager.broadcastStatus(this, state, state);
             return;
         }
         // OK - a real action request - ensure xmpp is setup (but not yet connected)
@@ -872,8 +872,6 @@ public class MainService extends Service {
         if (contacts.size() > 0) {
             send(getString(R.string.chat_sms_search, message, contacts.size()));
             
-            StringBuilder noSms = new StringBuilder();
-            Boolean hasMatch = false;
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name, message);
                 if (_settingsMgr.displaySentSms) {
@@ -881,38 +879,31 @@ public class MainService extends Service {
                 }
                 Collections.sort(smsArrayList);
 
-                List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
-                if (smsList.size() > 0) {
-                    hasMatch = true;
+                if (smsArrayList.size() > 0) {
                     StringBuilder smsContact = new StringBuilder();
-                    smsContact.append(makeBold(contact.name));
-                    for (Sms sms : smsList) {
+                    smsContact.append(makeBold(contact.name) + " - " + makeItalic(getString(R.string.chat_sms_search_results, smsArrayList.size())));
+                    
+                    for (Sms sms : smsArrayList) {
                         smsContact.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
                         smsContact.append(Tools.LineSep + sms.message);
                         nbResults++;
                     }
-                    if (smsList.size() < _settingsMgr.smsNumber) {
-                        smsContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_sms_search_results, smsList.size())));
-                    }
+                    
                     send(smsContact.toString() + Tools.LineSep);
                 }
             }
-            if (!hasMatch) {
-                send(noSms.toString());
-            }
         } else if (sentSms.size() > 0) {
             StringBuilder smsContact = new StringBuilder();
-            smsContact.append(makeBold(getString(R.string.chat_me)));
+            smsContact.append(makeBold(getString(R.string.chat_me)) + " - " + makeItalic(getString(R.string.chat_sms_search_results, sentSms.size())));
             for (Sms sms : sentSms) {
                 smsContact.append(Tools.LineSep + makeItalic(sms.date.toLocaleString() + " - " + sms.sender));
                 smsContact.append(Tools.LineSep + sms.message);
                 nbResults++;
             }
-            if (sentSms.size() < _settingsMgr.smsNumber) {
-                smsContact.append(Tools.LineSep + makeItalic(getString(R.string.chat_sms_search_results, sentSms.size())));
-            }
+            
             send(smsContact.toString() + Tools.LineSep);
         } 
+        
         if (nbResults > 0) {
             send(getString(R.string.chat_sms_search_results, nbResults));
         } else {

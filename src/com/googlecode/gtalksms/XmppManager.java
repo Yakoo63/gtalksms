@@ -81,7 +81,7 @@ public class XmppManager {
     private int _status = DISCONNECTED;
     private String _presenceMessage = "GTalkSMS";
     
-    private XMPPConnection _connection = null;
+    private static XMPPConnection _connection = null;
     private PacketListener _packetListener = null;
     private ConnectionListener _connectionListener = null;
     
@@ -184,7 +184,7 @@ public class XmppManager {
     }
 
     /** Updates the status about the service state (and the statusbar)*/
-    public void broadcastStatus(Context ctx, int old_state, int new_state) {
+    public static void broadcastStatus(Context ctx, int old_state, int new_state) {
         Intent intent = new Intent(ACTION_CONNECTION_CHANGED);
         intent.putExtra("old_state", old_state);
         intent.putExtra("new_state", new_state);

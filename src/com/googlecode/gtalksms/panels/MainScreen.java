@@ -49,7 +49,7 @@ public class MainScreen extends Activity {
     
     public void updateStatus(int status, boolean tls) {
         ImageView statusImg = (ImageView) findViewById(R.id.StatusImage);
-        TextView tlsStatus = (TextView) findViewById(R.id.TLSsecured);
+        ImageView tlsStatus = (ImageView) findViewById(R.id.TLSsecured);
         
         switch (status) {
             case XmppManager.CONNECTED:
@@ -66,11 +66,8 @@ public class MainScreen extends Activity {
             default:
                 break;
         }
-        if (tls) {
-            tlsStatus.setVisibility(View.VISIBLE);
-        } else {
-            tlsStatus.setVisibility(View.INVISIBLE);
-        }
+        
+        tlsStatus.setVisibility(tls ? View.VISIBLE : View.INVISIBLE);
     }
     
     @Override
