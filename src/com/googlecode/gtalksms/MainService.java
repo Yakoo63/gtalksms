@@ -401,7 +401,7 @@ public class MainService extends Service {
             
             // A request to broadcast our current status.
             int state = getConnectionStatus();
-            XmppManager.broadcastStatus(this, state, state);
+            _xmppMgr.broadcastStatus(this, state, state);
             return;
         }
         // OK - a real action request - ensure xmpp is setup (but not yet connected)

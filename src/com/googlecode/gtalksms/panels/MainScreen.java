@@ -39,13 +39,39 @@ public class MainScreen extends Activity {
     private ServiceConnection mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mainService = ((MainService.LocalBinder)service).getService();
-            updateStatus(mainService.getConnectionStatus(), mainService.getTLSStatus());
+            MainScreen.this.updateStatus(mainService.getConnectionStatus(), mainService.getTLSStatus());
         }
 
         public void onServiceDisconnected(ComponentName className) {
             mainService = null;
         }
     };
+    
+    public void updateStatus(int status, boolean tls) {
+        ImageView statusImg = (ImageView) findViewById(R.id.StatusImage);
+        TextView tlsStatus = (TextView) findViewById(R.id.TLSsecured);
+        
+        switch (status) {
+            case XmppManager.CONNECTED:
+                statusImg.setImageResource(R.drawable.led_green);
+                break;
+            case XmppManager.DISCONNECTED:
+                statusImg.setImageResource(R.drawable.led_red);
+                break;
+            case XmppManager.CONNECTING:
+            case XmppManager.DISCONNECTING:
+            case XmppManager.WAITING_TO_CONNECT:
+                statusImg.setImageResource(R.drawable.led_orange);
+                break;
+            default:
+                break;
+        }
+        if (tls) {
+            tlsStatus.setVisibility(View.VISIBLE);
+        } else {
+            tlsStatus.setVisibility(View.INVISIBLE);
+        }
+    }
     
     @Override
     public void onPause() {
@@ -168,32 +194,6 @@ public class MainScreen extends Activity {
 
     public void updateConsole() {
 //      TextView console = (TextView) findViewById(R.id.Console);
-    }
-  
-    public void updateStatus(int status, boolean tls) {
-        ImageView statusImg = (ImageView) findViewById(R.id.StatusImage);
-        TextView tlsStatus = (TextView) findViewById(R.id.TLSsecured);
-        
-        switch (status) {
-            case XmppManager.CONNECTED:
-                statusImg.setImageResource(R.drawable.led_green);
-                break;
-            case XmppManager.DISCONNECTED:
-                statusImg.setImageResource(R.drawable.led_red);
-                break;
-            case XmppManager.CONNECTING:
-            case XmppManager.DISCONNECTING:
-            case XmppManager.WAITING_TO_CONNECT:
-                statusImg.setImageResource(R.drawable.led_orange);
-                break;
-            default:
-                break;
-        }
-        if (tls) {
-            tlsStatus.setVisibility(View.VISIBLE);
-        } else {
-            tlsStatus.setVisibility(View.INVISIBLE);
-        }
     }
   
     @Override
