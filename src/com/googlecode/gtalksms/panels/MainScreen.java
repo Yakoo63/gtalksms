@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.KeyEvent;
@@ -122,6 +123,21 @@ public class MainScreen extends Activity {
             }
         });
         
+        Button donateBtn = (Button) findViewById(R.id.Donate);
+        donateBtn.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+                openLink("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted");
+            }
+        });
+        
+        // Set FREE label for not donate version
+        if (getPackageName().endsWith("donate")) {
+            donateBtn.setVisibility(View.GONE);
+        } else {
+            donateBtn.setVisibility(View.VISIBLE);
+        }
+        
         Button clipboardBtn = (Button) findViewById(R.id.Clipboard);
         clipboardBtn.setOnClickListener(new OnClickListener() {
 
@@ -140,6 +156,14 @@ public class MainScreen extends Activity {
         });
         
         updateConsole();
+    }
+    
+    /** lets the user choose an activity compatible with the url */
+    private void openLink(String url) {
+        Intent target = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        Intent intent = Intent.createChooser(target, getString(R.string.chat_choose_activity));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     public void updateConsole() {

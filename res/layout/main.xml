@@ -8,8 +8,8 @@
                   android:orientation="horizontal"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content" >
-    	<Button android:text="@string/main_but_start_stop" android:id="@+id/StartStop" 
-	       		android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight=".5"
+        <Button android:text="@string/main_but_start_stop" android:id="@+id/StartStop" 
+                android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight=".5"
                 android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/>
         <Button android:text="@string/main_but_preferences" android:id="@+id/Preferences"
                 android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight=".5"
@@ -28,18 +28,18 @@
     </LinearLayout>
     <ScrollView android:id="@+id/ScrollView" android:layout_width="fill_parent" android:layout_height="fill_parent" 
                 android:layout_weight=".9">
-	   <TextView android:id="@+id/Console" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+       <TextView android:id="@+id/Console" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
     </ScrollView>
-    
+    <Button android:text="@string/main_but_donate" android:id="@+id/Donate"
+                android:layout_height="wrap_content" android:layout_width="fill_parent" /> 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:orientation="horizontal"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content" >
         <ImageView android:id="@+id/StatusImage" android:src="@drawable/led_red" android:scaleType="centerCrop"
                    android:layout_width="30px" android:layout_height="30px" /> 
-		<TextView android:text="Version X.X.X" android:id="@+id/VersionLabel"
-		          android:layout_height="fill_parent" android:layout_width="fill_parent" 
-		          android:gravity="bottom|right" />
-	
+        <TextView android:text="Version X.X.X" android:id="@+id/VersionLabel"
+                  android:layout_height="fill_parent" android:layout_width="fill_parent" 
+                  android:gravity="bottom|right" />
     </LinearLayout>
 </LinearLayout>
