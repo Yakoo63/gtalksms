@@ -73,6 +73,7 @@
     <string name="app_name">GTalkSMS</string>
     <string name="about_panel">Über GTalkSMS</string>
     <string name="main_panel">GTalkSMS</string>
+    <string name="main_but_donate">Spenden</string>
     <string name="preference_panel">Anwendungsoptionen</string>
     <string name="log_panel_acquiring">Erstelle Log</string>
     <string name="log_panel_collect">Erstellt eine E-Mail mit GTalkSMS Log-Informationen. Die Informationen in der E-Mail können zur Problembehebung verwendet werden und z.B. an einen Bugreport angehängt werden.</string>
