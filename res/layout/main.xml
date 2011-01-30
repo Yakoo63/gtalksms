@@ -35,20 +35,13 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:orientation="horizontal"
                   android:layout_width="fill_parent"
-                  android:layout_height="wrap_content" 
-                  android:gravity="center_vertical|center_horizontal">                  
-        <ImageView android:layout_width=70px" android:src="@drawable/led_red" android:id="@+id/StatusImage" android:scaleType="fitCenter" android:layout_height="90px"></ImageView>
-        <ImageView android:id="@+id/TLSStatusImage" android:layout_width="70px" android:src="@drawable/TLSSecured" android:scaleType="fitcenter" android:layout_height="90px"></ImageView>                                       
-        <ImageView android:id="@+id/ImageView02" android:layout_width="wrap_content" android:layout_height="wrap_content"></ImageView><ImageView android:id="@+id/ImageView01" android:layout_width="wrap_content" android:layout_height="wrap_content"></ImageView>
+                  android:layout_height="wrap_content">                  
+        <ImageView android:id="@+id/StatusImage" android:layout_width="50px" android:src="@drawable/led_red" android:scaleType="centerCrop" android:layout_height="50px"></ImageView>                                    
+        <TextView android:text="TLS" android:id="@+id/TLSsecured" android:layout_width="wrap_content" android:layout_height="wrap_content" 
+        android:gravity="center_vertical" android:visibility="invisible"></TextView>
+        <ImageView android:id="@+id/ImageView01" android:layout_width="wrap_content" android:layout_height="wrap_content"></ImageView>
         <TextView android:text="Version X.X.X" android:id="@+id/VersionLabel"
                   android:layout_height="fill_parent" android:layout_width="fill_parent" 
-                  android:gravity="center_vertical|center_horizontal" />
-    
-
-
-
-
-
+                  android:gravity="bottom|right" />
+    </LinearLayout>
 </LinearLayout>
-</LinearLayout>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"></menu>

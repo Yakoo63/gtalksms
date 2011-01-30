@@ -81,7 +81,7 @@ public class XmppManager {
     private int _status = DISCONNECTED;
     private String _presenceMessage = "GTalkSMS";
     
-    private XMPPConnection _connection = null;
+    private static XMPPConnection _connection = null;
     private PacketListener _packetListener = null;
     private ConnectionListener _connectionListener = null;
     
@@ -188,6 +188,9 @@ public class XmppManager {
         Intent intent = new Intent(ACTION_CONNECTION_CHANGED);
         intent.putExtra("old_state", old_state);
         intent.putExtra("new_state", new_state);
+        if(new_state == CONNECTED) {
+            intent.putExtra("TLS", _connection.isUsingTLS());
+        }
         ctx.sendBroadcast(intent);
     }
 
@@ -363,6 +366,10 @@ public class XmppManager {
     /** returns the current connection state */
     public int getConnectionStatus() {
         return _status;
+    }
+    
+    public static boolean getTLSStatus() {
+        return _connection == null ? false : _connection.isUsingTLS();
     }
 
     /** sends a message to the user */

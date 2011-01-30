@@ -39,7 +39,7 @@ public class MainScreen extends Activity {
     private ServiceConnection mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mainService = ((MainService.LocalBinder)service).getService();
-            updateStatus(mainService.getConnectionStatus());
+            updateStatus(mainService.getConnectionStatus(), mainService.getTLSStatus());
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -67,7 +67,7 @@ public class MainScreen extends Activity {
 //                  String status = intent.getStringExtra("status");
 //                  console.append("\n" + person + " : " + status);
                 } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
-                        updateStatus(intent.getIntExtra("new_state", 0));
+                        updateStatus(intent.getIntExtra("new_state", 0), intent.getBooleanExtra("TLS", false));
                 }
             }
         };
@@ -170,8 +170,10 @@ public class MainScreen extends Activity {
 //      TextView console = (TextView) findViewById(R.id.Console);
     }
   
-    public void updateStatus(int status) {
+    public void updateStatus(int status, boolean tls) {
         ImageView statusImg = (ImageView) findViewById(R.id.StatusImage);
+        TextView tlsStatus = (TextView) findViewById(R.id.TLSsecured);
+        
         switch (status) {
             case XmppManager.CONNECTED:
                 statusImg.setImageResource(R.drawable.led_green);
@@ -186,6 +188,11 @@ public class MainScreen extends Activity {
                 break;
             default:
                 break;
+        }
+        if (tls) {
+            tlsStatus.setVisibility(View.VISIBLE);
+        } else {
+            tlsStatus.setVisibility(View.INVISIBLE);
         }
     }
   

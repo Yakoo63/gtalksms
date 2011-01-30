@@ -345,6 +345,10 @@ public class MainService extends Service {
     public int getConnectionStatus() {
         return _xmppMgr == null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
     }
+    
+    public boolean getTLSStatus() {
+        return _xmppMgr == null ? false : _xmppMgr.getTLSStatus();
+    }
 
 
     /**
