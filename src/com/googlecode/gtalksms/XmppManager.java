@@ -373,7 +373,7 @@ public class XmppManager {
     }
 
     /** sends a message to the user */
-    private void send(String message) {
+    public void send(String message) {
         send(new XmppMsg(message));
     }
     

@@ -28,6 +28,8 @@ import android.telephony.TelephonyManager;
 import android.text.ClipboardManager;
 import android.util.Log;
 
+import cmd.RingModeCmd;
+
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.googlecode.gtalksms.data.contacts.Contact;
 import com.googlecode.gtalksms.data.contacts.ContactAddress;
@@ -63,11 +65,12 @@ public class MainService extends Service {
     // the service is running, and therefore whether to tell the service
     // about some events
     public static boolean IsRunning = false;
-    private SettingsManager _settingsMgr;
+    private static SettingsManager _settingsMgr;
+    private static XmppManager _xmppMgr;
 
+    
     private CmdManager _cmdMgr;
     private MediaManager _mediaMgr;
-    private XmppManager _xmppMgr;
     private BroadcastReceiver _xmppreceiver;
     private SmsMmsManager _smsMgr;
     private PhoneManager _phoneMgr;
@@ -640,7 +643,7 @@ public class MainService extends Service {
         ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg));
     }
 
-    public void send(String msg) {
+    public static void send(String msg) {
         if (_xmppMgr != null) {
             _xmppMgr.send(new XmppMsg(msg));
         }
@@ -658,8 +661,14 @@ public class MainService extends Service {
         }
     }
 
-    /** handles the different commands */
-    public void onMessageReceived(String commandLine) {
+    /**
+     * Handels the different commands
+     * usually from an intent with
+     * ACTION_HANDLE_XMPP_NOTIFY
+     * 
+     * @param commandLine
+     */
+    private void onMessageReceived(String commandLine) {
         Log.v(Tools.LOG_TAG, "onMessageReceived: " + commandLine);
         try {
             String command;
@@ -760,6 +769,9 @@ public class MainService extends Service {
                 openLink("http:" + args);
             } else if (command.equals("https")) {
                 openLink("https:" + args);
+            } else if (command.equals("ringmode")) {
+                RingModeCmd c = new RingModeCmd(this, _settingsMgr, _xmppMgr);
+                c.executeCommand(command, args);
             } else {
                 send(getString(R.string.chat_error_unknown_cmd, commandLine));
             }
@@ -820,6 +832,7 @@ public class MainService extends Service {
         msg.appendLine(getString(R.string.chat_help_cmd, XmppMsg.makeBold("\"cmd:#command#\"")));
         msg.appendLine(getString(R.string.chat_help_write, XmppMsg.makeBold("\"write:#text#\""), XmppMsg.makeBold("\"w:#text#\"")));
         msg.appendLine(getString(R.string.chat_help_urls, XmppMsg.makeBold("\"http\"")));
+        msg.appendLine(getString(R.string.chat_help_ringmode, XmppMsg.makeBold("\"ringmode:#mode#\"")));        
         send(msg);
     }
 

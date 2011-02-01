@@ -144,6 +144,7 @@
     <string name="chat_help_cmd">- %s: execute shell instruction with root access if possible.</string>
     <string name="chat_help_write">- %1$s or %2$s: write text as virtual keyboard (don\'t forget to activate keyboard in Android Preferences panel).</string>
     <string name="chat_help_urls">and you can paste %s links and open it with the appropriate application.</string>
+    <string name="chat_help_ringmode">%s: With mode=(normal|silent|vibrate) Set ringer mode. Shows the actual mode if no argument is given.</string>    
     <string name="chat_call_unknown">Unknown</string>
     <string name="chat_call_incoming">Incoming</string>
     <string name="chat_call_outgoing">Outgoing</string>
@@ -154,6 +155,10 @@
     <string name="chat_is_calling">%s is calling…</string>
     <string name="chat_call_hidden">[hidden number]</string>
     <string name="chat_me">Me</string>
+    <string name="chat_ringer_error_cmd">Wrong command: %1s</string>
+    <string name="chat_ringer_vibrate">Ringer Mode Vibrate</string>
+    <string name="chat_ringer_silent">Ringer Mode Silent</string>
+    <string name="chat_ringer_normal">Ringer Mode Normal</string>          
     <string name="chat_sms_search">Search \"%1$s\" for %2$d contacts.</string>
     <string name="chat_sms_search_start">Search in progress...</string>
     <string name="chat_sms_search_results">%d SMS found.</string>

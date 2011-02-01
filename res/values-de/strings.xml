@@ -143,7 +143,8 @@
     <string name="chat_help_copy">- %s: Kopiert &lt;text&gt; in das Clipboard des Telefons oder sendet den Inahlt des Clipboards, wenn &lt;text&gt; leer ist.</string>
     <string name="chat_help_cmd">- %s: Für Shell Befehl (wenn möglich mit root Rechten) aus.</string>
     <string name="chat_help_write">- %1$s oder %2$s: Schreibt &lt;text&gt; in die virtuelle Tastatur (dazu muss die GTalkSMS Tastatur in den Android Einstellungen aktiviert sein).</string>
-    <string name="chat_help_urls">%s öffnet Links auf den Telefon mit der entsprechenden Anwendung</string>
+    <string name="chat_help_urls">%s: Öffnet Links auf den Telefon mit der entsprechenden Anwendung</string>
+    <string name="chat_help_ringmode">%s: Mit mode=normal,silent,vibrate - Setz den Klingelmodus entsprechend. Ohne Argument wird der aktuelle Modus angezeigt.</string>    
     <string name="chat_call_unknown">Unbekannt</string>
     <string name="chat_call_incoming">Eingehender Anruf</string>
     <string name="chat_call_outgoing">Ausgehender Anruf</string>
@@ -154,6 +155,10 @@
     <string name="chat_is_calling">%s ruft an.</string>
     <string name="chat_call_hidden">[verborgene Telefonnummer]</string>
     <string name="chat_me">Ich</string>
+    <string name="chat_ringer_error_cmd">Ungültiger Befehl: %1s</string>
+    <string name="chat_ringer_vibrate">Telefon lautlaus (Vibration aktiviert)</string>
+    <string name="chat_ringer_silent">Telefon lautlaus (Vibration deaktiviert)</string>
+    <string name="chat_ringer_normal">Telefon laut</string>   
     <string name="chat_sms_search">Suche nach \"%1$s\" in den SMS Nachrichten von %2$d Kontakten.</string>
     <string name="chat_sms_search_start">Suchen...</string>
     <string name="chat_sms_search_results">Insgesammt %d SMS gefunden.</string>
