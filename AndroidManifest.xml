@@ -19,7 +19,7 @@
         <activity android:name="com.googlecode.gtalksms.panels.About"
                   android:label="@string/about_panel">
         </activity>
-        <activity android:name="com.googlecode.gtalksms.LogCollectorActivity"/>
+        <activity android:name="com.googlecode.gtalksms.panels.LogCollector"/>
         <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService">
             <intent-filter>
                 <action android:name="com.googlecode.gtalksms.action.CONNECT" />

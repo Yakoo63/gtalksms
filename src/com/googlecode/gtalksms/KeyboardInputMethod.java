@@ -59,7 +59,7 @@ public class KeyboardInputMethod extends InputMethodService
     public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
         if (mainService != null) {
-            mainService._keyboard = this;
+            mainService.setKeyboard(this);
         }
         String text = getText();
         
@@ -85,7 +85,7 @@ public class KeyboardInputMethod extends InputMethodService
     public void onFinishInput() {
         super.onFinishInput();
         if (mainService != null) {
-            mainService._keyboard = null;
+            mainService.setKeyboard(null);
         }
         
         if (_inputView != null) {
@@ -112,7 +112,7 @@ public class KeyboardInputMethod extends InputMethodService
         }
     }
 
-    boolean setText(String text) {
+    public boolean setText(String text) {
         InputConnection conn = getCurrentInputConnection();
         if (conn == null) {
             return false;
@@ -124,7 +124,7 @@ public class KeyboardInputMethod extends InputMethodService
         return true;
     }
 
-    String getText() {
+    public String getText() {
         String text = "";
         try {
             InputConnection conn = getCurrentInputConnection();

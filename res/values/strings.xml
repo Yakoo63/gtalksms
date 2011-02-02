@@ -144,7 +144,7 @@
     <string name="chat_help_cmd">- %s: execute shell instruction with root access if possible.</string>
     <string name="chat_help_write">- %1$s or %2$s: write text as virtual keyboard (don\'t forget to activate keyboard in Android Preferences panel).</string>
     <string name="chat_help_urls">and you can paste %s links and open it with the appropriate application.</string>
-    <string name="chat_help_ringmode">%s: With mode=(normal|silent|vibrate) Set ringer mode. Shows the actual mode if no argument is given.</string>    
+    <string name="chat_help_ringmode">- %s: With mode=(normal|silent|vibrate) Set ringer mode. Shows the actual mode if no argument is given.</string>    
     <string name="chat_call_unknown">Unknown</string>
     <string name="chat_call_incoming">Incoming</string>
     <string name="chat_call_outgoing">Outgoing</string>

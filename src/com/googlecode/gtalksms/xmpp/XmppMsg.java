@@ -8,11 +8,11 @@ import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMsg {
-    final static String BoldBegin = "##BOLD_BEGIN##";
-    final static String BoldEnd = "##BOLD_END##";
-    final static String ItalicBegin = "##ITALIC_BEGIN##";
-    final static String ItalicEnd = "##ITALIC_END##";
-    final static String FontBegin = "##FONT_BEGIN##";
+    public final static String BoldBegin = "##BOLD_BEGIN##";
+    public final static String BoldEnd = "##BOLD_END##";
+    public final static String ItalicBegin = "##ITALIC_BEGIN##";
+    public final static String ItalicEnd = "##ITALIC_END##";
+    public final static String FontBegin = "##FONT_BEGIN##";
     
     // TODO to be initialized by SettingsMgr
     public static XmppFont DefaultFont = new XmppFont();
@@ -43,6 +43,10 @@ public class XmppMsg {
     
     public void setFont(XmppFont font) {
         _message.append(FontBegin);
+        _fonts.add(font);
+    }
+
+    public void insertFont(XmppFont font) {
         _fonts.add(font);
     }
 
@@ -99,16 +103,17 @@ public class XmppMsg {
         // TODO add parameters to configure default XHTML layout: font color style size...
         
         String msg = StringFmt.encodeHTML(_message.toString())
-                    .replaceAll("\n", "<BR/>")
+                    .replaceAll("\n", "<BR/>\n")
                     .replaceAll(BoldBegin, "<B>")
                     .replaceAll(BoldEnd, "</B>")
                     .replaceAll(ItalicBegin, "<I>")
                     .replaceAll(ItalicEnd, "</I>");
         
+        ArrayList<XmppFont> fonts = new ArrayList<XmppFont>(_fonts);
         while (msg.contains(FontBegin)) {
-            if (_fonts.size() > 0) {
-                XmppFont font = _fonts.remove(0);
-                msg = msg.replace(FontBegin, "</FONT>" + font.toString());
+            if (fonts.size() > 0) {
+                XmppFont font = fonts.remove(0);
+                msg = msg.replaceFirst(FontBegin, "</FONT>" + font.toString());
             } else {
                 Log.e(Tools.LOG_TAG, "XmppMsg.generateXhtml: Font tags doesn't match");
                 msg = msg.replace(FontBegin, "");

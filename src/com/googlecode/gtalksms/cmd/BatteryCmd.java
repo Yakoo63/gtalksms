@@ -1,23 +1,22 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.cmd;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-public abstract class BatteryMonitor {
+import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 
-    BroadcastReceiver _batInfoReceiver = null;
-    int _lastPercentageNotified = -1;
-    Context _context;
-    SettingsManager _settings;
+public class BatteryCmd extends Command {
 
-    public BatteryMonitor(SettingsManager settings, Context baseContext) {
-        _settings = settings;
-        _context = baseContext;
-
+    private BroadcastReceiver _batInfoReceiver = null;
+    private int _lastPercentageNotified = -1;
+    
+    public BatteryCmd(MainService mainService) {
+        super(mainService);
+    
         _batInfoReceiver = new BroadcastReceiver() {
-            
             @Override
             public void onReceive(Context arg0, Intent intent) {
                 int level = intent.getIntExtra("level", 0);
@@ -38,15 +37,22 @@ public abstract class BatteryMonitor {
         _context.registerReceiver(_batInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
-
-    void sendBatteryInfos(boolean force) {
-        sendBatteryInfos(_lastPercentageNotified, force);
+    private void sendBatteryInfos(int level, boolean force) {
+        if (force || (_settingsMgr.notifyBattery && level % _settingsMgr.batteryNotificationInterval == 0)) {
+            send(getString(R.string.chat_battery_level, level));
+        }
+        if (_settingsMgr.notifyBatteryInStatus) {
+            _mainService.setXmppStatus("GTalkSMS - " + level + "%");
+        }
+    }
+    
+    @Override
+    public void execute(String cmd, String args) {
+        sendBatteryInfos(_lastPercentageNotified, true);
     }
 
-    abstract void sendBatteryInfos(int level, boolean force);
-
-    /** clear the battery monitor */
-    public void clearBatteryMonitor() {
+    @Override
+    public void cleanUp() {
         if (_batInfoReceiver != null) {
             _context.unregisterReceiver(_batInfoReceiver);
         }

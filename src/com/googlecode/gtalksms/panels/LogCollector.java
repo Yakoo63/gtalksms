@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.panels;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 
 // From android-log-collector - http://code.google.com/p/android-log-collector
@@ -41,7 +42,7 @@ import com.googlecode.gtalksms.tools.Tools;
  * limitations under the License.
  */
 
-public class LogCollectorActivity extends Activity {
+public class LogCollector extends Activity {
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
     private ProgressDialog mProgressDialog;
     private CollectLogTask mCollectLogTask;
@@ -141,7 +142,7 @@ public class LogCollectorActivity extends Activity {
                 log.insert(0, LINE_SEPARATOR);
                 log.insert(0, "Kernel info: " + getFormattedKernelVersion());
                 log.insert(0, LINE_SEPARATOR);
-                log.insert(0, "Version: " + getVersionNumber(LogCollectorActivity.this));
+                log.insert(0, "Version: " + getVersionNumber(LogCollector.this));
 
                 sendLog(log.toString());
                 dismissProgressDialog();

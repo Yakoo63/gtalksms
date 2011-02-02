@@ -19,8 +19,8 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class SmsMmsManager {
 
-    Context _context;
-    SettingsManager _settings;
+    private Context _context;
+    private SettingsManager _settings;
 
     public SmsMmsManager(SettingsManager settings, Context baseContext) {
         _settings = settings;

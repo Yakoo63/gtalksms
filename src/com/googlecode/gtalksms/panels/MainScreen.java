@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.googlecode.gtalksms.LogCollectorActivity;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
@@ -166,7 +165,7 @@ public class MainScreen extends Activity {
 
             public void onClick(View v) {
                 if (mainService != null ) {
-                    mainService.sendClipboard();
+                    mainService.executeCommand("copy", "");
                 }
             }
         });
@@ -234,7 +233,7 @@ public class MainScreen extends Activity {
         // sense to create a new panel and have the log collector called from
         // there - but now, just jumping directly to the collector should be fine.
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Intent i = new Intent(this, LogCollectorActivity.class);
+            Intent i = new Intent(this, LogCollector.class);
             startActivity(i);            
             return true;
         }

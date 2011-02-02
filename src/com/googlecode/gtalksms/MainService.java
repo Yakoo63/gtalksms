@@ -2,9 +2,8 @@ package com.googlecode.gtalksms;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import android.app.Notification;
@@ -15,36 +14,31 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.Address;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
-import android.text.ClipboardManager;
 import android.util.Log;
 
-import cmd.RingModeCmd;
-
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-import com.googlecode.gtalksms.data.contacts.Contact;
-import com.googlecode.gtalksms.data.contacts.ContactAddress;
+import com.googlecode.gtalksms.cmd.BatteryCmd;
+import com.googlecode.gtalksms.cmd.CallCmd;
+import com.googlecode.gtalksms.cmd.ClipboardCmd;
+import com.googlecode.gtalksms.cmd.Command;
+import com.googlecode.gtalksms.cmd.ContactCmd;
+import com.googlecode.gtalksms.cmd.GeoCmd;
+import com.googlecode.gtalksms.cmd.HelpCmd;
+import com.googlecode.gtalksms.cmd.KeyboardCmd;
+import com.googlecode.gtalksms.cmd.RingCmd;
+import com.googlecode.gtalksms.cmd.ShellCmd;
+import com.googlecode.gtalksms.cmd.SmsCmd;
+import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
-import com.googlecode.gtalksms.data.phone.Call;
-import com.googlecode.gtalksms.data.phone.Phone;
-import com.googlecode.gtalksms.data.phone.PhoneManager;
-import com.googlecode.gtalksms.data.sms.Sms;
-import com.googlecode.gtalksms.data.sms.SmsMmsManager;
-import com.googlecode.gtalksms.geo.GeoManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
-import com.googlecode.gtalksms.receivers.PhoneCallListener;
 import com.googlecode.gtalksms.tools.Tools;
-import com.googlecode.gtalksms.xmpp.XmppFont;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MainService extends Service {
@@ -65,29 +59,15 @@ public class MainService extends Service {
     // the service is running, and therefore whether to tell the service
     // about some events
     public static boolean IsRunning = false;
-    private static SettingsManager _settingsMgr;
-    private static XmppManager _xmppMgr;
 
-    
-    private CmdManager _cmdMgr;
-    private MediaManager _mediaMgr;
+    private SettingsManager _settingsMgr;
+    private XmppManager _xmppMgr;
     private BroadcastReceiver _xmppreceiver;
-    private SmsMmsManager _smsMgr;
-    private PhoneManager _phoneMgr;
-    private GeoManager _geoMgr;
-
-    private BatteryMonitor _batteryMonitor;
-    private SmsMonitor _smsMonitor;
+    private KeyboardInputMethod _keyboard;
     
-    private PhoneCallListener _phoneListener = null;
-
-    public KeyboardInputMethod _keyboard;
+    private Map<String, Command> _commands = new HashMap<String, Command>();
     
-    // last person who sent sms/who we sent an sms to
-    public String _lastRecipient = null;
     
-    private boolean _hasOutgoingAction = false;
-
     // notification stuff
     @SuppressWarnings("unchecked")
     private static final Class[] _startForegroundSignature = new Class[] { int.class, Notification.class };
@@ -173,12 +153,7 @@ public class MainService extends Service {
                 }
             } else if (a.equals(ACTION_SEND)) {
                 if (initialState == XmppManager.CONNECTED) {
-                    XmppMsg msg = new XmppMsg(intent.getStringExtra("message"));
-                    if (intent.hasExtra("xhtml")) {
-                        _xmppMgr.sendXHTML(msg);
-                    } else {
-                        _xmppMgr.send(msg);
-                    }
+                    _xmppMgr.send(intent.getStringExtra("message"));
                 }
             } else if (a.equals(ACTION_HANDLE_XMPP_NOTIFY)) {
                 // If there is a message, then it is what we received.
@@ -201,12 +176,14 @@ public class MainService extends Service {
                     if (_settingsMgr.notifySmsInChatRooms) {
                         _xmppMgr.writeRoom(number, ContactsManager.getContactName(this, number), intent.getStringExtra("message"));
                     }
-                    setLastRecipient(number);
+                    
+                    if (_commands.containsKey("SmsCmd")) {
+                        ((SmsCmd)_commands.get("SmsCmd")).setLastRecipient(number);
+                    }
                 }
             } else if (a.equals(ACTION_NETWORK_CHANGED)) {
                 boolean available = intent.getBooleanExtra("available", true);
-                Log.d(Tools.LOG_TAG, "network_changed with available=" + available + 
-                                     " and with state=" + initialState);
+                Log.d(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
                 
                 // TODO wait few seconds if network not available ? to avoid multiple reconnections
                 if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
@@ -392,7 +369,7 @@ public class MainService extends Service {
         _serviceHandler = new ServiceHandler(_serviceLooper);
         initNotificationStuff();
         Log.i(Tools.LOG_TAG, "service created");
-        IsRunning = true;
+        IsRunning = true;    
     }
 
     @Override
@@ -518,15 +495,15 @@ public class MainService extends Service {
             wantListeners = false;
             break;
         default:
-            throw new IllegalStateException("updateListeners found invalid state: "+currentState);
+            throw new IllegalStateException("updateListeners found invalid state: " + currentState);
         }
-        // We use the fact _batteryMonitor is null or not as a flag to say
-        // if we previously setup the stuff we need while connected.
-        if (wantListeners && _batteryMonitor == null) {
+        
+        if (wantListeners && _commands.isEmpty()) {
             setupListenersForConnection();
-        } else if (!wantListeners && _batteryMonitor != null) {
+        } else if (!wantListeners && !_commands.isEmpty()) {
             teardownListenersForConnection();
         }
+        
         return currentState;
     }
 
@@ -543,46 +520,13 @@ public class MainService extends Service {
                 "Start " + Tools.getVersionName(getBaseContext(), getClass()), // Label
                 0);       // Value      
         _gAnalytics.dispatch();
-        
-        _mediaMgr = new MediaManager(_settingsMgr, getBaseContext());
-        _geoMgr = new GeoManager(_settingsMgr, getBaseContext());
-        _smsMgr = new SmsMmsManager(_settingsMgr, getBaseContext());
-        _phoneMgr = new PhoneManager(_settingsMgr, getBaseContext());
-        _batteryMonitor = new BatteryMonitor(_settingsMgr, getBaseContext()) {
-            void sendBatteryInfos(int level, boolean force) {
-                if (force || (_settings.notifyBattery && level % _settings.batteryNotificationInterval == 0)) {
-                    send(getString(R.string.chat_battery_level, level));
-                }
-                if (_settings.notifyBatteryInStatus) {
-                    _xmppMgr.setStatus(level);
-                }
-            }
-        };
-        _cmdMgr = new CmdManager(_settingsMgr, getBaseContext()) {
-            void sendResults(String message) {
-                if (_settings.formatChatResponses) {
-                    XmppMsg msg = new XmppMsg(new XmppFont("consolas", "red"));
-                    msg.append(message);
-                    sendXHTML(msg);
-                } else {
-                    send(message);
-                }
-            }
-        };
-        _smsMonitor = new SmsMonitor(_settingsMgr, getBaseContext()) {
-            
-            void sendSmsStatus(String status) {
-                send(status);
-            }
-        };
 
-        if (_settingsMgr.notifyIncomingCalls) {
-            _phoneListener = new PhoneCallListener(this);
-            TelephonyManager telephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            telephony.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
-        }
-            
-        _mediaMgr.initMediaPlayer();
+        try {
+            setupCommands();
+        } catch (Exception e) {
+            // Should not happen.
+            Log.w(Tools.LOG_TAG, "MainService.setupListenersForConnection: Setup commands error", e);
+        } 
     }
 
     @Override
@@ -611,39 +555,17 @@ public class MainService extends Service {
             _gAnalytics = null;
         }
         
-        stopNotifications();
-
         stopForegroundCompat(getConnectionStatus());
 
-        if (_geoMgr != null) {
-            _geoMgr.stopLocatingPhone();
-            _geoMgr = null;
-        }
-        if (_mediaMgr != null) {
-            _mediaMgr.clearMediaPlayer();
-            _mediaMgr = null;
-        }
-        if (_smsMonitor != null) {
-            _smsMonitor.clearSmsMonitor();
-            _smsMonitor = null;
-        }
-        if (_phoneListener != null) {
-            TelephonyManager telephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            telephony.listen(_phoneListener, 0);
-            _phoneListener = null;
-        }
-
-        if (_batteryMonitor != null) {
-            _batteryMonitor.clearBatteryMonitor();
-            _batteryMonitor = null;
-        }
+        stopCommands();
+        cleanupCommands();
     }
 
     public static void send(Context ctx, String msg) {
         ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg));
     }
 
-    public static void send(String msg) {
+    public void send(String msg) {
         if (_xmppMgr != null) {
             _xmppMgr.send(new XmppMsg(msg));
         }
@@ -654,13 +576,19 @@ public class MainService extends Service {
             _xmppMgr.send(msg);
         }
     }
-    
-    public void sendXHTML(XmppMsg msg) {
-        if (_xmppMgr != null) {
-            _xmppMgr.sendXHTML(msg);
-        }
-    }
 
+    public SettingsManager getSettingsManager() {
+        return _settingsMgr;
+    }
+    
+    public void setKeyboard(KeyboardInputMethod keyboard) {
+        _keyboard = keyboard;
+    }
+    
+    public KeyboardInputMethod getKeyboard() {
+        return _keyboard;
+    }
+    
     /**
      * Handels the different commands
      * usually from an intent with
@@ -683,562 +611,63 @@ public class MainService extends Service {
 
             // Not case sensitive commands
             command = command.toLowerCase();
-
-            if (command.equals("?") || command.equals("help")) {
-                showHelp();
-            } else if (command.equals("exit")) {
+            if (command.equals("exit")) {
                 stopService(new Intent(ACTION_CONNECT));
-            } else if (command.equals("sms")) {
-                int separatorPos = args.indexOf(":");
-                String contact = null;
-                String message = null;
-                if (-1 != separatorPos) {
-                    contact = args.substring(0, separatorPos);
-                    message = args.substring(separatorPos + 1);
-                    sendSMS(message, contact);
-                } else if (args.length() > 0) {
-                    if (args.equals("unread")) {
-                        readUnreadSMS();
-                    } else {
-                        readSMS(args);
-                    }
-                } else {
-                    readLastSMS();
-                }
-            } else if (command.equals("reply")) {
-                if (args.length() == 0) {
-                    displayLastRecipient();
-                } else if (_lastRecipient == null) {
-                    send(getString(R.string.chat_error_no_recipient));
-                } else {
-                    _smsMgr.markAsRead(_lastRecipient);
-                    sendSMS(args, _lastRecipient);
-                }
-            } else if (command.equals("findsms") || command.equals("fs")) {
-                int separatorPos = args.indexOf(":");
-                String contact = null;
-                String message = null;
-                if (-1 != separatorPos) {
-                    contact = args.substring(0, separatorPos);
-                    message = args.substring(separatorPos + 1);
-                    searchSMS(message, contact);
-                } else if (args.length() > 0) {
-                    searchSMS(args, null);
-                }
-            } else if (command.equals("markasread") || command.equals("mar")) {
-                if (args.length() > 0) {
-                    markSmsAsRead(args);
-                } else if (_lastRecipient == null) {
-                    send(getString(R.string.chat_error_no_recipient));
-                } else {
-                    markSmsAsRead(_lastRecipient);
-                }
-            } else if (command.equals("calls")) {
-                readCallLogs();
-            } else if (command.equals("battery") || command.equals("batt")) {
-                _batteryMonitor.sendBatteryInfos(true);
-            } else if (command.equals("copy")) {
-                if (args.length() > 0) {
-                    copyToClipboard(args);
-                } else {
-                    sendClipboard();
-                }
-            } else if (command.equals("write") || command.equals("w")) {
-                writeText(args);
-            } else if (command.equals("geo")) {
-                geo(args);
-            } else if (command.equals("dial")) {
-                dial(args);
-            } else if (command.equals("contact")) {
-                displayContacts(args);
-            } else if (command.equals("where")) {
-                geoLocate();
             } else if (command.equals("stop")) {
-                stopNotifications();
-            } else if (command.equals("ring")) {
-                Integer volume = Tools.parseInt(args);
-                
-                if (volume != null) {
-                    ring(volume);
-                } else {
-                    ring(100);
-                }
-            } else if (command.equals("cmd")) {
-                shellCmd(args);
-            } else if (command.equals("http")) {
-                openLink("http:" + args);
-            } else if (command.equals("https")) {
-                openLink("https:" + args);
-            } else if (command.equals("ringmode")) {
-                RingModeCmd c = new RingModeCmd(this, _settingsMgr, _xmppMgr);
-                c.executeCommand(command, args);
+                stopCommands();
+            } else if (_commands.containsKey(command)) {
+                _commands.get(command).execute(command, args);
             } else {
-                send(getString(R.string.chat_error_unknown_cmd, commandLine));
+                send(getString(R.string.chat_error_unknown_cmd, command));
             }
         } catch (Exception ex) {
             send(getString(R.string.chat_error, ex));
         }
     }
-
-    private void setLastRecipient(String phoneNumber) {
-        if (_lastRecipient == null || !phoneNumber.equals(_lastRecipient)) {
-            _lastRecipient = phoneNumber;
-            displayLastRecipient();
-        }
-    }
-
-    private void shellCmd(String cmd) {
-        try {
-            _cmdMgr.shellCmd(cmd);
-        }
-        catch (Exception ex) {
-            Log.w(Tools.LOG_TAG, "Shell command error", ex);
+    
+    public void executeCommand(String cmd, String args) {
+        if (_commands.containsKey(cmd)) {
+            _commands.get(cmd).execute(cmd, args);
+        } else {
+            send(getString(R.string.chat_error_unknown_cmd, cmd));
         }
     }
     
-    public void displayLastRecipient() {
-        if (_lastRecipient == null) {
-            send(getString(R.string.chat_error_no_recipient));
-        } else {
-            String contact = ContactsManager.getContactName(this, _lastRecipient);
-            if (Phone.isCellPhoneNumber(_lastRecipient) && contact.compareTo(_lastRecipient) != 0) {
-                contact += " (" + _lastRecipient + ")";
-            }
-            send(getString(R.string.chat_reply_contact, contact));
-        }
+    private void setupCommands() {
+        registerCommand(new HelpCmd(this), "?", "help");
+        registerCommand(new KeyboardCmd(this), "write", "w");
+        registerCommand(new BatteryCmd(this), "battery", "batt");
+        registerCommand(new GeoCmd(this), "where", "geo");
+        registerCommand(new CallCmd(this), "calls", "dial");
+        registerCommand(new ContactCmd(this), "contact");
+        registerCommand(new ClipboardCmd(this), "copy");
+        registerCommand(new ShellCmd(this), "cmd");
+        registerCommand(new UrlsCmd(this), "http", "https");
+        registerCommand(new RingCmd(this), "ring", "ringmode");
+        registerCommand(new SmsCmd(this), "sms", "reply", "findsms", "fs", "markasread", "mar");
     }
-
-    public void showHelp() {
-        XmppMsg msg = new XmppMsg();
-        msg.appendLine(getString(R.string.chat_help_title));
-        msg.appendLine(getString(R.string.chat_help_help, XmppMsg.makeBold("\"?\""), XmppMsg.makeBold("\"help\"")));
-        msg.appendLine(getString(R.string.chat_help_stop, XmppMsg.makeBold("\"exit\"")));
-        msg.appendLine(getString(R.string.chat_help_dial, XmppMsg.makeBold("\"dial:#contact#\"")));
-        msg.appendLine(getString(R.string.chat_help_sms_reply, XmppMsg.makeBold("\"reply:#message#\"")));
-        msg.appendLine(getString(R.string.chat_help_sms_show_all, XmppMsg.makeBold("\"sms\"")));
-        msg.appendLine(getString(R.string.chat_help_sms_show_unread, XmppMsg.makeBold("\"sms:unread\"")));
-        msg.appendLine(getString(R.string.chat_help_sms_show_contact, XmppMsg.makeBold("\"sms:#contact#\"")));
-        msg.appendLine(getString(R.string.chat_help_sms_send, XmppMsg.makeBold("\"sms:#contact#:#message#\"")));
-        msg.appendLine(getString(R.string.chat_help_find_sms_all, XmppMsg.makeBold("\"findsms:#message#\""), XmppMsg.makeBold("\"fs:#message#\"")));
-        msg.appendLine(getString(R.string.chat_help_find_sms, XmppMsg.makeBold("\"findsms:#contact#:#message#\""), XmppMsg.makeBold("\"fs:#contact#:#message#\"")));
-        msg.appendLine(getString(R.string.chat_help_mark_as_read, XmppMsg.makeBold("\"markAsRead:#contact#\""), XmppMsg.makeBold("\"mar\"")));
-        msg.appendLine(getString(R.string.chat_help_battery, XmppMsg.makeBold("\"battery\""), XmppMsg.makeBold("\"batt\"")));
-        msg.appendLine(getString(R.string.chat_help_calls, XmppMsg.makeBold("\"calls\"")));
-        msg.appendLine(getString(R.string.chat_help_contact, XmppMsg.makeBold("\"contact:#contact#\"")));
-        msg.appendLine(getString(R.string.chat_help_geo, XmppMsg.makeBold("\"geo:#address#\"")));
-        msg.appendLine(getString(R.string.chat_help_where, XmppMsg.makeBold("\"where\""), XmppMsg.makeBold("\"stop\"")));
-        msg.appendLine(getString(R.string.chat_help_ring, XmppMsg.makeBold("\"ring\""), XmppMsg.makeBold("\"ring:[0-100]\""), XmppMsg.makeBold("\"stop\"")));
-        msg.appendLine(getString(R.string.chat_help_copy, XmppMsg.makeBold("\"copy:#text#\"")));
-        msg.appendLine(getString(R.string.chat_help_cmd, XmppMsg.makeBold("\"cmd:#command#\"")));
-        msg.appendLine(getString(R.string.chat_help_write, XmppMsg.makeBold("\"write:#text#\""), XmppMsg.makeBold("\"w:#text#\"")));
-        msg.appendLine(getString(R.string.chat_help_urls, XmppMsg.makeBold("\"http\"")));
-        msg.appendLine(getString(R.string.chat_help_ringmode, XmppMsg.makeBold("\"ringmode:#mode#\"")));        
-        send(msg);
+    
+    private void cleanupCommands() {
+        for (String cmd : _commands.keySet()) {
+            _commands.get(cmd).cleanUp();
+        }
+        _commands.clear();
     }
-
-    public void geoLocate() {
-        _hasOutgoingAction = true;
-        send(getString(R.string.chat_start_locating));
-        _geoMgr.startLocatingPhone();
-    }
-
-    public void ring(int volume) {
-        _hasOutgoingAction = true;
-        send(getString(R.string.chat_start_ringing));
-        if (!_mediaMgr.ring(volume)) {
-            send(getString(R.string.chat_error_ringing));
-        }
-    }
-
-    public void stopNotifications() {
-        if (_hasOutgoingAction) {
-            send(getString(R.string.chat_stop_actions));
-        }
-        _hasOutgoingAction = false;
-        if (_geoMgr != null) {
-            _geoMgr.stopLocatingPhone();
-        }
-        if (_mediaMgr != null) {
-            _mediaMgr.stopRinging();
-        }
-    }
-
-    /** search SMS */
-    public void searchSMS(String message, String contactName) {
-        ArrayList<Contact> contacts = new ArrayList<Contact>();
-        ArrayList<Sms> sentSms = null;
-        
-        send(getString(R.string.chat_sms_search_start));
-        
-        if (contactName != null) {
-            contacts = ContactsManager.getMatchingContacts(this, contactName);
-        } else {
-            contacts = ContactsManager.getMatchingContacts(this, "*");
-        }
-
-        if (_settingsMgr.displaySentSms) {
-            sentSms = _smsMgr.getAllSentSms(message);
-        }
-        
-        int nbResults = 0;
-        if (contacts.size() > 0) {
-            send(getString(R.string.chat_sms_search, message, contacts.size()));
-            
-            for (Contact contact : contacts) {
-                ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name, message);
-                if (_settingsMgr.displaySentSms) {
-                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(this, contact.id), sentSms));
-                }
-                Collections.sort(smsArrayList);
-
-                if (smsArrayList.size() > 0) {
-                    XmppMsg smsContact = new XmppMsg();
-                    smsContact.appendBold(contact.name);
-                    smsContact.append(" - ");
-                    smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, smsArrayList.size()));
-                    
-                    for (Sms sms : smsArrayList) {
-                        smsContact.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                        smsContact.appendLine(sms.message);
-                        nbResults++;
-                    }
-                    
-                    send(smsContact);
-                }
-            }
-        } else if (sentSms.size() > 0) {
-            XmppMsg smsContact = new XmppMsg();
-            smsContact.appendBold(getString(R.string.chat_me));
-            smsContact.append(" - ");
-            smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, sentSms.size()));
-            
-            for (Sms sms : sentSms) {
-                smsContact.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                smsContact.appendLine(sms.message);
-                nbResults++;
-            }
-            
-            send(smsContact);
-        } 
-        
-        if (nbResults > 0) {
-            send(getString(R.string.chat_sms_search_results, nbResults));
-        } else {
-            send(getString(R.string.chat_no_match_for, message));
-        }
-    }
-
-    /** sends a SMS to the last contact */
-    public void sendSMS(String message) {
-        sendSMS(message, _lastRecipient);
-    }
-
-    /** sends a SMS to the specified contact */
-    public void sendSMS(String message, String contact) {
-        if (Phone.isCellPhoneNumber(contact)) {
-            send(getString(R.string.chat_send_sms, ContactsManager.getContactName(this, contact)));
-            sendSMSByPhoneNumber(message, contact, null);
-        } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contact);
-            if (mobilePhones.size() > 1) {
-                send(getString(R.string.chat_specify_details));
-
-                for (Phone phone : mobilePhones) {
-                    send(phone.contactName + " - " + phone.cleanNumber);
-                }
-            } else if (mobilePhones.size() == 1) {
-                Phone phone = mobilePhones.get(0);
-                send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")"));
-                setLastRecipient(phone.cleanNumber);
-                sendSMSByPhoneNumber(message, phone.cleanNumber, phone.contactName);
-            } else {
-                send(getString(R.string.chat_no_match_for, contact));
-            }
+    
+    private void stopCommands() {
+        for (String cmd : _commands.keySet()) {
+            _commands.get(cmd).stop();
         }
     }
     
-    /** Sends a sms to the specified phone number */
-    public void sendSMSByPhoneNumber(String message, String phoneNumber, String toName) {
-        _smsMonitor.sendSMSByPhoneNumber(message, phoneNumber, toName);
-        _smsMgr.addSmsToSentBox(message, phoneNumber);
-    }
-
-    public void markSmsAsRead(String contact) {
-
-        if (Phone.isCellPhoneNumber(contact)) {
-            send(getString(R.string.chat_mark_as_read, ContactsManager.getContactName(this, contact)));
-            _smsMgr.markAsRead(contact);
-        } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contact);
-            if (mobilePhones.size() > 0) {
-                send(getString(R.string.chat_mark_as_read, mobilePhones.get(0).contactName));
-
-                for (Phone phone : mobilePhones) {
-                    _smsMgr.markAsRead(phone.number);
-                }
-            } else {
-                send(getString(R.string.chat_no_match_for, contact));
-            }
+    private void registerCommand(Command cmd, Object... cmdNames) {
+        for (Object name : cmdNames) {
+            _commands.put((String)name, cmd);
         }
     }
 
-    /** reads (count) SMS from all contacts matching pattern */
-    public void readSMS(String searchedText) {
-
-        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(this, searchedText);
-        ArrayList<Sms> sentSms = new ArrayList<Sms>();
-        if (_settingsMgr.displaySentSms) {
-            sentSms = _smsMgr.getAllSentSms();
-        }
-
-        if (contacts.size() > 0) {
-
-            XmppMsg noSms = new XmppMsg();
-            Boolean hasMatch = false;
-            for (Contact contact : contacts) {
-                ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name);
-                if (_settingsMgr.displaySentSms) {
-                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(this, contact.id), sentSms));
-                }
-                Collections.sort(smsArrayList);
-
-                List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
-                if (smsList.size() > 0) {
-                    hasMatch = true;
-                    XmppMsg smsContact = new XmppMsg();
-                    smsContact.append(contact.name);
-                    smsContact.append(" - ");
-                    smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, smsArrayList.size()));
-                    
-                    for (Sms sms : smsList) {
-                        smsContact.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                        smsContact.appendLine(sms.message);
-                    }
-                    if (smsList.size() < _settingsMgr.smsNumber) {
-                        smsContact.appendItalicLine(getString(R.string.chat_only_got_n_sms, smsList.size()));
-                    }
-                    send(smsContact);
-                } else {
-                    noSms.appendBold(contact.name);
-                    noSms.appendLine(getString(R.string.chat_no_sms));
-                }
-            }
-            if (!hasMatch) {
-                send(noSms);
-            }
-        } else {
-            send(getString(R.string.chat_no_match_for, searchedText));
-        }
-    }
-
-    /** reads unread SMS from all contacts */
-    public void readUnreadSMS() {
-
-        ArrayList<Sms> smsArrayList = _smsMgr.getAllUnreadSms();
-        XmppMsg allSms = new XmppMsg();
-
-        List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
-        if (smsList.size() > 0) {
-            for (Sms sms : smsList) {
-                allSms.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                allSms.appendLine(sms.message);
-            }
-        } else {
-            allSms.appendLine(getString(R.string.chat_no_sms));
-        }
-        send(allSms);
-    }
-    
-    /** reads last (count) SMS from all contacts */
-    public void readLastSMS() {
-
-        ArrayList<Sms> smsArrayList = _smsMgr.getAllReceivedSms();
-        XmppMsg allSms = new XmppMsg();
-
-        if (_settingsMgr.displaySentSms) {
-            smsArrayList.addAll(_smsMgr.getAllSentSms());
-        }
-        Collections.sort(smsArrayList);
-
-        List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
-        if (smsList.size() > 0) {
-            for (Sms sms : smsList) {
-                allSms.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                allSms.appendLine(sms.message);
-            }
-        } else {
-            allSms.appendLine(getString(R.string.chat_no_sms));
-        }
-        send(allSms);
-    }
-
-    /** reads last Call Logs from all contacts */
-    public void readCallLogs() {
-
-        ArrayList<Call> arrayList = _phoneMgr.getPhoneLogs();
-        XmppMsg all = new XmppMsg();
-
-        List<Call> callList = Tools.getLastElements(arrayList, _settingsMgr.callLogsNumber);
-        if (callList.size() > 0) {
-            for (Call call : callList) {
-                all.appendItalic(call.date.toLocaleString());
-                all.append(" - ");
-                all.appendBold(ContactsManager.getContactName(this, call.phoneNumber));
-                all.appendLine(" - " + call.type(this) + getString(R.string.chat_call_duration) + call.duration());
-            }
-        } else {
-            all.appendLine(getString(R.string.chat_no_call));
-        }
-        send(all);
-    }
-
-    /** reads (count) SMS from all contacts matching pattern */
-    public void displayContacts(String searchedText) {
-
-        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(this, searchedText);
-
-        if (contacts.size() > 0) {
-
-            if (contacts.size() > 1) {
-                send(getString(R.string.chat_contact_found, contacts.size(), searchedText));
-            }
-
-            for (Contact contact : contacts) {
-                XmppMsg strContact = new XmppMsg();
-                strContact.appendBoldLine(contact.name);
-
-                // strContact.append(Tools.LineSep + "Id : " + contact.id);
-                // strContact.append(Tools.LineSep + "Raw Ids : " + TextUtils.join(" ",
-                // contact.rawIds));
-
-                ArrayList<Phone> mobilePhones = ContactsManager.getPhones(this, contact.id);
-                if (mobilePhones.size() > 0) {
-                    strContact.appendItalicLine(getString(R.string.chat_phones));
-                    for (Phone phone : mobilePhones) {
-                        strContact.appendLine(phone.label + " - " + phone.cleanNumber);
-                    }
-                }
-
-                ArrayList<ContactAddress> emails = ContactsManager.getEmailAddresses(this, contact.id);
-                if (emails.size() > 0) {
-                    strContact.appendItalicLine(getString(R.string.chat_emails));
-                    for (ContactAddress email : emails) {
-                        strContact.appendLine(email.label + " - " + email.address);
-                    }
-                }
-
-                ArrayList<ContactAddress> addresses = ContactsManager.getPostalAddresses(this, contact.id);
-                if (addresses.size() > 0) {
-                    strContact.appendItalicLine(getString(R.string.chat_addresses));
-                    for (ContactAddress address : addresses) {
-                        strContact.appendLine(address.label + " - " + address.address);
-                    }
-                }
-                send(strContact);
-            }
-        } else {
-            send(getString(R.string.chat_no_match_for, searchedText));
-        }
-    }
-
-    /** Open geolocalization application */
-    private void geo(String text) {
-        List<Address> addresses = _geoMgr.geoDecode(text);
-        if (addresses != null) {
-            if (addresses.size() > 1) {
-                XmppMsg addr = new XmppMsg(getString(R.string.chat_specify_details));
-                addr.newLine();
-                for (Address address : addresses) {
-                    for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-                        addr.appendLine(address.getAddressLine(i));
-                    }
-                }
-                send(addr);
-            } else if (addresses.size() == 1) {
-                _geoMgr.launchExternal(addresses.get(0).getLatitude() + "," + addresses.get(0).getLongitude());
-            }
-        } else {
-            send(getString(R.string.chat_no_match_for, text));
-            // For emulation testing
-            // GeoManager.launchExternal("48.833199,2.362232");
-        }
-    }
-
-    /** copy text as keyboard */
-    private void writeText(String text) {
-        try {
-            if (_keyboard != null) {
-                _keyboard.setText(text);
-            }
-        } catch (Exception ex) {
-            Log.w(Tools.LOG_TAG, "writeText error", ex);
-        }
-    }
-
-    /** copy text to clipboard */
-    private void copyToClipboard(String text) {
-        try {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Service.CLIPBOARD_SERVICE);
-            clipboard.setText(text);
-            send(getString(R.string.chat_text_copied));
-        } catch (Exception ex) {
-            Log.w(Tools.LOG_TAG, "Clipboard error", ex);
-            send(getString(R.string.chat_error_clipboard));
-        }
-    }
-
-    /** copy text to clipboard */
-    public void sendClipboard() {
-        try {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Service.CLIPBOARD_SERVICE);
-            send(getString(R.string.chat_clipboard, clipboard.getText()));
-            
-        } catch (Exception ex) {
-            Log.w(Tools.LOG_TAG, "Clipboard error", ex);
-            send(getString(R.string.chat_error_clipboard));
-        }
-    }
-
-    /** lets the user choose an activity compatible with the url */
-    private void openLink(String url) {
-        Intent target = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        Intent intent = Intent.createChooser(target, getString(R.string.chat_choose_activity));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    /** dial the specified contact */
-    private void dial(String contactInfo) {
-        String number = null;
-        String contact = null;
-
-        if (Phone.isCellPhoneNumber(contactInfo)) {
-            number = contactInfo;
-            contact = ContactsManager.getContactName(this, number);
-        } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(this, contactInfo);
-            if (mobilePhones.size() > 1) {
-                XmppMsg phones = new XmppMsg(getString(R.string.chat_specify_details));
-                phones.newLine();
-                for (Phone phone : mobilePhones) {
-                    phones.appendLine(phone.contactName + " - " + phone.cleanNumber);
-                }
-                send(phones);
-            } else if (mobilePhones.size() == 1) {
-                Phone phone = mobilePhones.get(0);
-                contact = phone.contactName;
-                number = phone.cleanNumber;
-            } else {
-                send(getString(R.string.chat_no_match_for, contactInfo));
-            }
-        }
-
-        if (number != null) {
-            send(getString(R.string.chat_dial, contact + " (" + number + ")"));
-            if (!_phoneMgr.Dial(number)) {
-                send(getString(R.string.chat_error_dial));
-            }
-        }
+    public void setXmppStatus(String status) {
+        _xmppMgr.setStatus(status);
     }
     
     /** Intent helper functions.

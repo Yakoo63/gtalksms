@@ -9,16 +9,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CallLog;
 
-import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class PhoneManager {
 
-    Context _context;
-    SettingsManager _settings;
-
-    public PhoneManager(SettingsManager settings, Context baseContext) {
-        _settings = settings;
+    private Context _context;
+    
+    public PhoneManager(Context baseContext) {
         _context = baseContext;
     }
 

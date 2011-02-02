@@ -144,6 +144,7 @@
     <string name="chat_help_cmd">- %s: exécuter une commande shell avec les droits super administrateur si possible.</string>
     <string name="chat_help_write">- %1$s ou %2$s: écrit le texte comme un clavier virtuel dans les autres applications (Ne pas oublier d\'activer le clavier GTalkSMS dans les paramètres d\'Android).</string>
     <string name="chat_help_urls">et coller les liens %s pour les ouvrir dans le navigateur du téléphone.</string>
+    <string name="chat_help_ringmode">- %s: modifie le type de sonnerie avec mode=(normal|silent|vibrate). Affiche le type courant de sonnerie s\'il n\'y a aucun paramètre.</string>    
     <string name="chat_call_unknown">Inconnu</string>
     <string name="chat_call_incoming">Entrant</string>
     <string name="chat_call_outgoing">Sortant</string>
@@ -154,6 +155,10 @@
     <string name="chat_is_calling">Appel de %s…</string>
     <string name="chat_call_hidden">[Appel Masqué]</string>
     <string name="chat_me">Moi</string>
+    <string name="chat_ringer_error_cmd">Mauvais paramètre: %1s</string>
+    <string name="chat_ringer_vibrate">Mode vibreur</string>
+    <string name="chat_ringer_silent">Mode silence</string>
+    <string name="chat_ringer_normal">Mode normal</string>          
     <string name="chat_sms_search">Recherche \"%1$s\" pour %2$d contacts...</string>
     <string name="chat_sms_search_start">Recherche en cours...</string>
     <string name="chat_sms_search_results">%d SMS trouvé(s).</string>

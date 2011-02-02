@@ -143,8 +143,8 @@
     <string name="chat_help_copy">- %s: Kopiert &lt;text&gt; in das Clipboard des Telefons oder sendet den Inahlt des Clipboards, wenn &lt;text&gt; leer ist.</string>
     <string name="chat_help_cmd">- %s: Für Shell Befehl (wenn möglich mit root Rechten) aus.</string>
     <string name="chat_help_write">- %1$s oder %2$s: Schreibt &lt;text&gt; in die virtuelle Tastatur (dazu muss die GTalkSMS Tastatur in den Android Einstellungen aktiviert sein).</string>
-    <string name="chat_help_urls">%s: Öffnet Links auf den Telefon mit der entsprechenden Anwendung</string>
-    <string name="chat_help_ringmode">%s: Mit mode=normal,silent,vibrate - Setz den Klingelmodus entsprechend. Ohne Argument wird der aktuelle Modus angezeigt.</string>    
+    <string name="chat_help_urls">- %s: Öffnet Links auf den Telefon mit der entsprechenden Anwendung</string>
+    <string name="chat_help_ringmode">- %s: Mit mode=normal,silent,vibrate - Setz den Klingelmodus entsprechend. Ohne Argument wird der aktuelle Modus angezeigt.</string>    
     <string name="chat_call_unknown">Unbekannt</string>
     <string name="chat_call_incoming">Eingehender Anruf</string>
     <string name="chat_call_outgoing">Ausgehender Anruf</string>

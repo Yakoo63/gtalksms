@@ -387,30 +387,14 @@ public class XmppManager {
             } else {
                 msg.setBody(message.generateTxt());
             }
-            
-            _connection.sendPacket(msg);
-        }
-    }
-
-    /** sends a message to the user */
-    public void sendXHTML(XmppMsg message) {
-        if (isConnected()) {
-            Message msg = new Message(_settings.notifiedAddress, Message.Type.chat);
-            
-            if (_settings.formatChatResponses) {
-                msg.setBody(message.generateFmtTxt());
-            } else {
-                msg.setBody(message.generateTxt());
-            }
-            
             XHTMLManager.addBody(msg, message.generateXhtml());
 
             _connection.sendPacket(msg);
         }
     }
     
-    public void setStatus(int batteryLevel) {
-        _presenceMessage = "GTalkSMS - " + batteryLevel + "%";
+    public void setStatus(String status) {
+        _presenceMessage = status;
         
         if (isConnected()) {
             Presence presence = new Presence(Presence.Type.available);

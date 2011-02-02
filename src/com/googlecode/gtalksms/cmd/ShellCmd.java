@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.cmd;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -6,23 +6,25 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
 
-import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.xmpp.XmppFont;
+import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public abstract class CmdManager {
-    Context _context;
-    SettingsManager _settings;
+public class ShellCmd extends Command {
+
     Handler _cmdHandler = new Handler();
     Thread _cmdThread;
     final StringBuilder _cmdResults = new StringBuilder();
     String _currentCommand;
+    XmppFont _font = new XmppFont("consolas", "red");
     
-    public CmdManager(SettingsManager settings, Context baseContext) {
-        _settings = settings;
-        _context = baseContext;
+    public ShellCmd(MainService mainService) {
+        super(mainService);
     }
     
     private boolean askRootAccess() {
@@ -59,7 +61,7 @@ public abstract class CmdManager {
                 readStream(myproc.getInputStream());
                 readStream(myproc.getErrorStream());
                 
-                sendResults(_cmdResults.toString());
+                send(_cmdResults.toString());
                 _cmdResults.setLength(0);
             }
             catch (Exception ex) {
@@ -84,7 +86,7 @@ public abstract class CmdManager {
                     start = end;
                     int last = _cmdResults.lastIndexOf("\n");
                     if (last != -1) {
-                        sendResults(_cmdResults.substring(0, last + 1));
+                        send(_cmdResults.substring(0, last + 1));
                         _cmdResults.delete(0, last + 1);
                     }
                 }
@@ -92,9 +94,10 @@ public abstract class CmdManager {
         }
     };
     
-    public void shellCmd(String cmd) {
+    @Override
+    public void execute(String unused, String cmd) {
         if (_cmdThread != null && _cmdThread.isAlive()) {
-            sendResults(_currentCommand + " killed.");
+            send(_currentCommand + " killed.");
             try { 
                 _cmdThread.interrupt();
                 _cmdThread.join(1000); 
@@ -102,7 +105,7 @@ public abstract class CmdManager {
             
             try { _cmdThread.stop(); } catch (Exception e) {}
             
-            sendResults(_cmdResults.toString());
+            send(_cmdResults.toString());
             _cmdResults.setLength(0);
         }
         
@@ -110,6 +113,11 @@ public abstract class CmdManager {
         _cmdThread = new Thread(_cmdRunnable);
         _cmdThread.start();
     }
-
-    abstract void sendResults(String message);
+    
+    @Override
+    protected void send(String message) {
+        XmppMsg msg = new XmppMsg(_font);
+        msg.append(message);
+        send(msg);
+    }
 }
