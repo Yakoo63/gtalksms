@@ -387,7 +387,9 @@ public class XmppManager {
             } else {
                 msg.setBody(message.generateTxt());
             }
-            XHTMLManager.addBody(msg, message.generateXhtml());
+            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) {
+                XHTMLManager.addBody(msg, message.generateXhtml());
+            }
 
             _connection.sendPacket(msg);
         }

@@ -43,7 +43,7 @@ public class RingCmd extends Command {
             }
         } else {
             int mode;
-            if(args.equals("vibrate")) {
+            if (args.equals("vibrate")) {
                 _audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
             } else if (args.equals("normal")) {
                 _audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
@@ -51,19 +51,20 @@ public class RingCmd extends Command {
                 _audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             } else if (!args.equals("")) {
                 send(getString(R.string.chat_ringer_error_cmd, args));
-            } else {
-                mode = _audioManager.getRingerMode();
-                switch (mode) {
-                case AudioManager.RINGER_MODE_VIBRATE:
-                    send(getString(R.string.chat_ringer_vibrate));
-                    break;
-                case AudioManager.RINGER_MODE_NORMAL:
-                    send(getString(R.string.chat_ringer_normal));
-                    break;
-                case AudioManager.RINGER_MODE_SILENT:
-                    send(getString(R.string.chat_ringer_silent));
-                    break;            
-                }
+                return;
+            }
+            mode = _audioManager.getRingerMode();
+            switch (mode) {
+            case AudioManager.RINGER_MODE_VIBRATE:
+                send(getString(R.string.chat_ringer_vibrate));
+                break;
+            case AudioManager.RINGER_MODE_NORMAL:
+                send(getString(R.string.chat_ringer_normal));
+                break;
+            case AudioManager.RINGER_MODE_SILENT:
+                send(getString(R.string.chat_ringer_silent));
+                break;
+
             }
         }
     }
