@@ -316,12 +316,12 @@ public class XmppManager {
                 public void reconnectionSuccessful() {
                 }
             };
-            _connection.addConnectionListener(_connectionListener);
-            onConnectionComplete();
-            
+            _connection.addConnectionListener(_connectionListener);            
         } finally {
             _lock.unlock();
         }
+        onConnectionComplete();
+
     }
 
     private void onConnectionComplete() {
@@ -387,9 +387,9 @@ public class XmppManager {
             } else {
                 msg.setBody(message.generateTxt());
             }
-            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) {
+//            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) {
                 XHTMLManager.addBody(msg, message.generateXhtml());
-            }
+//            }
 
             _connection.sendPacket(msg);
         }

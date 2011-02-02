@@ -20,7 +20,7 @@ public class XmppFont {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
-        sb.append("<FONT ");
+        sb.append("<font ");
         if (_font != null) {
             sb.append("face=\"" + _font + "\" ");
         }

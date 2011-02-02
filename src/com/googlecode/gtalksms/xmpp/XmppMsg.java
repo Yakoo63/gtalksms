@@ -103,23 +103,23 @@ public class XmppMsg {
         // TODO add parameters to configure default XHTML layout: font color style size...
         
         String msg = StringFmt.encodeHTML(_message.toString())
-                    .replaceAll("\n", "<BR/>\n")
-                    .replaceAll(BoldBegin, "<B>")
-                    .replaceAll(BoldEnd, "</B>")
-                    .replaceAll(ItalicBegin, "<I>")
-                    .replaceAll(ItalicEnd, "</I>");
+                    .replaceAll("\n", "<br/>\n")
+                    .replaceAll(BoldBegin, "<strong>")
+                    .replaceAll(BoldEnd, "</strong>")
+                    .replaceAll(ItalicBegin, "<em>")
+                    .replaceAll(ItalicEnd, "</em>");
         
         ArrayList<XmppFont> fonts = new ArrayList<XmppFont>(_fonts);
         while (msg.contains(FontBegin)) {
             if (fonts.size() > 0) {
                 XmppFont font = fonts.remove(0);
-                msg = msg.replaceFirst(FontBegin, "</FONT>" + font.toString());
+                msg = msg.replaceFirst(FontBegin, "</font>" + font.toString());
             } else {
                 Log.e(Tools.LOG_TAG, "XmppMsg.generateXhtml: Font tags doesn't match");
                 msg = msg.replace(FontBegin, "");
             }
         }
 
-        return "<body>" + _mainFont + msg + "</FONT></body>";
+        return "<body>" + _mainFont + msg + "</font></body>";
     }
 }
