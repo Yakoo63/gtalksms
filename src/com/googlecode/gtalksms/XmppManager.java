@@ -274,8 +274,6 @@ public class XmppManager {
                     Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_invalid_credentials));
                     stop();
                 }
-                roomNumbers.clear();
-                rooms.clear();
                 return;
             }
             
@@ -326,6 +324,8 @@ public class XmppManager {
 
     private void onConnectionComplete() {
         Log.v(Tools.LOG_TAG, "connection established");
+        roomNumbers.clear();  //clear the roomNumbers and room ArrayList as we have a new connection
+        rooms.clear();
         _currentRetryCount = 0;
         PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
         _packetListener = new PacketListener() {
