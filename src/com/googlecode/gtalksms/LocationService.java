@@ -7,6 +7,8 @@ package com.googlecode.gtalksms;
 
 import java.lang.reflect.Method;
 
+import com.googlecode.gtalksms.tools.Tools;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +21,7 @@ import android.provider.Settings;
 
 public class LocationService extends Service {
 
+    private SettingsManager _settingsManager = null;
     private LocationManager _locationManager = null;
     private LocationListener _locationListener = null;
     private Location _currentBestLocation = null;
@@ -35,6 +38,7 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        _settingsManager = new SettingsManager(this);
     }
 
     /*
@@ -63,8 +67,7 @@ public class LocationService extends Service {
         if (pNewGPSStatus == true) {
             allowedLocationProviders += "," + LocationManager.GPS_PROVIDER;
         }
-        Settings.System.putString(getContentResolver(),
-            Settings.System.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
+        Settings.System.putString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
         try {
             Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
             m.setAccessible(true);
@@ -81,10 +84,18 @@ public class LocationService extends Service {
      */
     public void sendLocationUpdate(Location location) {
         StringBuilder builder = new StringBuilder();
-        builder.append("http://maps.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude() + " (");
+        if (_settingsManager.useGoogleMap) {
+            builder.append("http://maps.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude() + Tools.LineSep);
+        }
+        if (_settingsManager.useOpenStreetMap) {
+            builder.append("http://www.openstreetmap.org/?mlat=" + location.getLatitude() + "&mlon=" + location.getLongitude() + "&zoom=14&layers=M" + Tools.LineSep);
+        }
         builder.append(getString(R.string.chat_geo_accuracy, location.getAccuracy()));
+        builder.append(Tools.LineSep);
         builder.append(getString(R.string.chat_geo_altitude, location.getAltitude()));
+        builder.append(Tools.LineSep);
         builder.append(getString(R.string.chat_geo_speed, location.getSpeed()));
+        builder.append(Tools.LineSep);
         builder.append(getString(R.string.chat_geo_provider, location.getProvider()));
         MainService.send(this, builder.toString());
     }

@@ -28,6 +28,10 @@ public class SettingsManager {
     public boolean formatChatResponses;
     public boolean showStatusIcon;
     
+    // geo location
+    public boolean useGoogleMap;
+    public boolean useOpenStreetMap;
+
     // ring
     public String ringtone = null;
 
@@ -90,6 +94,9 @@ public class SettingsManager {
         } else{
             login = notifiedAddress;
         }
+        
+        useGoogleMap = _sharedPreferences.getBoolean("useGoogleMapUrl", true);
+        useOpenStreetMap = _sharedPreferences.getBoolean("useOpenStreetMapUrl", false);
         
         showStatusIcon = _sharedPreferences.getBoolean("showStatusIcon", true);
         notifyApplicationConnection = _sharedPreferences.getBoolean("notifyApplicationConnection", true);

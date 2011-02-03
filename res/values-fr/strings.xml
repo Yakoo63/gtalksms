@@ -27,6 +27,11 @@
     <string name="pref_app_ringtone_help">Sonnerie pour la commande ring</string>
     <string name="pref_app_locale">Langue</string>
     <string name="pref_app_locale_help">Choisir la langue</string>
+    <string name="pref_app_geo_link_app">Application de localisation</string>
+    <string name="pref_app_geo_link_app_gmap">Google Map</string>
+    <string name="pref_app_geo_link_app_gmap_help">Utiliser Google Map pour localiser le téléphone</string>
+    <string name="pref_app_geo_link_app_openstreetmap">Open Street Map</string>
+    <string name="pref_app_geo_link_app_openstreetmap_help">Utiliser Open Street Map pour localiser le téléphone</string>
     <string name="pref_con">Connexion</string>
     <string name="pref_con_notified_address_cat">Adresse de notification</string>
     <string name="pref_con_notified_address">Adresse de notification</string>

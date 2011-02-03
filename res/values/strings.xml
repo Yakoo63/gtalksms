@@ -27,6 +27,11 @@
     <string name="pref_app_ringtone_help">Ringtone to use with the ring command</string>
     <string name="pref_app_locale">Choose the application localization</string>
     <string name="pref_app_locale_help">Localization</string>
+    <string name="pref_app_geo_link_app">Location map provider</string>
+    <string name="pref_app_geo_link_app_gmap">Google Map</string>
+    <string name="pref_app_geo_link_app_gmap_help">Use Google Map as location map provider</string>
+    <string name="pref_app_geo_link_app_openstreetmap">Open Street Map</string>
+    <string name="pref_app_geo_link_app_openstreetmap_help">Use Open Street Map as location map provider</string>
     <string name="pref_con">Connection settings</string>
     <string name="pref_con_notified_address_cat">Address to notify</string>
     <string name="pref_con_notified_address">Address to notify</string>
