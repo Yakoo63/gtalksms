@@ -15,11 +15,11 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(Tools.LOG_TAG, "NetworkConnectivityReceiver");
         // 'failover' due to another network stopping? 
         boolean failover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
         // Are we in a 'no connectivity' state?
         boolean connected = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+        Log.i(Tools.LOG_TAG, "NetworkConnectivityReceiver: connected=" + connected + ", failover=" + failover);
         NetworkInfo network = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
         
         SharedPreferences prefs = context.getSharedPreferences("GTalkSMS", 0);
@@ -36,7 +36,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
             serviceIntent.putExtra("force", true);
             serviceIntent.putExtra("disconnect", true);
             context.startService(serviceIntent);
-        } else if (MainService.IsRunning && !prefs.getBoolean("stopOnPowerDisconnected", false)) {
+        } else if (MainService.IsRunning) {
             // if no network, or if this is a "failover" notification 
             // (meaning the network we are connected to has stopped) 
             // and we are connected , we must disconnect.
