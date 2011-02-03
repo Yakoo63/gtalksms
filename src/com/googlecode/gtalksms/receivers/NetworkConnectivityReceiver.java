@@ -36,7 +36,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
             serviceIntent.putExtra("force", true);
             serviceIntent.putExtra("disconnect", true);
             context.startService(serviceIntent);
-        } else if (MainService.IsRunning && !prefs.getBoolean("stopOnWifiDisconnected", false)) {
+        } else if (MainService.IsRunning) {
             // if no network, or if this is a "failover" notification 
             // (meaning the network we are connected to has stopped) 
             // and we are connected , we must disconnect.
