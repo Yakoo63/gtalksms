@@ -28,6 +28,11 @@
     <string name="pref_app_locale">Sprache</string>
     <string name="pref_app_locale_help">Sprachumgebung der Anwendung festlegen</string>
     <string name="pref_con">Verbindungsoptionen</string>
+    <string name="pref_app_geo_link_app">Kartenlink für folgende Karten</string>
+    <string name="pref_app_geo_link_app_gmap">Google Maps</string>
+    <string name="pref_app_geo_link_app_gmap_help">Google Maps Link</string>
+    <string name="pref_app_geo_link_app_openstreetmap">Open Street Map</string>
+    <string name="pref_app_geo_link_app_openstreetmap_help">Open Street Map Link</string>
     <string name="pref_con_notified_address_cat">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address_help">Eigene GMail (oder XMPP JID) eingeben</string>
