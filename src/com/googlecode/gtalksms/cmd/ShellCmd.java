@@ -50,14 +50,22 @@ public class ShellCmd extends Command {
             _cmdResults.append(_currentCommand);
             _cmdResults.append(Tools.LineSep);
             
-            if (!askRootAccess()) {
-                _cmdResults.append(_context.getString(R.string.chat_error_root) + Tools.LineSep);
-            }
-    
+           
             Process myproc = null;
             
-            try {
-                myproc = Runtime.getRuntime().exec(new String[] {"/system/bin/sh", "-c", _currentCommand});
+            try { 
+                if (!askRootAccess()) {
+                    _cmdResults.append(_context.getString(R.string.chat_error_root) + Tools.LineSep);
+                    myproc = Runtime.getRuntime().exec(new String[] {"/system/bin/sh", "-c", _currentCommand});
+                } else {
+                    myproc = Runtime.getRuntime().exec("su");
+
+                    // Attempt to write a file to a root-only
+                    DataOutputStream os = new DataOutputStream(myproc.getOutputStream());
+                    os.writeBytes(_currentCommand + "\n");
+                    os.flush();
+                }
+    
                 readStream(myproc.getInputStream());
                 readStream(myproc.getErrorStream());
                 
