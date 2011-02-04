@@ -12,25 +12,15 @@ public class PhoneCallListener extends PhoneStateListener {
         super();
         _svc = svc;
     }
+
     private MainService _svc;
-    
-    static boolean _manageIncoming = true;
-    
+
     public void onCallStateChanged(int state, String incomingNumber) {
-        switch(state) {
-            case TelephonyManager.CALL_STATE_IDLE:
-                _manageIncoming = true;
-                break;
-            case TelephonyManager.CALL_STATE_OFFHOOK:
-                _manageIncoming = true;
-                break;
-            case TelephonyManager.CALL_STATE_RINGING:
-                if (_manageIncoming) {
-                    _manageIncoming = false;
-                    String contact = ContactsManager.getContactName(_svc, incomingNumber);
-                    _svc.send(_svc.getString(R.string.chat_is_calling, contact));
-                }
-                break;
+        switch (state) {
+        case TelephonyManager.CALL_STATE_RINGING:
+            String contact = ContactsManager.getContactName(_svc, incomingNumber);
+            _svc.send(_svc.getString(R.string.chat_is_calling, contact));
+            break;
         }
     }
 }
