@@ -16,11 +16,9 @@ public class PhoneCallListener extends PhoneStateListener {
     private MainService _svc;
 
     public void onCallStateChanged(int state, String incomingNumber) {
-        switch (state) {
-        case TelephonyManager.CALL_STATE_RINGING:
+        if (state == TelephonyManager.CALL_STATE_RINGING) {
             String contact = ContactsManager.getContactName(_svc, incomingNumber);
             _svc.send(_svc.getString(R.string.chat_is_calling, contact));
-            break;
         }
     }
 }
