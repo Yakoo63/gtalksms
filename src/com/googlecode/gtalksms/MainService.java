@@ -331,7 +331,12 @@ public class MainService extends Service {
         return _xmppMgr == null ? false : _xmppMgr.getTLSStatus();
     }
 
-
+    public void updateBuddies() {
+        if (_xmppMgr != null) {
+            _xmppMgr.retrieveFriendList();
+        }
+    }
+   
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with

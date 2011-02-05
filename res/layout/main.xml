@@ -26,10 +26,8 @@
                 android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight=".5"
                 android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/> 
     </LinearLayout>
-    <ScrollView android:id="@+id/ScrollView" android:layout_width="fill_parent" android:layout_height="fill_parent" 
-                android:layout_weight=".9">
-       <TextView android:id="@+id/Console" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
-    </ScrollView>
+    <ListView android:id="@+id/ListViewBuddies" android:layout_width="fill_parent" android:layout_height="fill_parent" 
+              android:layout_weight=".9" />
     <Button android:text="@string/main_but_donate" android:id="@+id/Donate"
                 android:layout_height="wrap_content" android:layout_width="fill_parent" /> 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+ 
+    <ImageView
+        android:id="@+id/buddyState"
+        android:layout_width="50px"
+        android:layout_height="50px"
+        android:scaleType="centerInside"
+        android:layout_gravity="center_vertical"
+        android:padding="5px"
+        />
+ 
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingLeft="10px"
+        android:layout_weight="1"
+        >
+ 
+        <TextView android:id="@+id/buddyName"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             android:textSize="16px"
+             android:textStyle="bold"
+             />
+ 
+        <TextView android:id="@+id/buddyStatus"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             />
+ 
+    </LinearLayout>
+ 
+</LinearLayout>
