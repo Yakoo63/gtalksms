@@ -12,7 +12,7 @@
     <string name="pref_app_stop_on_wifi_disconnected">WLAN getrennt</string>
     <string name="pref_app_stop_on_wifi_disconnected_help">Beendet  GTalkSMS automatisch wenn keine WLAN Verbindung existiert</string>
     <string name="pref_app_stop_on_power_disconnected">Wenn Ladegerät entfernt wird</string>
-    <string name="pref_app_stop_on_power_disconnected_help">Stop GTalkSMS wenn das Ladegerät entfernt wird</string>
+    <string name="pref_app_stop_on_power_disconnected_help">Beendet GTalkSMS wenn das Ladegerät entfernt wird</string>
     <string name="pref_app_show_status_icon">Zeige Icon</string>
     <string name="pref_app_show_status_icon_help">Zeigt das GTalkSMS Status Icon im Benachrichtigungsbalken an</string>
     <string name="pref_app_format_responses">Formatiere Chat Nachrichten</string>
