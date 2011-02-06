@@ -123,7 +123,6 @@ public class MainScreen extends Activity {
                     XmppFriend.UserStateType stateType = XmppFriend.UserStateType.valueOf(state);
                     state = getStateImg(stateType);
 
-
                     boolean exist = false;
                     for (HashMap<String, String> map : _friends) {
                         if (map.get("userid").equals(userId)) {
@@ -133,8 +132,10 @@ public class MainScreen extends Activity {
                                 
                                 for (String key : map.keySet()) {
                                     if (key.startsWith("location_")) {
-                                        state = getStateImg(XmppFriend.UserStateType.valueOf(map.get(key)));
-                                        break;
+                                        try {
+                                            state = getStateImg(XmppFriend.UserStateType.valueOf(map.get(key)));
+                                            break; 
+                                        } catch (Exception e) {}
                                     }
                                 }
                             } else if (userFullId != null) {
@@ -286,7 +287,10 @@ public class MainScreen extends Activity {
         Collections.sort(_friends, new Comparator<HashMap<String, String>> () {
             @Override
             public int compare(HashMap<String, String> object1, HashMap<String, String> object2) {
-                return object1.get("name").compareTo(object2.get("name"));
+                if (object1.get("name") != null && object2.get("name") != null) {
+                    return object1.get("name").compareTo(object2.get("name"));
+                }
+                return object1.get("userid").compareTo(object2.get("userid"));
             }});
         
         

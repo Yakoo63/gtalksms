@@ -1,38 +1,22 @@
 package com.googlecode.gtalksms;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.GroupChatInvitation;
 import org.jivesoftware.smackx.PrivateDataManager;
 import org.jivesoftware.smackx.XHTMLManager;
-import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
-import org.jivesoftware.smackx.packet.DelayInformation;
 import org.jivesoftware.smackx.packet.LastActivity;
 import org.jivesoftware.smackx.packet.OfflineMessageInfo;
 import org.jivesoftware.smackx.packet.OfflineMessageRequest;
@@ -63,8 +47,11 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XHTMLExtensionProvider;
+import com.googlecode.gtalksms.xmpp.XmppBuddies;
+import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppFriend;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
+import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class XmppManager {
 
@@ -91,6 +78,9 @@ public class XmppManager {
     private PacketListener _packetListener = null;
     private ConnectionListener _connectionListener = null;
     private long _myThreadId = 0;
+    private XmppMuc _xmppMuc;
+    private XmppBuddies _xmppBuddies;
+    private XmppFileManager _xmppFileMgr;
     
     // Our current retry attempt, plus a runnable and handler to implement retry
     private int _currentRetryCount = 0;
@@ -113,6 +103,17 @@ public class XmppManager {
         _settings = settings;
         _context = context;
         configure(ProviderManager.getInstance());
+        _xmppBuddies = new XmppBuddies(context, settings);
+        _xmppFileMgr = new XmppFileManager(context, settings) {
+            @Override protected void send(String msg) {
+                XmppManager.this.send(msg);
+            }
+        };
+        _xmppMuc = new XmppMuc(context, settings) {
+            @Override protected void send(String msg) {
+                XmppManager.this.send(msg);
+            }
+        };
     }
 
     public void start() {
@@ -255,7 +256,11 @@ public class XmppManager {
             return;
         }
 
-        XMPPConnection connection = new XMPPConnection(new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName));
+        ConnectionConfiguration conf = new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName);
+        conf.setTruststorePath("/system/etc/security/cacerts.bks");
+        conf.setTruststorePassword("changeit");
+        conf.setTruststoreType("bks");
+        XMPPConnection connection = new XMPPConnection(conf);
         try {
             connection.connect();
         } catch (Exception e) {
@@ -329,8 +334,11 @@ public class XmppManager {
 
     private void onConnectionComplete() {
         Log.v(Tools.LOG_TAG, "connection established");
-        roomNumbers.clear();  //clear the roomNumbers and room ArrayList as we have a new connection
-        rooms.clear();
+        
+        _xmppMuc.initialize(_connection);
+        _xmppBuddies.initialize(_connection);
+        _xmppFileMgr.initialize(_connection);
+               
         _currentRetryCount = 0;
         PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
         _packetListener = new PacketListener() {
@@ -362,37 +370,9 @@ public class XmppManager {
         presence.setPriority(24);                   
         _connection.sendPacket(presence);
         
-        _connection.getRoster().addRosterListener(new RosterListener() {
-
-            @Override
-            public void entriesAdded(Collection<String> addresses) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void entriesDeleted(Collection<String> addresses) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void entriesUpdated(Collection<String> addresses) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void presenceChanged(Presence presence) {
-                Intent intent = new Intent(ACTION_PRESENCE_CHANGED);
-                intent.putExtra("userid", StringUtils.parseBareAddress(presence.getFrom()));
-                intent.putExtra("fullid", presence.getFrom());
-                intent.putExtra("state", retrieveState(presence.getMode(), presence.isAvailable()).toString());
-                intent.putExtra("status", presence.getStatus());
-                _context.sendBroadcast(intent);
-            }
-            
-        });
+        _connection.getRoster().addRosterListener(_xmppBuddies);
         _connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
-        
-        retrieveFriendList();
+        _xmppBuddies.retrieveFriendList();
     }
     
     /** returns true if the service is correctly connected */
@@ -445,109 +425,20 @@ public class XmppManager {
         }
     }
     
-    public void addFriend(String userID) {
-        Roster roster = null;
-        String nickname = null;
-
-        nickname = StringUtils.parseBareAddress(userID);
-
-        roster = _connection.getRoster();
-        if (!roster.contains(userID)) {
-            try {
-                roster.createEntry(userID, nickname, null);
-            } catch (XMPPException e) {
-                System.err.println("Error in adding friend");
-            }
-        }
-
-        return;
-    }
-    
     public ArrayList<XmppFriend> retrieveFriendList() {
-        
-        ArrayList<XmppFriend> friends = new ArrayList<XmppFriend>();
-
-        if (_connection == null) {
-            return friends;
-        }
-        
-        String userID = null;
-        String status = null;
-        Roster roster = _connection.getRoster();
-
-        for (RosterEntry r : roster.getEntries()) {
-            userID = r.getUser();
-            status = retrieveStatus(userID);
-            friends.add(new XmppFriend(userID, r.getName(), status, retrieveState(userID)));
-        }
-
-        sendFriendList(friends);
-        
-        return friends;
+        return _xmppBuddies.retrieveFriendList();
     }
     
-    public void sendFriendList(ArrayList<XmppFriend> list) {
-        
-        for (XmppFriend xmppFriend : list) {
-            Intent intent = new Intent(ACTION_PRESENCE_CHANGED);
-            intent.putExtra("userid", xmppFriend.id);
-            intent.putExtra("name", xmppFriend.name == null ? xmppFriend.id : xmppFriend.name);
-            intent.putExtra("status", xmppFriend.status);
-            intent.putExtra("state", xmppFriend.state.toString());
-            _context.sendBroadcast(intent);
-        }
+    public void writeRoom(String number, String sender, String message) {
+        _xmppMuc.writeRoom(number, sender, message);
     }
-
-    public String retrieveStatus(String userID) {
-        String userStatus = ""; // default return value
-
-        try {
-            userStatus = _connection.getRoster().getPresence(userID).getStatus();
-        } catch (NullPointerException e) {
-            System.err.println("Invalid connection or user in retrieveStatus()");
-            userStatus = "";
-        }
-
-        // Server may set their status to null; we want empty string
-        if (userStatus == null) {
-            userStatus = "";
-        }
-
-        return userStatus;
+    
+    public void sendFile(String path) {
+        _xmppFileMgr.sendFile(path);
     }
-
-    public XmppFriend.UserStateType retrieveState(String userID) {
-        XmppFriend.UserStateType userState = XmppFriend.UserStateType.OFFLINE; // default return value
-        Presence userFromServer = null;
-
-        try {
-            userFromServer = _connection.getRoster().getPresence(userID);
-            userState = retrieveState(userFromServer.getMode(), userFromServer.isAvailable());
-        } catch (NullPointerException e) {
-            System.err.println("Invalid connection or user in retrieveState()");
-            userState = XmppFriend.UserStateType.OFFLINE;
-        }
-
-        return userState;
-    }
-
-    public XmppFriend.UserStateType retrieveState(Mode userMode, boolean isOnline) {
-        XmppFriend.UserStateType userState = XmppFriend.UserStateType.OFFLINE; // default return value
-        
-        if (userMode == Mode.dnd) {
-            userState = XmppFriend.UserStateType.BUSY;
-        } else if (userMode == Mode.away
-                || userMode == Mode.xa) {
-            userState = XmppFriend.UserStateType.AWAY;
-        } else if (isOnline) {
-            userState = XmppFriend.UserStateType.ONLINE;
-        }
-
-        return userState;
-    }
+    
 
     public void configure(ProviderManager pm) {
-        
         //  Private Data Storage
         pm.addIQProvider("query","jabber:iq:private", new PrivateDataManager.PrivateDataIQProvider());
  
@@ -555,7 +446,7 @@ public class XmppManager {
         try {
             pm.addIQProvider("query","jabber:iq:time", Class.forName("org.jivesoftware.smackx.packet.Time"));
         } catch (ClassNotFoundException e) {
-            Log.w("TestClient", "Can't load class for org.jivesoftware.smackx.packet.Time");
+            Log.w(Tools.LOG_TAG, "Can't load class for org.jivesoftware.smackx.packet.Time");
         }
  
         //  XHTML
@@ -571,6 +462,13 @@ public class XmppManager {
         pm.addExtensionProvider("paused","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
         pm.addExtensionProvider("inactive","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
         pm.addExtensionProvider("gone","http://jabber.org/protocol/chatstates", new ChatStateExtension.Provider());
+        
+        //   FileTransfer
+        pm.addIQProvider("si","http://jabber.org/protocol/si", new StreamInitiationProvider());
+        pm.addIQProvider("query","http://jabber.org/protocol/bytestreams", new BytestreamsProvider());
+        pm.addIQProvider("open","http://jabber.org/protocol/ibb", new IBBProviders.Open());
+        pm.addIQProvider("close","http://jabber.org/protocol/ibb", new IBBProviders.Close());
+        pm.addExtensionProvider("data","http://jabber.org/protocol/ibb", new IBBProviders.Data());
         
         //  Group Chat Invitations
         pm.addExtensionProvider("x","jabber:x:conference", new GroupChatInvitation.Provider());
@@ -592,7 +490,7 @@ public class XmppManager {
         try {
             pm.addIQProvider("query","jabber:iq:version", Class.forName("org.jivesoftware.smackx.packet.Version"));
         } catch (ClassNotFoundException e) {
-            //  Not sure what's happening here.
+            Log.w(Tools.LOG_TAG, "Can't load class for org.jivesoftware.smackx.packet.Version");
         }
         //  VCard
         pm.addIQProvider("vCard","vcard-temp", new VCardProvider());
@@ -608,154 +506,6 @@ public class XmppManager {
         pm.addIQProvider("sharedgroup","http://www.jivesoftware.org/protocol/sharedgroup", new SharedGroupsInfo.Provider());
         //  JEP-33: Extended Stanza Addressing
         pm.addExtensionProvider("addresses","http://jabber.org/protocol/address", new MultipleAddressesProvider());
-        //   FileTransfer
-        pm.addIQProvider("si","http://jabber.org/protocol/si", new StreamInitiationProvider());
-        pm.addIQProvider("query","http://jabber.org/protocol/bytestreams", new BytestreamsProvider());
-        pm.addIQProvider("open","http://jabber.org/protocol/ibb", new IBBProviders.Open());
-        pm.addIQProvider("close","http://jabber.org/protocol/ibb", new IBBProviders.Close());
-        pm.addExtensionProvider("data","http://jabber.org/protocol/ibb", new IBBProviders.Data());
-    }
-
-    // Chat rooms source code
-    Map<String, MultiUserChat> rooms = new HashMap<String, MultiUserChat>();
-    Set<Integer> roomNumbers = new HashSet<Integer>();
-    
-    public void writeRoom(String number, String sender, String message) {
-        String room = sender + " (" + number + ")";
-        try {
-            MultiUserChat muc;
-            if (!rooms.containsKey(room)) {
-                muc = createRoom(number, room, sender);
-                
-                if (muc != null) {
-                    rooms.put(room, muc);
-                }
-                
-            } else {
-                muc = rooms.get(room);
-                
-                // TODO: test if occupants content sender (in case we invite other people)
-                if (muc != null && muc.getOccupantsCount() < 2) {
-                    muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
-                }
-            }
-            
-            if (muc != null) {
-                muc.sendMessage(message);
-            }
-        } catch (Exception ex) {
-            Log.e(Tools.LOG_TAG, "writeRoom: room = " + room, ex);
-        }
-    }
-    
-    public MultiUserChat createRoom(String number, String room, String sender) {
-        
-        MultiUserChat multiUserChat = null;
-        boolean passwordMode = false;
-        Integer randomInt;
-        
-        do {
-            randomInt = (new Random()).nextInt();
-        } while (roomNumbers.contains(randomInt));
-        roomNumbers.add(randomInt);
-        
-        // With "@conference.jabber.org" messages are sent several times... Jwchat seems to work fine and is the default
-        String cnx = "GTalkSMS_" + randomInt + "_" + _settings.login.replaceAll("@", "_") 
-            + "@" + _settings.mucServer; 
-        try {
-            // Create the room
-            multiUserChat = new MultiUserChat(_connection, cnx);
-            multiUserChat.create(room);
-                
-            try {
-                // Since this is a private room, make the room not public and set user as owner of the room.
-                Form submitForm = multiUserChat.getConfigurationForm().createAnswerForm();
-                submitForm.setAnswer("muc#roomconfig_publicroom", false);
-                submitForm.setAnswer("muc#roomconfig_roomname", room);
-
-                    
-                try {
-                    List<String> owners = new ArrayList<String>();
-                    owners.add(_settings.login);
-                    owners.add(_settings.notifiedAddress);
-                    submitForm.setAnswer("muc#roomconfig_roomowners", owners);
-                    //submitForm.setAnswer("muc#roomconfig_roomadmins", owners);  //throws exception (at least on my server)
-                }
-                catch (Exception ex) {
-                    Log.e(Tools.LOG_TAG, "Unable to configure room owners. Falling back to room passwords", ex);
-                    submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
-                    submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomsPassword);
-                    passwordMode = true;
-                }
-                    
-                if (!passwordMode) {
-                 	submitForm.setAnswer("muc#roomconfig_membersonly", true);
-                }
-                                    
-                multiUserChat.sendConfigurationForm(submitForm);
-            }
-            catch (XMPPException e1) {
-                Log.e(Tools.LOG_TAG, "Unable to send conference room configuration form.", e1);
-                send(_context.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
-                return null; //then we also should not send an invite as the room will be locked
-            }
-               
-            multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
-
-            ChatPacketListener chatListener = new ChatPacketListener(number, multiUserChat);
-            multiUserChat.addMessageListener(chatListener);
-        } catch (Exception ex) {
-            Log.e(Tools.LOG_TAG, "createRoom() - Error creating room: " + room, ex);
-            send(_context.getString(R.string.chat_sms_muc_error, ex.getMessage()));
-            return null;
-        }
-        return multiUserChat;
-    }
-    
-    class ChatPacketListener implements PacketListener {
-        private String _number;
-        private Date _lastDate;
-        private MultiUserChat _muc;
-        
-        public ChatPacketListener(String number, MultiUserChat muc) {
-            _number = number;
-            _lastDate = new Date(0);
-            _muc = muc;
-        }
-        
-        @Override
-        public void processPacket(Packet packet) {
-            Message message = (Message) packet;
-            String from = message.getFrom();
-        
-            Log.d(Tools.LOG_TAG, "Xmpp chat room packet received");
-            
-            if (!from.contains(_number)) {
-                if (message.getBody() != null) {
-                    DelayInformation inf = (DelayInformation)message.getExtension("x", "jabber:x:delay");
-                    Date sentDate;
-                    if (inf != null) {
-                        sentDate = inf.getStamp();
-                    } else {
-                        sentDate = new Date();
-                    }
-                    
-                    if (sentDate.compareTo(_lastDate) > 0 ) {
-                        Intent intent = new Intent(ACTION_MESSAGE_RECEIVED);
-                        if(_muc.getOccupantsCount() > 2) {
-                        	intent.putExtra("message", "sms:" + _number + ":" + from + ": " + message.getBody());
-                        } else {
-                        	intent.putExtra("message", "sms:" + _number + ":" + message.getBody());
-                        }
-                        
-                        _context.sendBroadcast(intent);
-                        _lastDate = sentDate;
-                    } else {
-                        Log.w(Tools.LOG_TAG, "Receive old message: date=" + sentDate.toLocaleString() + " ; message=" + message.getBody());
-                    }
-                }
-            }
-        }
     }
     
 }
