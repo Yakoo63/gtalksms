@@ -27,6 +27,7 @@ import com.googlecode.gtalksms.cmd.CallCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
 import com.googlecode.gtalksms.cmd.Command;
 import com.googlecode.gtalksms.cmd.ContactCmd;
+import com.googlecode.gtalksms.cmd.FileCmd;
 import com.googlecode.gtalksms.cmd.GeoCmd;
 import com.googlecode.gtalksms.cmd.HelpCmd;
 import com.googlecode.gtalksms.cmd.KeyboardCmd;
@@ -579,6 +580,12 @@ public class MainService extends Service {
         }
     }
 
+    public void sendFile(String fileName) {
+        if (_xmppMgr != null) {
+            _xmppMgr.sendFile(fileName);
+        }
+    }
+    
     public SettingsManager getSettingsManager() {
         return _settingsMgr;
     }
@@ -646,6 +653,7 @@ public class MainService extends Service {
         registerCommand(new ShellCmd(this), "cmd");
         registerCommand(new UrlsCmd(this), "http", "https");
         registerCommand(new RingCmd(this), "ring", "ringmode");
+        registerCommand(new FileCmd(this), "send");
         registerCommand(new SmsCmd(this), "sms", "reply", "findsms", "fs", "markasread", "mar");
     }
     

@@ -60,10 +60,10 @@ public class ShellCmd extends Command {
                 } else {
                     myproc = Runtime.getRuntime().exec("su");
 
-                    // Attempt to write a file to a root-only
                     DataOutputStream os = new DataOutputStream(myproc.getOutputStream());
                     os.writeBytes(_currentCommand + "\n");
                     os.flush();
+                    os.close();
                 }
     
                 readStream(myproc.getInputStream());
