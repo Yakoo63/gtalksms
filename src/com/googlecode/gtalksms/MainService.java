@@ -662,9 +662,9 @@ public class MainService extends Service {
         }
     }
     
-    private void registerCommand(Command cmd, Object... cmdNames) {
-        for (Object name : cmdNames) {
-            _commands.put((String)name, cmd);
+    private void registerCommand(Command cmd, String... cmdNames) {
+        for (String name : cmdNames) {
+            _commands.put(name, cmd);
         }
     }
 

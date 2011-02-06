@@ -12,7 +12,7 @@
     <string name="pref_app_stop_on_wifi_disconnected">WLAN getrennt</string>
     <string name="pref_app_stop_on_wifi_disconnected_help">Beendet  GTalkSMS automatisch wenn keine WLAN Verbindung existiert</string>
     <string name="pref_app_stop_on_power_disconnected">Wenn Ladegerät entfernt wird</string>
-    <string name="pref_app_stop_on_power_disconnected_help">Stop GTalkSMS wenn das Ladegerät entfernt wird</string>
+    <string name="pref_app_stop_on_power_disconnected_help">Beendet GTalkSMS wenn das Ladegerät entfernt wird</string>
     <string name="pref_app_show_status_icon">Zeige Icon</string>
     <string name="pref_app_show_status_icon_help">Zeigt das GTalkSMS Status Icon im Benachrichtigungsbalken an</string>
     <string name="pref_app_format_responses">Formatiere Chat Nachrichten</string>
@@ -108,7 +108,7 @@
     <string name="chat_reply_contact">Nachrichten gehen an %s</string>
     <string name="chat_start_locating">Telefon wird lokalisiert</string>
     <string name="chat_start_ringing">Telefon klingelt</string>
-    <string name="chat_error_ringing">Fehler bei Wiedergabe des Klingeltons - bitte anderen Klingelton wählen</string>
+    <string name="chat_error_ringing">Fehler bei Wiedergabe des Klingeltons - Klingelton lautlos/stumm, nicht verfügbar oder Lautstärke auf 0 gesetzt</string>
     <string name="chat_stop_actions">Beende alle ausstehenden Aktionen</string>
     <string name="chat_send_sms">Sende SMS an %s</string>
     <string name="chat_specify_details">Bitte genauere Kontaktinformationen angeben:</string>

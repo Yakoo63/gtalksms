@@ -37,11 +37,12 @@ public class RingCmd extends Command {
                 volume = 100;
             }
             
-            send(getString(R.string.chat_start_ringing));
-            if (!ring(volume)) {
+            if (ring(volume)) {
+                send(getString(R.string.chat_start_ringing));
+            } else {
                 send(getString(R.string.chat_error_ringing));
             }
-        } else {
+        } else { //command "ringmode" given
             int mode;
             if (args.equals("vibrate")) {
                 _audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
@@ -69,7 +70,12 @@ public class RingCmd extends Command {
         }
     }
     
-    /** makes the phone ring */
+    /**
+     * Makes the phone ring
+     * 
+     * @param volume from [0-100] where 0 means vibration mode
+     * @return true is phone is able to ring, otherwise false
+     */
     public boolean ring(float volume) {
         boolean res = false;
         if (volume > 0) {
@@ -88,10 +94,9 @@ public class RingCmd extends Command {
                 _mediaPlayer.setVolume(volume / 100, volume / 100);
                 if (!_mediaPlayer.isPlaying()) {
                     _mediaPlayer.start();
-                }
-                
+                }                         
                 res = true;
-            }
+            } 
         } else {
             _vibrator.vibrate(_pattern, 0);
             res = true;
@@ -103,6 +108,10 @@ public class RingCmd extends Command {
     public void initMediaPlayer() {
         _canRing = true;
         Uri alert = Uri.parse(_settingsMgr.ringtone);
+        if(alert.toString().equals("")) { //if URI is empty string user has set ringtone to "no sound"/"silent"
+            _canRing = false;
+            return;
+        }
         _mediaPlayer = new MediaPlayer();
         try {
             _mediaPlayer.setDataSource(_context, alert);

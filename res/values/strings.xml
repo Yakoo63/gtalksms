@@ -108,7 +108,7 @@
     <string name="chat_reply_contact">Reply contact is %s</string>
     <string name="chat_start_locating">Start locating phone</string>
     <string name="chat_start_ringing">Ringing phone</string>
-    <string name="chat_error_ringing">Unable to ring, change the ringtone in the options</string>
+    <string name="chat_error_ringing">Unable to ring. Check if ringtone is not set to silent and accessible or that the alarm volume is set.</string>
     <string name="chat_stop_actions">Stopping ongoing actions</string>
     <string name="chat_send_sms">Sending SMS to %s</string>
     <string name="chat_specify_details">Specify more details:</string>
