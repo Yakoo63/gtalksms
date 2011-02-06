@@ -108,7 +108,7 @@
     <string name="chat_reply_contact">Nachrichten gehen an %s</string>
     <string name="chat_start_locating">Telefon wird lokalisiert</string>
     <string name="chat_start_ringing">Telefon klingelt</string>
-    <string name="chat_error_ringing">Fehler bei Wiedergabe des Klingeltons - bitte anderen Klingelton wählen</string>
+    <string name="chat_error_ringing">Fehler bei Wiedergabe des Klingeltons - Klingelton lautlos/stumm, nicht verfügbar oder Lautstärke auf 0 gesetzt</string>
     <string name="chat_stop_actions">Beende alle ausstehenden Aktionen</string>
     <string name="chat_send_sms">Sende SMS an %s</string>
     <string name="chat_specify_details">Bitte genauere Kontaktinformationen angeben:</string>

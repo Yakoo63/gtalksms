@@ -37,6 +37,16 @@ public abstract class Command {
      * @param args substring after the first ":" 
      */
     public abstract void execute(String cmd, String args);
+    
+    /**
+     * Stop all ongoing actions caused by a command
+     * gets called in mainService when "stop" command recieved
+     */
     public void stop() {}
+    
+    /**
+     * Cleans up the structures holden by the Command Class
+     * Usually issued on exit of GtalkSMS
+     */
     public void cleanUp() {}
 }
