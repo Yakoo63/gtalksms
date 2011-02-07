@@ -15,6 +15,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.GroupChatInvitation;
 import org.jivesoftware.smackx.PrivateDataManager;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
 import org.jivesoftware.smackx.packet.LastActivity;
@@ -337,7 +338,6 @@ public class XmppManager {
         
         _xmppMuc.initialize(_connection);
         _xmppBuddies.initialize(_connection);
-        _xmppFileMgr.initialize(_connection);
                
         _currentRetryCount = 0;
         PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
@@ -373,6 +373,9 @@ public class XmppManager {
         _connection.getRoster().addRosterListener(_xmppBuddies);
         _connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
         _xmppBuddies.retrieveFriendList();
+        
+        new ServiceDiscoveryManager(_connection);
+        _xmppFileMgr.initialize(_connection);
     }
     
     /** returns true if the service is correctly connected */

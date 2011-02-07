@@ -110,7 +110,6 @@ public class SmsCmd extends Command {
                 }
             };
             mainService.registerReceiver(_sentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
-
         }
 
         if (_settingsMgr.notifySmsDelivered) {
@@ -159,7 +158,6 @@ public class SmsCmd extends Command {
                 }
             };
             mainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
-
         }
     }
 
@@ -210,10 +208,59 @@ public class SmsCmd extends Command {
             } else {
                 markSmsAsRead(_lastRecipient);
             }
+        } else if (command.equals("delsms")) {
+            if (args.length() == 0) {
+                send("Syntax is:\ndelsms:contact:[contact]\ndelsms:sent\ndelsms:all");
+            } else {
+                int separatorPos = args.indexOf(":");
+                String subCommand = null;
+                String search = null;
+                if (-1 != separatorPos) {
+                    subCommand = args.substring(0, separatorPos);
+                    search = args.substring(separatorPos + 1);
+                } else if (args.length() > 0) {
+                    subCommand = args;
+                }
+                deleteSMS(subCommand, search);
+            }
         }
-
     }
 
+    /** delete SMS */
+    private void deleteSMS(String cmd, String search) {
+        
+        int nbDeleted = -2;
+        if (cmd.equals("all")) {
+            nbDeleted = _smsMgr.deleteAllSms();
+        } else if (cmd.equals("sent")) {
+            nbDeleted = _smsMgr.deleteSentSms();
+        } else if (cmd.equals("contact") && search != null) {
+            ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(_context, search);
+            if (contacts.size() > 1) {
+                StringBuilder sb = new StringBuilder(getString(R.string.chat_specify_details));
+                sb.append(Tools.LineSep);
+                for (Contact contact : contacts) {
+                    sb.append(contact.name);
+                    sb.append(Tools.LineSep);
+                }
+                send(sb.toString());
+            } else if (contacts.size() == 1) {
+                Contact contact = contacts.get(0);
+                send("Deleting SMS from " + contact.name + ".");
+                nbDeleted = _smsMgr.deleteSmsByContact(contact.rawIds);
+            } else {
+                send(getString(R.string.chat_no_match_for, search));
+            }
+        } else {
+            send("Syntax is:\ndelsms:contact:[contact]\ndelsms:sent\ndelsms:all");
+        }
+        
+        if (nbDeleted >= 0) {
+            send(nbDeleted + " SMS deleted.");
+        } else if (nbDeleted == -1) {
+            send("Can't delete SMS.");
+        }
+    }
     
     /** search SMS */
     private void searchSMS(String message, String contactName) {

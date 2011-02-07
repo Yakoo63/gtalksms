@@ -1,6 +1,8 @@
 package com.googlecode.gtalksms.data.sms;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -128,6 +130,7 @@ public class SmsMmsManager {
            
             ContentValues values = new ContentValues();
             values.put("read", "1");
+            
             cr.update(smsUri, values, " address='" + smsNumber + "'", null);
         } catch (Exception e) {
             Log.i("exception in setRead:", e.getMessage());
@@ -142,4 +145,71 @@ public class SmsMmsManager {
         values.put("body", message);
         _context.getContentResolver().insert(Uri.parse("content://sms/sent"), values);
     }
+
+    public int deleteAllSms() {
+        return deleteSms("content://sms", null);
+    }
+
+    public int deleteSentSms() {
+        return deleteSms("content://sms/sent", null);
+    }
+    
+    public int deleteSmsByContact(ArrayList<Long> rawIds) {
+        int result = -1;
+        if (rawIds.size() > 0) {
+            return deleteThreads("content://sms/inbox", "person IN (" + TextUtils.join(", ", rawIds) + ")");
+        }
+        return result;
+    }
+    
+    private int deleteThreads(String url, String where) {
+        int result = 0;
+
+        ContentResolver cr = _context.getContentResolver();
+        Uri deleteUri = Uri.parse(url);
+        Cursor c = cr.query(deleteUri, new String[] { "thread_id" }, where, null, null);
+        try {
+            Set<String> threads = new HashSet<String>();
+            
+            while (c.moveToNext()) {
+                threads.add(c.getString(0));
+            }
+            
+            for (String thread : threads) {
+                // Delete the SMS
+                String uri = "content://sms/conversations/" + thread;
+                result += cr.delete(Uri.parse(uri), null, null);
+            }
+        } catch (Exception e) {
+            Log.e(Tools.LOG_TAG, "exception in deleteSms:", e);
+            if (result == 0) {
+                result = -1;
+            }
+        }
+
+        return result;
+    }
+
+    private int deleteSms(String url, String where) {
+        int result = 0;
+
+        ContentResolver cr = _context.getContentResolver();
+        Uri deleteUri = Uri.parse(url);
+        Cursor c = cr.query(deleteUri, new String[] { "_id" }, where, null, null);
+        try {
+            while (c.moveToNext()) {
+                // Delete the SMS
+                String uri = "content://sms/" + c.getString(0);
+                result += cr.delete(Uri.parse(uri), null, null);
+            }
+        } catch (Exception e) {
+            Log.e(Tools.LOG_TAG, "exception in deleteSms:", e);
+            if (result == 0) {
+                result = -1;
+            }
+        }
+
+        return result;
+    }
+
 }

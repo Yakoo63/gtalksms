@@ -654,7 +654,7 @@ public class MainService extends Service {
         registerCommand(new UrlsCmd(this), "http", "https");
         registerCommand(new RingCmd(this), "ring", "ringmode");
         registerCommand(new FileCmd(this), "send");
-        registerCommand(new SmsCmd(this), "sms", "reply", "findsms", "fs", "markasread", "mar");
+        registerCommand(new SmsCmd(this), "sms", "reply", "findsms", "fs", "markasread", "mar", "delsms");
     }
     
     private void cleanupCommands() {

@@ -3,7 +3,6 @@ package com.googlecode.gtalksms.xmpp;
 import java.io.File;
 
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
@@ -29,7 +28,6 @@ public abstract class XmppFileManager implements FileTransferListener {
     
     public void initialize(XMPPConnection connection) {
         _connection = connection;
-        new ServiceDiscoveryManager(_connection);
         
         _fileTransferManager = new FileTransferManager(_connection);
         _fileTransferManager.addFileTransferListener(this);
@@ -94,7 +92,7 @@ public abstract class XmppFileManager implements FileTransferListener {
             }
         } catch (Exception ex) {
             String message = "Cannot receive the file because an error occured during the process." 
-                + Tools.LineSep + ex.getMessage();
+                + Tools.LineSep + ex;
             Log.e(Tools.LOG_TAG, message, ex);
             send(message);
         }
