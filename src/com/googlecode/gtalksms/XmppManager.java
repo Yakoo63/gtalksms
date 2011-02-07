@@ -406,8 +406,10 @@ public class XmppManager {
             } else {
                 msg.setBody(message.generateTxt());
             }
-//            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) {
-                XHTMLManager.addBody(msg, message.generateXhtml());
+//            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) {  //TODO does not work. jid with presence? asmack problem?
+                String xhtmlBody = message.generateXHTMLText().toString();
+                xhtmlBody = xhtmlBody.replace("<br>", "<br/>");  //fix for smackx problem
+                XHTMLManager.addBody(msg, xhtmlBody);
 //            }
 
             _connection.sendPacket(msg);

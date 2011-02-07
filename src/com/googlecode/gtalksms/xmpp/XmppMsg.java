@@ -2,9 +2,10 @@ package com.googlecode.gtalksms.xmpp;
 
 import java.util.ArrayList;
 
+import org.jivesoftware.smackx.XHTMLText;
+
 import android.util.Log;
 
-import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMsg {
@@ -98,28 +99,79 @@ public class XmppMsg {
                     .replaceAll(ItalicBegin, " _")
                     .replaceAll(ItalicEnd, "_ ");
     }
-
-    public String generateXhtml() {
-        // TODO add parameters to configure default XHTML layout: font color style size...
-        
-        String msg = StringFmt.encodeHTML(_message.toString())
-                    .replaceAll("\n", "<br/>\n")
-                    .replaceAll(BoldBegin, "<strong>")
-                    .replaceAll(BoldEnd, "</strong>")
-                    .replaceAll(ItalicBegin, "<em>")
-                    .replaceAll(ItalicEnd, "</em>");
-        
+    
+    public XHTMLText generateXHTMLText() {
+        int pos;
+        StringBuilder m = new StringBuilder(_message.toString()); 
         ArrayList<XmppFont> fonts = new ArrayList<XmppFont>(_fonts);
-        while (msg.contains(FontBegin)) {
+        
+        XHTMLText x = new XHTMLText(null, null);
+        x.appendOpenParagraphTag("font-family:" + _mainFont._font); // open a paragraph with default font - which is currently null - is ok clients will fall back to their default font
+        x.appendOpenSpanTag("");  // needed because we close span on fontbegin
+        while((pos = getTagPos(m)) != -1) {
+            procesTagAt(pos, x, m, fonts);
+        }
+        if(m.length() != 0) 
+            x.append(m.toString());
+        x.appendCloseSpanTag();
+        x.appendCloseParagraphTag();
+        return x;
+        
+    }
+    /**
+     * Returns the smallest indexposition of a internal string format tag
+     * @param msg
+     * @return smallest indexposition, -1 if no more tags were found
+     */
+    private static int getTagPos(StringBuilder msg) {
+        int newline = msg.indexOf("\n");
+        int boldbeg = msg.indexOf(BoldBegin);
+        int boldend = msg.indexOf(BoldEnd);
+        int italbeg = msg.indexOf(ItalicBegin);
+        int italend = msg.indexOf(ItalicEnd);
+        int fontbeg = msg.indexOf(FontBegin);  //there is no font end tag, so just treat every fontbegin as the end of the previous font
+        
+        //if all int's are -1 we found no tag
+        if(-1 == newline && -1 == boldbeg && -1 == boldend && -1 == italbeg && -1 == italend && -1 == fontbeg) {
+            return -1;
+        } else {
+            return Tools.getMinNonNeg(newline, boldbeg, boldend, italbeg, italend, fontbeg);
+        }
+    }
+    
+    private static void procesTagAt(int i, XHTMLText x, StringBuilder msg, ArrayList<XmppFont> fonts) {
+        String s = msg.substring(0, i);
+        msg.delete(0, i);
+        x.append(s);
+        if (msg.indexOf("\n") == 0) {                   // newline
+            x.appendBrTag();                            // smack appends "<br>" where the XEP-71 postulates "<br/>" 
+            msg.delete(0, "\n".length());               //  we fix this in XmppManager
+        } else if (msg.indexOf(BoldBegin) == 0) {       // bold
+            x.appendOpenSpanTag("font-weight:bold");
+            msg.delete(0, BoldBegin.length());
+        } else if (msg.indexOf(BoldEnd) == 0) {
+            x.appendCloseSpanTag();
+            msg.delete(0, BoldEnd.length());
+        } else if (msg.indexOf(ItalicBegin) == 0) {     // italic
+            x.appendOpenSpanTag("font-style:italic");
+            msg.delete(0, ItalicBegin.length());
+        } else if (msg.indexOf(ItalicEnd) == 0) {
+            x.appendCloseSpanTag();
+            msg.delete(0, ItalicEnd.length());
+        } else if (msg.indexOf(FontBegin) == 0) {       // font
+            x.appendCloseSpanTag();
             if (fonts.size() > 0) {
                 XmppFont font = fonts.remove(0);
-                msg = msg.replaceFirst(FontBegin, "</font>" + font.toString());
+                if (font._color == null) {
+                    x.appendOpenSpanTag("font:" + font._font);
+                } else {
+                    x.appendOpenSpanTag("font:" + font + " " + "color:" + font._color);
+                }
             } else {
                 Log.e(Tools.LOG_TAG, "XmppMsg.generateXhtml: Font tags doesn't match");
-                msg = msg.replace(FontBegin, "");
+                x.appendOpenSpanTag("font:null");   
             }
+            msg.delete(0, FontBegin.length());
         }
-
-        return "<body>" + _mainFont + msg + "</font></body>";
     }
 }

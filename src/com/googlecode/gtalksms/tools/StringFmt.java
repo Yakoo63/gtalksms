@@ -21,6 +21,15 @@ public class StringFmt {
         }
         return out.toString();
     }
+    
+    public static String encodeXML(String s) {
+        String ret = s.replace("&", "&amp")
+        .replace("\"", "&quot")
+        .replace("'", "&apos")
+        .replace("<", "&lt")
+        .replace(">", "&gt");
+        return ret;
+    }
 
     public static String encodeSQL(String s) {
         return s.replaceAll("'", "''");

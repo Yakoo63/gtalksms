@@ -103,4 +103,13 @@ public class Tools {
         
         return res;
     }
+    
+    public static int getMinNonNeg(int... x) {
+        int min = Integer.MAX_VALUE;
+        for(int i : x) {
+            if(i >= 0 && i < min)
+                min = i;
+        }
+        return min;
+    }
 }
