@@ -210,7 +210,7 @@ public class SmsCmd extends Command {
             }
         } else if (command.equals("delsms")) {
             if (args.length() == 0) {
-                send("Syntax is:\ndelsms:contact:[contact]\ndelsms:sent\ndelsms:all");
+                send(getString(R.string.chat_del_sms_syntax));
             } else {
                 int separatorPos = args.indexOf(":");
                 String subCommand = null;
@@ -246,19 +246,19 @@ public class SmsCmd extends Command {
                 send(sb.toString());
             } else if (contacts.size() == 1) {
                 Contact contact = contacts.get(0);
-                send("Deleting SMS from " + contact.name + ".");
+                send(getString(R.string.chat_del_sms_from, contact.name));
                 nbDeleted = _smsMgr.deleteSmsByContact(contact.rawIds);
             } else {
                 send(getString(R.string.chat_no_match_for, search));
             }
         } else {
-            send("Syntax is:\ndelsms:contact:[contact]\ndelsms:sent\ndelsms:all");
+            send(getString(R.string.chat_del_sms_syntax));
         }
         
         if (nbDeleted >= 0) {
-            send(nbDeleted + " SMS deleted.");
+            send(getString(R.string.chat_del_sms_nb, nbDeleted));
         } else if (nbDeleted == -1) {
-            send("Can't delete SMS.");
+            send(getString(R.string.chat_del_sms_error));
         }
     }
     
