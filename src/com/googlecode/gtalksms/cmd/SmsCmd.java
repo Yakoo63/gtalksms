@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.data.contacts.Contact;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
@@ -29,6 +30,10 @@ public class SmsCmd extends Command {
 
     private SmsMmsManager _smsMgr;
     private String _lastRecipient = null;
+    private String _lastRecipientName = null;    
+//    private String _lastSender = null;
+//    private String _lastSenderName = null;
+    private XmppManager _xmppMgr;
     
     public BroadcastReceiver _sentSmsReceiver = null;
     public BroadcastReceiver _deliveredSmsReceiver = null;
@@ -161,13 +166,15 @@ public class SmsCmd extends Command {
             mainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
 
         }
+        _xmppMgr = _mainService.getXmppmanager();
     }
 
     @Override
     public void execute(String command, String args) {
+    	String contact;
         if (command.equals("sms")) {
             int separatorPos = args.indexOf(":");
-            String contact = null;
+            contact = null;
             String message = null;
             if (-1 != separatorPos) {
                 contact = args.substring(0, separatorPos);
@@ -193,7 +200,7 @@ public class SmsCmd extends Command {
             }
         } else if (command.equals("findsms") || command.equals("fs")) {
             int separatorPos = args.indexOf(":");
-            String contact = null;
+            contact = null;
             String message = null;
             if (-1 != separatorPos) {
                 contact = args.substring(0, separatorPos);
@@ -210,10 +217,46 @@ public class SmsCmd extends Command {
             } else {
                 markSmsAsRead(_lastRecipient);
             }
+        } else if (command.equals("chat")) {
+        	if (args.length() > 0) {
+                inviteRoom(args);
+        	} else if (_lastRecipient != null) {
+        			_xmppMgr.inviteRoom(_lastRecipient, _lastRecipientName);
+        	}
         }
-
     }
-
+    
+    /**
+     * create a MUC with the specified contact
+     * and invites the user
+     * in case the contact isn't distinct
+     * the user is informed
+     * 
+     * @param contact
+     */
+    private void inviteRoom(String contact) {
+    	String name, number;
+        if (Phone.isCellPhoneNumber(contact)) {
+       		number = contact;
+       		name = ContactsManager.getContactName(_context, contact);
+       		_xmppMgr.inviteRoom(number, name);
+        } else {
+        	name = contact;
+            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
+            if (mobilePhones.size() > 1) {
+                send(getString(R.string.chat_specify_details));
+                for (Phone phone : mobilePhones) {
+                    send(phone.contactName + " - " + phone.cleanNumber);
+                }
+            } else if (mobilePhones.size() == 1) {
+                Phone phone = mobilePhones.get(0);
+                _xmppMgr.inviteRoom(phone.cleanNumber, contact);
+                setLastRecipient(phone.cleanNumber);
+            } else {
+                send(getString(R.string.chat_no_match_for, contact));
+            }
+        }
+    }
     
     /** search SMS */
     private void searchSMS(String message, String contactName) {
@@ -275,7 +318,6 @@ public class SmsCmd extends Command {
             send(getString(R.string.chat_no_match_for, message));
         }
     }
-
 
     /** sends a SMS to the specified contact */
     private void sendSMS(String message, String contact) {
@@ -414,6 +456,7 @@ public class SmsCmd extends Command {
         if (_lastRecipient == null || !phoneNumber.equals(_lastRecipient)) {
             _lastRecipient = phoneNumber;
             displayLastRecipient();
+            _lastRecipientName = ContactsManager.getContactName(_context, phoneNumber);
         }
     }
     

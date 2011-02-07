@@ -427,12 +427,20 @@ public class XmppManager {
         }
     }
     
+    public boolean roomExists(String number, String name) {
+    	return _xmppMuc.roomExists(number, name);
+    }
+    
     public ArrayList<XmppFriend> retrieveFriendList() {
         return _xmppBuddies.retrieveFriendList();
     }
     
     public void writeRoom(String number, String sender, String message) {
         _xmppMuc.writeRoom(number, sender, message);
+    }
+    
+    public void inviteRoom(String number, String name) {
+    	_xmppMuc.inviteRoom(number, name);
     }
     
     public void sendFile(String path) {

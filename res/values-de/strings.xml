@@ -136,6 +136,7 @@
     <string name="chat_help_sms_show_unread">- %s: Zeigt ungelesene SMS Nachrichten von allen Kontakten an.</string>
     <string name="chat_help_sms_show_contact">- %s: Zeigt die letzten SMS Nachrichten des angegebenen Kontaktes an.</string>
     <string name="chat_help_sms_send">- %s: Sende eine SMS an den angegebenen Kontakt mit den Inahlt &lt;message&gt;.</string>
+    <string name="chat_help_sms_chat">- %s: eröffnet neuen Chat mit dem Kontatk und schick eine entsprechende Einladung.</string>
     <string name="chat_help_find_sms_all">- %1$s oder %2$s: Suche nach SMS Nachrichten.</string>
     <string name="chat_help_find_sms">- %1$s oder %2$s: Suche nach SMS Nachrichten von bestimmten Kontakt.</string>
     <string name="chat_help_mark_as_read">- %1$s oder %2$s: Markiert die Nachricht des angegebenen oder des letzten Kontaktes als gelesen.</string>

@@ -46,8 +46,15 @@ public abstract class XmppMuc {
         _rooms.clear();
     }
     
+    /**
+     * Sends a message to a MUC, creates the MUC if necessary
+     * 
+     * @param number 	the phone number of the receiver
+     * @param sender    the name of the receiver
+     * @param message   the message to send
+     */
     public void writeRoom(String number, String sender, String message) {
-        String room = sender + " (" + number + ")";
+        String room = sender.toLowerCase() + " (" + number + ")";
         try {
             MultiUserChat muc;
             if (!_rooms.containsKey(room)) {
@@ -60,7 +67,7 @@ public abstract class XmppMuc {
             } else {
                 muc = _rooms.get(room);
                 
-                // TODO: test if occupants content sender (in case we invite other people)
+                // TODO: test if occupants contains also the sender (in case we invite other people)
                 if (muc != null && muc.getOccupantsCount() < 2) {
                     muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
                 }
@@ -74,7 +81,49 @@ public abstract class XmppMuc {
         }
     }
     
-    public MultiUserChat createRoom(String number, String room, String sender) {
+    public void inviteRoom(String number, String sender) {
+        String room = sender.toLowerCase() + " (" + number + ")";
+        try {
+            MultiUserChat muc;
+            if (!_rooms.containsKey(room)) {
+                muc = createRoom(number, room, sender);             
+                if (muc != null) {  //create successful
+                    _rooms.put(room, muc);
+                }
+                
+            } else {
+                muc = _rooms.get(room);
+                
+                // TODO: test if occupants contains also the sender (in case we invite other people)
+                if (muc != null && muc.getOccupantsCount() < 2) {
+                    muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
+                }
+            }
+        } catch (Exception ex) {
+            Log.e(Tools.LOG_TAG, "writeRoom: room = " + room, ex);
+        }
+    }
+    
+    public boolean roomExists(String number, String name) {
+    	name = name.toLowerCase();
+    	String room = name + " (" + number + ")";
+    	if(_rooms.containsKey(room)) {
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
+    
+    /**
+     * Creates a new MUC AND invites the user
+     * room name will be extended with an random number
+     * 
+     * @param number
+     * @param room
+     * @param sender
+     * @return
+     */
+    private MultiUserChat createRoom(String number, String room, String sender) {
         
         MultiUserChat multiUserChat = null;
         boolean passwordMode = false;

@@ -136,6 +136,7 @@
     <string name="chat_help_sms_show_unread">- %s: display unread SMS from all contact.</string>
     <string name="chat_help_sms_show_contact">- %s: display last sent SMS from searched contacts.</string>
     <string name="chat_help_sms_send">- %s: sends a SMS to number with content message.</string>
+    <string name="chat_help_sms_chat">- %s: creates a new Chat with the contact and invites you to that chat. Leave contact empty to use last contact</string>
     <string name="chat_help_find_sms_all">- %1$s or %2$s: search specific message in all SMS.</string>
     <string name="chat_help_find_sms">- %1$s or %2$s: search specific message in all SMS from searched contacts.</string>
     <string name="chat_help_mark_as_read">- %1$s or %2$s: mark SMS as read for last recipient or given contact.</string>

@@ -166,6 +166,7 @@ public class MainService extends Service {
         } else if (a.equals(ACTION_SMS_RECEIVED)) {
             if (initialState == XmppManager.CONNECTED) {
                 String number = intent.getStringExtra("sender");
+                String name = ContactsManager.getContactName(this, number);
                 
                 if (_settingsMgr.notifySmsInSameConversation) {
                     XmppMsg msg = new XmppMsg();
@@ -173,12 +174,12 @@ public class MainService extends Service {
                     msg.append(intent.getStringExtra("message"));
                     _xmppMgr.send(msg);
                 }
-                if (_settingsMgr.notifySmsInChatRooms) {
-                    _xmppMgr.writeRoom(number, ContactsManager.getContactName(this, number), intent.getStringExtra("message"));
+                if (_settingsMgr.notifySmsInChatRooms || _xmppMgr.roomExists(number, name)) {
+                    _xmppMgr.writeRoom(number, name, intent.getStringExtra("message"));
                 }
                 
-                if (_commands.containsKey("SmsCmd")) {
-                    ((SmsCmd)_commands.get("SmsCmd")).setLastRecipient(number);
+                if (_commands.containsKey("sms")) {
+                    ((SmsCmd)_commands.get("sms")).setLastRecipient(number);
                 }
             }
         } else if (a.equals(ACTION_NETWORK_CHANGED)) {
@@ -654,7 +655,7 @@ public class MainService extends Service {
         registerCommand(new UrlsCmd(this), "http", "https");
         registerCommand(new RingCmd(this), "ring", "ringmode");
         registerCommand(new FileCmd(this), "send");
-        registerCommand(new SmsCmd(this), "sms", "reply", "findsms", "fs", "markasread", "mar");
+        registerCommand(new SmsCmd(this), "sms", "reply", "findsms", "fs", "markasread", "mar", "chat");
     }
     
     private void cleanupCommands() {
@@ -694,5 +695,9 @@ public class MainService extends Service {
             i.putExtra("message", message);
         }
         return i;
+    }
+    
+    public XmppManager getXmppmanager() {
+    	return _xmppMgr;
     }
 }

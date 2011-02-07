@@ -20,6 +20,7 @@ public class HelpCmd extends Command {
         _msg.appendLine(getString(R.string.chat_help_sms_show_unread, get("\"sms:unread\"")));
         _msg.appendLine(getString(R.string.chat_help_sms_show_contact, get("\"sms:#contact#\"")));
         _msg.appendLine(getString(R.string.chat_help_sms_send, get("\"sms:#contact#:#message#\"")));
+        _msg.appendLine(getString(R.string.chat_help_sms_chat, get("\"chat:#contact#")));
         _msg.appendLine(getString(R.string.chat_help_find_sms_all, get("\"findsms:#message#\""), get("\"fs:#message#\"")));
         _msg.appendLine(getString(R.string.chat_help_find_sms, get("\"findsms:#contact#:#message#\""), get("\"fs:#contact#:#message#\"")));
         _msg.appendLine(getString(R.string.chat_help_mark_as_read, get("\"markAsRead:#contact#\""), get("\"mar\"")));
