@@ -27,8 +27,6 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class SmsCmd extends Command {
-    private final String[] commands = {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"};
-
     private SmsMmsManager _smsMgr;
     private String _lastRecipient = null;
     private String _lastRecipientName = null;    
@@ -44,12 +42,8 @@ public class SmsCmd extends Command {
     private int _penDIntentCount;
     private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
     
-    public String[] getCommands() {
-        return commands;
-    }
-    
     public SmsCmd(MainService mainService) {
-        super(mainService);
+        super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"});
         _smsMgr = new SmsMmsManager(_settingsMgr, _context);
 
         if (_settingsMgr.notifySmsSent) {

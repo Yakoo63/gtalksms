@@ -16,8 +16,6 @@ import com.googlecode.gtalksms.xmpp.XmppFont;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class ShellCmd extends Command {
-    private final String[] commands = {"cmd"};
-
     Handler _cmdHandler = new Handler();
     Thread _cmdThread;
     final StringBuilder _cmdResults = new StringBuilder();
@@ -25,11 +23,7 @@ public class ShellCmd extends Command {
     XmppFont _font = new XmppFont("consolas", "red");
     
     public ShellCmd(MainService mainService) {
-        super(mainService);
-    }
-    
-    public String[] getCommands() {
-        return commands;
+        super(mainService, new String[] {"cmd"});
     }
     
     private boolean askRootAccess() {

@@ -18,14 +18,12 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class CallCmd extends Command {
-    private final String[] commands = {"calls", "dial"};
-
     private PhoneManager _phoneMgr;
     private PhoneCallListener _phoneListener = null;
     private TelephonyManager _telephonyMgr = null;
     
     public CallCmd(MainService mainService) {
-        super(mainService);
+        super(mainService, new String[] {"calls", "dial"});
         _phoneMgr = new PhoneManager(_context);
         _telephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
         
@@ -35,10 +33,6 @@ public class CallCmd extends Command {
         }
     }
     
-    public String[] getCommands() {
-        return commands;
-    }
-
     @Override
     public void execute(String cmd, String args) {
         if (cmd.equals("dial")) {

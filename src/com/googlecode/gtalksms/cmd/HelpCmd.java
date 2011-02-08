@@ -5,12 +5,10 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class HelpCmd extends Command {
-    private final String[] commands = {"?", "help"};
-
     private XmppMsg _msg = new XmppMsg();
     
     public HelpCmd(MainService mainService) {
-        super(mainService);
+        super(mainService, new String[] {"?", "help"});
         
         _msg.appendLine(getString(R.string.chat_help_title));
         _msg.appendLine(getString(R.string.chat_help_help, makeBold("\"?\""), makeBold("\"help\"")));
@@ -39,10 +37,6 @@ public class HelpCmd extends Command {
         _msg.appendLine(getString(R.string.chat_help_cmd, makeBold("\"cmd:#command#\"")));
         _msg.appendLine(getString(R.string.chat_help_write, makeBold("\"write:#text#\""), makeBold("\"w:#text#\"")));
         _msg.appendLine(getString(R.string.chat_help_urls, makeBold("\"http\"")));
-    }
-    
-    public String[] getCommands() {
-        return commands;
     }
     
     @Override

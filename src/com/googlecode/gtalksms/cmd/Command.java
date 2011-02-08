@@ -10,11 +10,13 @@ public abstract class Command {
     protected SettingsManager _settingsMgr;
     protected Context _context;
     protected MainService _mainService;
-    
-    Command(MainService mainService) {
+    protected final String[] _commands;
+        
+    Command(MainService mainService, String[] commands) {
         _mainService = mainService;
         _settingsMgr = mainService.getSettingsManager();
         _context = mainService.getBaseContext();
+        _commands = commands;
     }
     
     protected String getString(int id, Object... args) {
@@ -29,8 +31,10 @@ public abstract class Command {
         _mainService.send(message);
     }
     
-    public abstract String[] getCommands();    
-    
+    public String[] getCommands() {
+        return _commands;
+    }
+   
     /**
      * Executes the given command
      * has no return value, the method has to do the error reporting by itself

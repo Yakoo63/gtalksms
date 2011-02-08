@@ -9,13 +9,12 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 
 public class BatteryCmd extends Command {
-    private final String[] commands = {"battery", "batt"};
     private BroadcastReceiver _batInfoReceiver = null;
     private int _lastPercentageNotified = -1;
     
     public BatteryCmd(MainService mainService) {
-        super(mainService);
-    
+        super(mainService, new String[] {"battery", "batt"});
+        
         _batInfoReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent intent) {
@@ -35,10 +34,6 @@ public class BatteryCmd extends Command {
             }
         };
         _context.registerReceiver(_batInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-    }
-    
-    public String[] getCommands() {
-        return commands;
     }
 
     private void sendBatteryInfos(int level, boolean force) {

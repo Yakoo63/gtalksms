@@ -16,8 +16,6 @@ import com.googlecode.gtalksms.tools.Tools;
 
 
 public class RingCmd extends Command {
-    private final String[] commands = {"ring", "ringmode"};
-    
     private static AudioManager _audioManager;
     private MediaPlayer _mediaPlayer;
     private Vibrator _vibrator;
@@ -25,15 +23,11 @@ public class RingCmd extends Command {
     private long[] _pattern = {0, 1000, 100};
    
     public RingCmd(MainService mainService) {
-        super(mainService);
+        super(mainService, new String[] {"ring", "ringmode"});
         _audioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         _vibrator = (Vibrator) mainService.getSystemService(Context.VIBRATOR_SERVICE);
     }
     
-    public String[] getCommands() {
-        return commands;
-    }
-
     @Override
     public void execute(String cmd, String args) {
         if (cmd.equals("ring")) {

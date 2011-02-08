@@ -7,16 +7,10 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 
 public class UrlsCmd extends Command {
-    private final String[] commands = {"http", "https"};
-    
     public UrlsCmd(MainService mainService) {
-        super(mainService);
+        super(mainService, new String[] {"http", "https"});
     }
     
-    public String[] getCommands() {
-        return commands;
-    }
-
     @Override
     public void execute(String cmd, String args) {
         Intent target = new Intent(Intent.ACTION_VIEW, Uri.parse(cmd + ":" + args));
