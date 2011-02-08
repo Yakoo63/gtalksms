@@ -14,9 +14,14 @@ import com.googlecode.gtalksms.panels.GeoPopup;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class GeoCmd extends Command {
+    public final String[] commands = {"geo", "where"};
 
     public GeoCmd(MainService mainService) {
         super(mainService);
+    }
+    
+    public String[] getCommands() {
+        return commands;
     }
 
     @Override

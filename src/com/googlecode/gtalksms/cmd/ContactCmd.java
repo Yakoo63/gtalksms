@@ -11,9 +11,13 @@ import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class ContactCmd extends Command {
-
+    private final String[] commands = {"contact"};
     public ContactCmd(MainService mainService) {
         super(mainService);
+    }
+    
+    public String[] getCommands() {
+        return commands;
     }
 
     @Override

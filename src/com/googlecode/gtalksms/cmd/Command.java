@@ -6,7 +6,7 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public abstract class Command {
+public abstract class Command {    
     protected SettingsManager _settingsMgr;
     protected Context _context;
     protected MainService _mainService;
@@ -28,6 +28,8 @@ public abstract class Command {
     protected void send(XmppMsg message) {
         _mainService.send(message);
     }
+    
+    public abstract String[] getCommands();    
     
     /**
      * Executes the given command

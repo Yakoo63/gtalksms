@@ -3,7 +3,9 @@ package com.googlecode.gtalksms;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -66,6 +68,7 @@ public class MainService extends Service {
     private KeyboardInputMethod _keyboard;
     
     private Map<String, Command> _commands = new HashMap<String, Command>();
+    private Set<Command> _commandSet = new HashSet<Command>();
     
     
     // notification stuff
@@ -601,6 +604,7 @@ public class MainService extends Service {
     
     /**
      * Handels the different commands
+     * that came with the xmpp connection
      * usually from an intent with
      * ACTION_HANDLE_XMPP_NOTIFY
      * 
@@ -644,38 +648,42 @@ public class MainService extends Service {
     }
     
     private void setupCommands() {
-        registerCommand(new HelpCmd(this), "?", "help");
-        registerCommand(new KeyboardCmd(this), "write", "w");
-        registerCommand(new BatteryCmd(this), "battery", "batt");
-        registerCommand(new GeoCmd(this), "where", "geo");
-        registerCommand(new CallCmd(this), "calls", "dial");
-        registerCommand(new ContactCmd(this), "contact");
-        registerCommand(new ClipboardCmd(this), "copy");
-        registerCommand(new ShellCmd(this), "cmd");
-        registerCommand(new UrlsCmd(this), "http", "https");
-        registerCommand(new RingCmd(this), "ring", "ringmode");
-        registerCommand(new FileCmd(this), "send");
-        registerCommand(new SmsCmd(this), "sms", "reply", "findsms", "fs", "markasread", "mar", "chat");
+        registerCommand(new HelpCmd(this));
+        registerCommand(new KeyboardCmd(this));
+        registerCommand(new BatteryCmd(this));
+        registerCommand(new GeoCmd(this));
+        registerCommand(new CallCmd(this));
+        registerCommand(new ContactCmd(this));
+        registerCommand(new ClipboardCmd(this));
+        registerCommand(new ShellCmd(this));
+        registerCommand(new UrlsCmd(this));
+        registerCommand(new RingCmd(this));
+        registerCommand(new FileCmd(this));
+        registerCommand(new SmsCmd(this));
     }
     
     private void cleanupCommands() {
-        for (String cmd : _commands.keySet()) {
-            _commands.get(cmd).cleanUp();
+        for (Command cmd : _commandSet) {
+            cmd.cleanUp();
         }
         _commands.clear();
     }
     
+    /**
+     * used to stop ongoing actions, like gps updates, ringing, ... 
+     */
     private void stopCommands() {
-        for (String cmd : _commands.keySet()) {
-            _commands.get(cmd).stop();
-        }
+        for(Command c : _commandSet)
+            c.stop();
     }
     
-    private void registerCommand(Command cmd, String... cmdNames) {
-        for (String name : cmdNames) {
-            _commands.put(name, cmd);
+    private void registerCommand(Command cmd) {
+        String[] commands = cmd.getCommands();
+        for (String c : commands) {
+            _commands.put(c, cmd);
         }
-    }
+        _commandSet.add(cmd);
+    } 
 
     public void setXmppStatus(String status) {
         _xmppMgr.setStatus(status);

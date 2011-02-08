@@ -7,9 +7,14 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 
 public class UrlsCmd extends Command {
+    private final String[] commands = {"http", "https"};
     
     public UrlsCmd(MainService mainService) {
         super(mainService);
+    }
+    
+    public String[] getCommands() {
+        return commands;
     }
 
     @Override

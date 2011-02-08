@@ -18,6 +18,7 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class CallCmd extends Command {
+    private final String[] commands = {"calls", "dial"};
 
     private PhoneManager _phoneMgr;
     private PhoneCallListener _phoneListener = null;
@@ -32,6 +33,10 @@ public class CallCmd extends Command {
             _phoneListener = new PhoneCallListener(mainService);
             _telephonyMgr.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
         }
+    }
+    
+    public String[] getCommands() {
+        return commands;
     }
 
     @Override

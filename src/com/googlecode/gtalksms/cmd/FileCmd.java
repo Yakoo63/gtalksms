@@ -5,9 +5,14 @@ import java.io.File;
 import com.googlecode.gtalksms.MainService;
 
 public class FileCmd extends Command {
+    private final String[] commands = {"send"};
 
     public FileCmd(MainService mainService) {
         super(mainService);
+    }
+    
+    public String[] getCommands() {
+        return commands;
     }
 
     @Override

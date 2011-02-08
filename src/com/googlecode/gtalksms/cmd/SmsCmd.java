@@ -27,6 +27,7 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class SmsCmd extends Command {
+    private final String[] commands = {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"};
 
     private SmsMmsManager _smsMgr;
     private String _lastRecipient = null;
@@ -42,6 +43,10 @@ public class SmsCmd extends Command {
     private int _penSIntentCount;
     private int _penDIntentCount;
     private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
+    
+    public String[] getCommands() {
+        return commands;
+    }
     
     public SmsCmd(MainService mainService) {
         super(mainService);
@@ -246,8 +251,7 @@ public class SmsCmd extends Command {
      * @param cmd - all, sent, contact
      * @param search - if cmd == contact the name of the contact
      */
-    private void deleteSMS(String cmd, String search) {
-        
+    private void deleteSMS(String cmd, String search) {    
         int nbDeleted = -2;
         if (cmd.equals("all")) {
             nbDeleted = _smsMgr.deleteAllSms();
@@ -290,13 +294,13 @@ public class SmsCmd extends Command {
      * @param contact
      */
     private void inviteRoom(String contact) {
-    	String name, number;
+        String name, number;
         if (Phone.isCellPhoneNumber(contact)) {
-       		number = contact;
-       		name = ContactsManager.getContactName(_context, contact);
-       		_xmppMgr.inviteRoom(number, name);
+                number = contact;
+                name = ContactsManager.getContactName(_context, contact);
+                _xmppMgr.inviteRoom(number, name);
         } else {
-        	name = contact;
+                name = contact;
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
             if (mobilePhones.size() > 1) {
                 send(getString(R.string.chat_specify_details));

@@ -9,11 +9,17 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class ClipboardCmd extends Command {
+    private final String[] commands = {"copy"};
+    
     ClipboardManager _clipboardMgr;
     
     public ClipboardCmd(MainService mainService) {
         super(mainService);
         _clipboardMgr = (ClipboardManager) mainService.getSystemService(Service.CLIPBOARD_SERVICE);
+    }
+    
+    public String[] getCommands() {
+        return commands;
     }
 
     @Override
