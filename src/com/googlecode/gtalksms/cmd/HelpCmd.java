@@ -24,6 +24,9 @@ public class HelpCmd extends Command {
         _msg.appendLine(getString(R.string.chat_help_find_sms_all, get("\"findsms:#message#\""), get("\"fs:#message#\"")));
         _msg.appendLine(getString(R.string.chat_help_find_sms, get("\"findsms:#contact#:#message#\""), get("\"fs:#contact#:#message#\"")));
         _msg.appendLine(getString(R.string.chat_help_mark_as_read, get("\"markAsRead:#contact#\""), get("\"mar\"")));
+        _msg.appendLine(getString(R.string.chat_help_del_sms_all, get("\"delsms:all\"")));
+        _msg.appendLine(getString(R.string.chat_help_del_sms_sent, get("\"delsms:sent\"")));
+        _msg.appendLine(getString(R.string.chat_help_del_sms_contact, get("\"delsms:contact:#contact#\"")));
         _msg.appendLine(getString(R.string.chat_help_battery, get("\"battery\""), get("\"batt\"")));
         _msg.appendLine(getString(R.string.chat_help_calls, get("\"calls\"")));
         _msg.appendLine(getString(R.string.chat_help_contact, get("\"contact:#contact#\"")));

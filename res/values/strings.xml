@@ -151,6 +151,9 @@
     <string name="chat_help_write">- %1$s or %2$s: write text as virtual keyboard (don\'t forget to activate keyboard in Android Preferences panel).</string>
     <string name="chat_help_urls">and you can paste %s links and open it with the appropriate application.</string>
     <string name="chat_help_ringmode">- %s: With mode=(normal|silent|vibrate) Set ringer mode. Shows the actual mode if no argument is given.</string>    
+    <string name="chat_help_del_sms_all">- %s: Delete all SMS without confirmation!</string>    
+    <string name="chat_help_del_sms_sent">- %s: Delete all sent SMS without confirmation!</string>    
+    <string name="chat_help_del_sms_contact">- %s: Delete all SMS in the thread of the specified contact without confirmation!</string>    
     <string name="chat_call_unknown">Unknown</string>
     <string name="chat_call_incoming">Incoming</string>
     <string name="chat_call_outgoing">Outgoing</string>
@@ -190,4 +193,8 @@
     <string name="chat_geo_altitude">altitude: %f&#xA0;</string>
     <string name="chat_geo_speed">speed: %fm/s&#xA0;</string>
     <string name="chat_geo_provider">provider: %s</string>
+    <string name="chat_del_sms_syntax">Syntax is:\ndelsms:contact:[contact]\ndelsms:sent\ndelsms:all</string>
+    <string name="chat_del_sms_from">Deleting SMS from %s.</string>
+    <string name="chat_del_sms_nb">%d SMS deleted.</string>
+    <string name="chat_del_sms_error">Can\'t delete SMS.</string>
 </resources>
