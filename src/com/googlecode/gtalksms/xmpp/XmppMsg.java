@@ -157,20 +157,20 @@ public class XmppMsg {
             x.appendBrTag();                            // smack appends "<br>" where the XEP-71 postulates "<br/>" 
             msg.delete(0, "\n".length());               //  we fix this in XmppManager
         } else if (msg.indexOf(BoldBegin) == 0) {       // bold
-//            x.appendOpenSpanTag("font-weight:bold");  // pidgin does not like these tags
-            x.appendOpenStrongTag();
+            x.appendOpenSpanTag("font-weight:bold");  
+//            x.appendOpenStrongTag();
             msg.delete(0, BoldBegin.length());
         } else if (msg.indexOf(BoldEnd) == 0) {
-//            x.appendCloseSpanTag();
-            x.appendCloseStrongTag();
+            x.appendCloseSpanTag();
+//            x.appendCloseStrongTag();
             msg.delete(0, BoldEnd.length());
         } else if (msg.indexOf(ItalicBegin) == 0) {     // italic
-//            x.appendOpenSpanTag("font-style:italic");
-            x.appendOpenEmTag();
+            x.appendOpenSpanTag("font-style:italic");
+//            x.appendOpenEmTag();
             msg.delete(0, ItalicBegin.length());
         } else if (msg.indexOf(ItalicEnd) == 0) {
-//            x.appendCloseSpanTag();
-            x.appendCloseEmTag();
+            x.appendCloseSpanTag();
+//            x.appendCloseEmTag();
             msg.delete(0, ItalicEnd.length());
         } else if (msg.indexOf(FontBegin) == 0) {       // font
             x.appendCloseSpanTag();
