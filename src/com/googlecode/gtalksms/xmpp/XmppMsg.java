@@ -177,9 +177,9 @@ public class XmppMsg {
             if (fonts.size() > 0) {
                 XmppFont font = fonts.remove(0);
                 if (font._color == null) {
-                    x.appendOpenSpanTag("font:" + font._font);
+                    x.appendOpenSpanTag("font-family:" + font._font);
                 } else {
-                    x.appendOpenSpanTag("font:" + font + " " + "color:" + font._color);
+                    x.appendOpenSpanTag("font-family:" + font + " " + "color:" + font._color);
                 }
             } else {
                 Log.e(Tools.LOG_TAG, "XmppMsg.generateXhtml: Font tags doesn't match");
