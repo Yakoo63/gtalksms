@@ -54,7 +54,7 @@ public abstract class XmppMuc {
      * @param message   the message to send
      */
     public void writeRoom(String number, String sender, String message) {
-        String room = sender.toLowerCase() + " (" + number + ")";
+        String room = getRoomString(number, sender);
         try {
             MultiUserChat muc;
             if (!_rooms.containsKey(room)) {
@@ -65,8 +65,7 @@ public abstract class XmppMuc {
                 }
                 
             } else {
-                muc = _rooms.get(room);
-                
+                muc = _rooms.get(room);              
                 // TODO: test if occupants contains also the sender (in case we invite other people)
                 if (muc != null && muc.getOccupantsCount() < 2) {
                     muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
@@ -82,7 +81,7 @@ public abstract class XmppMuc {
     }
     
     public void inviteRoom(String number, String sender) {
-        String room = sender.toLowerCase() + " (" + number + ")";
+        String room = getRoomString(number, sender);
         try {
             MultiUserChat muc;
             if (!_rooms.containsKey(room)) {
@@ -104,9 +103,32 @@ public abstract class XmppMuc {
         }
     }
     
-    public boolean roomExists(String number, String name) {
-    	name = name.toLowerCase();
-    	String room = name + " (" + number + ")";
+    /**
+     * creates a string from number and contact
+     * for use as the room key in the rooms array
+     * (the actual room name will have another string
+     * + an randInt)
+     * 
+     * @param number
+     * @param contact
+     * @return
+     */
+    private static String getRoomString(String number, String contact) {
+        String contactLowerCase = new String(contact);
+        contactLowerCase.toLowerCase();
+        return contactLowerCase + " (" + number + ")";
+    }
+    
+    /**
+     * Checks if a room for the specific contact 
+     * AND corresponding number exists
+     * 
+     * @param number
+     * @param contact
+     * @return true if the room exists and gtalksms is in it, otherwise false
+     */
+    public boolean roomExists(String number, String contact) {
+    	String room = getRoomString(number, contact);
     	if(_rooms.containsKey(room)) {
     		return true;
     	} else {
@@ -139,7 +161,7 @@ public abstract class XmppMuc {
         try {
             // Create the room
             multiUserChat = new MultiUserChat(_connection, cnx);
-            multiUserChat.create(room);
+            multiUserChat.create(sender + "(" + number + ")");
                 
             try {
                 // Since this is a private room, make the room not public and set user as owner of the room.
