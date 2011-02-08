@@ -237,7 +237,15 @@ public class SmsCmd extends Command {
         }
     }
     
-    /** delete SMS */
+    /**
+     * "delsms" cmd - deltes sms, either
+     * - all sms
+     * - all sent sms
+     * - sms from specified contact
+     * 
+     * @param cmd - all, sent, contact
+     * @param search - if cmd == contact the name of the contact
+     */
     private void deleteSMS(String cmd, String search) {
         
         int nbDeleted = -2;

@@ -150,7 +150,10 @@
     <string name="chat_help_cmd">- %s: Für Shell Befehl (wenn möglich mit root Rechten) aus.</string>
     <string name="chat_help_write">- %1$s oder %2$s: Schreibt &lt;text&gt; in die virtuelle Tastatur (dazu muss die GTalkSMS Tastatur in den Android Einstellungen aktiviert sein).</string>
     <string name="chat_help_urls">- %s: Öffnet Links auf den Telefon mit der entsprechenden Anwendung</string>
-    <string name="chat_help_ringmode">- %s: Mit mode=normal,silent,vibrate - Setz den Klingelmodus entsprechend. Ohne Argument wird der aktuelle Modus angezeigt.</string>    
+    <string name="chat_help_ringmode">- %s: Mit mode=normal,silent,vibrate - Setz den Klingelmodus entsprechend. Ohne Argument wird der aktuelle Modus angezeigt.</string>
+    <string name="chat_help_del_sms_all">- %s: Lösche alle SMS Nachrichten ohne Nachfrage!</string>
+    <string name="chat_help_del_sms_sent">- %s: Lösche alle gesendeten SMS Nachrichten ohne Nachfrage!</string>
+    <string name="chat_help_del_sms_contact">- %s: Lösche alle SMS Nachrichten zwischen mir und dem gewählen Kontakt ohne Nachfrage!</string>
     <string name="chat_call_unknown">Unbekannt</string>
     <string name="chat_call_incoming">Eingehender Anruf</string>
     <string name="chat_call_outgoing">Ausgehender Anruf</string>
@@ -190,4 +193,8 @@
     <string name="chat_geo_altitude">Höhe: %f </string>
     <string name="chat_geo_speed">Geschwindigkeit: %fm/s </string>
     <string name="chat_geo_provider">Quelle: %s</string>
+    <string name="chat_del_sms_syntax">Syntax :\ndelsms:contact:[contact]\ndelsms:sent\ndelsms:all</string>
+    <string name="chat_del_sms_from">Lösche SMS Nachrichten von %s.</string>
+    <string name="chat_del_sms_nb">%d SMS Nachricht(n) gelöscht.</string>
+    <string name="chat_del_sms_error">SMS Nachrichten(n) konnte(n) nicht gelöscht werden.</string>
 </resources>
