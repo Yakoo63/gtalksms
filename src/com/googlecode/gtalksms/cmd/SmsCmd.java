@@ -453,6 +453,7 @@ public class SmsCmd extends Command {
                     send(smsContact);
                 } else {
                     noSms.appendBold(contact.name);
+                    noSms.append(" - ");
                     noSms.appendLine(getString(R.string.chat_no_sms));
                 }
             }

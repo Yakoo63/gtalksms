@@ -59,6 +59,10 @@ public class XmppMsg {
         _message.append(msg);
         newLine();
     }
+
+    public void insertLineBegin(String msg) {
+        _message.insert(0, msg + Tools.LineSep);
+    }
     
     public void appendBold(String msg) {
         _message.append(makeBold(msg));
@@ -80,6 +84,12 @@ public class XmppMsg {
     
     public void newLine() {
         _message.append(Tools.LineSep);
+    }    
+    
+    public XmppMsg append(XmppMsg input) {
+        _message.append(input._message);
+        _fonts.addAll(input._fonts);
+        return this;
     }
     
     public String generateTxt() {

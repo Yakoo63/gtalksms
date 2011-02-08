@@ -129,6 +129,7 @@
     <string name="chat_error_dial">Erreur, impossible de composer le numéro.</string>
     <string name="chat_help_title">Commandes disponibles :</string>
     <string name="chat_help_help">- %1$s ou %2$s: afficher cette aide.</string>
+    <string name="chat_help_help_all">- %s: affiche toute l\'aide.</string>
     <string name="chat_help_stop">- %s: stopper l\'application sur le téléphone.</string>
     <string name="chat_help_dial">- %s: composer le numéro du contact spécifié.</string>
     <string name="chat_help_sms_reply">- %s: envoyer un SMS au dernier destinataire entrant ou sortant.</string>
@@ -148,7 +149,7 @@
     <string name="chat_help_copy">- %s: copier le texte dans le presse-papier du téléphone ou récupérer celui du téléphone si vide.</string>
     <string name="chat_help_cmd">- %s: exécuter une commande shell avec les droits super administrateur si possible.</string>
     <string name="chat_help_write">- %1$s ou %2$s: écrit le texte comme un clavier virtuel dans les autres applications (Ne pas oublier d\'activer le clavier GTalkSMS dans les paramètres d\'Android).</string>
-    <string name="chat_help_urls">et coller les liens %s pour les ouvrir dans le navigateur du téléphone.</string>
+    <string name="chat_help_urls">- %s: coller les liens pour les ouvrir dans le navigateur du téléphone.</string>
     <string name="chat_help_ringmode">- %s: modifie le type de sonnerie avec mode=(normal|silent|vibrate). Affiche le type courant de sonnerie s\'il n\'y a aucun paramètre.</string>    
     <string name="chat_help_del_sms_all">- %s: Supprime tous les SMS sans confirmation !</string>    
     <string name="chat_help_del_sms_sent">- %s: Supprime tous les SMS envoyé sans confirmation !</string>    

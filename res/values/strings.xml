@@ -129,6 +129,7 @@
     <string name="chat_error_dial">Error can\'t dial.</string>
     <string name="chat_help_title">Available commands:</string>
     <string name="chat_help_help">- %1$s or %2$s: shows this help.</string>
+    <string name="chat_help_help_all">- %s: shows full help.</string>
     <string name="chat_help_stop">- %s: stop application on your phone.</string>
     <string name="chat_help_dial">- %s: dial the specified contact.</string>
     <string name="chat_help_sms_reply">- %s: send a SMS to your last recipient with content message.</string>
@@ -149,7 +150,7 @@
     <string name="chat_help_copy">- %s: copy text to clipboard or sent phone clipboard if text is empty.</string>
     <string name="chat_help_cmd">- %s: execute shell instruction with root access if possible.</string>
     <string name="chat_help_write">- %1$s or %2$s: write text as virtual keyboard (don\'t forget to activate keyboard in Android Preferences panel).</string>
-    <string name="chat_help_urls">and you can paste %s links and open it with the appropriate application.</string>
+    <string name="chat_help_urls">- %s: paste links and open it with the appropriate application.</string>
     <string name="chat_help_ringmode">- %s: With mode=(normal|silent|vibrate) Set ringer mode. Shows the actual mode if no argument is given.</string>    
     <string name="chat_help_del_sms_all">- %s: Delete all SMS without confirmation!</string>    
     <string name="chat_help_del_sms_sent">- %s: Delete all sent SMS without confirmation!</string>    
