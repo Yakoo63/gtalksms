@@ -19,13 +19,13 @@ public class XmppFont {
     
     public String toString() {        
         if (_font != null && _color == null) {
-            return  "font-family: " + this._font;
+            return  "font-family:" + this._font;
         } else if (_font != null && _color != null) {
-            return "font-family: " + this._font + " " + "color: " + this._color;
+            return "font-family:" + this._font + " " + "color:" + this._color;
         } else if (_font == null && _color == null) {
-            return "font-family: null";
+            return "font-family:null";
         } else {
-            return "color: " + this._color;
+            return "color:" + this._color;
         }
     }
 }
