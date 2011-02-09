@@ -18,7 +18,7 @@ public class NewInstallUpdate {
 	public NewInstallUpdate(Context c) {
 		version = Tools.getVersionCode(c, getClass());
 		this.ctx = c;
-		version_filename = Tools.LOG_TAG + version;
+		version_filename = Tools.LOG_TAG + "_version_" + version;
 	}
 	
 	/**
@@ -46,6 +46,11 @@ public class NewInstallUpdate {
 	 * @return true if one or more old version files where found, otherwise false
 	 */
 	private boolean hasOldVersionFile() {
+		for(String s : ctx.fileList()) {
+			if(s.contains(Tools.LOG_TAG + "_version_")) {  //TODO change to good regex
+				return true;
+			}
+		}
 		return false;
 	}
 	
