@@ -17,18 +17,15 @@ public class XmppFont {
         _color = color;
     }
     
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append("<font");
-        if (_font != null) {
-            sb.append(" face=\"" + _font + "\"");
+    public String toString() {        
+        if (_font != null && _color == null) {
+            return  "font-family: " + this._font;
+        } else if (_font != null && _color != null) {
+            return "font-family: " + this._font + " " + "color: " + this._color;
+        } else if (_font == null && _color == null) {
+            return "font-family: null";
+        } else {
+            return "color: " + this._color;
         }
-        if (_color != null) {
-            sb.append(" color=\"" + _color + "\"");
-        }
-        sb.append(">");
-        
-        return sb.toString();
     }
 }
