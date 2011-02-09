@@ -41,6 +41,7 @@ import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.tools.NewInstallUpdate;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MainService extends Service {
@@ -89,7 +90,9 @@ public class MainService extends Service {
 
     private long _handlerThreadId;
     
-    GoogleAnalyticsTracker _gAnalytics;
+    private GoogleAnalyticsTracker _gAnalytics;
+    private static NewInstallUpdate _NewInstallUpdate;
+    
 
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
@@ -376,7 +379,33 @@ public class MainService extends Service {
         _serviceHandler = new ServiceHandler(_serviceLooper);
         initNotificationStuff();
         Log.i(Tools.LOG_TAG, "service created");
-        IsRunning = true;    
+        IsRunning = true;
+        
+        _gAnalytics = GoogleAnalyticsTracker.getInstance();
+        _gAnalytics.setProductVersion(
+                Tools.getVersion(getBaseContext(), getClass()), 
+                Tools.getVersionCode(getBaseContext(), getClass()));
+        _gAnalytics.start("UA-20245441-1", this);
+        
+        _NewInstallUpdate = new NewInstallUpdate(getApplicationContext());
+        switch(_NewInstallUpdate.isNewInstallUpdate()) {
+        	case NewInstallUpdate.FRESH_INSTALL:
+                _gAnalytics.trackEvent(
+                        "GTalkSMS",  // Category
+                        "Fresh Install",  // Action
+                        "Fresh Install:  " + Tools.getVersionName(getBaseContext(), getClass()), // Label
+                        0);       // Value      
+                _gAnalytics.dispatch();
+                break;
+        	case NewInstallUpdate.UPDATE:
+                _gAnalytics.trackEvent(
+                        "GTalkSMS",  // Category
+                        "Update",  // Action
+                        "Update: " + Tools.getVersionName(getBaseContext(), getClass()), // Label
+                        0);       // Value      
+                _gAnalytics.dispatch();
+                break;      		
+        }
     }
 
     @Override
@@ -516,18 +545,11 @@ public class MainService extends Service {
 
     private void setupListenersForConnection() {
         Log.d(Tools.LOG_TAG, "setupListenersForConnection");
-        _gAnalytics = GoogleAnalyticsTracker.getInstance();
-        _gAnalytics.setProductVersion(
-                Tools.getVersion(getBaseContext(), getClass()), 
-                Tools.getVersionCode(getBaseContext(), getClass()));
-        _gAnalytics.start("UA-20245441-1", this);
         _gAnalytics.trackEvent(
                 "GTalkSMS",  // Category
                 "Service",  // Action
                 "Start " + Tools.getVersionName(getBaseContext(), getClass()), // Label
                 0);       // Value      
-        _gAnalytics.dispatch();
-
         try {
             setupCommands();
         } catch (Exception e) {
