@@ -294,7 +294,6 @@ public class SmsCmd extends Command {
                 name = ContactsManager.getContactName(_context, contact);
                 _xmppMgr.inviteRoom(number, name);
         } else {
-                name = contact;
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
             if (mobilePhones.size() > 1) {
                 send(getString(R.string.chat_specify_details));
@@ -303,7 +302,7 @@ public class SmsCmd extends Command {
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
-                _xmppMgr.inviteRoom(phone.cleanNumber, contact);
+                _xmppMgr.inviteRoom(phone.cleanNumber, phone.contactName);
                 setLastRecipient(phone.cleanNumber);
             } else {
                 send(getString(R.string.chat_no_match_for, contact));
