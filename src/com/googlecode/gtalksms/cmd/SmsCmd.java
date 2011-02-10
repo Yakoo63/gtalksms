@@ -374,7 +374,7 @@ public class SmsCmd extends Command {
     /** sends a SMS to the specified contact */
     private void sendSMS(String message, String contact) {
         if (Phone.isCellPhoneNumber(contact)) {
-            send(getString(R.string.chat_send_sms, ContactsManager.getContactName(_context, contact)));
+            send(getString(R.string.chat_send_sms, ContactsManager.getContactName(_context, contact)) + ": \"" + shortenMessage(message) + "\"");
             sendSMSByPhoneNumber(message, contact, null);
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
@@ -386,7 +386,7 @@ public class SmsCmd extends Command {
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
-                send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")"));
+                send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")")  + ": \"" + shortenMessage(message) + "\"");
                 setLastRecipient(phone.cleanNumber);
                 sendSMSByPhoneNumber(message, phone.cleanNumber, phone.contactName);
             } else {
