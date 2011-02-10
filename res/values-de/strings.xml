@@ -166,8 +166,8 @@
     <string name="chat_call_hidden">[verborgene Telefonnummer]</string>
     <string name="chat_me">Ich</string>
     <string name="chat_ringer_error_cmd">Ungültiger Befehl: %1s</string>
-    <string name="chat_ringer_vibrate">Telefon lautlaus (Vibration aktiviert)</string>
-    <string name="chat_ringer_silent">Telefon lautlaus (Vibration deaktiviert)</string>
+    <string name="chat_ringer_vibrate">Telefon lautlos (Vibration aktiviert)</string>
+    <string name="chat_ringer_silent">Telefon lautlos (Vibration deaktiviert)</string>
     <string name="chat_ringer_normal">Telefon laut</string>   
     <string name="chat_sms_search">Suche nach \"%1$s\" in den SMS Nachrichten von %2$d Kontakten.</string>
     <string name="chat_sms_search_start">Suchen...</string>
