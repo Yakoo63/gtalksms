@@ -35,7 +35,7 @@
     <string name="pref_con">Connection settings</string>
     <string name="pref_con_notified_address_cat">Address to notify</string>
     <string name="pref_con_notified_address">Address to notify</string>
-    <string name="pref_con_notified_address_help">Enter your GMail address</string>
+    <string name="pref_con_notified_address_help">Enter your GMail address or your XMPP JID</string>
     <string name="pref_con_cat">Connection settings</string>
     <string name="pref_con_use_different_account">Use a different account</string>
     <string name="pref_con_use_different_account_help">Check if you want the phone to connect from a different account</string>
