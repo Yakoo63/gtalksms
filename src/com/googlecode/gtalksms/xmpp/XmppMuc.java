@@ -145,7 +145,7 @@ public abstract class XmppMuc {
      * @param sender
      * @return
      */
-    private MultiUserChat createRoom(String number, String room, String sender) {
+    private MultiUserChat createRoom(String number, String room, String name) {
         
         MultiUserChat multiUserChat = null;
         boolean passwordMode = false;
@@ -161,7 +161,7 @@ public abstract class XmppMuc {
         try {
             // Create the room
             multiUserChat = new MultiUserChat(_connection, cnx);
-            multiUserChat.create(sender + "(" + number + ")");
+            multiUserChat.create(name + "(" + number + ")");
                 
             try {
                 // Since this is a private room, make the room not public and set user as owner of the room.
@@ -196,9 +196,9 @@ public abstract class XmppMuc {
                 return null; //then we also should not send an invite as the room will be locked
             }
                
-            multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
+            multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + name);
 
-            ChatPacketListener chatListener = new ChatPacketListener(number, multiUserChat);
+            ChatPacketListener chatListener = new ChatPacketListener(number, name, multiUserChat);
             multiUserChat.addMessageListener(chatListener);
         } catch (Exception ex) {
             Log.e(Tools.LOG_TAG, "createRoom() - Error creating room: " + room, ex);
@@ -209,12 +209,14 @@ public abstract class XmppMuc {
     }
     
     class ChatPacketListener implements PacketListener {
+        private String _name;
         private String _number;
         private Date _lastDate;
         private MultiUserChat _muc;
         
-        public ChatPacketListener(String number, MultiUserChat muc) {
+        public ChatPacketListener(String number, String name, MultiUserChat muc) {
             _number = number;
+            _name = name;
             _lastDate = new Date(0);
             _muc = muc;
         }
@@ -239,9 +241,9 @@ public abstract class XmppMuc {
                     if (sentDate.compareTo(_lastDate) > 0 ) {
                         Intent intent = new Intent(XmppManager.ACTION_MESSAGE_RECEIVED);
                         if(_muc.getOccupantsCount() > 2) {
-                            intent.putExtra("message", "sms:" + _number + ":" + from + ": " + message.getBody());
+                            intent.putExtra("message", "sms:" + _name + ":" + from + ": " + message.getBody());
                         } else {
-                            intent.putExtra("message", "sms:" + _number + ":" + message.getBody());
+                            intent.putExtra("message", "sms:" + _name + ":" + message.getBody());
                         }
                         
                         _context.sendBroadcast(intent);
