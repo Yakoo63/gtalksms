@@ -379,33 +379,7 @@ public class MainService extends Service {
         _serviceHandler = new ServiceHandler(_serviceLooper);
         initNotificationStuff();
         Log.i(Tools.LOG_TAG, "service created");
-        IsRunning = true;
-        
-        _gAnalytics = GoogleAnalyticsTracker.getInstance();
-        _gAnalytics.setProductVersion(
-                Tools.getVersion(getBaseContext(), getClass()), 
-                Tools.getVersionCode(getBaseContext(), getClass()));
-        _gAnalytics.start("UA-20245441-1", this);
-        
-        _NewInstallUpdate = new NewInstallUpdate(getApplicationContext());
-        switch(_NewInstallUpdate.isNewInstallUpdate()) {
-        	case NewInstallUpdate.FRESH_INSTALL:
-                _gAnalytics.trackEvent(
-                        "GTalkSMS",  // Category
-                        "Fresh Install",  // Action
-                        "Fresh Install:  " + Tools.getVersionName(getBaseContext(), getClass()), // Label
-                        0);       // Value      
-                _gAnalytics.dispatch();
-                break;
-        	case NewInstallUpdate.UPDATE:
-                _gAnalytics.trackEvent(
-                        "GTalkSMS",  // Category
-                        "Update",  // Action
-                        "Update: " + Tools.getVersionName(getBaseContext(), getClass()), // Label
-                        0);       // Value      
-                _gAnalytics.dispatch();
-                break;      		
-        }
+        IsRunning = true;           		       
     }
 
     @Override
@@ -542,14 +516,38 @@ public class MainService extends Service {
         
         return currentState;
     }
-
+    
+    /**
+     * this method is called once in the lifetime of the service
+     * and only if we have a network available
+     */
     private void setupListenersForConnection() {
-        Log.d(Tools.LOG_TAG, "setupListenersForConnection");
-        _gAnalytics.trackEvent(
-                "GTalkSMS",  // Category
-                "Service",  // Action
-                "Start " + Tools.getVersionName(getBaseContext(), getClass()), // Label
-                0);       // Value      
+        Log.d(Tools.LOG_TAG, "setupListenersForConnection");  
+    	_gAnalytics = GoogleAnalyticsTracker.getInstance();
+        _gAnalytics.setProductVersion(
+                Tools.getVersion(getBaseContext(), getClass()), 
+                Tools.getVersionCode(getBaseContext(), getClass()));
+        _gAnalytics.start("UA-20245441-1", this);
+        
+        _NewInstallUpdate = new NewInstallUpdate(getApplicationContext());
+        switch(_NewInstallUpdate.isNewInstallUpdate()) {
+        	case NewInstallUpdate.FRESH_INSTALL:
+                _gAnalytics.trackEvent(
+                        "GTalkSMS",  // Category
+                        "Fresh Install",  // Action
+                        "Fresh Install:  " + Tools.getVersionName(getBaseContext(), getClass()), // Label
+                        0);       // Value      
+                _gAnalytics.dispatch();
+                break;
+        	case NewInstallUpdate.UPDATE:
+                _gAnalytics.trackEvent(
+                        "GTalkSMS",  // Category
+                        "Update",  // Action
+                        "Update: " + Tools.getVersionName(getBaseContext(), getClass()), // Label
+                        0);       // Value      
+                _gAnalytics.dispatch();
+                break;   
+        }
         try {
             setupCommands();
         } catch (Exception e) {
