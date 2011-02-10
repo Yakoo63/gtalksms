@@ -116,7 +116,7 @@ public class XmppMsg {
         ArrayList<XmppFont> fonts = new ArrayList<XmppFont>(_fonts);
         
         XHTMLText x = new XHTMLText(null, null);
-        x.appendOpenParagraphTag("font-family:" + _mainFont._font); // open a paragraph with default font - which is currently null - is ok clients will fall back to their default font
+        x.appendOpenParagraphTag(_mainFont.toString()); // open a paragraph with default font - which is may be null - clients will fall back to their default font
         x.appendOpenSpanTag("");  // needed because we close span on fontbegin
         while((pos = getTagPos(m)) != -1) {
             procesTagAt(pos, x, m, fonts);
