@@ -51,7 +51,7 @@ public class MainScreen extends Activity {
     private ServiceConnection _mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mainService = ((MainService.LocalBinder) service).getService();
-            MainScreen.this.updateStatus(mainService.getConnectionStatus(), mainService.getTLSStatus());
+            MainScreen.this.updateStatus(mainService.getConnectionStatus(), mainService.getTLSStatus(), mainService.getCompressionStatus());
             mainService.updateBuddies();
         }
 
@@ -60,9 +60,10 @@ public class MainScreen extends Activity {
         }
     };
 
-    public void updateStatus(int status, boolean tls) {
+    public void updateStatus(int status, boolean tls, boolean compression) {
         ImageView statusImg = (ImageView) findViewById(R.id.StatusImage);
         ImageView tlsStatus = (ImageView) findViewById(R.id.TLSsecured);
+        ImageView compressionStatus = (ImageView) findViewById(R.id.compression);
 
         switch (status) {
             case XmppManager.CONNECTED:
@@ -81,6 +82,8 @@ public class MainScreen extends Activity {
         }
 
         tlsStatus.setVisibility(tls ? View.VISIBLE : View.INVISIBLE);
+        compressionStatus.setVisibility(compression ? View.VISIBLE : View.INVISIBLE);
+        
     }
 
     @Override
@@ -165,7 +168,7 @@ public class MainScreen extends Activity {
                     updateBuddiesList();
 
                 } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
-                    updateStatus(intent.getIntExtra("new_state", 0), intent.getBooleanExtra("TLS", false));
+                    updateStatus(intent.getIntExtra("new_state", 0), intent.getBooleanExtra("TLS", false), intent.getBooleanExtra("Compression", false));
                 }
             }
         };

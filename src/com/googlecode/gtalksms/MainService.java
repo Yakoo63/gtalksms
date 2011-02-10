@@ -338,6 +338,10 @@ public class MainService extends Service {
     public boolean getTLSStatus() {
         return _xmppMgr == null ? false : _xmppMgr.getTLSStatus();
     }
+    
+    public boolean getCompressionStatus() {
+    	return _xmppMgr == null ? false : _xmppMgr.getCompressionStatus();
+    }
 
     public void updateBuddies() {
         if (_xmppMgr != null) {

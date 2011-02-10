@@ -39,6 +39,9 @@
         <ImageView android:id="@+id/TLSsecured" android:layout_width="wrap_content" android:src="@drawable/ic_lock_lock"
                    android:scaleType="centerInside" android:layout_height="40px" 
                    android:gravity="center_vertical" android:visibility="invisible" />
+        <ImageView android:id="@+id/compression" android:layout_width="wrap_content" android:src="@drawable/zlib"
+                   android:scaleType="centerInside" android:layout_height="40px" 
+                   android:gravity="center_vertical" android:visibility="invisible" />
         <TextView android:text="Version X.X.X" android:id="@+id/VersionLabel"
                   android:layout_height="fill_parent" android:layout_width="fill_parent" 
                   android:gravity="bottom|right" />

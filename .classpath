@@ -13,5 +13,6 @@
 			<attribute name="javadoc_location" value="http://code.google.com/intl/fr-FR/apis/gdata/javadoc/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/jzlib-1.07.jar" sourcepath="lib/jzlib-1.0.7.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

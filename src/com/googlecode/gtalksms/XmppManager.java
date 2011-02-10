@@ -197,6 +197,7 @@ public class XmppManager {
         intent.putExtra("new_state", new_state);
         if(new_state == CONNECTED) {
             intent.putExtra("TLS", _connection.isUsingTLS());
+            intent.putExtra("Compression", _connection.isUsingCompression());
         }
         ctx.sendBroadcast(intent);
     }
@@ -260,6 +261,8 @@ public class XmppManager {
         conf.setTruststorePath("/system/etc/security/cacerts.bks");
         conf.setTruststorePassword("changeit");
         conf.setTruststoreType("bks");
+        conf.setCompressionEnabled(true);  // TODO make this a setting
+        
         XMPPConnection connection = new XMPPConnection(conf);
         try {
             connection.connect();
@@ -389,6 +392,10 @@ public class XmppManager {
     
     public boolean getTLSStatus() {
         return _connection == null ? false : _connection.isUsingTLS();
+    }
+    
+    public boolean getCompressionStatus() {
+    	return _connection == null ? false : _connection.isUsingCompression();
     }
 
     /** sends a message to the user */
