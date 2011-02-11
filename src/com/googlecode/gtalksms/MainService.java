@@ -190,7 +190,9 @@ public class MainService extends Service {
         } else if (a.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
             Log.d(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
-            
+            if(available) {
+            	GoogleAnalyticsHelper.dispatch();
+            }
             // TODO wait few seconds if network not available ? to avoid multiple reconnections
             if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
                 // We are in a waiting state and have a network - try to connect.
@@ -429,7 +431,7 @@ public class MainService extends Service {
                     } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
                         onConnectionStatusChanged(intent.getIntExtra("old_state", 0),
                                                   intent.getIntExtra("new_state", 0));
-                        startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY));
+                        startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY));  //TODO the intent handling could be improved at this point
                     }
                 }
             };
@@ -504,7 +506,6 @@ public class MainService extends Service {
         boolean wantListeners;
         switch (currentState) {
         case XmppManager.CONNECTED:
-            GoogleAnalyticsHelper.dispatch();
             wantListeners = true;
             break;
         case XmppManager.CONNECTING:
