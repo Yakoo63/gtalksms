@@ -593,7 +593,7 @@ public class SmsCmd extends Command {
         if (message.length() < shortenTo) {
             shortendMessage = message;
         } else {
-            shortendMessage = message.substring(0, shortenTo) + "...";
+            shortendMessage = message.substring(0, shortenTo).replace("\n", " ") + "...";
         }
         return shortendMessage;
     }
