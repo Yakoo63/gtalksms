@@ -40,7 +40,7 @@ public class XmppFileManager implements FileTransferListener {
 
         try {
             transfer.sendFile(new File(path), "Sending you: " + path);
-            send("File transfert: " + path + " - " + transfer.getFileSize() / 1024 + " KB");
+            send("File transfer: " + path + " - " + transfer.getFileSize() / 1024 + " KB");
             
             while (!transfer.isDone()) {
                 if (transfer.getStatus() == FileTransfer.Status.refused) {
@@ -63,7 +63,7 @@ public class XmppFileManager implements FileTransferListener {
 
     @Override
     public void fileTransferRequest(FileTransferRequest request) {
-        if (!request.getRequestor().contains(_settings.notifiedAddress)) {
+        if (!request.getRequestor().equals(_settings.notifiedAddress)) { 
             send("File transfert from " + request.getRequestor() + " rejected.");
             return;
         }
