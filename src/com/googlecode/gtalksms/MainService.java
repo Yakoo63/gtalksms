@@ -23,7 +23,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.googlecode.gtalksms.cmd.BatteryCmd;
 import com.googlecode.gtalksms.cmd.CallCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
@@ -90,6 +89,7 @@ public class MainService extends Service {
 
     private long _handlerThreadId;
     
+    // to get the helper use MainService.getAnalyticsHelper()
     private static GoogleAnalyticsHelper _gAnalytics;
     
 
@@ -341,6 +341,10 @@ public class MainService extends Service {
     public boolean getCompressionStatus() {
     	return _xmppMgr == null ? false : _xmppMgr.getCompressionStatus();
     }
+    
+    public static GoogleAnalyticsHelper getAnalyticsHelper() {
+    	return _gAnalytics;
+    }
 
     public void updateBuddies() {
         if (_xmppMgr != null) {
@@ -390,9 +394,7 @@ public class MainService extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
-        // The application has been killed by Android and then restart
-        if (intent == null) {
-            Log.e(Tools.LOG_TAG, "onStart start connection: Intent null, force connection");
+        if (intent == null) {  // The application has been killed by Android and we try to restart the connection
             startService(new Intent(MainService.ACTION_CONNECT));
             return;
         }
@@ -502,6 +504,7 @@ public class MainService extends Service {
         boolean wantListeners;
         switch (currentState) {
         case XmppManager.CONNECTED:
+            GoogleAnalyticsHelper.dispatch();
             wantListeners = true;
             break;
         case XmppManager.CONNECTING:
@@ -533,7 +536,6 @@ public class MainService extends Service {
         	_gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         }
         _gAnalytics.trackInstalls(); //we only track if we have a data connection
-        GoogleAnalyticsHelper.dispatch();
 
         try {
             setupCommands();
@@ -558,16 +560,13 @@ public class MainService extends Service {
             _xmppMgr = null;
         }
         teardownListenersForConnection();
+            _gAnalytics.stop();
         _serviceLooper.quit();
         super.onDestroy();
     }
     
     private void teardownListenersForConnection() {
         Log.d(Tools.LOG_TAG, "teardownListenersForConnection");
-        if (_gAnalytics != null) {
-            _gAnalytics.stop();
-            _gAnalytics = null;
-        }
         
         stopForegroundCompat(getConnectionStatus());
 

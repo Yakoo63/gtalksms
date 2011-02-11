@@ -261,7 +261,7 @@ public class XmppManager {
         conf.setTruststorePath("/system/etc/security/cacerts.bks");
         conf.setTruststorePassword("changeit");
         conf.setTruststoreType("bks");
-        conf.setCompressionEnabled(true);  // TODO make this a setting
+        if(_settings.useCompression) conf.setCompressionEnabled(true); 
         
         XMPPConnection connection = new XMPPConnection(conf);
         try {

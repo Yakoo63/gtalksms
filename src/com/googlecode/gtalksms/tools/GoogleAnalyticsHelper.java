@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import android.content.Context;
+import android.util.Log;
 
 public class GoogleAnalyticsHelper {
 	public static final int NONE = 0;
@@ -19,9 +20,7 @@ public class GoogleAnalyticsHelper {
     private static GoogleAnalyticsTracker gAnalytics;
     private static boolean statisticsEnabled;
     private static boolean run = false;
-
-	
-	
+    
 	public GoogleAnalyticsHelper(Context c) {
         statisticsEnabled = true;  //TODO preference
 		version = Tools.getVersionCode(c, getClass());
@@ -35,6 +34,12 @@ public class GoogleAnalyticsHelper {
 		}
 	}
 	
+	public void stop() {
+		if (gAnalytics != null) {
+			gAnalytics.stop();
+		}
+	}
+	
 	public void trackEvent(String action, String label, int value) {
 		if(gAnalytics != null) {
 			gAnalytics.trackEvent(Tools.APP_NAME, 
@@ -44,12 +49,24 @@ public class GoogleAnalyticsHelper {
 		}
 	}
 	
-	public boolean trackEventAndDispatch(String action, String label, int value) {
-		if (gAnalytics != null) {
-			gAnalytics.trackEvent(Tools.APP_NAME, action, label, value);
-			return dispatch();
+	public void trackAndLogError(String errorMsg) {
+		if(gAnalytics != null) {
+			gAnalytics.trackEvent(Tools.APP_NAME, 
+					"error",
+					errorMsg,
+					0);
 		}
-		return false;
+		Log.e(Tools.LOG_TAG, errorMsg);
+	}
+	
+	public void trackAndLogWarning(String warningMsg) {
+		if(gAnalytics != null) {
+			gAnalytics.trackEvent(Tools.APP_NAME, 
+					"error",
+					warningMsg,
+					0);
+		}
+		Log.w(Tools.LOG_TAG, warningMsg);
 	}
 	
 	public void trackInstalls() {

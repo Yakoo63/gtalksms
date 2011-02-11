@@ -22,6 +22,7 @@ public class SettingsManager {
     public boolean useDifferentAccount;
     public String roomsPassword;
     public String mucServer;
+    public boolean useCompression;
     
     // notifications
     public boolean notifyApplicationConnection;
@@ -94,6 +95,7 @@ public class SettingsManager {
         } else{
             login = notifiedAddress;
         }
+        useCompression = _sharedPreferences.getBoolean("useCompression", false);
         
         useGoogleMap = _sharedPreferences.getBoolean("useGoogleMapUrl", true);
         useOpenStreetMap = _sharedPreferences.getBoolean("useOpenStreetMapUrl", false);

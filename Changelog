@@ -1,6 +1,6 @@
 1.9
 * Ringmode command added
-* OpenStreetView added as location provider
+* OpenStreetMap added as location provider
 * Buddies list displayed in main screen
 * Show an icon if connection is secured
 * Enhance xmpp connections
