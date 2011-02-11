@@ -4,21 +4,81 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.content.Context;
 
-public class NewInstallUpdate {
+public class GoogleAnalyticsHelper {
 	public static final int NONE = 0;
 	public static final int FRESH_INSTALL = 1;
 	public static final int UPDATE = 2;
 	
 	private final String version_filename;
 	private final Context ctx;
-	final String version;
+	private final String version;
+    private static GoogleAnalyticsTracker gAnalytics;
+    private static boolean statisticsEnabled;
+    private static boolean run = false;
+
 	
-	public NewInstallUpdate(Context c) {
+	
+	public GoogleAnalyticsHelper(Context c) {
+        statisticsEnabled = true;  //TODO preference
 		version = Tools.getVersionCode(c, getClass());
 		this.ctx = c;
 		version_filename = Tools.LOG_TAG + "_version_" + version;
+		if (statisticsEnabled) {  //avoid running GoogleAnalytics if it is not wanted to save memory and cpu
+			gAnalytics = GoogleAnalyticsTracker.getInstance();
+			gAnalytics.setProductVersion(Tools.getVersion(c, getClass()),
+					Tools.getVersionCode(c, getClass()));
+			gAnalytics.start("UA-21339659-1", c);
+		}
+	}
+	
+	public void trackEvent(String action, String label, int value) {
+		if(gAnalytics != null) {
+			gAnalytics.trackEvent(Tools.APP_NAME, 
+					action,
+					label,
+					value);
+		}
+	}
+	
+	public boolean trackEventAndDispatch(String action, String label, int value) {
+		if (gAnalytics != null) {
+			gAnalytics.trackEvent(Tools.APP_NAME, action, label, value);
+			return dispatch();
+		}
+		return false;
+	}
+	
+	public void trackInstalls() {
+		if (!run && (gAnalytics != null)) {
+			switch (isNewInstallUpdate()) {
+			case GoogleAnalyticsHelper.FRESH_INSTALL:
+				gAnalytics.trackEvent("GTalkSMS", // Category
+						"Fresh Install", // Action
+						"Fresh Install:  "
+								+ Tools.getVersionName(ctx, getClass()), // Label
+						0); // Value
+				break;
+			case GoogleAnalyticsHelper.UPDATE:
+				gAnalytics.trackEvent("GTalkSMS", // Category
+						"Update", // Action
+						"Update: " + Tools.getVersionName(ctx, getClass()), // Label
+						0); // Value
+				break;
+			}
+			run = true;
+		}
+	}
+	
+	public static boolean dispatch() {
+		if (gAnalytics != null) {
+			return gAnalytics.dispatch();
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -27,7 +87,7 @@ public class NewInstallUpdate {
 	 * 
 	 * @return 2 on update, 1 if this is an fresh install, otherwise 0
 	 */
-	public int isNewInstallUpdate() {
+	private int isNewInstallUpdate() {
 		if(isVersionInstalled()) {
 			return NONE;
 		} else if (hasOldVersionFile()) {

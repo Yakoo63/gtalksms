@@ -41,7 +41,7 @@ import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.tools.Tools;
-import com.googlecode.gtalksms.tools.NewInstallUpdate;
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MainService extends Service {
@@ -90,8 +90,7 @@ public class MainService extends Service {
 
     private long _handlerThreadId;
     
-    private GoogleAnalyticsTracker _gAnalytics;
-    private static NewInstallUpdate _NewInstallUpdate;
+    private static GoogleAnalyticsHelper _gAnalytics;
     
 
     // some stuff for the async service implementation - borrowed heavily from
@@ -368,7 +367,10 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
     	super.onCreate();
-    	
+        
+    	if(_gAnalytics == null)
+        	_gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
+        
     	_settingsMgr = new SettingsManager(this) {
             @Override  public void OnPreferencesUpdated() {
                 Tools.setLocale(_settingsMgr, getBaseContext());
@@ -527,31 +529,12 @@ public class MainService extends Service {
      */
     private void setupListenersForConnection() {
         Log.d(Tools.LOG_TAG, "setupListenersForConnection");  
-    	_gAnalytics = GoogleAnalyticsTracker.getInstance();
-        _gAnalytics.setProductVersion(
-                Tools.getVersion(getBaseContext(), getClass()), 
-                Tools.getVersionCode(getBaseContext(), getClass()));
-        _gAnalytics.start("UA-20245441-1", this);
-        
-        _NewInstallUpdate = new NewInstallUpdate(getApplicationContext());
-        switch(_NewInstallUpdate.isNewInstallUpdate()) {
-        	case NewInstallUpdate.FRESH_INSTALL:
-                _gAnalytics.trackEvent(
-                        "GTalkSMS",  // Category
-                        "Fresh Install",  // Action
-                        "Fresh Install:  " + Tools.getVersionName(getBaseContext(), getClass()), // Label
-                        0);       // Value      
-                _gAnalytics.dispatch();
-                break;
-        	case NewInstallUpdate.UPDATE:
-                _gAnalytics.trackEvent(
-                        "GTalkSMS",  // Category
-                        "Update",  // Action
-                        "Update: " + Tools.getVersionName(getBaseContext(), getClass()), // Label
-                        0);       // Value      
-                _gAnalytics.dispatch();
-                break;   
+        if(_gAnalytics == null) {
+        	_gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         }
+        _gAnalytics.trackInstalls(); //we only track if we have a data connection
+        GoogleAnalyticsHelper.dispatch();
+
         try {
             setupCommands();
         } catch (Exception e) {
