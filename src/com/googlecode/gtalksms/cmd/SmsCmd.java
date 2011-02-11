@@ -37,7 +37,7 @@ public class SmsCmd extends Command {
 
     private int _smsCount;
     
-    // Id used to distinguish the PendingIntents
+    // int counter used to distinguish the PendingIntents
     private int _penSIntentCount;
     private int _penDIntentCount;
     private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
@@ -508,8 +508,8 @@ public class SmsCmd extends Command {
     public void setLastRecipient(String phoneNumber) {
         if (_lastRecipient == null || !phoneNumber.equals(_lastRecipient)) {
             _lastRecipient = phoneNumber;
-            displayLastRecipient();
             _lastRecipientName = ContactsManager.getContactName(_context, phoneNumber);
+            displayLastRecipient();
         }
     }
     
