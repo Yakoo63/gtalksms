@@ -104,16 +104,8 @@ public class XmppManager {
         _context = context;
         configure(ProviderManager.getInstance());
         _xmppBuddies = new XmppBuddies(context, settings);
-        _xmppFileMgr = new XmppFileManager(context, settings) {
-            @Override protected void send(String msg) {
-                XmppManager.this.send(msg);
-            }
-        };
-        _xmppMuc = new XmppMuc(context, settings) {
-            @Override protected void send(String msg) {
-                XmppManager.this.send(msg);
-            }
-        };
+        _xmppFileMgr = new XmppFileManager(context, settings, this);
+        _xmppMuc = new XmppMuc(context, settings, this);
     }
 
     public void start() {
@@ -398,9 +390,16 @@ public class XmppManager {
     	return _connection == null ? false : _connection.isUsingCompression();
     }
 
-    /** sends a message to the user */
+    /** 
+     * sends a message to the user
+     * but only if we connected
+     * does nothing if we are not connected 
+     * 
+     */
     public void send(String message) {
-        send(new XmppMsg(message));
+        if (isConnected()) {
+            send(new XmppMsg(message));
+        }
     }
     
     /** sends a message to the user */

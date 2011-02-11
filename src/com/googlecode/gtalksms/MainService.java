@@ -590,12 +590,6 @@ public class MainService extends Service {
             _xmppMgr.send(msg);
         }
     }
-
-    public void sendFile(String fileName) {
-        if (_xmppMgr != null) {
-            _xmppMgr.sendFile(fileName);
-        }
-    }
     
     public SettingsManager getSettingsManager() {
         return _settingsMgr;

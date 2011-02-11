@@ -27,8 +27,8 @@ public class LocationService extends Service {
     private Location _currentBestLocation = null;
 
     private static final int TWO_MINUTES = 1000 * 60 * 2;
-    public static final String STOP_SERVICE = "STOP_SERVICE";
-    public static final String START_SERVICE = "START_SERVICE";
+    public static final String STOP_SERVICE = "com.googlecode.gtalksms.LOCATION_STOP_SERVICE";
+    public static final String START_SERVICE = "com.googlecode.gtalksms.LOCATION_START_SERVICE";
 
     @Override
     public IBinder onBind(Intent arg0) {

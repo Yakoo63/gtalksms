@@ -27,17 +27,20 @@ import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 
-public abstract class XmppMuc {
+public class XmppMuc {
 
     private Map<String, MultiUserChat> _rooms = new HashMap<String, MultiUserChat>();
     private Set<Integer> _roomNumbers = new HashSet<Integer>();
     private Context _context;
     private SettingsManager _settings;
     private XMPPConnection _connection;
+    private XmppManager _xmppMgr;
+
     
-    public XmppMuc(Context context, SettingsManager settings) {
+    public XmppMuc(Context context, SettingsManager settings, XmppManager xmppMgr) {
         _context = context;
         _settings = settings;
+        _xmppMgr = xmppMgr;
     }
     
     public void initialize(XMPPConnection connection) {
@@ -256,5 +259,7 @@ public abstract class XmppMuc {
         }
     }
 
-    protected abstract void send(String msg);
+    private void send(String msg) {
+        _xmppMgr.send(msg);
+    }
 }

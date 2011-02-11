@@ -15,20 +15,22 @@ import android.content.Context;
 import android.util.Log;
 
 import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 
-public abstract class XmppFileManager implements FileTransferListener {
+public class XmppFileManager implements FileTransferListener {
     private SettingsManager _settings;
     private XMPPConnection _connection;
     private FileTransferManager _fileTransferManager = null;
+    private XmppManager _xmppMgr;
     
-    public XmppFileManager(Context context, SettingsManager settings) {
+    public XmppFileManager(Context context, SettingsManager settings, XmppManager xmppMgr) {
         _settings = settings;
+        _xmppMgr = xmppMgr;
     }
     
     public void initialize(XMPPConnection connection) {
-        _connection = connection;
-        
+        _connection = connection;      
         _fileTransferManager = new FileTransferManager(_connection);
         _fileTransferManager.addFileTransferListener(this);
    }
@@ -37,7 +39,7 @@ public abstract class XmppFileManager implements FileTransferListener {
         OutgoingFileTransfer transfer = _fileTransferManager.createOutgoingFileTransfer(_settings.notifiedAddress);
 
         try {
-            transfer.sendFile(new File(path), "");
+            transfer.sendFile(new File(path), "Sending you: " + path);
             send("File transfert: " + path + " - " + transfer.getFileSize() / 1024 + " KB");
             
             while (!transfer.isDone()) {
@@ -49,6 +51,7 @@ public abstract class XmppFileManager implements FileTransferListener {
                     printError(transfer);
                     return;
                }
+               Thread.sleep(500);
             }
         } catch (Exception ex) {
             String message = "Cannot send the file because an error occured during the process." 
@@ -66,9 +69,9 @@ public abstract class XmppFileManager implements FileTransferListener {
         }
             
         IncomingFileTransfer transfer = request.accept();
-           
+        //TODO check if destination dir exists, create if not   
         String filePath = "/sdcard/GTalkSMS/" + request.getFileName();
-        send("File transfert: " + filePath + " - " + request.getFileSize() / 1024 + " KB");
+        send("File transfer: " + filePath + " - " + request.getFileSize() / 1024 + " KB");
         try {
             transfer.recieveFile(new File(filePath));
             send("File transfert: " + filePath + " - " + transfer.getStatus());
@@ -76,7 +79,7 @@ public abstract class XmppFileManager implements FileTransferListener {
             while (!transfer.isDone()) {
                 if (transfer.getStatus().equals(Status.in_progress)) {
                     percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
-                    send("File transfert: " + filePath + " - " + percents + "%");
+                    send("File transfer: " + filePath + " - " + percents + "%");
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {}
@@ -84,6 +87,7 @@ public abstract class XmppFileManager implements FileTransferListener {
                     printError(transfer);
                     return;
                 }
+                Thread.sleep(500);
             }
             if (transfer.getStatus().equals(Status.complete)) {
                 send("File transfert: " + filePath + " - 100%");
@@ -110,5 +114,7 @@ public abstract class XmppFileManager implements FileTransferListener {
         send(message);
     }
     
-    protected abstract void send(String msg);
+    private void send(String msg) {
+        _xmppMgr.send(msg);
+    }
 }
