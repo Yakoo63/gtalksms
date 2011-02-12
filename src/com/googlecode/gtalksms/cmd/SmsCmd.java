@@ -171,9 +171,13 @@ public class SmsCmd extends Command {
             int separatorPos = args.indexOf(":");
             contact = null;
             String message = null;
+            
             if (-1 != separatorPos) {
                 contact = args.substring(0, separatorPos);
                 message = args.substring(separatorPos + 1);
+            }
+            
+            if (message != null && message.length() > 0) {
                 sendSMS(message, contact);
             } else if (args.length() > 0) {
                 if (args.equals("unread")) {

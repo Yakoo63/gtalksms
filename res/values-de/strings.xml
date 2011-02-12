@@ -101,7 +101,7 @@
     <string name="about_authors">Autoren</string>
     <string name="about_donors">Unterstützer - Donors</string>
     <string name="about_change_log">Änderungen - Changelog</string>
-    <string name="chat_sms_from">SMS von %s: </string>
+    <string name="chat_sms_from">SMS von %s:&#xA0;</string>
     <string name="chat_battery_level">Akkuladestand %d%%</string>
     <string name="chat_error_no_recipient">Empfänger/Reply Kontakt ist nicht gesetzt.</string>
     <string name="chat_error_unknown_cmd">\'%s\': unbekannter Befehl. \&quot;?\&quot; für Hilfe.</string>

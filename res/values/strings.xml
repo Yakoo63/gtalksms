@@ -101,7 +101,7 @@
     <string name="about_authors">Authors</string>
     <string name="about_donors">Donors</string>
     <string name="about_change_log">Change Log</string>
-    <string name="chat_sms_from">SMS from %s: </string>
+    <string name="chat_sms_from">SMS from %s:&#xA0;</string>
     <string name="chat_battery_level">Battery level %d%%</string>
     <string name="chat_error_no_recipient">Reply contact is not set.</string>
     <string name="chat_error_unknown_cmd">\'%s\': unknown command. Send \"?\" for getting help.</string>

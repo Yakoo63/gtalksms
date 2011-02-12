@@ -99,7 +99,7 @@
     <string name="about_authors">Auteurs</string>
     <string name="about_donors">Doneurs</string>
     <string name="about_change_log">Liste des changements</string>
-    <string name="chat_sms_from">SMS de %s :</string>
+    <string name="chat_sms_from">SMS de %s :&#xA0;</string>
     <string name="chat_battery_level">Batterie à %d%%</string>
     <string name="chat_error_no_recipient">Destinataire non défini.</string>
     <string name="chat_error_unknown_cmd">\'%s\' : commande inconnue. Envoyer \"?\" afficher l\'aide.</string>
