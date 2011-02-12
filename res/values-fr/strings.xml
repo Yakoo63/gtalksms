@@ -39,6 +39,8 @@
     <string name="pref_con_cat">Paramètres de connexion</string>
     <string name="pref_con_use_different_account">Utiliser un compte différent</string>
     <string name="pref_con_use_different_account_help">Cocher pour utiliser un compte différent</string>
+    <string name="pref_con_use_compression">Compression des données</string>
+    <string name="pref_con_use_compression_help">Activer la compression des données du protocol XMPP</string>
     <string name="pref_con_login">Nom d\'utilisateur</string>
     <string name="pref_con_login_help">Nom d\'utilisateur utilisé pour le téléphone</string>
     <string name="pref_con_password">Mot de passe</string>
