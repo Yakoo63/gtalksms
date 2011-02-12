@@ -212,4 +212,38 @@ public class SmsMmsManager {
         return result;
     }
 
+    public int deleteLastSms(int number) {
+        return deleteLastSms("content://sms", number);
+    }
+    
+    public int deleteLastInSms(int number) {
+        return deleteLastSms("content://sms/inbox", number);
+    }
+    
+    public int deleteLastOutSms(int number) {
+        return deleteLastSms("content://sms/sent", number);
+    }
+    
+    public int deleteLastSms(String url, int number) {
+        int result = 0;
+
+        ContentResolver cr = _context.getContentResolver();
+        Uri deleteUri = Uri.parse(url);
+        Cursor c = cr.query(deleteUri, new String[] { "_id" }, null, null, "date desc");
+        try {
+            for (int i = 0 ; i < number && c.moveToNext() ; ++i) {
+                // Delete the SMS
+                String uri = "content://sms/" + c.getString(0);
+                result += cr.delete(Uri.parse(uri), null, null);
+            }
+        } catch (Exception e) {
+            Log.e(Tools.LOG_TAG, "exception in deleteSms:", e);
+            if (result == 0) {
+                result = -1;
+            }
+        }
+
+        return result;
+    }
+
 }

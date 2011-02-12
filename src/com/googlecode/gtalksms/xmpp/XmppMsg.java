@@ -165,12 +165,12 @@ public class XmppMsg {
 //            x.appendCloseStrongTag();
             msg.delete(0, BoldEnd.length());
         } else if (msg.indexOf(ItalicBegin) == 0) {     // italic
-            x.appendOpenSpanTag("font-style:italic");
-//            x.appendOpenEmTag();
+//            x.appendOpenSpanTag("font-style:italic");
+            x.appendOpenEmTag();
             msg.delete(0, ItalicBegin.length());
         } else if (msg.indexOf(ItalicEnd) == 0) {
-            x.appendCloseSpanTag();
-//            x.appendCloseEmTag();
+//            x.appendCloseSpanTag();
+            x.appendCloseEmTag();
             msg.delete(0, ItalicEnd.length());
         } else if (msg.indexOf(FontBegin) == 0) {       // font
             x.appendCloseSpanTag();

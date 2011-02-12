@@ -41,6 +41,7 @@ public class HelpCmd extends Command {
         _msgSms.appendLine(getString(R.string.chat_help_mark_as_read, makeBold("\"markAsRead:#contact#\""), makeBold("\"mar\"")));
         _msgSms.appendLine(getString(R.string.chat_help_del_sms_all, makeBold("\"delsms:all\"")));
         _msgSms.appendLine(getString(R.string.chat_help_del_sms_sent, makeBold("\"delsms:sent\"")));
+        _msgSms.appendLine(getString(R.string.chat_help_del_sms_last, makeBold("\"delsms:last:[number]\""), makeBold("\"delsms:lastin:[number]\""), makeBold("\"delsms:lastout:[number]\"")));
         _msgSms.appendLine(getString(R.string.chat_help_del_sms_contact, makeBold("\"delsms:contact:#contact#\"")));
         
         _msgGeo.appendLine(getString(R.string.chat_help_geo, makeBold("\"geo:#address#\"")));

@@ -137,6 +137,7 @@
     <string name="chat_help_sms_show_unread">- %s: afficher les SMS non lus de tous les contacts.</string>
     <string name="chat_help_sms_show_contact">- %s: afficher les SMS des contacts spécifiés.</string>
     <string name="chat_help_sms_send">- %s: envoyer un SMS au contact/numéro spécifié.</string>
+    <string name="chat_help_sms_chat">- %s: crée un nouveau salon de discussion. Le dernier contact sera utilisé si rien n\'est passé en paramètre.</string>
     <string name="chat_help_find_sms_all">- %1$s or %2$s: effectue une recherche dans tous les SMS.</string>
     <string name="chat_help_find_sms">- %1$s or %2$s: effectue une recherche dans les SMS des contacts spécifiés.</string>
     <string name="chat_help_mark_as_read">- %1$s ou %2$s: marquer comme lu les SMS du dernier destinataire ou du contact spécifié.</string>
@@ -153,6 +154,7 @@
     <string name="chat_help_ringmode">- %s: modifie le type de sonnerie avec mode=(normal|silent|vibrate). Affiche le type courant de sonnerie s\'il n\'y a aucun paramètre.</string>    
     <string name="chat_help_del_sms_all">- %s: Supprime tous les SMS sans confirmation !</string>    
     <string name="chat_help_del_sms_sent">- %s: Supprime tous les SMS envoyé sans confirmation !</string>    
+    <string name="chat_help_del_sms_last">- %1$s ou %2$s ou %3$s : Supprime les [number] derniers SMS, 1 par défaut.</string>    
     <string name="chat_help_del_sms_contact">- %s: Supprime tous les SMS échangés avec le contact spécifié sans confirmation !</string>    
     <string name="chat_call_unknown">Inconnu</string>
     <string name="chat_call_incoming">Entrant</string>

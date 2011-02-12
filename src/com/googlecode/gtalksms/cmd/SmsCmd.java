@@ -251,6 +251,21 @@ public class SmsCmd extends Command {
             nbDeleted = _smsMgr.deleteAllSms();
         } else if (cmd.equals("sent")) {
             nbDeleted = _smsMgr.deleteSentSms();
+        } else if (cmd.startsWith("last")) {
+            Integer number = Tools.parseInt(search);
+            if (number == null) {
+                number = 1;
+            }
+
+            if (cmd.equals("last")) { 
+                nbDeleted = _smsMgr.deleteLastSms(number);
+            } else if (cmd.equals("lastin")) { 
+                nbDeleted = _smsMgr.deleteLastInSms(number);
+            } else if (cmd.equals("lastout")) { 
+                nbDeleted = _smsMgr.deleteLastOutSms(number);
+            } else {
+                send(getString(R.string.chat_del_sms_error));
+            }
         } else if (cmd.equals("contact") && search != null) {
             ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(_context, search);
             if (contacts.size() > 1) {

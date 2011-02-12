@@ -154,6 +154,7 @@
     <string name="chat_help_ringmode">- %s: With mode=(normal|silent|vibrate) Set ringer mode. Shows the actual mode if no argument is given.</string>    
     <string name="chat_help_del_sms_all">- %s: Delete all SMS without confirmation!</string>    
     <string name="chat_help_del_sms_sent">- %s: Delete all sent SMS without confirmation!</string>    
+    <string name="chat_help_del_sms_last">- %1$s or %2$s or %3$s : Delete last [number] SMS, 1 by default.</string>    
     <string name="chat_help_del_sms_contact">- %s: Delete all SMS in the thread of the specified contact without confirmation!</string>    
     <string name="chat_call_unknown">Unknown</string>
     <string name="chat_call_incoming">Incoming</string>
