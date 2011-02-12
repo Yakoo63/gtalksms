@@ -16,6 +16,7 @@ import com.googlecode.gtalksms.SettingsManager;
 
 public class Tools {
     public final static String LOG_TAG = "gtalksms";
+    public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
     
     public static void toastMessage(Context ctx, String msg) {

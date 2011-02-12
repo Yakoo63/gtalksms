@@ -23,7 +23,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.googlecode.gtalksms.cmd.BatteryCmd;
 import com.googlecode.gtalksms.cmd.CallCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
@@ -41,6 +40,7 @@ import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MainService extends Service {
@@ -89,7 +89,9 @@ public class MainService extends Service {
 
     private long _handlerThreadId;
     
-    GoogleAnalyticsTracker _gAnalytics;
+    // to get the helper use MainService.getAnalyticsHelper()
+    private static GoogleAnalyticsHelper _gAnalytics;
+    
 
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
@@ -188,7 +190,9 @@ public class MainService extends Service {
         } else if (a.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
             Log.d(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
-            
+            if(available) {
+            	GoogleAnalyticsHelper.dispatch();
+            }
             // TODO wait few seconds if network not available ? to avoid multiple reconnections
             if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
                 // We are in a waiting state and have a network - try to connect.
@@ -335,6 +339,14 @@ public class MainService extends Service {
     public boolean getTLSStatus() {
         return _xmppMgr == null ? false : _xmppMgr.getTLSStatus();
     }
+    
+    public boolean getCompressionStatus() {
+    	return _xmppMgr == null ? false : _xmppMgr.getCompressionStatus();
+    }
+    
+    public static GoogleAnalyticsHelper getAnalyticsHelper() {
+    	return _gAnalytics;
+    }
 
     public void updateBuddies() {
         if (_xmppMgr != null) {
@@ -361,7 +373,10 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
     	super.onCreate();
-    	
+        
+    	if(_gAnalytics == null)
+        	_gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
+        
     	_settingsMgr = new SettingsManager(this) {
             @Override  public void OnPreferencesUpdated() {
                 Tools.setLocale(_settingsMgr, getBaseContext());
@@ -376,14 +391,12 @@ public class MainService extends Service {
         _serviceHandler = new ServiceHandler(_serviceLooper);
         initNotificationStuff();
         Log.i(Tools.LOG_TAG, "service created");
-        IsRunning = true;    
+        IsRunning = true;           		       
     }
 
     @Override
     public void onStart(Intent intent, int startId) {
-        // The application has been killed by Android and then restart
-        if (intent == null) {
-            Log.e(Tools.LOG_TAG, "onStart start connection: Intent null, force connection");
+        if (intent == null) {  // The application has been killed by Android and we try to restart the connection
             startService(new Intent(MainService.ACTION_CONNECT));
             return;
         }
@@ -418,7 +431,7 @@ public class MainService extends Service {
                     } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
                         onConnectionStatusChanged(intent.getIntExtra("old_state", 0),
                                                   intent.getIntExtra("new_state", 0));
-                        startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY));
+                        startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY));  //TODO the intent handling could be improved at this point
                     }
                 }
             };
@@ -513,20 +526,17 @@ public class MainService extends Service {
         
         return currentState;
     }
-
+    
+    /**
+     * this method is called once in the lifetime of the service
+     * and only if we have a network available
+     */
     private void setupListenersForConnection() {
-        Log.d(Tools.LOG_TAG, "setupListenersForConnection");
-        _gAnalytics = GoogleAnalyticsTracker.getInstance();
-        _gAnalytics.setProductVersion(
-                Tools.getVersion(getBaseContext(), getClass()), 
-                Tools.getVersionCode(getBaseContext(), getClass()));
-        _gAnalytics.start("UA-20245441-1", this);
-        _gAnalytics.trackEvent(
-                "GTalkSMS",  // Category
-                "Service",  // Action
-                "Start " + Tools.getVersionName(getBaseContext(), getClass()), // Label
-                0);       // Value      
-        _gAnalytics.dispatch();
+        Log.d(Tools.LOG_TAG, "setupListenersForConnection");  
+        if(_gAnalytics == null) {
+        	_gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
+        }
+        _gAnalytics.trackInstalls(); //we only track if we have a data connection
 
         try {
             setupCommands();
@@ -551,16 +561,13 @@ public class MainService extends Service {
             _xmppMgr = null;
         }
         teardownListenersForConnection();
+            _gAnalytics.stop();
         _serviceLooper.quit();
         super.onDestroy();
     }
     
     private void teardownListenersForConnection() {
         Log.d(Tools.LOG_TAG, "teardownListenersForConnection");
-        if (_gAnalytics != null) {
-            _gAnalytics.stop();
-            _gAnalytics = null;
-        }
         
         stopForegroundCompat(getConnectionStatus());
 
@@ -581,12 +588,6 @@ public class MainService extends Service {
     public void send(XmppMsg msg) {
         if (_xmppMgr != null) {
             _xmppMgr.send(msg);
-        }
-    }
-
-    public void sendFile(String fileName) {
-        if (_xmppMgr != null) {
-            _xmppMgr.sendFile(fileName);
         }
     }
     

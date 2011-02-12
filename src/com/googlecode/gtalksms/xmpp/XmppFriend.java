@@ -2,7 +2,7 @@ package com.googlecode.gtalksms.xmpp;
 
 public class XmppFriend {
 
-    public static enum UserStateType {
+    public static enum UserStateType { //TODO enum is bad in android programming
         OFFLINE,
         BUSY,
         AWAY,

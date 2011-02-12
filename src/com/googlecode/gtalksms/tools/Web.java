@@ -47,9 +47,7 @@ public class Web {
             File file = new File(path + fileName);
 
             long startTime = System.currentTimeMillis();
-            Log.d(Tools.LOG_TAG, "Download begins");
-            Log.d(Tools.LOG_TAG, "Downloading url:" + url);
-            Log.d(Tools.LOG_TAG, "Downloaded file name:" + fileName);
+            Log.d(Tools.LOG_TAG, "Download begins. url:" + url + " file name:" + fileName);
 
             URLConnection ucon = url.openConnection();
             InputStream is = ucon.getInputStream();

@@ -104,16 +104,8 @@ public class XmppManager {
         _context = context;
         configure(ProviderManager.getInstance());
         _xmppBuddies = new XmppBuddies(context, settings);
-        _xmppFileMgr = new XmppFileManager(context, settings) {
-            @Override protected void send(String msg) {
-                XmppManager.this.send(msg);
-            }
-        };
-        _xmppMuc = new XmppMuc(context, settings) {
-            @Override protected void send(String msg) {
-                XmppManager.this.send(msg);
-            }
-        };
+        _xmppFileMgr = new XmppFileManager(context, settings, this);
+        _xmppMuc = new XmppMuc(context, settings, this);
     }
 
     public void start() {
@@ -197,6 +189,7 @@ public class XmppManager {
         intent.putExtra("new_state", new_state);
         if(new_state == CONNECTED) {
             intent.putExtra("TLS", _connection.isUsingTLS());
+            intent.putExtra("Compression", _connection.isUsingCompression());
         }
         ctx.sendBroadcast(intent);
     }
@@ -260,6 +253,8 @@ public class XmppManager {
         conf.setTruststorePath("/system/etc/security/cacerts.bks");
         conf.setTruststorePassword("changeit");
         conf.setTruststoreType("bks");
+        if(_settings.useCompression) conf.setCompressionEnabled(true); 
+        
         XMPPConnection connection = new XMPPConnection(conf);
         try {
             connection.connect();
@@ -390,10 +385,21 @@ public class XmppManager {
     public boolean getTLSStatus() {
         return _connection == null ? false : _connection.isUsingTLS();
     }
+    
+    public boolean getCompressionStatus() {
+    	return _connection == null ? false : _connection.isUsingCompression();
+    }
 
-    /** sends a message to the user */
+    /** 
+     * sends a message to the user
+     * but only if we connected
+     * does nothing if we are not connected 
+     * 
+     */
     public void send(String message) {
-        send(new XmppMsg(message));
+        if (isConnected()) {
+            send(new XmppMsg(message));
+        }
     }
     
     /** sends a message to the user */

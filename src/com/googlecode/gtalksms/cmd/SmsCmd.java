@@ -37,7 +37,7 @@ public class SmsCmd extends Command {
 
     private int _smsCount;
     
-    // Id used to distinguish the PendingIntents
+    // int counter used to distinguish the PendingIntents
     private int _penSIntentCount;
     private int _penDIntentCount;
     private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
@@ -389,7 +389,7 @@ public class SmsCmd extends Command {
     /** sends a SMS to the specified contact */
     private void sendSMS(String message, String contact) {
         if (Phone.isCellPhoneNumber(contact)) {
-            send(getString(R.string.chat_send_sms, ContactsManager.getContactName(_context, contact)));
+            send(getString(R.string.chat_send_sms, ContactsManager.getContactName(_context, contact)) + ": \"" + shortenMessage(message) + "\"");
             sendSMSByPhoneNumber(message, contact, null);
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
@@ -401,7 +401,7 @@ public class SmsCmd extends Command {
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
-                send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")"));
+                send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")")  + ": \"" + shortenMessage(message) + "\"");
                 setLastRecipient(phone.cleanNumber);
                 sendSMSByPhoneNumber(message, phone.cleanNumber, phone.contactName);
             } else {
@@ -523,8 +523,8 @@ public class SmsCmd extends Command {
     public void setLastRecipient(String phoneNumber) {
         if (_lastRecipient == null || !phoneNumber.equals(_lastRecipient)) {
             _lastRecipient = phoneNumber;
-            displayLastRecipient();
             _lastRecipientName = ContactsManager.getContactName(_context, phoneNumber);
+            displayLastRecipient();
         }
     }
     
@@ -608,7 +608,7 @@ public class SmsCmd extends Command {
         if (message.length() < shortenTo) {
             shortendMessage = message;
         } else {
-            shortendMessage = message.substring(0, shortenTo) + "...";
+            shortendMessage = message.substring(0, shortenTo).replace("\n", " ") + "...";
         }
         return shortendMessage;
     }
