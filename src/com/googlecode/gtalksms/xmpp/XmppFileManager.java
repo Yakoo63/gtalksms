@@ -51,7 +51,7 @@ public class XmppFileManager implements FileTransferListener {
                     printError(transfer);
                     return;
                }
-               Thread.sleep(500);
+               Thread.sleep(1000);
             }
         } catch (Exception ex) {
             String message = "Cannot send the file because an error occured during the process." 
@@ -87,7 +87,7 @@ public class XmppFileManager implements FileTransferListener {
                     printError(transfer);
                     return;
                 }
-                Thread.sleep(500);
+                Thread.sleep(1000);
             }
             if (transfer.getStatus().equals(Status.complete)) {
                 send("File transfert: " + filePath + " - 100%");
