@@ -14,9 +14,11 @@ import org.jivesoftware.smack.util.StringUtils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppBuddies implements RosterListener {
     
@@ -57,17 +59,21 @@ public class XmppBuddies implements RosterListener {
             return friends;
         }
         
-        String userID = null;
-        String status = null;
-        Roster roster = _connection.getRoster();
-
-        for (RosterEntry r : roster.getEntries()) {
-            userID = r.getUser();
-            status = retrieveStatus(userID);
-            friends.add(new XmppFriend(userID, r.getName(), status, retrieveState(userID)));
+        try {
+            String userID = null;
+            String status = null;
+            Roster roster = _connection.getRoster();
+    
+            for (RosterEntry r : roster.getEntries()) {
+                userID = r.getUser();
+                status = retrieveStatus(userID);
+                friends.add(new XmppFriend(userID, r.getName(), status, retrieveState(userID)));
+            }
+    
+            sendFriendList(friends);
+        } catch (Exception ex) {
+            Log.e(Tools.LOG_TAG, "Failed to retrieve Xmpp Friend list", ex);
         }
-
-        sendFriendList(friends);
         
         return friends;
     }

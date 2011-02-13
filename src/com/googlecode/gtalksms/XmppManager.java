@@ -365,9 +365,13 @@ public class XmppManager {
         presence.setPriority(24);                   
         _connection.sendPacket(presence);
         
-        _connection.getRoster().addRosterListener(_xmppBuddies);
-        _connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
-        _xmppBuddies.retrieveFriendList();
+        try {
+            _connection.getRoster().addRosterListener(_xmppBuddies);
+            _connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
+            _xmppBuddies.retrieveFriendList();
+        } catch (Exception ex) {
+            Log.e(Tools.LOG_TAG, "Failed to setup Xmpp Friend list roster.", ex);
+        }
     }
     
     /** returns true if the service is correctly connected */
