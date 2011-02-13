@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.googlecode.gtalksms" android:versionName="1.9" android:versionCode="23">
+    package="com.googlecode.gtalksms" android:versionName="1.9.1" android:versionCode="24">
     <uses-sdk android:minSdkVersion="5" />
     <application android:icon="@drawable/icon_green" android:label="@string/app_name" android:debuggable="false">
         <activity android:name="com.googlecode.gtalksms.panels.MainScreen"

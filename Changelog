@@ -5,6 +5,8 @@
 * Show an icon if connection is secured
 * Enhance xmpp connections
 * Fix root access for shell commands
+* New "chat" command
+* New "delsms" command
 
 1.8
 * Xmpp lib updated
