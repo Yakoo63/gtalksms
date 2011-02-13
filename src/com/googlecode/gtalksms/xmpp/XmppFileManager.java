@@ -63,7 +63,7 @@ public class XmppFileManager implements FileTransferListener {
 
     @Override
     public void fileTransferRequest(FileTransferRequest request) {
-        if (!request.getRequestor().equals(_settings.notifiedAddress)) { 
+        if (!request.getRequestor().startsWith(_settings.notifiedAddress)) { 
             send("File transfert from " + request.getRequestor() + " rejected.");
             return;
         }
@@ -80,9 +80,6 @@ public class XmppFileManager implements FileTransferListener {
                 if (transfer.getStatus().equals(Status.in_progress)) {
                     percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
                     send("File transfer: " + filePath + " - " + percents + "%");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {}
                 } else if (transfer.getStatus().equals(Status.error)) {
                     printError(transfer);
                     return;
