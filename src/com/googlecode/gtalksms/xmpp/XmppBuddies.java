@@ -18,6 +18,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppBuddies implements RosterListener {
@@ -72,7 +73,7 @@ public class XmppBuddies implements RosterListener {
     
             sendFriendList(friends);
         } catch (Exception ex) {
-            Log.e(Tools.LOG_TAG, "Failed to retrieve Xmpp Friend list", ex);
+            GoogleAnalyticsHelper.trackAndLogWarning("Failed to retrieve Xmpp Friend list", ex);
         }
         
         return friends;

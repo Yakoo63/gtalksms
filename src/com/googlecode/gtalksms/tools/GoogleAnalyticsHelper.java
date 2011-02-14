@@ -34,13 +34,13 @@ public class GoogleAnalyticsHelper {
 		}
 	}
 	
-	public void stop() {
+	public static void stop() {
 		if (gAnalytics != null) {
 			gAnalytics.stop();
 		}
 	}
 	
-	public void trackEvent(String action, String label, int value) {
+	public static void trackEvent(String action, String label, int value) {
 		if(gAnalytics != null) {
 			gAnalytics.trackEvent(Tools.APP_NAME, 
 					action,
@@ -49,26 +49,34 @@ public class GoogleAnalyticsHelper {
 		}
 	}
 	
-	public void trackAndLogError(String errorMsg) {
-		if(gAnalytics != null) {
-			gAnalytics.trackEvent(Tools.APP_NAME, 
-					"error",
-					errorMsg,
-					0);
-		}
-		Log.e(Tools.LOG_TAG, errorMsg);
-	}
-	
-	public void trackAndLogWarning(String warningMsg) {
-		if(gAnalytics != null) {
-			gAnalytics.trackEvent(Tools.APP_NAME, 
-					"error",
-					warningMsg,
-					0);
-		}
-		Log.w(Tools.LOG_TAG, warningMsg);
-	}
-	
+    public static void trackAndLogError(String errorMsg) {
+        if (gAnalytics != null) {
+            gAnalytics.trackEvent(Tools.APP_NAME, "error", errorMsg, 0);
+        }
+        Log.e(Tools.LOG_TAG, errorMsg);
+    }
+
+    public static void trackAndLogWarning(String warningMsg) {
+        if (gAnalytics != null) {
+            gAnalytics.trackEvent(Tools.APP_NAME, "error", warningMsg, 0);
+        }
+        Log.w(Tools.LOG_TAG, warningMsg);
+    }
+
+    public static void trackAndLogError(String errorMsg, Exception e) {
+        if (gAnalytics != null) {
+            gAnalytics.trackEvent(Tools.APP_NAME, "error", errorMsg, 0);
+        }
+        Log.e(Tools.LOG_TAG, errorMsg + " " + e);
+    }
+
+    public static void trackAndLogWarning(String warningMsg, Exception e) {
+        if (gAnalytics != null) {
+            gAnalytics.trackEvent(Tools.APP_NAME, "error", warningMsg, 0);
+        }
+        Log.w(Tools.LOG_TAG, warningMsg + " " + e);
+    }
+
 	public void trackInstalls() {
 		if (!run && (gAnalytics != null)) {
 			switch (isNewInstallUpdate()) {

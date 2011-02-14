@@ -26,8 +26,11 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
         if (prefs.getBoolean("startOnWifiConnected", false) && connected && network != null 
                 && network.isConnected() && network.getTypeName().equals("WIFI")) {
             // Start GTalkSMS
+            Intent net_changed = new Intent(MainService.ACTION_NETWORK_CHANGED);
+            net_changed.putExtra("available", true);
             Log.i(Tools.LOG_TAG, "NetworkConnectivityReceiver: connected on wifi");
             context.startService(new Intent(MainService.ACTION_CONNECT));
+            context.startService(net_changed);
         } else if (prefs.getBoolean("stopOnWifiDisconnected", false)
                 && (!connected || network == null || !network.isConnected() || failover || !network.getTypeName().equals("WIFI"))) {
             // Stop GTalkSMS
@@ -42,14 +45,14 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
             // and we are connected , we must disconnect.
             if (network == null || !network.isConnected() || failover) {
                 Log.i(Tools.LOG_TAG, "NetworkConnectivityReceiver: notifying that the network is unavailable");
-                Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_NETWORK_CHANGED);
+                Intent svcintent = new Intent(MainService.ACTION_NETWORK_CHANGED);
                 svcintent.putExtra("available", false);
                 context.startService(svcintent);
             }
             // connect if not already connected (eg, if we disconnected above) and we have connectivity
             if (connected) {
                 Log.i(Tools.LOG_TAG, "NetworkConnectivityReceiver: notifying that a network is available...");
-                Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_NETWORK_CHANGED);
+                Intent svcintent = new Intent(MainService.ACTION_NETWORK_CHANGED);
                 svcintent.putExtra("available", true);
                 context.startService(svcintent);
             }
