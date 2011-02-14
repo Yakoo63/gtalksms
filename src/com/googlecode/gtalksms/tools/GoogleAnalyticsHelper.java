@@ -1,8 +1,13 @@
 package com.googlecode.gtalksms.tools;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
@@ -17,6 +22,7 @@ public class GoogleAnalyticsHelper {
 	private final String version_filename;
 	private final Context ctx;
 	private final String version;
+	private final String datefile;
     private static GoogleAnalyticsTracker gAnalytics;
     private static boolean statisticsEnabled;
     private static boolean run = false;
@@ -26,6 +32,7 @@ public class GoogleAnalyticsHelper {
 		version = Tools.getVersionCode(c, getClass());
 		this.ctx = c;
 		version_filename = Tools.LOG_TAG + "_version_" + version;
+		datefile = Tools.LOG_TAG + "_datefile";
 		if (statisticsEnabled) {  //avoid running GoogleAnalytics if it is not wanted to save memory and cpu
 			gAnalytics = GoogleAnalyticsTracker.getInstance();
 			gAnalytics.setProductVersion(Tools.getVersion(c, getClass()),
@@ -98,6 +105,15 @@ public class GoogleAnalyticsHelper {
 		}
 	}
 	
+	public void trackServiceStartsPerDay() {
+	   if(!datefileHasCurrentDate()) {
+           gAnalytics.trackEvent("GTalkSMS", // Category
+                   "Service", // Action
+                   "StartPerDay", // Label
+                   0); // Value
+	   }
+	}
+	
 	public static boolean dispatch() {
 		if (gAnalytics != null) {
 			return gAnalytics.dispatch();
@@ -105,6 +121,55 @@ public class GoogleAnalyticsHelper {
 			return false;
 		}
 	}
+	
+	/**
+	 * checks the contents of the datefile
+	 * and updates the datefile if its outdated
+	 * 
+	 * @return false if datefile is outdated, true otherwise
+	 */
+    private boolean datefileHasCurrentDate() {
+        char[] inputBuffer = new char[10];
+        try {
+            FileInputStream fIn = ctx.openFileInput(datefile);
+            InputStreamReader isr = new InputStreamReader(fIn);
+            isr.read(inputBuffer);
+        } catch (IOException e) {
+            trackAndLogError("Reading datefile", e);
+        }
+        if ((new String(inputBuffer)).equals(currentDate())) {
+            return true;
+        }
+        createDatefile();
+        return false;
+    }
+	
+    private boolean createDatefile() {
+        try {
+            FileOutputStream fOut = ctx.openFileOutput(datefile, Context.MODE_PRIVATE); //MODE_APPEND not set, should be ok
+            OutputStreamWriter osw = new OutputStreamWriter(fOut);
+            osw.write(currentDate());
+            osw.close();
+        } catch (IOException ioe) {
+            return false;
+        }
+        return true;
+    }
+	
+    private String currentDate() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        Calendar cal = Calendar.getInstance();
+        return dateFormat.format(cal.getTime());
+    }
+	
+//    private boolean datefileExists() {
+//        for (String s : ctx.fileList()) {
+//            if (s.contains(datefile)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 	
 	/**
 	 * Checks if the user has newly installed this app

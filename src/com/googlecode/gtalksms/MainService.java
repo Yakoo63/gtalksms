@@ -417,11 +417,15 @@ public class MainService extends Service {
         _serviceHandler = new ServiceHandler(_serviceLooper);
         initNotificationStuff();
         Log.i(Tools.LOG_TAG, "service created");
-        IsRunning = true;           		       
+        IsRunning = true;   
+        _gAnalytics.trackServiceStartsPerDay();        
     }
 
     @Override
     public void onStart(Intent intent, int startId) {
+        if(_gAnalytics == null) {
+            _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
+        }
         if (intent == null) {  // The application has been killed by Android and we try to restart the connection
             startService(new Intent(MainService.ACTION_CONNECT));
             return;
@@ -476,7 +480,8 @@ public class MainService extends Service {
             msg.obj = intent;
             _serviceHandler.sendMessage(msg);
         }
-        IsRunning = true;                          
+        IsRunning = true;
+        _gAnalytics.trackServiceStartsPerDay();        
     }
 
     @Override
@@ -516,9 +521,6 @@ public class MainService extends Service {
      */
     private void setupListenersForConnection() {
         Log.d(Tools.LOG_TAG, "setupListenersForConnection");  
-        if(_gAnalytics == null) {
-        	_gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
-        }
         _gAnalytics.trackInstalls(); //we only track if we have a data connection
 
         try {
