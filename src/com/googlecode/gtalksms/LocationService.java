@@ -139,7 +139,7 @@ public class LocationService extends Service {
             if (location != null) {
                 if (isBetterLocation(location, _currentBestLocation)) {
                     _currentBestLocation = location;
-                    MainService.send(this, "Last known location");
+                    MainService.send(this, "Last known location");  //TODO localization
                     sendLocationUpdate(_currentBestLocation);
                 }
             }

@@ -109,20 +109,26 @@ public class MainService extends Service {
         }
     }
 
-    // The IntentService(-like) implementation manages taking the
-    // intents passed to startService and delivering them to
-    // this function which runs in its own thread (so can block 
-    // Pretty-much everything using the _xmppMgr is here...
+    /**
+     * The IntentService(-like) implementation manages taking the intents passed
+     * to startService and delivering them to this function which runs in its
+     * own thread (so can block Pretty-much everything using the _xmppMgr is
+     * here...
+     * 
+     * @param intent
+     * @param id
+     */
     protected void onHandleIntent(final Intent intent, int id) {
         if (intent == null) {
             Log.e(Tools.LOG_TAG, "onHandleIntent: Intent null");
             return;
         }
+        //TODO do we need to check _xmppMgr == null?
         
         // Set Disconnected state by force to manage pending tasks
         if (intent.getBooleanExtra("force", false) && intent.getBooleanExtra("disconnect", false)) {
             // request to disconnect.
-            xmppRequestStateChange(XmppManager.DISCONNECTED);
+            _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
         }
 
         if (Thread.currentThread().getId() != _handlerThreadId)
@@ -138,19 +144,19 @@ public class MainService extends Service {
         if (a.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // request to disconnect.
-                xmppRequestStateChange(XmppManager.DISCONNECTED);
+                _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
             } else {
                 // a simple 'connect' request.
-                xmppRequestStateChange(XmppManager.CONNECTED);
+                _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             }
         } else if (a.equals(ACTION_TOGGLE)) {
             switch (initialState) {
             case XmppManager.CONNECTED:
             case XmppManager.WAITING_TO_CONNECT:
-                xmppRequestStateChange(XmppManager.DISCONNECTED);
+                _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
                 break;
             case XmppManager.DISCONNECTED:
-                xmppRequestStateChange(XmppManager.CONNECTED);
+                _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
                 break;
             default:
                 Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ initialState);
@@ -196,12 +202,12 @@ public class MainService extends Service {
             // TODO wait few seconds if network not available ? to avoid multiple reconnections
             if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
                 // We are in a waiting state and have a network - try to connect.
-                xmppRequestStateChange(XmppManager.CONNECTED);
+                _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             } else if (!available && initialState == XmppManager.CONNECTED) {
                 // We are connected but the network has gone down - disconnect and go
                 // into WAITING state so we auto-connect when we get a future 
                 // notification that a network is available.
-                xmppRequestStateChange(XmppManager.WAITING_TO_CONNECT);
+                _xmppMgr.xmppRequestStateChange(XmppManager.WAITING_TO_CONNECT);
             }
         } else {
             Log.w(Tools.LOG_TAG, "Unexpected intent: " + a);
@@ -265,7 +271,7 @@ public class MainService extends Service {
      * This is a wrapper around the startForeground method, using the older APIs
      * if it is not available.
      */
-    void startForegroundCompat(int id, Notification notification) {
+    private void startForegroundCompat(int id, Notification notification) {
         // If we have the new startForeground API, then use it.
         if (_startForeground != null) {
             _startForegroundArgs[0] = Integer.valueOf(id);
@@ -290,7 +296,7 @@ public class MainService extends Service {
      * This is a wrapper around the stopForeground method, using the older APIs
      * if it is not available.
      */
-    void stopForegroundCompat(int id) {
+    private void stopForegroundCompat(int id) {
         // If we have the new stopForeground API, then use it.
         if (_stopForeground != null) {
             _stopForegroundArgs[0] = Boolean.TRUE;
@@ -353,7 +359,27 @@ public class MainService extends Service {
             _xmppMgr.retrieveFriendList();
         }
     }
-   
+    
+    /** Intent helper functions.
+     *  As many of our intent objects use a 'message' extra, we have a helper that
+     *  allows you to provide that too.  Any other extras must be set manually
+     */
+    public static Intent newSvcIntent(Context ctx, String action) {
+        return newSvcIntent(ctx, action, null);
+    }
+
+    public static Intent newSvcIntent(Context ctx, String action, String message) {
+        Intent i = new Intent(action, null, ctx, MainService.class);
+        if (message != null) {
+            i.putExtra("message", message);
+        }
+        return i;
+    }
+    
+    public XmppManager getXmppmanager() {
+        return _xmppMgr;
+    }
+    
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -404,7 +430,7 @@ public class MainService extends Service {
         else if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
             Log.d(Tools.LOG_TAG, "onStart: ACTION_BROADCAST_STATUS");
             
-            // A request to broadcast our current status evenif _xmpp is null.
+            // A request to broadcast our current status even if _xmpp is null.
             int state = getConnectionStatus();
             XmppManager.broadcastStatus(this, state, state);
             return;
@@ -450,56 +476,13 @@ public class MainService extends Service {
             msg.obj = intent;
             _serviceHandler.sendMessage(msg);
         }
+        IsRunning = true;                          
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         onStart(intent, startId);
         return START_STICKY;
-    }
-
-    // This method *requests* a state change - what state things actually
-    // wind up in is impossible to know (eg, a request to connect may wind up
-    // with a state of CONNECTED, DISCONNECTED or WAITING_TO_CONNECT...
-    private void xmppRequestStateChange(int newState) {
-        int currentState = _xmppMgr.getConnectionStatus();
-        switch (newState) {
-        case XmppManager.CONNECTED:
-            switch (currentState) {
-            case XmppManager.CONNECTED:
-                break;
-            case XmppManager.DISCONNECTED:
-            case XmppManager.WAITING_TO_CONNECT:
-                _xmppMgr.stop();
-                _xmppMgr.start();
-                break;
-            default:
-                throw new IllegalStateException("unexpected current state when moving to connected: " + currentState);
-            }
-            break;
-        case XmppManager.DISCONNECTED:
-            _xmppMgr.stop();
-            break;
-        case XmppManager.WAITING_TO_CONNECT:
-            switch (currentState) {
-            case XmppManager.CONNECTED:
-                _xmppMgr.stop();
-                _xmppMgr.start(XmppManager.WAITING_TO_CONNECT);
-                break;
-            case XmppManager.DISCONNECTED:
-                _xmppMgr.start(XmppManager.WAITING_TO_CONNECT);
-                break;
-            case XmppManager.WAITING_TO_CONNECT:
-                break;
-            default:
-                throw new IllegalStateException("unexpected current state when moving to waiting: " + currentState);
-            }
-            break;
-        default:
-            throw new IllegalStateException("invalid state to switch to: "+newState);
-        }
-        // Now we have requested a new state, our state receiver will see when
-        // the state actually changes and update everything accordingly.
     }
 
     private int updateListenersToCurrentState(int currentState) {
@@ -574,7 +557,14 @@ public class MainService extends Service {
         stopCommands();
         cleanupCommands();
     }
-
+    
+    /**
+     * Wrapper to send a string to the user via xmpp
+     * needed by some receivers
+     * 
+     * @param ctx
+     * @param msg
+     */
     public static void send(Context ctx, String msg) {
         ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg));
     }
@@ -685,28 +675,4 @@ public class MainService extends Service {
         }
         _commandSet.add(cmd);
     } 
-
-    public void setXmppStatus(String status) {
-        _xmppMgr.setStatus(status);
-    }
-    
-    /** Intent helper functions.
-     *  As many of our intent objects use a 'message' extra, we have a helper that
-     *  allows you to provide that too.  Any other extras must be set manually
-     */
-    public static Intent newSvcIntent(Context ctx, String action) {
-        return newSvcIntent(ctx, action, null);
-    }
-
-    public static Intent newSvcIntent(Context ctx, String action, String message) {
-        Intent i = new Intent(action, null, ctx, MainService.class);
-        if (message != null) {
-            i.putExtra("message", message);
-        }
-        return i;
-    }
-    
-    public XmppManager getXmppmanager() {
-    	return _xmppMgr;
-    }
 }

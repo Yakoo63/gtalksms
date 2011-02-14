@@ -108,11 +108,11 @@ public class XmppManager {
         _xmppMuc = new XmppMuc(context, settings, this);
     }
 
-    public void start() {
+    private void start() {
         start(CONNECTED);
     }
     
-    public void start(int initialState) {
+    private void start(int initialState) {
         switch (initialState) {
             case CONNECTED:
                 initConnection();
@@ -125,7 +125,7 @@ public class XmppManager {
         }
     }
     
-    public void stop() {
+    protected void stop() {
         if (_connection != null && _connection.isConnected()) {
             updateStatus(DISCONNECTING);
             if (_settings.notifyApplicationConnection) {
@@ -151,6 +151,50 @@ public class XmppManager {
         _packetListener = null;
         _connectionListener = null;
         updateStatus(DISCONNECTED);
+    }
+    
+    // This method *requests* a state change - what state things actually
+    // wind up in is impossible to know (eg, a request to connect may wind up
+    // with a state of CONNECTED, DISCONNECTED or WAITING_TO_CONNECT...
+    protected void xmppRequestStateChange(int newState) {
+        int currentState = getConnectionStatus();
+        switch (newState) {
+        case XmppManager.CONNECTED:
+            switch (currentState) {
+            case XmppManager.CONNECTED:
+                break;
+            case XmppManager.DISCONNECTED:
+            case XmppManager.WAITING_TO_CONNECT:
+                stop();
+                start();
+                break;
+            default:
+                throw new IllegalStateException("unexpected current state when moving to connected: " + currentState);
+            }
+            break;
+        case XmppManager.DISCONNECTED:
+            stop();
+            break;
+        case XmppManager.WAITING_TO_CONNECT:
+            switch (currentState) {
+            case XmppManager.CONNECTED:
+                stop();
+                start(XmppManager.WAITING_TO_CONNECT);
+                break;
+            case XmppManager.DISCONNECTED:
+                start(XmppManager.WAITING_TO_CONNECT);
+                break;
+            case XmppManager.WAITING_TO_CONNECT:
+                break;
+            default:
+                throw new IllegalStateException("unexpected current state when moving to waiting: " + currentState);
+            }
+            break;
+        default:
+            throw new IllegalStateException("invalid state to switch to: "+newState);
+        }
+        // Now we have requested a new state, our state receiver will see when
+        // the state actually changes and update everything accordingly.
     }
 
     private static void xmppDisconnect(XMPPConnection connection) {
@@ -426,6 +470,10 @@ public class XmppManager {
         }
     }
     
+    /**
+     * Sets the xmpp presence status
+     * @param status
+     */
     public void setStatus(String status) {
         _presenceMessage = status;
         

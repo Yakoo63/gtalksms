@@ -7,13 +7,16 @@ import android.content.IntentFilter;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.XmppManager;
 
 public class BatteryCmd extends Command {
     private BroadcastReceiver _batInfoReceiver = null;
     private int _lastPercentageNotified = -1;
+    XmppManager _xmppMgr;
     
     public BatteryCmd(MainService mainService) {
         super(mainService, new String[] {"battery", "batt"});
+        _xmppMgr = mainService.getXmppmanager();
         
         _batInfoReceiver = new BroadcastReceiver() {
             @Override
@@ -41,7 +44,7 @@ public class BatteryCmd extends Command {
             send(getString(R.string.chat_battery_level, level));
         }
         if (_settingsMgr.notifyBatteryInStatus) {
-            _mainService.setXmppStatus("GTalkSMS - " + level + "%");
+            _xmppMgr.setStatus("GTalkSMS - " + level + "%");
         }
     }
     
