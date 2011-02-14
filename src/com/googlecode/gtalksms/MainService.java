@@ -561,7 +561,7 @@ public class MainService extends Service {
             _xmppMgr = null;
         }
         teardownListenersForConnection();
-            _gAnalytics.stop();
+            GoogleAnalyticsHelper.stop();
         _serviceLooper.quit();
         super.onDestroy();
     }

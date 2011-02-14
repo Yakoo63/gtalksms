@@ -14,12 +14,10 @@ import org.jivesoftware.smack.util.StringUtils;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
-import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppBuddies implements RosterListener {
     
