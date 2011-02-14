@@ -1,14 +1,11 @@
 package com.googlecode.gtalksms;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -69,18 +66,6 @@ public class MainService extends Service {
     
     private Map<String, Command> _commands = new HashMap<String, Command>();
     private Set<Command> _commandSet = new HashSet<Command>();
-    
-    
-    // notification stuff
-    @SuppressWarnings("unchecked")
-    private static final Class[] _startForegroundSignature = new Class[] { int.class, Notification.class };
-    @SuppressWarnings("unchecked")
-    private static final Class[] _stopForegroundSignature = new Class[] { boolean.class };
-    private NotificationManager _notificationMgr;
-    private Method _startForeground;
-    private Method _stopForeground;
-    private Object[] _startForegroundArgs = new Object[2];
-    private Object[] _stopForegroundArgs = new Object[1];
     private PendingIntent _contentIntent = null;
 
     // This is the object that receives interactions from clients.  See
@@ -261,81 +246,10 @@ public class MainService extends Service {
 
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
         notification.flags |= Notification.FLAG_NO_CLEAR;
-        stopForegroundCompat(oldStatus);
+        stopForeground(true);
         if (_settingsMgr.showStatusIcon) {
-            startForegroundCompat(status, notification);
+            startForeground(status, notification);
         }
-    }
-
-    /**
-     * This is a wrapper around the startForeground method, using the older APIs
-     * if it is not available.
-     */
-    private void startForegroundCompat(int id, Notification notification) {
-        // If we have the new startForeground API, then use it.
-        if (_startForeground != null) {
-            _startForegroundArgs[0] = Integer.valueOf(id);
-            _startForegroundArgs[1] = notification;
-            try {
-                _startForeground.invoke(this, _startForegroundArgs);
-            } catch (InvocationTargetException e) {
-                // Should not happen.
-                Log.w(Tools.LOG_TAG, "Unable to invoke startForeground", e);
-            } catch (IllegalAccessException e) {
-                // Should not happen.
-                Log.w(Tools.LOG_TAG, "Unable to invoke startForeground", e);
-            }
-            return;
-        }
-        // Fall back on the old API.
-        setForeground(true);
-        _notificationMgr.notify(id, notification);
-    }
-
-    /**
-     * This is a wrapper around the stopForeground method, using the older APIs
-     * if it is not available.
-     */
-    private void stopForegroundCompat(int id) {
-        // If we have the new stopForeground API, then use it.
-        if (_stopForeground != null) {
-            _stopForegroundArgs[0] = Boolean.TRUE;
-            try {
-                _stopForeground.invoke(this, _stopForegroundArgs);
-            } catch (InvocationTargetException e) {
-                // Should not happen.
-                Log.w(Tools.LOG_TAG, "Unable to invoke stopForeground", e);
-            } catch (IllegalAccessException e) {
-                // Should not happen.
-                Log.w(Tools.LOG_TAG, "Unable to invoke stopForeground", e);
-            }
-            return;
-        }
-
-        try {
-            // Fall back on the old API. Note to cancel BEFORE changing the
-            // foreground state, since we could be killed at that point.
-            _notificationMgr.cancel(id);
-            setForeground(false);
-        } catch (Exception e) {
-            // Should not happen.
-            Log.w(Tools.LOG_TAG, "Unable to invoke stopForeground", e);
-        }
-    }
-
-    /**
-     * This makes the 2 previous wrappers possible
-     */
-    private void initNotificationStuff() {
-        _notificationMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        try {
-            _startForeground = getClass().getMethod("startForeground", _startForegroundSignature);
-            _stopForeground = getClass().getMethod("stopForeground", _stopForegroundSignature);
-        } catch (NoSuchMethodException e) {
-            // Running on an older platform.
-            _startForeground = _stopForeground = null;
-        }
-        _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
     }
 
     public int getConnectionStatus() {
@@ -415,15 +329,16 @@ public class MainService extends Service {
         _handlerThreadId = thread.getId();
         _serviceLooper = thread.getLooper();
         _serviceHandler = new ServiceHandler(_serviceLooper);
-        initNotificationStuff();
         Log.i(Tools.LOG_TAG, "service created");
-        IsRunning = true;   
+//        IsRunning = true;  // TODO should not be needed here
+        					 // ctx.STartService() -> onCreate() -> onStartCommand()
+        					 // if service is restarted by android only onSTartCommand() is invoked
         _gAnalytics.trackServiceStartsPerDay();        
     }
 
     @Override
     public void onStart(Intent intent, int startId) {
-        if(_gAnalytics == null) {
+    	if(_gAnalytics == null) {
             _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         }
         if (intent == null) {  // The application has been killed by Android and we try to restart the connection
@@ -489,46 +404,13 @@ public class MainService extends Service {
         onStart(intent, startId);
         return START_STICKY;
     }
-
-    private int updateListenersToCurrentState(int currentState) {
-        boolean wantListeners;
-        switch (currentState) {
-        case XmppManager.CONNECTED:
-            wantListeners = true;
-            break;
-        case XmppManager.CONNECTING:
-        case XmppManager.DISCONNECTED:
-        case XmppManager.DISCONNECTING:
-        case XmppManager.WAITING_TO_CONNECT:
-            wantListeners = false;
-            break;
-        default:
-            throw new IllegalStateException("updateListeners found invalid state: " + currentState);
-        }
-        
-        if (wantListeners && _commands.isEmpty()) {
-            setupListenersForConnection();
-        } else if (!wantListeners && !_commands.isEmpty()) {
-            teardownListenersForConnection();
-        }
-        
-        return currentState;
-    }
     
-    /**
-     * this method is called once in the lifetime of the service
-     * and only if we have a network available
-     */
-    private void setupListenersForConnection() {
-        Log.d(Tools.LOG_TAG, "setupListenersForConnection");  
-        _gAnalytics.trackInstalls(); //we only track if we have a data connection
-
-        try {
-            setupCommands();
-        } catch (Exception e) {
-            // Should not happen.
-            Log.w(Tools.LOG_TAG, "MainService.setupListenersForConnection: Setup commands error", e);
-        } 
+    public void executeCommand(String cmd, String args) {
+        if (_commands.containsKey(cmd)) {
+            _commands.get(cmd).execute(cmd, args);
+        } else {
+            send(getString(R.string.chat_error_unknown_cmd, cmd));
+        }
     }
 
     @Override
@@ -549,15 +431,6 @@ public class MainService extends Service {
             GoogleAnalyticsHelper.stop();
         _serviceLooper.quit();
         super.onDestroy();
-    }
-    
-    private void teardownListenersForConnection() {
-        Log.d(Tools.LOG_TAG, "teardownListenersForConnection");
-        
-        stopForegroundCompat(getConnectionStatus());
-
-        stopCommands();
-        cleanupCommands();
     }
     
     /**
@@ -632,14 +505,6 @@ public class MainService extends Service {
         }
     }
     
-    public void executeCommand(String cmd, String args) {
-        if (_commands.containsKey(cmd)) {
-            _commands.get(cmd).execute(cmd, args);
-        } else {
-            send(getString(R.string.chat_error_unknown_cmd, cmd));
-        }
-    }
-    
     private void setupCommands() {
         registerCommand(new HelpCmd(this));
         registerCommand(new KeyboardCmd(this));
@@ -677,4 +542,52 @@ public class MainService extends Service {
         }
         _commandSet.add(cmd);
     } 
+    
+    private int updateListenersToCurrentState(int currentState) {
+        boolean wantListeners;
+        switch (currentState) {
+        case XmppManager.CONNECTED:
+            wantListeners = true;
+            break;
+        case XmppManager.CONNECTING:
+        case XmppManager.DISCONNECTED:
+        case XmppManager.DISCONNECTING:
+        case XmppManager.WAITING_TO_CONNECT:
+            wantListeners = false;
+            break;
+        default:
+            throw new IllegalStateException("updateListeners found invalid state: " + currentState);
+        }
+        
+        if (wantListeners && _commands.isEmpty()) {
+            setupListenersForConnection();
+        } else if (!wantListeners && !_commands.isEmpty()) {
+            teardownListenersForConnection();
+        }
+        
+        return currentState;
+    }
+    
+    /**
+     * this method is called once in the lifetime of the service
+     * and only if we have a network available
+     */
+    private void setupListenersForConnection() {
+        Log.d(Tools.LOG_TAG, "setupListenersForConnection");  
+        _gAnalytics.trackInstalls(); //we only track if we have a data connection
+
+        try {
+            setupCommands();
+        } catch (Exception e) {
+            // Should not happen.
+            Log.w(Tools.LOG_TAG, "MainService.setupListenersForConnection: Setup commands error", e);
+        } 
+    }
+    
+    private void teardownListenersForConnection() {
+        Log.d(Tools.LOG_TAG, "teardownListenersForConnection");      
+        stopForeground(true);
+        stopCommands();
+        cleanupCommands();
+    }
 }
