@@ -341,6 +341,10 @@ public class MainService extends Service {
     	if(_gAnalytics == null) {
             _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         }
+		if (_contentIntent == null) {
+			_contentIntent = PendingIntent.getActivity(this, 0, new Intent(
+					this, MainScreen.class), 0);
+		}
         if (intent == null) {  // The application has been killed by Android and we try to restart the connection
             startService(new Intent(MainService.ACTION_CONNECT));
             return;
