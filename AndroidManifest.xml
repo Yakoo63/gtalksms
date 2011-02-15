@@ -25,6 +25,7 @@
                 <action android:name="com.googlecode.gtalksms.action.CONNECT" />
                 <action android:name="com.googlecode.gtalksms.action.TOGGLE" />
                 <action android:name="com.googlecode.gtalksms.action.SEND" />
+                <action android:name="com.googlecode.gtalksms.action.NETWORK_CHANGED" />
             </intent-filter>
         </service>
         <receiver android:name="com.googlecode.gtalksms.WidgetProvider" >
