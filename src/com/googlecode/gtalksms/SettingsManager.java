@@ -28,6 +28,7 @@ public class SettingsManager {
     public boolean notifyApplicationConnection;
     public boolean formatChatResponses;
     public boolean showStatusIcon;
+    public boolean showToastMessages;
     
     // geo location
     public boolean useGoogleMap;
@@ -101,6 +102,8 @@ public class SettingsManager {
         useOpenStreetMap = _sharedPreferences.getBoolean("useOpenStreetMapUrl", false);
         
         showStatusIcon = _sharedPreferences.getBoolean("showStatusIcon", true);
+        showToastMessages = showStatusIcon;
+        
         notifyApplicationConnection = _sharedPreferences.getBoolean("notifyApplicationConnection", true);
         notifyBattery = _sharedPreferences.getBoolean("notifyBattery", true);
         notifyBatteryInStatus = _sharedPreferences.getBoolean("notifyBatteryInStatus", true);

@@ -136,16 +136,16 @@ public class MainService extends Service {
             }
         } else if (a.equals(ACTION_TOGGLE)) {
             switch (initialState) {
-            case XmppManager.CONNECTED:
-            case XmppManager.WAITING_TO_CONNECT:
-                _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
-                break;
-            case XmppManager.DISCONNECTED:
-                _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
-                break;
-            default:
-                Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ initialState);
-                break;
+                case XmppManager.CONNECTED:
+                case XmppManager.WAITING_TO_CONNECT:
+                    _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+                    break;
+                case XmppManager.DISCONNECTED:
+                    _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+                    break;
+                default:
+                    Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ initialState);
+                    break;
             }
         } else if (a.equals(ACTION_SEND)) {
             if (initialState == XmppManager.CONNECTED) {
@@ -427,12 +427,12 @@ public class MainService extends Service {
             unregisterReceiver(_xmppreceiver);
             _xmppreceiver = null;
             
-            Tools.toastMessage(this, getString(R.string.main_service_stop));
+            Tools.toastMessage(this, _settingsMgr, getString(R.string.main_service_stop));
             _xmppMgr.stop();
             _xmppMgr = null;
         }
         teardownListenersForConnection();
-            GoogleAnalyticsHelper.stop();
+        GoogleAnalyticsHelper.stop();
         _serviceLooper.quit();
         super.onDestroy();
     }
