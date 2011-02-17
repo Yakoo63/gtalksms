@@ -209,49 +209,6 @@ public class MainService extends Service {
         }
     }
 
-    /** Updates the status about the service state (and the status bar) */
-    public void onConnectionStatusChanged(int oldStatus, int status) {
-        Notification notification = new Notification();
-        String appName = getString(R.string.app_name);
-        String msg = null;
-        switch (status) {
-            case XmppManager.CONNECTED:
-                msg = getString(R.string.main_service_connected);
-                notification = new Notification(R.drawable.status_green, msg, System.currentTimeMillis());
-                break;
-            case XmppManager.CONNECTING:
-                msg = getString(R.string.main_service_connecting);
-                notification = new Notification(R.drawable.status_orange, msg, System.currentTimeMillis());
-                break;
-            case XmppManager.DISCONNECTED:
-                msg = getString(R.string.main_service_disconnected);
-                notification = new Notification(R.drawable.status_red, msg, System.currentTimeMillis());
-                break;
-            case XmppManager.DISCONNECTING:
-                msg = getString(R.string.main_service_disconnecting);
-                notification = new Notification(R.drawable.status_orange, msg, System.currentTimeMillis());
-                break;
-            case XmppManager.WAITING_TO_CONNECT:
-                String msgNotif = getString(R.string.main_service_waiting);
-                msg = getString(R.string.main_service_waiting_to_connect);
-                notification = new Notification(R.drawable.status_orange, msgNotif, System.currentTimeMillis());
-                break;
-            default:
-                break;
-        }
-        
-        if (msg != null) {
-            notification.setLatestEventInfo(getApplicationContext(), appName, msg, _contentIntent);
-        }
-
-        notification.flags |= Notification.FLAG_ONGOING_EVENT;
-        notification.flags |= Notification.FLAG_NO_CLEAR;
-        stopForeground(true);
-        if (_settingsMgr.showStatusIcon) {
-            startForeground(status, notification);
-        }
-    }
-
     public int getConnectionStatus() {
         return _xmppMgr == null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
     }
@@ -312,6 +269,7 @@ public class MainService extends Service {
 
     @Override
     public void onCreate() {
+        Log.d(Tools.LOG_TAG, "onCreate(): begin");
     	super.onCreate();
         
     	if(_gAnalytics == null)
@@ -337,62 +295,63 @@ public class MainService extends Service {
     }
 
     @Override
-    public void onStart(Intent intent, int startId) {
-    	if(_gAnalytics == null) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (_gAnalytics == null) {        
+            Log.d(Tools.LOG_TAG, "onStartCommand(): _gAnalytics == null");
             _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         }
-		if (_contentIntent == null) {
-			_contentIntent = PendingIntent.getActivity(this, 0, new Intent(
-					this, MainScreen.class), 0);
-		}
-        if (intent == null) {  // The application has been killed by Android and we try to restart the connection
-            startService(new Intent(MainService.ACTION_CONNECT));
-            return;
+        if (_contentIntent == null) {
+            _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
         }
-        // A special case for the 'broadcast status' intent - we avoid setting up the _xmppMgr etc
+        if (intent == null) { // The application has been killed by Android and
+                              // we try to restart the connection
+            startService(new Intent(MainService.ACTION_CONNECT));
+        }
+        // A special case for the 'broadcast status' intent - we avoid setting
+        // up the _xmppMgr etc
         else if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
             Log.d(Tools.LOG_TAG, "onStart: ACTION_BROADCAST_STATUS");
-            
             // A request to broadcast our current status even if _xmpp is null.
             int state = getConnectionStatus();
             XmppManager.broadcastStatus(this, state, state);
-            return;
-        }
-        // OK - a real action request - ensure xmpp is setup (but not yet connected)
-        // in preparation for the worker thread performing the request.
-        if (_xmppMgr == null) {
-            if (_settingsMgr.notifiedAddress == null || _settingsMgr.notifiedAddress.equals("") || _settingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
-                Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
-                Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
-                settingsActivity.putExtra("panel", R.xml.prefs_connection);
-                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(settingsActivity);
-                return;
-            }
-
-            _xmppreceiver = new BroadcastReceiver() {
-                public void onReceive(Context context, Intent intent) {
-                    String action = intent.getAction();
-                    if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
-                        // as this comes in on the main thread and not the worker thread,
-                        // we just push the message onto the worker thread queue.
-                        startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY, intent.getStringExtra("message")));
-                    } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
-                        onConnectionStatusChanged(intent.getIntExtra("old_state", 0),
-                                                  intent.getIntExtra("new_state", 0));
-                        startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY));  //TODO the intent handling could be improved at this point
-                    }
+        } else {
+            // OK - a real action request - ensure xmpp is setup (but not yet
+            // connected)
+            // in preparation for the worker thread performing the request.
+            if (_xmppMgr == null) {
+                if (_settingsMgr.notifiedAddress == null || _settingsMgr.notifiedAddress.equals("")
+                        || _settingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
+                    Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
+                    Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
+                    settingsActivity.putExtra("panel", R.xml.prefs_connection);
+                    settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(settingsActivity);
+                    return START_STICKY;
                 }
-            };
-            Log.d(Tools.LOG_TAG, "onStart: ACTION_MESSAGE_RECEIVED");
-            IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
-            intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
-            registerReceiver(_xmppreceiver, intentFilter);
-            
-            _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
-        }
 
-        if (intent != null) {
+                _xmppreceiver = new BroadcastReceiver() {
+                    public void onReceive(Context context, Intent intent) {
+                        String action = intent.getAction();
+                        if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
+                            // as this comes in on the main thread and not the
+                            // worker thread,
+                            // we just push the message onto the worker thread
+                            // queue.
+                            startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY, intent.getStringExtra("message")));
+                        } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
+                            onConnectionStatusChanged(intent.getIntExtra("old_state", 0), intent.getIntExtra("new_state", 0));
+                            startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY)); 
+                         // TODO the intent handling culd be improved at this point
+                        }
+                    }
+                };
+                Log.d(Tools.LOG_TAG, "onStart: ACTION_MESSAGE_RECEIVED");
+                IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
+                intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
+                registerReceiver(_xmppreceiver, intentFilter);
+                _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
+            }
+            
             Log.d(Tools.LOG_TAG, "onStart: _serviceHandler.sendMessage");
             Message msg = _serviceHandler.obtainMessage();
             msg.arg1 = startId;
@@ -400,12 +359,7 @@ public class MainService extends Service {
             _serviceHandler.sendMessage(msg);
         }
         IsRunning = true;
-        _gAnalytics.trackServiceStartsPerDay();        
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        onStart(intent, startId);
+        _gAnalytics.trackServiceStartsPerDay();
         return START_STICKY;
     }
     
@@ -470,6 +424,47 @@ public class MainService extends Service {
     
     public KeyboardInputMethod getKeyboard() {
         return _keyboard;
+    }
+    
+    /** Updates the status about the service state (and the status bar) */
+    private void onConnectionStatusChanged(int oldStatus, int status) {
+        Notification notification = new Notification();
+        String appName = getString(R.string.app_name);
+        String msg = null;
+        switch (status) {
+            case XmppManager.CONNECTED:
+                msg = getString(R.string.main_service_connected);
+                notification = new Notification(R.drawable.status_green, msg, System.currentTimeMillis());
+                break;
+            case XmppManager.CONNECTING:
+                msg = getString(R.string.main_service_connecting);
+                notification = new Notification(R.drawable.status_orange, msg, System.currentTimeMillis());
+                break;
+            case XmppManager.DISCONNECTED:
+                msg = getString(R.string.main_service_disconnected);
+                notification = new Notification(R.drawable.status_red, msg, System.currentTimeMillis());
+                break;
+            case XmppManager.DISCONNECTING:
+                msg = getString(R.string.main_service_disconnecting);
+                notification = new Notification(R.drawable.status_orange, msg, System.currentTimeMillis());
+                break;
+            case XmppManager.WAITING_TO_CONNECT:
+                String msgNotif = getString(R.string.main_service_waiting);
+                msg = getString(R.string.main_service_waiting_to_connect);
+                notification = new Notification(R.drawable.status_orange, msgNotif, System.currentTimeMillis());
+                break;
+            default:
+                GoogleAnalyticsHelper.trackAndLogError("onConnectionStatusChanged(): unkown status int");
+                return;
+        }
+        
+        notification.setLatestEventInfo(getApplicationContext(), appName, msg, _contentIntent);
+        notification.flags |= Notification.FLAG_ONGOING_EVENT;
+        notification.flags |= Notification.FLAG_NO_CLEAR;
+        stopForeground(true);
+        if (_settingsMgr.showStatusIcon) {
+            startForeground(status, notification);
+        }
     }
     
     /**

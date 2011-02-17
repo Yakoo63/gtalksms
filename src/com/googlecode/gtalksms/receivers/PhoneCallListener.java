@@ -2,10 +2,12 @@ package com.googlecode.gtalksms.receivers;
 
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
+import com.googlecode.gtalksms.tools.Tools;
 
 public class PhoneCallListener extends PhoneStateListener {
     public PhoneCallListener(MainService svc) {
@@ -17,6 +19,7 @@ public class PhoneCallListener extends PhoneStateListener {
 
     public void onCallStateChanged(int state, String incomingNumber) {
         if (state == TelephonyManager.CALL_STATE_RINGING) {
+            Log.i(Tools.LOG_TAG, "PhoneCallListener Call State Ringing with incomingNumber:" + incomingNumber);
             String contact = ContactsManager.getContactName(_svc, incomingNumber);
             _svc.send(_svc.getString(R.string.chat_is_calling, contact));
         }

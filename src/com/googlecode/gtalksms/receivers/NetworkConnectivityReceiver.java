@@ -53,6 +53,11 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
             if (connected) {
                 Log.i(Tools.LOG_TAG, "NetworkConnectivityReceiver: notifying that a network is available...");
                 Intent svcintent = new Intent(MainService.ACTION_NETWORK_CHANGED);
+                if(network.getTypeName().equals("WIFI")) {
+                    svcintent.putExtra("WIFI", true);
+                } else {
+                    svcintent.putExtra("WIFI", false);                    
+                }
                 svcintent.putExtra("available", true);
                 context.startService(svcintent);
             }
