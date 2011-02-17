@@ -11,14 +11,6 @@ public class XmppFriend {
     public static final int FFC = 4;
     public static final int OFFLINE = 5;
     
-
-//    public static enum UserStateType { //TODO enum is bad in android programming
-//        OFFLINE,
-//        BUSY,
-//        AWAY,
-//        ONLINE
-//    }
-    
     public String id;
     public String name;
     public String status;
