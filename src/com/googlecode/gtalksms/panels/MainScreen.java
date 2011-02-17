@@ -56,6 +56,8 @@ public class MainScreen extends Activity {
         }
 
         public void onServiceDisconnected(ComponentName className) {
+            //TODO should we call updateBuddies() here, as sometimes the service if offline (red)
+            //but the buddy is still shown as online
             mainService = null;
         }
     };
@@ -93,16 +95,17 @@ public class MainScreen extends Activity {
         unregisterReceiver(_xmppreceiver);
     }
 
-    public String getStateImg(XmppFriend.UserStateType stateType) {
+    public String getStateImg(int stateType) {
         String state = String.valueOf(R.drawable.buddy_offline);
         switch (stateType) {
-            case AWAY:
+            case XmppFriend.AWAY:
+            case XmppFriend.EXAWAY:
                 state = String.valueOf(R.drawable.buddy_away);
                 break;
-            case BUSY:
+            case XmppFriend.BUSY:
                 state = String.valueOf(R.drawable.buddy_busy);
                 break;
-            case ONLINE:
+            case XmppFriend.ONLINE:
                 state = String.valueOf(R.drawable.buddy_available);
                 break;
         }
@@ -117,37 +120,34 @@ public class MainScreen extends Activity {
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if (action.equals(XmppManager.ACTION_PRESENCE_CHANGED)) {
-                    String state = intent.getStringExtra("state");
+                    int stateInt = intent.getIntExtra("state", XmppFriend.OFFLINE);
                     String userId = intent.getStringExtra("userid");
                     String userFullId = intent.getStringExtra("fullid");
                     String name = intent.getStringExtra("name");
                     String status = intent.getStringExtra("status");
-                    
-                    XmppFriend.UserStateType stateType = XmppFriend.UserStateType.valueOf(state);
-                    state = getStateImg(stateType);
+                    String stateImg = getStateImg(stateInt);
 
                     boolean exist = false;
                     for (HashMap<String, String> map : _friends) {
                         if (map.get("userid").equals(userId)) {
                             
-                            if (stateType == XmppFriend.UserStateType.OFFLINE) {
+                            if (stateInt == XmppFriend.OFFLINE) {
                                 map.remove("location_" + userFullId);
                                 
                                 for (String key : map.keySet()) {
                                     if (key.startsWith("location_")) {
                                         try {
-                                            state = getStateImg(XmppFriend.UserStateType.valueOf(map.get(key)));
+                                            stateImg = getStateImg(stateInt);
                                             break; 
                                         } catch (Exception e) {}
                                     }
                                 }
                             } else if (userFullId != null) {
-                                map.put("location_" + userFullId, stateType.toString());
+                                map.put("location_" + userFullId, XmppFriend.stateToString(stateInt));
                             }
-                            map.put("state", state);
+                            map.put("state", stateImg);
                             map.put("status", status);
-                            exist = true;
-                            
+                            exist = true;                          
                             break;
                         }
                     }
@@ -157,14 +157,14 @@ public class MainScreen extends Activity {
                         map.put("name", name);
                         map.put("status", status);
                         map.put("userid", userId);
-                        map.put("state", state);
-                        if (userFullId != null && stateType != XmppFriend.UserStateType.OFFLINE) {
-                            map.put("location_" + userFullId, stateType.toString() + "\n");
+                        map.put("state", stateImg);
+                        if (userFullId != null && stateInt != XmppFriend.OFFLINE) {
+                            map.put("location_" + userFullId, XmppFriend.stateToString(stateInt)+ "\n");
                         }
                         
                         _friends.add(map);
                     }
-                    Log.d(Tools.LOG_TAG, "Update presence: " + userId + " - " + stateType.toString());
+                    Log.d(Tools.LOG_TAG, "Update presence: " + userId + " - " + XmppFriend.stateToString(stateInt));
                     updateBuddiesList();
 
                 } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {

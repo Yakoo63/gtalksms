@@ -271,9 +271,7 @@ public class MainService extends Service {
     public void onCreate() {
         Log.d(Tools.LOG_TAG, "onCreate(): begin");
     	super.onCreate();
-        
-    	if(_gAnalytics == null)
-        	_gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
+        _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         
     	_settingsMgr = new SettingsManager(this) {
             @Override  public void OnPreferencesUpdated() {
@@ -287,16 +285,15 @@ public class MainService extends Service {
         _handlerThreadId = thread.getId();
         _serviceLooper = thread.getLooper();
         _serviceHandler = new ServiceHandler(_serviceLooper);
-        Log.i(Tools.LOG_TAG, "service created");
-//        IsRunning = true;  // TODO should not be needed here
-        					 // ctx.STartService() -> onCreate() -> onStartCommand()
-        					 // if service is restarted by android only onSTartCommand() is invoked
+        Log.d(Tools.LOG_TAG, "onCreate(): service thread created");
+        IsRunning = true; 
         _gAnalytics.trackServiceStartsPerDay();        
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (_gAnalytics == null) {        
+        Log.d(Tools.LOG_TAG, "onStartCommand(): begin");
+        if (_gAnalytics == null) {  // TODO is the log msg is never seen move it to onCreate()
             Log.d(Tools.LOG_TAG, "onStartCommand(): _gAnalytics == null");
             _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         }
@@ -352,7 +349,7 @@ public class MainService extends Service {
                 _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
             }
             
-            Log.d(Tools.LOG_TAG, "onStart: _serviceHandler.sendMessage");
+            Log.d(Tools.LOG_TAG, "onStartCommand: _serviceHandler.sendMessage with intent action: " + intent.getAction());
             Message msg = _serviceHandler.obtainMessage();
             msg.arg1 = startId;
             msg.obj = intent;

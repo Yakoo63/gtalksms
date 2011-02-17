@@ -84,7 +84,7 @@ public class XmppBuddies implements RosterListener {
             intent.putExtra("userid", xmppFriend.id);
             intent.putExtra("name", xmppFriend.name == null ? xmppFriend.id : xmppFriend.name);
             intent.putExtra("status", xmppFriend.status);
-            intent.putExtra("state", xmppFriend.state.toString());
+            intent.putExtra("state", xmppFriend.state);
             _context.sendBroadcast(intent);
         }
     }
@@ -107,32 +107,31 @@ public class XmppBuddies implements RosterListener {
         return userStatus;
     }
 
-    public XmppFriend.UserStateType retrieveState(String userID) {
-        XmppFriend.UserStateType userState = XmppFriend.UserStateType.OFFLINE; // default return value
+    public int retrieveState(String userID) {
+        int userState = XmppFriend.OFFLINE; // default return value
         Presence userFromServer = null;
 
         try {
             userFromServer = _connection.getRoster().getPresence(userID);
             userState = retrieveState(userFromServer.getMode(), userFromServer.isAvailable());
         } catch (NullPointerException e) {
-            System.err.println("Invalid connection or user in retrieveState()");
-            userState = XmppFriend.UserStateType.OFFLINE;
+            GoogleAnalyticsHelper.trackAndLogError("retrieveState(): Invalid connection or user");
         }
 
         return userState;
     }
     
 
-    public XmppFriend.UserStateType retrieveState(Mode userMode, boolean isOnline) {
-        XmppFriend.UserStateType userState = XmppFriend.UserStateType.OFFLINE; // default return value
+    public int retrieveState(Mode userMode, boolean isOnline) {
+        int userState = XmppFriend.OFFLINE; // default return value
         
         if (userMode == Mode.dnd) {
-            userState = XmppFriend.UserStateType.BUSY;
+            userState = XmppFriend.BUSY;
         } else if (userMode == Mode.away
                 || userMode == Mode.xa) {
-            userState = XmppFriend.UserStateType.AWAY;
+            userState = XmppFriend.AWAY;
         } else if (isOnline) {
-            userState = XmppFriend.UserStateType.ONLINE;
+            userState = XmppFriend.ONLINE;
         }
 
         return userState;
@@ -158,7 +157,7 @@ public class XmppBuddies implements RosterListener {
         Intent intent = new Intent(XmppManager.ACTION_PRESENCE_CHANGED);
         intent.putExtra("userid", StringUtils.parseBareAddress(presence.getFrom()));
         intent.putExtra("fullid", presence.getFrom());
-        intent.putExtra("state", retrieveState(presence.getMode(), presence.isAvailable()).toString());
+        intent.putExtra("state", retrieveState(presence.getMode(), presence.isAvailable()));
         intent.putExtra("status", presence.getStatus());
         _context.sendBroadcast(intent);
     }
