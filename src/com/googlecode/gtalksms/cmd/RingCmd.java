@@ -125,8 +125,12 @@ public class RingCmd extends Command {
         } catch (Exception e) {
             _canRing = false;
         }
+        if(_canRing) { 
         _mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
         _mediaPlayer.setLooping(true);
+        } else {
+            _mediaPlayer = null;
+        }
     }
    
     /** clears the media player */
@@ -138,7 +142,7 @@ public class RingCmd extends Command {
     }
     
     public void stop() {
-        if (_canRing) {
+        if (_canRing && _mediaPlayer != null) {
             _mediaPlayer.stop();
         }
         _vibrator.cancel();
