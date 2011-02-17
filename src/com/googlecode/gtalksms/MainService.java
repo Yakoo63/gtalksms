@@ -355,8 +355,6 @@ public class MainService extends Service {
             msg.obj = intent;
             _serviceHandler.sendMessage(msg);
         }
-        IsRunning = true;
-        _gAnalytics.trackServiceStartsPerDay();
         return START_STICKY;
     }
     
