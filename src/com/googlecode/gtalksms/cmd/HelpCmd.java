@@ -41,7 +41,7 @@ public class HelpCmd extends Command {
         _msgSms.appendLine(getString(R.string.chat_help_mark_as_read, makeBold("\"markAsRead:#contact#\""), makeBold("\"mar\"")));
         _msgSms.appendLine(getString(R.string.chat_help_del_sms_all, makeBold("\"delsms:all\"")));
         _msgSms.appendLine(getString(R.string.chat_help_del_sms_sent, makeBold("\"delsms:sent\"")));
-        _msgSms.appendLine(getString(R.string.chat_help_del_sms_last, makeBold("\"delsms:last:[number]\""), makeBold("\"delsms:lastin:[number]\""), makeBold("\"delsms:lastout:[number]\"")));
+        _msgSms.appendLine(getString(R.string.chat_help_del_sms_last, makeBold("\"delsms:last:#number#\""), makeBold("\"delsms:lastin:#number#\""), makeBold("\"delsms:lastout:#number#\"")));
         _msgSms.appendLine(getString(R.string.chat_help_del_sms_contact, makeBold("\"delsms:contact:#contact#\"")));
         
         _msgGeo.appendLine(getString(R.string.chat_help_geo, makeBold("\"geo:#address#\"")));
@@ -49,7 +49,7 @@ public class HelpCmd extends Command {
         
         _msgSystem.appendLine(getString(R.string.chat_help_battery, makeBold("\"battery\""), makeBold("\"batt\"")));
         _msgSystem.appendLine(getString(R.string.chat_help_ring, makeBold("\"ring\""), makeBold("\"ring:[0-100]\""), makeBold("\"stop\"")));
-        _msgSystem.appendLine(getString(R.string.chat_help_ringmode, makeBold("\"ringmode:#mode#\"")));        
+        _msgSystem.appendLine(getString(R.string.chat_help_ringmode, makeBold("\"ringmode:#mode#\"")));
         _msgSystem.appendLine(getString(R.string.chat_help_cmd, makeBold("\"cmd:#command#\"")));
         _msgSystem.appendLine(getString(R.string.chat_help_stop, makeBold("\"exit\"")));
         
