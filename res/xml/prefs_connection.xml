@@ -11,7 +11,6 @@
             android:title="@string/pref_con_notified_address"
             android:summary="@string/pref_con_notified_address_help"/>
     </PreferenceCategory>
-
     <PreferenceCategory 
         android:title="@string/pref_con_cat" 
         android:key="ConnectionSettings">
@@ -41,8 +40,12 @@
             android:defaultValue="conference.jwchat.org" 
             android:title="@string/pref_con_muc_server" 
             android:summary="@string/pref_con_muc_server_help"/>
-    <CheckBoxPreference android:key="useCompression" android:summary="@string/pref_con_use_compression_help" android:title="@string/pref_con_use_compression" android:defaultValue="false"></CheckBoxPreference>
-</PreferenceCategory>
+        <CheckBoxPreference 
+            android:key="useCompression"
+            android:defaultValue="false"
+            android:summary="@string/pref_con_use_compression_help" 
+            android:title="@string/pref_con_use_compression"/>
+    </PreferenceCategory>
     <PreferenceScreen
         android:title="@string/pref_con_server_settings">
         <EditTextPreference

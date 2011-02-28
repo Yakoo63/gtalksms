@@ -182,7 +182,7 @@ public class MainService extends Service {
             boolean available = intent.getBooleanExtra("available", true);
             Log.d(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
             if(available) {
-            	GoogleAnalyticsHelper.dispatch();
+                GoogleAnalyticsHelper.dispatch();
             }
             // TODO wait few seconds if network not available ? to avoid multiple reconnections
             if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
@@ -270,16 +270,16 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
         Log.d(Tools.LOG_TAG, "onCreate(): begin");
-    	super.onCreate();
+        super.onCreate();
         _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         
-    	_settingsMgr = new SettingsManager(this) {
-            @Override  public void OnPreferencesUpdated() {
+        _settingsMgr = new SettingsManager(this) {
+            @Override public void OnPreferencesUpdated() {
                 Tools.setLocale(_settingsMgr, getBaseContext());
             }
         };
         
-    	Tools.setLocale(_settingsMgr, this);
+        Tools.setLocale(_settingsMgr, this);
         HandlerThread thread = new HandlerThread("GTalkSMS.Service");
         thread.start();
         _handlerThreadId = thread.getId();
@@ -293,15 +293,17 @@ public class MainService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(Tools.LOG_TAG, "onStartCommand(): begin");
-        if (_gAnalytics == null) {  // TODO is the log msg is never seen move it to onCreate()
+        if (_gAnalytics == null) {  
+            // TODO is the log msg is never seen move it to onCreate()
             Log.d(Tools.LOG_TAG, "onStartCommand(): _gAnalytics == null");
             _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         }
         if (_contentIntent == null) {
             _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
         }
-        if (intent == null) { // The application has been killed by Android and
-                              // we try to restart the connection
+        if (intent == null) { 
+            // The application has been killed by Android and
+            // we try to restart the connection
             startService(new Intent(MainService.ACTION_CONNECT));
         }
         // A special case for the 'broadcast status' intent - we avoid setting
@@ -312,8 +314,7 @@ public class MainService extends Service {
             int state = getConnectionStatus();
             XmppManager.broadcastStatus(this, state, state);
         } else {
-            // OK - a real action request - ensure xmpp is setup (but not yet
-            // connected)
+            // OK - a real action request - ensure xmpp is setup (but not yet connected)
             // in preparation for the worker thread performing the request.
             if (_xmppMgr == null) {
                 if (_settingsMgr.notifiedAddress == null || _settingsMgr.notifiedAddress.equals("")
@@ -330,15 +331,13 @@ public class MainService extends Service {
                     public void onReceive(Context context, Intent intent) {
                         String action = intent.getAction();
                         if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
-                            // as this comes in on the main thread and not the
-                            // worker thread,
-                            // we just push the message onto the worker thread
-                            // queue.
+                            // as this comes in on the main thread and not the worker thread,
+                            // we just push the message onto the worker thread queue.
                             startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY, intent.getStringExtra("message")));
                         } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
                             onConnectionStatusChanged(intent.getIntExtra("old_state", 0), intent.getIntExtra("new_state", 0));
                             startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY)); 
-                         // TODO the intent handling culd be improved at this point
+                            // TODO the intent handling could be improved at this point
                         }
                     }
                 };
@@ -376,7 +375,6 @@ public class MainService extends Service {
             unregisterReceiver(_xmppreceiver);
             _xmppreceiver = null;
             
-            Tools.toastMessage(this, _settingsMgr, getString(R.string.main_service_stop));
             _xmppMgr.stop();
             _xmppMgr = null;
         }

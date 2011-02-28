@@ -19,13 +19,11 @@ public class Tools {
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
     
-    public static void toastMessage(Context ctx, SettingsManager settings, String msg) {
-        if (settings.showToastMessages) {
-            String toastMsg  = ctx.getString(R.string.app_name) + ": " + msg;
-            Toast.makeText(ctx, toastMsg, Toast.LENGTH_SHORT).show();
-        }
+    public static void toastMessage(Context ctx, String msg) {
+        String toastMsg  = ctx.getString(R.string.app_name) + ": " + msg;
+        Toast.makeText(ctx, toastMsg, Toast.LENGTH_SHORT).show();
     }
-    
+        
     public static String getVersionName(Context context, Class<?> cls) {
 
         try {

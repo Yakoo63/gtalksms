@@ -14,6 +14,7 @@
         android:summary="@string/pref_notif_battery_state_help"/>
     <ListPreference
         android:key="batteryNotificationInterval"
+        android:dependency="notifyBattery"
         android:title="@string/pref_notif_battery_notif_interval"
         android:summary="@string/pref_notif_battery_notif_interval_help"
         android:defaultValue="10"
@@ -24,6 +25,11 @@
         android:defaultValue="true"
         android:title="@string/pref_notif_battery_state_in_status"
         android:summary="@string/pref_notif_battery_state_in_status_help"/>
+    <CheckBoxPreference
+        android:key="notifyIncomingCalls"
+        android:defaultValue="true"
+        android:title="@string/pref_notif_incoming_calls"
+        android:summary="@string/pref_notif_incoming_calls_help"/>
     <ListPreference 
         android:key="notificationIncomingSmsType" 
         android:title="@string/pref_notif_incoming_sms" 
@@ -31,11 +37,6 @@
         android:entryValues="@array/list_smsNotificationType_entryValues" 
         android:entries="@array/list_smsNotificationType_entries" 
         android:defaultValue="same"/>
-    <CheckBoxPreference
-        android:key="notifyIncomingCalls"
-        android:defaultValue="true"
-        android:title="@string/pref_notif_incoming_calls"
-        android:summary="@string/pref_notif_incoming_calls_help"/>
     <CheckBoxPreference
         android:key="notifySmsSent"
         android:defaultValue="true"

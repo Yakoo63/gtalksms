@@ -88,7 +88,6 @@ public class XmppManager {
         public void run() {
             if (_currentRetryCount > 0) {
                 Log.v(Tools.LOG_TAG, "attempting reconnection");
-                Tools.toastMessage(_context, _settings, _context.getString(R.string.xmpp_manager_reconnecting));
             }
             _context.startService(MainService.newSvcIntent(_context, MainService.ACTION_CONNECT));
         }
@@ -255,7 +254,6 @@ public class XmppManager {
             // we failed after all the retries - just die.
             Log.v(Tools.LOG_TAG, "maybeStartReconnect ran out of retrys");
             stop(); // will set state to DISCONNECTED.
-            Tools.toastMessage(_context, _settings, _context.getString(R.string.xmpp_manager_failed_max_attempts));
             return;
         } else {
             _currentRetryCount += 1;
@@ -286,7 +284,6 @@ public class XmppManager {
         NetworkInfo active = ((ConnectivityManager)_context.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (active == null || !active.isAvailable()) {
             Log.e(Tools.LOG_TAG, "connection request, but no network available");
-            Tools.toastMessage(_context, _settings, _context.getString(R.string.xmpp_manager_waiting));
             // we don't destroy the service here - our network receiver will notify us when
             // the network comes up and we try again then.
             updateStatus(WAITING_TO_CONNECT);
@@ -304,7 +301,7 @@ public class XmppManager {
             connection.connect();
         } catch (Exception e) {
             Log.e(Tools.LOG_TAG, "xmpp connection failed: " + e);
-            Tools.toastMessage(_context, _settings, _context.getString(R.string.xmpp_manager_connection_failed));
+            Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_connection_failed));
             maybeStartReconnect();
             return;
         }
@@ -321,10 +318,10 @@ public class XmppManager {
             // hard-coded string.
             if (e.getMessage().indexOf("SASL authentication") == -1) {
                 // doesn't look like a bad username/password, so retry
-                Tools.toastMessage(_context, _settings, _context.getString(R.string.xmpp_manager_login_failed));
+                Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_login_failed));
                 maybeStartReconnect();
             } else {
-                Tools.toastMessage(_context, _settings, _context.getString(R.string.xmpp_manager_invalid_credentials));
+                Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_invalid_credentials));
                 stop();
             }
             return;
