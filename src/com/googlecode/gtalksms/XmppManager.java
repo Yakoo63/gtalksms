@@ -405,7 +405,7 @@ public class XmppManager {
         // Manage Xmpp presence status
         Presence presence = new Presence(Presence.Type.available);
         presence.setStatus(_presenceMessage);
-        presence.setPriority(24);                   
+        presence.setPriority(24);
         _connection.sendPacket(presence);
         
         try {

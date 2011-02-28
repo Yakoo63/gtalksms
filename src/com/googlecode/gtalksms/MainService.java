@@ -287,7 +287,7 @@ public class MainService extends Service {
         _serviceHandler = new ServiceHandler(_serviceLooper);
         Log.d(Tools.LOG_TAG, "onCreate(): service thread created");
         IsRunning = true; 
-        _gAnalytics.trackServiceStartsPerDay();        
+        _gAnalytics.trackServiceStartsPerDay();
     }
 
     @Override
