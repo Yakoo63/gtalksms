@@ -183,13 +183,14 @@ public class MainScreen extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _settingsMgr = new SettingsManager(this) {
-            @Override
-            public void OnPreferencesUpdated() {
-                createView();
-            }
-        };
+        _settingsMgr = new SettingsManager(this);
+//        _settingsMgr = new SettingsManager(this) {
+//            @Override
+//            public void OnPreferencesUpdated() {
+//            	super.OnPreferencesUpdated();
+//                createView();
+//            }
+//        };
 
         createView();
     }

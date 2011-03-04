@@ -338,7 +338,7 @@ public class SmsCmd extends Command {
         
         contacts = ContactsManager.getMatchingContacts(_context, contactName != null ? contactName : "*");
         
-        if (_settingsMgr.displaySentSms) {
+        if (_settingsMgr.showSentSms) {
             sentSms = _smsMgr.getAllSentSms(message);
         }
         
@@ -348,7 +348,7 @@ public class SmsCmd extends Command {
             
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name, message);
-                if (_settingsMgr.displaySentSms) {
+                if (_settingsMgr.showSentSms) {
                     smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(_context, contact.id), sentSms));
                 }
                 Collections.sort(smsArrayList);
@@ -442,7 +442,7 @@ public class SmsCmd extends Command {
 
         ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(_context, searchedText);
         ArrayList<Sms> sentSms = new ArrayList<Sms>();
-        if (_settingsMgr.displaySentSms) {
+        if (_settingsMgr.showSentSms) {
             sentSms = _smsMgr.getAllSentSms();
         }
 
@@ -452,7 +452,7 @@ public class SmsCmd extends Command {
             Boolean hasMatch = false;
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name);
-                if (_settingsMgr.displaySentSms) {
+                if (_settingsMgr.showSentSms) {
                     smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(_context, contact.id), sentSms));
                 }
                 Collections.sort(smsArrayList);
@@ -511,7 +511,7 @@ public class SmsCmd extends Command {
         ArrayList<Sms> smsArrayList = _smsMgr.getAllReceivedSms();
         XmppMsg allSms = new XmppMsg();
 
-        if (_settingsMgr.displaySentSms) {
+        if (_settingsMgr.showSentSms) {
             smsArrayList.addAll(_smsMgr.getAllSentSms());
         }
         Collections.sort(smsArrayList);

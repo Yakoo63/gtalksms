@@ -275,6 +275,7 @@ public class MainService extends Service {
         
         _settingsMgr = new SettingsManager(this) {
             @Override public void OnPreferencesUpdated() {
+            	super.OnPreferencesUpdated();
                 Tools.setLocale(_settingsMgr, getBaseContext());
             }
         };

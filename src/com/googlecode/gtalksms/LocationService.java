@@ -84,10 +84,10 @@ public class LocationService extends Service {
      */
     public void sendLocationUpdate(Location location) {
         StringBuilder builder = new StringBuilder();
-        if (_settingsManager.useGoogleMap) {
+        if (_settingsManager.useGoogleMapUrl) {
             builder.append("http://maps.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude() + Tools.LineSep);
         }
-        if (_settingsManager.useOpenStreetMap) {
+        if (_settingsManager.useOpenStreetMapUrl) {
             builder.append("http://www.openstreetmap.org/?mlat=" + location.getLatitude() + "&mlon=" + location.getLongitude() + "&zoom=14&layers=M" + Tools.LineSep);
         }
         builder.append(getString(R.string.chat_geo_accuracy, location.getAccuracy()));

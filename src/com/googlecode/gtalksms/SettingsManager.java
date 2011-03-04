@@ -2,6 +2,7 @@ package com.googlecode.gtalksms;
 
 import java.util.Locale;
 
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -9,7 +10,16 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.googlecode.gtalksms.tools.Tools;
-
+/**
+ * 
+ * @author GTalkSMS Team
+ * 
+ * In order to work flawlessly with the BackupAgent
+ * ALL settings in SettingsManager have to be of the same type
+ * as within the SharedPreferences backend AND they need to have
+ * the same name
+ *
+ */
 public class SettingsManager {
     // XMPP connection
     public String serverHost;
@@ -20,18 +30,18 @@ public class SettingsManager {
     public String password;
     public String notifiedAddress;
     public boolean useDifferentAccount;
-    public String roomsPassword;
+    public String roomPassword;
     public String mucServer;
     public boolean useCompression;
     
     // notifications
     public boolean notifyApplicationConnection;
-    public boolean formatChatResponses;
+    public boolean formatResponses;
     public boolean showStatusIcon;
     
     // geo location
-    public boolean useGoogleMap;
-    public boolean useOpenStreetMap;
+    public boolean useGoogleMapUrl;
+    public boolean useOpenStreetMapUrl;
 
     // ring
     public String ringtone = null;
@@ -39,11 +49,12 @@ public class SettingsManager {
     // battery
     public boolean notifyBatteryInStatus;
     public boolean notifyBattery;
-    public int batteryNotificationInterval;
+    public int batteryNotificationIntervalInt;
+    public String batteryNotificationInterval;
 
     // sms
     public int smsNumber;
-    public boolean displaySentSms;
+    public boolean showSentSms;
     public boolean notifySmsSent;
     public boolean notifySmsDelivered;
     public boolean notifySmsSentDelivered;
@@ -56,6 +67,8 @@ public class SettingsManager {
     
     // locale
     public Locale locale;
+    
+    public boolean backupAgentAvailable;
     
     private SharedPreferences _sharedPreferences;
     private Context _context;
@@ -79,11 +92,24 @@ public class SettingsManager {
     public void Destroy() {
         _sharedPreferences.unregisterOnSharedPreferenceChangeListener(_changeListener);
     }
+    
+    public SharedPreferences.Editor getEditor() {
+    	return _sharedPreferences.edit();
+    }
+    
+    public boolean SharedPreferencesContains(String key) {
+    	return _sharedPreferences.contains(key);
+    }
 
-    public void OnPreferencesUpdated() {}
+    public void OnPreferencesUpdated() {
+    	if(backupAgentAvailable) {
+    		BackupManager.dataChanged(_context.getPackageName());
+    	}
+    }
     
     /** imports the preferences */
-    private void importPreferences() {
+    @SuppressWarnings("unchecked")
+	private void importPreferences() {
         serverHost = _sharedPreferences.getString("serverHost", "");
         serverPort = _sharedPreferences.getInt("serverPort", 0);
         serviceName = _sharedPreferences.getString("serviceName", "");
@@ -97,23 +123,24 @@ public class SettingsManager {
         }
         useCompression = _sharedPreferences.getBoolean("useCompression", false);
         
-        useGoogleMap = _sharedPreferences.getBoolean("useGoogleMapUrl", true);
-        useOpenStreetMap = _sharedPreferences.getBoolean("useOpenStreetMapUrl", false);
+        useGoogleMapUrl = _sharedPreferences.getBoolean("useGoogleMapUrl", true);
+        useOpenStreetMapUrl = _sharedPreferences.getBoolean("useOpenStreetMapUrl", false);
         
         showStatusIcon = _sharedPreferences.getBoolean("showStatusIcon", true);
         
         notifyApplicationConnection = _sharedPreferences.getBoolean("notifyApplicationConnection", true);
         notifyBattery = _sharedPreferences.getBoolean("notifyBattery", true);
         notifyBatteryInStatus = _sharedPreferences.getBoolean("notifyBatteryInStatus", true);
-        batteryNotificationInterval = Integer.valueOf(_sharedPreferences.getString("batteryNotificationInterval", "10"));
+        batteryNotificationInterval = _sharedPreferences.getString("batteryNotificationInterval", "10");
+        batteryNotificationIntervalInt = Integer.parseInt(batteryNotificationInterval);
         notifySmsSent = _sharedPreferences.getBoolean("notifySmsSent", true);
         notifySmsDelivered = _sharedPreferences.getBoolean("notifySmsDelivered", true);
         notifySmsSentDelivered = notifySmsSent || notifySmsDelivered;
         ringtone = _sharedPreferences.getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
-        displaySentSms = _sharedPreferences.getBoolean("showSentSms", false);
+        showSentSms = _sharedPreferences.getBoolean("showSentSms", false);
         smsNumber = _sharedPreferences.getInt("smsNumber", 5);
         callLogsNumber = _sharedPreferences.getInt("callLogsNumber", 10);
-        formatChatResponses = _sharedPreferences.getBoolean("formatResponses", false);
+        formatResponses = _sharedPreferences.getBoolean("formatResponses", false);
         notifyIncomingCalls = _sharedPreferences.getBoolean("notifyIncomingCalls", false);
 
         String localeStr = _sharedPreferences.getString("locale", "default");
@@ -123,22 +150,30 @@ public class SettingsManager {
             locale = new Locale(localeStr);
         }
         
-        roomsPassword = _sharedPreferences.getString("roomPassword", "gtalksms");
+        roomPassword = _sharedPreferences.getString("roomPassword", "gtalksms");
         mucServer = _sharedPreferences.getString("mucServer", "conference.jwchat.org");
-        String smsNotificationType = _sharedPreferences.getString("notificationIncomingSmsType", "same");
+        String notificationIncomingSmsType = _sharedPreferences.getString("notificationIncomingSmsType", "same");
         
-        if (smsNotificationType.equals("both")) {
+        if (notificationIncomingSmsType.equals("both")) {
             notifySmsInChatRooms = true;
             notifySmsInSameConversation = true;
-        } else if (smsNotificationType.equals("no")) {
+        } else if (notificationIncomingSmsType.equals("no")) {
             notifySmsInChatRooms = false;
             notifySmsInSameConversation = false;
-        } else if (smsNotificationType.equals("separate")) {
+        } else if (notificationIncomingSmsType.equals("separate")) {
             notifySmsInChatRooms = true;
             notifySmsInSameConversation = false;
         } else {
             notifySmsInSameConversation = true;
             notifySmsInChatRooms = false;
+        }
+        
+        try {
+        	@SuppressWarnings("unused")
+			Class c = Class.forName("android.app.backup.BackupAgent");
+        	backupAgentAvailable = true;
+        } catch (Exception e) {
+        	backupAgentAvailable = false;
         }
     }
 }

@@ -183,7 +183,7 @@ public class XmppMuc {
                 catch (Exception ex) {
                     Log.e(Tools.LOG_TAG, "Unable to configure room owners. Falling back to room passwords", ex);
                     submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
-                    submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomsPassword);
+                    submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomPassword);
                     passwordMode = true;
                 }
                     

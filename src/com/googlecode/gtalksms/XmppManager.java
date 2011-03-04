@@ -454,7 +454,7 @@ public class XmppManager {
         if (isConnected()) {
             Message msg = new Message(_settings.notifiedAddress, Message.Type.chat);
             
-            if (_settings.formatChatResponses) {
+            if (_settings.formatResponses) {
                 msg.setBody(message.generateFmtTxt());
             } else {
                 msg.setBody(message.generateTxt());
