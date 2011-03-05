@@ -125,7 +125,7 @@ public class MainService extends Service {
         updateListenersToCurrentState(initialState);
         
         String a = intent.getAction();
-        Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + initialState);
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + initialState);
         if (a.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // request to disconnect.
@@ -180,7 +180,7 @@ public class MainService extends Service {
             }
         } else if (a.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
-            Log.d(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
+            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
             if(available) {
                 GoogleAnalyticsHelper.dispatch();
             }
@@ -197,14 +197,14 @@ public class MainService extends Service {
         } else {
             Log.w(Tools.LOG_TAG, "Unexpected intent: " + a);
         }
-        Log.d(Tools.LOG_TAG, "handled action '" + a + "' - state now " + getConnectionStatus());
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "handled action '" + a + "' - state now " + getConnectionStatus());
         // stop the service if we are disconnected (but stopping the service
         // doesn't mean the process is terminated - onStart can still happen.)
         if (getConnectionStatus() == XmppManager.DISCONNECTED) {
             if (stopSelfResult(id) == true) {
-                Log.d(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
+                if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
             } else {
-                Log.d(Tools.LOG_TAG, "more pending intents to be delivered - service will not stop");
+                if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "more pending intents to be delivered - service will not stop");
             }
         }
     }
@@ -269,7 +269,7 @@ public class MainService extends Service {
 
     @Override
     public void onCreate() {
-        Log.d(Tools.LOG_TAG, "onCreate(): begin");
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onCreate(): begin");
         super.onCreate();
         _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         
@@ -286,17 +286,17 @@ public class MainService extends Service {
         _handlerThreadId = thread.getId();
         _serviceLooper = thread.getLooper();
         _serviceHandler = new ServiceHandler(_serviceLooper);
-        Log.d(Tools.LOG_TAG, "onCreate(): service thread created");
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onCreate(): service thread created");
         IsRunning = true; 
         _gAnalytics.trackServiceStartsPerDay();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(Tools.LOG_TAG, "onStartCommand(): begin");
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStartCommand(): begin");
         if (_gAnalytics == null) {  
             // TODO is the log msg is never seen move it to onCreate()
-            Log.d(Tools.LOG_TAG, "onStartCommand(): _gAnalytics == null");
+            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStartCommand(): _gAnalytics == null");
             _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         }
         if (_contentIntent == null) {
@@ -310,7 +310,7 @@ public class MainService extends Service {
         // A special case for the 'broadcast status' intent - we avoid setting
         // up the _xmppMgr etc
         else if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
-            Log.d(Tools.LOG_TAG, "onStart: ACTION_BROADCAST_STATUS");
+            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStart: ACTION_BROADCAST_STATUS");
             // A request to broadcast our current status even if _xmpp is null.
             int state = getConnectionStatus();
             XmppManager.broadcastStatus(this, state, state);
@@ -342,14 +342,14 @@ public class MainService extends Service {
                         }
                     }
                 };
-                Log.d(Tools.LOG_TAG, "onStart: ACTION_MESSAGE_RECEIVED");
+                if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStart: ACTION_MESSAGE_RECEIVED");
                 IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
                 intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
                 registerReceiver(_xmppreceiver, intentFilter);
                 _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
             }
             
-            Log.d(Tools.LOG_TAG, "onStartCommand: _serviceHandler.sendMessage with intent action: " + intent.getAction());
+            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStartCommand: _serviceHandler.sendMessage with intent action: " + intent.getAction());
             Message msg = _serviceHandler.obtainMessage();
             msg.arg1 = startId;
             msg.obj = intent;
@@ -566,19 +566,19 @@ public class MainService extends Service {
      * and only if we have a network available
      */
     private void setupListenersForConnection() {
-        Log.d(Tools.LOG_TAG, "setupListenersForConnection");  
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "setupListenersForConnection");  
         _gAnalytics.trackInstalls(); //we only track if we have a data connection
 
         try {
             setupCommands();
         } catch (Exception e) {
             // Should not happen.
-            Log.w(Tools.LOG_TAG, "MainService.setupListenersForConnection: Setup commands error", e);
+            GoogleAnalyticsHelper.trackAndLogError("MainService.setupListenersForConnection: Setup commands error", e);
         } 
     }
     
     private void teardownListenersForConnection() {
-        Log.d(Tools.LOG_TAG, "teardownListenersForConnection");      
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "teardownListenersForConnection");      
         stopForeground(true);
         stopCommands();
         cleanupCommands();

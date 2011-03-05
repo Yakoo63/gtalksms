@@ -131,7 +131,7 @@ public class GoogleAnalyticsHelper {
             InputStreamReader isr = new InputStreamReader(fIn);
             isr.read(inputBuffer);
         } catch (IOException e) {
-            trackAndLogError("Reading datefile", e);
+//            trackAndLogError("Reading datefile", e);  //commented out - just spams the event on fresh installs
         }
         if ((new String(inputBuffer)).equals(currentDate())) {
             return true;

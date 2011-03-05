@@ -383,7 +383,7 @@ public class XmppManager {
             public void processPacket(Packet packet) {
                 Message message = (Message) packet;
                 
-                Log.d(Tools.LOG_TAG, "Xmpp packet received");
+                if(_settings.debugLog) Log.d(Tools.LOG_TAG, "Xmpp packet received");
                 
                 if ( message.getFrom().toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") && 
                      !message.getFrom().equals(_connection.getUser())) {

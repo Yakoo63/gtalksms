@@ -164,7 +164,7 @@ public class MainScreen extends Activity {
                         
                         _friends.add(map);
                     }
-                    Log.d(Tools.LOG_TAG, "Update presence: " + userId + " - " + XmppFriend.stateToString(stateInt));
+                    if (_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "Update presence: " + userId + " - " + XmppFriend.stateToString(stateInt));
                     updateBuddiesList();
 
                 } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {

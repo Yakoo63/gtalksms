@@ -23,6 +23,7 @@ import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.data.sms.Sms;
 import com.googlecode.gtalksms.data.sms.SmsMmsManager;
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -90,7 +91,7 @@ public class SmsCmd extends Command {
                         }
                         
                     } else { // we could NOT find the sms in the smsMap - fall back to old behavior
-                        Log.d(Tools.LOG_TAG, "sms in smsMap missing");
+                        GoogleAnalyticsHelper.trackAndLogWarning("sms in smsMap missing");
                         switch (res) {
                         case Activity.RESULT_OK:
                             send(_context.getString(R.string.chat_sms_sent));
@@ -147,7 +148,7 @@ public class SmsCmd extends Command {
                         }
 
                     } else { // we could NOT find the sms in the smsMap - fall back to old the behavior
-                        Log.d(Tools.LOG_TAG, "sms in smsMap missing");
+                        GoogleAnalyticsHelper.trackAndLogWarning("sms in smsMap missing");
                         switch (res) {
                         case Activity.RESULT_OK:
                             send(_context.getString(R.string.chat_sms_delivered));

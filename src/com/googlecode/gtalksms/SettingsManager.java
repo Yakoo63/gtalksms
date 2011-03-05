@@ -70,6 +70,8 @@ public class SettingsManager {
     
     public boolean backupAgentAvailable;
     
+    public boolean debugLog;
+    
     private SharedPreferences _sharedPreferences;
     private Context _context;
     private OnSharedPreferenceChangeListener _changeListener = new OnSharedPreferenceChangeListener() {
@@ -175,5 +177,7 @@ public class SettingsManager {
         } catch (Exception e) {
         	backupAgentAvailable = false;
         }
+        
+        debugLog = true; // TODO make this a preference
     }
 }

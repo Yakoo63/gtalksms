@@ -229,7 +229,7 @@ public class XmppMuc {
             Message message = (Message) packet;
             String from = message.getFrom();
         
-            Log.d(Tools.LOG_TAG, "Xmpp chat room packet received");
+            if (_settings.debugLog) Log.d(Tools.LOG_TAG, "Xmpp chat room packet received");
             
             if (!from.contains(_number)) {
                 if (message.getBody() != null) {
