@@ -39,7 +39,7 @@
     <string name="pref_con_cat">Verbindungsoptionen</string>
     <string name="pref_con_use_different_account">Benutze anderen Account</string>
     <string name="pref_con_use_different_account_help">Aktivieren um anderen Account für GTalkSMS zu verwenden</string>
-    <string name="pref_con_use_compression_account">Verbindungskomprimierung</string>
+    <string name="pref_con_use_compression">Verbindungskomprimierung</string>
     <string name="pref_con_use_compression_help">Komprimiert die XMPP Daten</string>
     <string name="pref_con_login">Login</string>
     <string name="pref_con_login_help">Login des GTalkSMS Accounts (vollständige JID)</string>
