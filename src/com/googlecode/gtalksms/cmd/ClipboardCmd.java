@@ -30,5 +30,12 @@ public class ClipboardCmd extends Command {
             send(getString(R.string.chat_error_clipboard));
         }
     }
+    
+    public String[] help() {
+        String[] s = { 
+                getString(R.string.chat_help_copy, makeBold("\"copy:#text#\""))
+                };
+        return s;
+    }
 
 }

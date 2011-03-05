@@ -151,5 +151,14 @@ public class RingCmd extends Command {
     public void cleanUp() {
         clearMediaPlayer();
     }
+    
+    @Override
+    public String[] help() {
+        String[] s = { 
+                getString(R.string.chat_help_ring, makeBold("\"ring\""), makeBold("\"ring:[0-100]\""), makeBold("\"stop\"")),
+                getString(R.string.chat_help_ringmode, makeBold("\"ringmode:#mode#\""))
+                };
+        return s;
+    }
 
 }

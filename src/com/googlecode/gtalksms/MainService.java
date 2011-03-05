@@ -25,6 +25,7 @@ import com.googlecode.gtalksms.cmd.CallCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
 import com.googlecode.gtalksms.cmd.Command;
 import com.googlecode.gtalksms.cmd.ContactCmd;
+import com.googlecode.gtalksms.cmd.ExitCmd;
 import com.googlecode.gtalksms.cmd.FileCmd;
 import com.googlecode.gtalksms.cmd.GeoCmd;
 import com.googlecode.gtalksms.cmd.HelpCmd;
@@ -213,6 +214,14 @@ public class MainService extends Service {
         return _xmppMgr == null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
     }
     
+    public Map<String, Command> getCommands() {
+        return _commands;
+    }
+    
+    public Set<Command> getCommandSet() {
+        return _commandSet;
+    }
+    
     public boolean getTLSStatus() {
         return _xmppMgr == null ? false : _xmppMgr.getTLSStatus();
     }
@@ -269,7 +278,6 @@ public class MainService extends Service {
 
     @Override
     public void onCreate() {
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onCreate(): begin");
         super.onCreate();
         _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         
@@ -484,9 +492,7 @@ public class MainService extends Service {
 
             // Not case sensitive commands
             command = command.toLowerCase();
-            if (command.equals("exit")) {
-                stopService(new Intent(ACTION_CONNECT));
-            } else if (command.equals("stop")) {
+            if (command.equals("stop")) {
                 stopCommands();
             } else if (_commands.containsKey(command)) {
                 _commands.get(command).execute(command, args);
@@ -499,7 +505,7 @@ public class MainService extends Service {
     }
     
     private void setupCommands() {
-        registerCommand(new HelpCmd(this));
+        
         registerCommand(new KeyboardCmd(this));
         registerCommand(new BatteryCmd(this));
         registerCommand(new GeoCmd(this));
@@ -511,6 +517,9 @@ public class MainService extends Service {
         registerCommand(new RingCmd(this));
         registerCommand(new FileCmd(this));
         registerCommand(new SmsCmd(this));
+        registerCommand(new ExitCmd(this));
+        
+        registerCommand(new HelpCmd(this));  //help command needs to be registered as last
     }
     
     private void cleanupCommands() {

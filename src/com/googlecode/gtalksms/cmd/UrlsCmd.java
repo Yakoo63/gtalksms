@@ -18,4 +18,12 @@ public class UrlsCmd extends Command {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         _context.startActivity(intent);
     }
+    
+    @Override
+    public String[] help() {
+        String[] s = { 
+                getString(R.string.chat_help_urls, makeBold("\"http\""))
+                };
+        return s;
+    }
 }

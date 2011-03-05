@@ -2,6 +2,7 @@ package com.googlecode.gtalksms.cmd;
 
 import com.googlecode.gtalksms.KeyboardInputMethod;
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 
 public class KeyboardCmd extends Command {
     public KeyboardCmd(MainService mainService) {
@@ -16,5 +17,12 @@ public class KeyboardCmd extends Command {
             keyboard.setText(args);
         }
     }
-
+    
+    @Override
+    public String[] help() {
+        String[] s = { 
+                getString(R.string.chat_help_write, makeBold("\"write:#text#\""), makeBold("\"w:#text#\""))
+                };
+        return s;
+    }
 }

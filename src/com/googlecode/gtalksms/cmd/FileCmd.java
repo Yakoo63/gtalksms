@@ -3,6 +3,7 @@ package com.googlecode.gtalksms.cmd;
 import java.io.File;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.XmppManager;
 
 public class FileCmd extends Command {
@@ -21,6 +22,11 @@ public class FileCmd extends Command {
         } else {
             send("File '" + args + "' doesn't exist!" );
         }
+    }
+    
+    @Override
+    public String[] help() {
+        return null;
     }
 
 }

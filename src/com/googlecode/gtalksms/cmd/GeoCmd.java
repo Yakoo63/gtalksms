@@ -93,4 +93,13 @@ public class GeoCmd extends Command {
     public void stop() {
         stopLocatingPhone();
     }
+    
+    @Override
+    public String[] help() {
+        String[] s = { 
+                getString(R.string.chat_help_geo, makeBold("\"geo:#address#\"")),
+                getString(R.string.chat_help_where, makeBold("\"where\""), makeBold("\"stop\""))
+                };
+        return s;
+    }
 }

@@ -103,4 +103,13 @@ public class CallCmd extends Command {
             _phoneListener = null;
         }
     }
+
+    @Override
+    public String[] help() {
+        String[] s = { 
+                getString(R.string.chat_help_calls, makeBold("\"calls\"")),
+                getString(R.string.chat_help_dial, makeBold("\"dial:#contact#\"")) 
+                };
+        return s;
+    }
 }

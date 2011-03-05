@@ -54,5 +54,17 @@ public abstract class Command {
      * Cleans up the structures holden by the Command Class
      * Usually issued on exit of GtalkSMS
      */
-    public void cleanUp() {}
+    public void cleanUp() {};
+    
+    /**
+     * Request a help String array from the command
+     * The String is formated with your internal BOLD/ITALIC/etc Tags
+     * 
+     * @return Help String array, null if there is no help available
+     */
+    public abstract String[] help();
+    
+    protected String makeBold(String msg) {
+        return XmppMsg.makeBold(msg);
+    }
 }

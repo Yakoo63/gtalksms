@@ -127,4 +127,12 @@ public class ShellCmd extends Command {
         msg.append(message);
         send(msg);
     }
+    
+    @Override
+    public String[] help() {
+        String[] s = { 
+                getString(R.string.chat_help_cmd, makeBold("\"cmd:#command#\""))
+                };
+        return s;
+    }
 }

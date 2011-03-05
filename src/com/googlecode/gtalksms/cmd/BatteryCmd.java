@@ -80,4 +80,12 @@ public class BatteryCmd extends Command {
         }
         _batInfoReceiver = null;
     }
+
+    @Override
+    public String[] help() {
+        String[] s = { 
+                getString(R.string.chat_help_battery, makeBold("\"battery\""), makeBold("\"batt\"")) 
+                };
+        return s;
+    }
 }

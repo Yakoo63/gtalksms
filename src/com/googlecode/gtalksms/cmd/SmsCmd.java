@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.telephony.SmsManager;
-import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
@@ -239,6 +238,26 @@ public class SmsCmd extends Command {
                 deleteSMS(subCommand, search);
             }
         }
+    }
+    
+    @Override
+    public String[] help() {
+        String[] s = { 
+                getString(R.string.chat_help_sms_reply, makeBold("\"reply:#message#\"")),
+                getString(R.string.chat_help_sms_show_all, makeBold("\"sms\"")),
+                getString(R.string.chat_help_sms_show_unread, makeBold("\"sms:unread\"")),
+                getString(R.string.chat_help_sms_show_contact, makeBold("\"sms:#contact#\"")),
+                getString(R.string.chat_help_sms_send, makeBold("\"sms:#contact#:#message#\"")),
+                getString(R.string.chat_help_sms_chat, makeBold("\"chat:#contact#")),
+                getString(R.string.chat_help_find_sms_all, makeBold("\"findsms:#message#\""), makeBold("\"fs:#message#\"")),
+                getString(R.string.chat_help_find_sms, makeBold("\"findsms:#contact#:#message#\""), makeBold("\"fs:#contact#:#message#\"")),
+                getString(R.string.chat_help_mark_as_read, makeBold("\"markAsRead:#contact#\""), makeBold("\"mar\"")),
+                getString(R.string.chat_help_del_sms_all, makeBold("\"delsms:all\"")),
+                getString(R.string.chat_help_del_sms_sent, makeBold("\"delsms:sent\"")),
+                getString(R.string.chat_help_del_sms_last, makeBold("\"delsms:last:#number#\""), makeBold("\"delsms:lastin:#number#\""), makeBold("\"delsms:lastout:#number#\"")),
+                getString(R.string.chat_help_del_sms_contact, makeBold("\"delsms:contact:#contact#\""))
+                };
+        return s;
     }
     
     /**
@@ -626,4 +645,5 @@ public class SmsCmd extends Command {
     public void cleanUp() {
         clearSmsMonitor();
     }
+    
 }
