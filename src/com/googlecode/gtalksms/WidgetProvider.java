@@ -52,7 +52,7 @@ public class WidgetProvider extends AppWidgetProvider {
          }
         
         // Set FREE label for not donate version
-        if (context.getPackageName().endsWith("donate")) {
+        if (Tools.isDonateAppInstalled(context)) {
             views.setViewVisibility(R.id.Label, View.GONE);
         } else {
             views.setViewVisibility(R.id.Label, View.VISIBLE);

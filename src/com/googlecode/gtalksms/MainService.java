@@ -37,8 +37,8 @@ import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
-import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
+import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MainService extends Service {

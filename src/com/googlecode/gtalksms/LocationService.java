@@ -7,8 +7,6 @@ package com.googlecode.gtalksms;
 
 import java.lang.reflect.Method;
 
-import com.googlecode.gtalksms.tools.Tools;
-
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +16,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+
+import com.googlecode.gtalksms.tools.Tools;
 
 public class LocationService extends Service {
 

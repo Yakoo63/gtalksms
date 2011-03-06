@@ -3,7 +3,6 @@ package com.googlecode.gtalksms.cmd;
 import java.io.File;
 
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.XmppManager;
 
 public class FileCmd extends Command {

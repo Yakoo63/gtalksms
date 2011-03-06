@@ -15,13 +15,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.googlecode.gtalksms.SettingsManager;
-
 import android.app.backup.BackupAgent;
 import android.app.backup.BackupDataInput;
 import android.app.backup.BackupDataOutput;
 import android.content.SharedPreferences;
 import android.os.ParcelFileDescriptor;
+
+import com.googlecode.gtalksms.SettingsManager;
 
 public class MyBackupAgent extends BackupAgent {
 	public static final int KEYTYPE_UNKOWN = 0;

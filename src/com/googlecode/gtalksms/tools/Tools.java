@@ -113,4 +113,14 @@ public class Tools {
         }
         return min;
     }
+    
+    public static boolean isDonateAppInstalled(Context context) {  
+        List<PackageInfo> packs = context.getPackageManager().getInstalledPackages(0);  
+        for(PackageInfo p : packs) {
+            if (p.packageName.equalsIgnoreCase("com.googlecode.gtalksmsdonate")) {  
+                return true;
+            }  
+        }
+        return false;
+    }
 }

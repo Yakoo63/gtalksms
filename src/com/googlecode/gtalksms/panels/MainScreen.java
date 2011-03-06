@@ -235,7 +235,7 @@ public class MainScreen extends Activity {
         });
 
         // Set FREE label for not donate version
-        if (getPackageName().endsWith("donate")) {
+        if (Tools.isDonateAppInstalled(getBaseContext())) {
             donateBtn.setVisibility(View.GONE);
         } else {
             donateBtn.setVisibility(View.VISIBLE);

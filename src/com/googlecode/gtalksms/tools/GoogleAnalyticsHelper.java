@@ -9,10 +9,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-
 import android.content.Context;
 import android.util.Log;
+
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class GoogleAnalyticsHelper {
     public static final int NONE = 0;
