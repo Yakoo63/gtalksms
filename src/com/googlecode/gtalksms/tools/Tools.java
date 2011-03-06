@@ -1,5 +1,11 @@
 package com.googlecode.gtalksms.tools;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -112,5 +118,40 @@ public class Tools {
                 min = i;
         }
         return min;
+    }
+    
+    public static boolean copyFile(File from, File to) {
+        if (!from.isFile() || !to.isFile()) 
+            return false;
+        
+        InputStream in = null;
+        OutputStream out = null;
+        
+        try {
+            in = new FileInputStream(from);
+            out = new FileOutputStream(to);
+            
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (out != null)
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    /* Ignore */
+                }
+            if (in != null)
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    /* Ignore */
+                }
+        }            
+        return true;
     }
 }
