@@ -35,8 +35,12 @@ public class Tools {
         try {
             ComponentName comp = new ComponentName(context, cls);
             PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
-
-            return "v" + pinfo.versionName + " @ Yakoo";
+            String donate = "";
+            
+            if(isDonateAppInstalled(context)) {
+                donate = "Full ";
+            }
+            return donate + "v" + pinfo.versionName + "\n@ Yakoo";
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {
             return "";
         }

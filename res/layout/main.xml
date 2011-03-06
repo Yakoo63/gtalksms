@@ -1,35 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.googlecode.gtalksms"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
     
+    <com.admob.android.ads.AdView
+        android:id="@+id/ad" 
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:backgroundColor="#000000"
+        app:primaryTextColor="#FFFFFF"
+        app:secondaryTextColor="#CCCCCC"
+        app:keywords="@string/main_but_donate"/>
+        
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:orientation="horizontal"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content" >
         <Button android:text="@string/main_but_start_stop" android:id="@+id/StartStop" 
-                android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight=".5"
+                android:layout_height="40px" android:layout_width="fill_parent" android:layout_weight=".5"
                 android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/>
         <Button android:text="@string/main_but_preferences" android:id="@+id/Preferences"
-                android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight=".5"
+                android:layout_height="40px" android:layout_width="fill_parent" android:layout_weight=".5"
                 android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/> 
     </LinearLayout>
+    
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:orientation="horizontal"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content" >
 	    <Button android:text="@string/main_but_send_clipboard" android:id="@+id/Clipboard"
-	            android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight=".5"
+	            android:layout_height="40px" android:layout_width="fill_parent" android:layout_weight=".5"
 	            android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/> 
         <Button android:text="@string/main_but_about" android:id="@+id/About"
-                android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight=".5"
+                android:layout_height="40px" android:layout_width="fill_parent" android:layout_weight=".5"
                 android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/> 
     </LinearLayout>
+    
     <ListView android:id="@+id/ListViewBuddies" android:layout_width="fill_parent" android:layout_height="fill_parent" 
               android:layout_weight=".9" />
-    <Button android:text="@string/main_but_donate" android:id="@+id/Donate"
-                android:layout_height="wrap_content" android:layout_width="fill_parent" /> 
+              
+    <Button 
+        android:text="@string/main_but_donate" 
+        android:id="@+id/Donate"
+        android:layout_height="40px" 
+        android:layout_width="fill_parent" />
+    
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:orientation="horizontal"
                   android:layout_width="fill_parent"
