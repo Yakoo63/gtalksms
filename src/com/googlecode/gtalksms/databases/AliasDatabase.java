@@ -38,12 +38,7 @@ public class AliasDatabase extends Database {
     
     public static boolean deleteAlias(String alias) {
         int ret = database.delete(DatabaseOpenHelper.ALIAS_TABLE_NAME, "aliasName =" + alias, null);
-        if(ret == 1) {
-            return true;
-        } else {
-            return false;
-        }
-        return false;
+        return ret == 1;
     }
     
     public static String getNumber(String alias) {
