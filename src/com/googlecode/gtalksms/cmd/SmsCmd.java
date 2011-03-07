@@ -344,7 +344,7 @@ public class SmsCmd extends Command {
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 _xmppMgr.inviteRoom(phone.cleanNumber, phone.contactName);
-                setLastRecipient(phone.cleanNumber);
+//                setLastRecipient(phone.cleanNumber); // issue 117
             } else {
                 send(getString(R.string.chat_no_match_for, contact));
             }
