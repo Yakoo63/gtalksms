@@ -75,7 +75,7 @@
     <string name="pref_notif_sms_delivered_help">Notification pour les SMS délivrés</string>
     <string name="main_but_start_stop">Démarrer/Arrêter</string>
     <string name="main_but_preferences">Préférences</string>
-    <string name="main_but_send_clipboard">Envoyer presse-papier</string>
+    <string name="main_but_send_clipboard">Presse-papier</string>
     <string name="main_but_about">A propos</string>
     <string name="app_name">GTalkSMS</string>
     <string name="about_panel">A propos de GTalkSMS</string>

@@ -32,6 +32,11 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.admob.android.ads.AdView;
+import com.admob.android.ads.InterstitialAd;
+import com.admob.android.ads.InterstitialAdListener;
+import com.admob.android.ads.SimpleAdListener;
+import com.admob.android.ads.InterstitialAd.Event;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
@@ -40,8 +45,11 @@ import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFriend;
 
-public class MainScreen extends Activity {
+public class MainScreen extends Activity implements InterstitialAdListener{
 
+    /** AdMob Interstitial Ad */
+    private InterstitialAd mInterstitialAd = new InterstitialAd(Event.APP_START, this);
+    
     private MainService mainService;
     private SettingsManager _settingsMgr;
     private BroadcastReceiver _xmppreceiver;
@@ -184,15 +192,9 @@ public class MainScreen extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         _settingsMgr = new SettingsManager(this);
-//        _settingsMgr = new SettingsManager(this) {
-//            @Override
-//            public void OnPreferencesUpdated() {
-//            	super.OnPreferencesUpdated();
-//                createView();
-//            }
-//        };
-
         createView();
+        
+        mInterstitialAd.requestAd(this);
     }
 
     /** Called when the activity is first created. */
@@ -226,9 +228,15 @@ public class MainScreen extends Activity {
             }
         });
 
+        if (mInterstitialAd.isReady()) {
+            mInterstitialAd.show(this);
+        }
+        
+        AdView ad = (AdView) findViewById(R.id.ad);
+        ad.setAdListener(new SimpleAdListener());
+        
         Button donateBtn = (Button) findViewById(R.id.Donate);
         donateBtn.setOnClickListener(new OnClickListener() {
-
             public void onClick(View v) {
                 openLink("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted");
             }
@@ -236,9 +244,12 @@ public class MainScreen extends Activity {
 
         // Set FREE label for not donate version
         if (Tools.isDonateAppInstalled(getBaseContext())) {
+            ad.setVisibility(View.GONE);
             donateBtn.setVisibility(View.GONE);
         } else {
+            ad.setVisibility(View.VISIBLE);
             donateBtn.setVisibility(View.VISIBLE);
+            mInterstitialAd.requestAd(this); // request a new ad
         }
 
         Button clipboardBtn = (Button) findViewById(R.id.Clipboard);
@@ -360,4 +371,19 @@ public class MainScreen extends Activity {
         }
         return super.onKeyLongPress(keyCode, event);
     }
+
+      @Override
+    public void onFailedToReceiveInterstitial(InterstitialAd interstitialAd) {
+        Log.d(Tools.LOG_TAG, "onFailedToReceiveInterstitial");
+    }
+
+    @Override
+    public void onReceiveInterstitial(InterstitialAd interstitialAd) {
+        Log.d(Tools.LOG_TAG, "onReceiveInterstitial");
+        if(interstitialAd == mInterstitialAd) {
+            mInterstitialAd.show(this);
+        }
+    }
+    
+  
 }
