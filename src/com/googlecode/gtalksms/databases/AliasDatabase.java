@@ -19,21 +19,13 @@ public class AliasDatabase extends Database {
     public static boolean setAlias(String alias, String number) {
         ContentValues values = composeValues(alias, number);
         long ret = database.insert(DatabaseOpenHelper.ALIAS_TABLE_NAME, null, values);
-        if(ret != -1) {
-            return true;
-        } else {
-            return false;
-        }
+        return ret != -1;
     }
     
     public static boolean updateAlias(String alias, String number) {
         ContentValues values = composeValues(alias, number);
         int ret = database.update(DatabaseOpenHelper.ALIAS_TABLE_NAME, values, "aliasName =" + alias, null);
-        if(ret == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return ret == 1;
     }
     
     public static boolean deleteAlias(String alias) {
@@ -52,11 +44,7 @@ public class AliasDatabase extends Database {
     
     public static boolean containsAlias(String alias) {
         Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "number" }, alias, null, null , null, null);
-        if(c.getCount() == 1) {
-            return true;
-        } else { 
-            return false;
-        }
+        return c.getCount() == 1;
     }
     
     public static String[][] getFullDatabase() {
@@ -76,5 +64,4 @@ public class AliasDatabase extends Database {
         values.put("number", number);
         return values;
     }
-
 }

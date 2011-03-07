@@ -26,7 +26,7 @@ public class About extends Activity {
         setContentView(R.layout.about);
 
         TextView label = (TextView) findViewById(R.id.VersionLabel);
-        label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()), Typeface.BOLD));
+        label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
 
         updateConsole();
     }

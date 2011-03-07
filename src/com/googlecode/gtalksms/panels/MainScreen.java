@@ -48,9 +48,9 @@ import com.googlecode.gtalksms.xmpp.XmppFriend;
 public class MainScreen extends Activity implements InterstitialAdListener{
 
     /** AdMob Interstitial Ad */
-    private InterstitialAd mInterstitialAd = new InterstitialAd(Event.APP_START, this);
+    private InterstitialAd _interstitialAd = new InterstitialAd(Event.APP_START, this);
     
-    private MainService mainService;
+    private MainService _mainService;
     private SettingsManager _settingsMgr;
     private BroadcastReceiver _xmppreceiver;
     private ArrayList<HashMap<String, String>> _friends = new ArrayList<HashMap<String, String>>();
@@ -58,15 +58,15 @@ public class MainScreen extends Activity implements InterstitialAdListener{
 
     private ServiceConnection _mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            mainService = ((MainService.LocalBinder) service).getService();
-            MainScreen.this.updateStatus(mainService.getConnectionStatus(), mainService.getTLSStatus(), mainService.getCompressionStatus());
-            mainService.updateBuddies();
+            _mainService = ((MainService.LocalBinder) service).getService();
+            MainScreen.this.updateStatus(_mainService.getConnectionStatus(), _mainService.getTLSStatus(), _mainService.getCompressionStatus());
+            _mainService.updateBuddies();
         }
 
         public void onServiceDisconnected(ComponentName className) {
             //TODO should we call updateBuddies() here, as sometimes the service if offline (red)
             //but the buddy is still shown as online
-            mainService = null;
+            _mainService = null;
         }
     };
 
@@ -194,7 +194,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         _settingsMgr = new SettingsManager(this);
         createView();
         
-        mInterstitialAd.requestAd(this);
+        _interstitialAd.requestAd(this);
     }
 
     /** Called when the activity is first created. */
@@ -210,7 +210,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         setContentView(R.layout.main);
 
         TextView label = (TextView) findViewById(R.id.VersionLabel);
-        label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext(), getClass()), Typeface.BOLD));
+        label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
 
         Button prefBtn = (Button) findViewById(R.id.Preferences);
         prefBtn.setOnClickListener(new OnClickListener() {
@@ -228,8 +228,8 @@ public class MainScreen extends Activity implements InterstitialAdListener{
             }
         });
 
-        if (mInterstitialAd.isReady()) {
-            mInterstitialAd.show(this);
+        if (_interstitialAd.isReady()) {
+            _interstitialAd.show(this);
         }
         
         AdView ad = (AdView) findViewById(R.id.ad);
@@ -249,15 +249,15 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         } else {
             ad.setVisibility(View.VISIBLE);
             donateBtn.setVisibility(View.VISIBLE);
-            mInterstitialAd.requestAd(this); // request a new ad
+            _interstitialAd.requestAd(this); // request a new ad
         }
 
         Button clipboardBtn = (Button) findViewById(R.id.Clipboard);
         clipboardBtn.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
-                if (mainService != null) {
-                    mainService.executeCommand("copy", "");
+                if (_mainService != null) {
+                    _mainService.executeCommand("copy", "");
                 }
             }
         });
@@ -380,10 +380,8 @@ public class MainScreen extends Activity implements InterstitialAdListener{
     @Override
     public void onReceiveInterstitial(InterstitialAd interstitialAd) {
         Log.d(Tools.LOG_TAG, "onReceiveInterstitial");
-        if(interstitialAd == mInterstitialAd) {
-            mInterstitialAd.show(this);
+        if(interstitialAd == _interstitialAd) {
+            _interstitialAd.show(this);
         }
     }
-    
-  
 }

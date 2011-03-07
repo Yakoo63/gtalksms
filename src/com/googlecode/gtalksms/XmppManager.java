@@ -399,7 +399,7 @@ public class XmppManager {
         updateStatus(CONNECTED);
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
-            send(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context, getClass())));
+            send(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context)));
         }
         
         // Manage Xmpp presence status

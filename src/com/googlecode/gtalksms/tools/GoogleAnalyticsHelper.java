@@ -87,13 +87,13 @@ public class GoogleAnalyticsHelper {
             case GoogleAnalyticsHelper.FRESH_INSTALL:
                 gAnalytics.trackEvent("GTalkSMS", // Category
                         "Fresh Install", // Action
-                        "Fresh Install:  " + Tools.getVersionName(ctx, getClass()), // Label
+                        "Fresh Install:  " + Tools.getVersionName(ctx), // Label
                         0); // Value
                 break;
             case GoogleAnalyticsHelper.UPDATE:
                 gAnalytics.trackEvent("GTalkSMS", // Category
                         "Update", // Action
-                        "Update: " + Tools.getVersionName(ctx, getClass()), // Label
+                        "Update: " + Tools.getVersionName(ctx), // Label
                         0); // Value
                 break;
             }

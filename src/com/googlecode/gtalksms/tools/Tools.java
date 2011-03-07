@@ -13,7 +13,6 @@ import java.util.List;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.widget.Toast;
@@ -25,18 +24,16 @@ public class Tools {
     public final static String LOG_TAG = "gtalksms";
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
-    public final static String GTalkSMSSignature = "TODO: Add GtalkSMS Signature Fingerprint Here"; // TODO add key
     
     public static void toastMessage(Context ctx, String msg) {
         String toastMsg  = ctx.getString(R.string.app_name) + ": " + msg;
         Toast.makeText(ctx, toastMsg, Toast.LENGTH_SHORT).show();
     }
         
-    public static String getVersionName(Context context, Class<?> cls) {
+    public static String getVersionName(Context context) {
 
         try {
-            ComponentName comp = new ComponentName(context, cls);
-            PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
+            PackageInfo pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             String donate = "";
             
             if(isDonateAppInstalled(context)) {
@@ -126,19 +123,8 @@ public class Tools {
         return min;
     }
     
-    public static boolean isDonateAppInstalled(Context context) {  
-        List<PackageInfo> packs = context.getPackageManager().getInstalledPackages(0);  
-        for(PackageInfo p : packs) {
-            if (p.packageName.equalsIgnoreCase("com.googlecode.gtalksmsdonate")) {  
-                for (Signature s : p.signatures) {
-                    if(s.toString().equals(GTalkSMSSignature)) {
-                        return true;
-                    }
-                }
-                return false;  // package found but has not the right signature
-            }  
-        }
-        return false;
+    public static boolean isDonateAppInstalled(Context context) {
+        return 0 == context.getPackageManager().checkSignatures( context.getPackageName(), "com.googlecode.gtalksmsdonate");
     }
     
     public static boolean copyFile(File from, File to) {
