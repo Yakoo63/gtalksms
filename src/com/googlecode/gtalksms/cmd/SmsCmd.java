@@ -20,6 +20,7 @@ import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.data.contacts.Contact;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
+import com.googlecode.gtalksms.data.sms.SetLastRecipientRunnable;
 import com.googlecode.gtalksms.data.sms.Sms;
 import com.googlecode.gtalksms.data.sms.SmsMmsManager;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
@@ -36,6 +37,7 @@ public class SmsCmd extends Command {
     public BroadcastReceiver _deliveredSmsReceiver = null;
 
     private int _smsCount;
+    private SetLastRecipientRunnable _setLastrecipientRunnable;
     
     // int counter used to distinguish the PendingIntents
     private int _penSIntentCount;
@@ -549,6 +551,17 @@ public class SmsCmd extends Command {
     }
     
     public void setLastRecipient(String phoneNumber) {
+        SetLastRecipientRunnable slrRunnable = new SetLastRecipientRunnable(this, phoneNumber);
+        if (_setLastrecipientRunnable != null) {
+            _setLastrecipientRunnable.setOutdated();
+        }
+        _setLastrecipientRunnable = slrRunnable;
+        Thread t = new Thread(slrRunnable);
+        t.setDaemon(true);
+        t.start();
+    }
+    
+    public synchronized void setLastRecipientNow(String phoneNumber) {
         if (_lastRecipient == null || !phoneNumber.equals(_lastRecipient)) {
             _lastRecipient = phoneNumber;
             _lastRecipientName = ContactsManager.getContactName(_context, phoneNumber);

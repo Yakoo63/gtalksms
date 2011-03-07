@@ -50,7 +50,6 @@ public class MyBackupAgent extends BackupAgent {
 				return;
 			}
 		} catch (IOException e) {
-		    Exception ex = e;
 			// Unable to read state file... be safe and do a backup
 		} catch (Exception e1) {
 			

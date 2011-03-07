@@ -21,10 +21,10 @@
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content" >
         <Button android:text="@string/main_but_start_stop" android:id="@+id/StartStop" 
-                android:layout_height="40px" android:layout_width="fill_parent" android:layout_weight=".5"
+                android:layout_height="40dp" android:layout_width="fill_parent" android:layout_weight=".5"
                 android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/>
         <Button android:text="@string/main_but_preferences" android:id="@+id/Preferences"
-                android:layout_height="40px" android:layout_width="fill_parent" android:layout_weight=".5"
+                android:layout_height="40dp" android:layout_width="fill_parent" android:layout_weight=".5"
                 android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/> 
     </LinearLayout>
     
@@ -33,10 +33,10 @@
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content" >
 	    <Button android:text="@string/main_but_send_clipboard" android:id="@+id/Clipboard"
-	            android:layout_height="40px" android:layout_width="fill_parent" android:layout_weight=".5"
+	            android:layout_height="40dp" android:layout_width="fill_parent" android:layout_weight=".5"
 	            android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/> 
         <Button android:text="@string/main_but_about" android:id="@+id/About"
-                android:layout_height="40px" android:layout_width="fill_parent" android:layout_weight=".5"
+                android:layout_height="40dp" android:layout_width="fill_parent" android:layout_weight=".5"
                 android:fitsSystemWindows="true" android:gravity="center" android:layout_gravity="center"/> 
     </LinearLayout>
     
@@ -46,22 +46,22 @@
     <Button 
         android:text="@string/main_but_donate" 
         android:id="@+id/Donate"
-        android:layout_height="40px" 
+        android:layout_height="40dp" 
         android:layout_width="fill_parent" />
     
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:orientation="horizontal"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content">                  
-        <ImageView android:id="@+id/StatusImage" android:layout_width="40px" android:src="@drawable/led_red" 
-                   android:scaleType="centerCrop" android:layout_height="40px" />                                    
+        <ImageView android:id="@+id/StatusImage" android:layout_width="40dp" android:src="@drawable/led_red" 
+                   android:scaleType="centerCrop" android:layout_height="40dp" />                                    
         <ImageView android:id="@+id/TLSsecured" android:layout_width="wrap_content" android:src="@drawable/ic_lock_lock"
-                   android:scaleType="centerInside" android:layout_height="40px" 
+                   android:scaleType="centerInside" android:layout_height="40dp" 
                    android:gravity="center_vertical" android:visibility="invisible" />
-        <ImageView android:id="@+id/compression" android:layout_width="60px" android:src="@drawable/zlib"
-                   android:scaleType="centerInside" android:layout_height="40px" 
+        <ImageView android:id="@+id/compression" android:layout_width="60dp" android:src="@drawable/zlib"
+                   android:scaleType="centerInside" android:layout_height="40dp" 
                    android:gravity="center_vertical" android:visibility="invisible" />
-        <TextView android:text="Version X.X.X" android:id="@+id/VersionLabel"
+        <TextView android:text="Version X.X.X @Yakooo" android:id="@+id/VersionLabel"
                   android:layout_height="fill_parent" android:layout_width="fill_parent" 
                   android:gravity="bottom|right" />
     </LinearLayout>
