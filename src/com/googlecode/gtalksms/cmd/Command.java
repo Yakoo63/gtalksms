@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms.cmd;
 
+import java.util.StringTokenizer;
+
 import android.content.Context;
 
 import com.googlecode.gtalksms.MainService;
@@ -66,5 +68,14 @@ public abstract class Command {
     
     protected String makeBold(String msg) {
         return XmppMsg.makeBold(msg);
+    }
+    
+    protected String[] splitArgs(String args) {
+        StringTokenizer strtok = new StringTokenizer(args, ":");
+        int tokenCount = strtok.countTokens();
+        String[] res = new String[tokenCount];
+        for(int i = 0; i < tokenCount; i++)
+            res[i] = strtok.nextToken();
+        return res;
     }
 }
