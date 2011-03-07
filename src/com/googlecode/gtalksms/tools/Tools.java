@@ -13,6 +13,7 @@ import java.util.List;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ public class Tools {
     public final static String LOG_TAG = "gtalksms";
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
+    public final static String GTalkSMSSignature = "TODO: Add GtalkSMS Signature Fingerprint Here"; // TODO add key
     
     public static void toastMessage(Context ctx, String msg) {
         String toastMsg  = ctx.getString(R.string.app_name) + ": " + msg;
@@ -124,7 +126,12 @@ public class Tools {
         List<PackageInfo> packs = context.getPackageManager().getInstalledPackages(0);  
         for(PackageInfo p : packs) {
             if (p.packageName.equalsIgnoreCase("com.googlecode.gtalksmsdonate")) {  
-                return true;
+                for (Signature s : p.signatures) {
+                    if(s.toString().equals(GTalkSMSSignature)) {
+                        return true;
+                    }
+                }
+                return false;  // package found but has not the right signature
             }  
         }
         return false;
@@ -165,5 +172,16 @@ public class Tools {
             }
         }
         return true;
+    }
+    
+    public static String getAppBaseDir(Context ctx) {
+        String filesDir = ctx.getFilesDir().toString();
+        int index = filesDir.indexOf("/files");
+        String res = filesDir.substring(0, index);
+        return res;
+    }
+    
+    public static String getSharedPrefDir(Context ctx) {
+        return getAppBaseDir(ctx) + "/shared_prefs";
     }
 }

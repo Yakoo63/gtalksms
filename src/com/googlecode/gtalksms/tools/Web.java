@@ -20,7 +20,6 @@ public class Web {
             URL url = new URL(urlStr);
 
             long startTime = System.currentTimeMillis();
-            Log.d(Tools.LOG_TAG, "Download begins");
             Log.d(Tools.LOG_TAG, "Downloading url:" + url);
 
             URLConnection ucon = url.openConnection();
@@ -41,7 +40,7 @@ public class Web {
 
     public static void DownloadFromUrl(String strURL, String fileName, Context context) {
         try {
-            String path = "/data/data/" + context.getPackageName() + "/";
+            String path = context.getFilesDir() + "/";
 
             URL url = new URL(strURL); // you can write here any link
             File file = new File(path + fileName);

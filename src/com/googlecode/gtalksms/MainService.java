@@ -303,9 +303,9 @@ public class MainService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStartCommand(): begin");
         if (_gAnalytics == null) {  
-            // TODO is the log msg is never seen move it to onCreate()
-            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStartCommand(): _gAnalytics == null");
             _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
+            // TODO is the log msg is never seen move it to onCreate()
+            GoogleAnalyticsHelper.trackAndLogWarning("onStartCommand(): _gAnalytics == null");
         }
         if (_contentIntent == null) {
             _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);

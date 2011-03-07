@@ -29,17 +29,14 @@ public class MyBackupAgent extends BackupAgent {
 	public static final int KEYTYPE_INT = 2;
 	public static final int KEYTYPE_BOOLEAN = 3;
 	
-	private File mDataFile;  //File to preserve the last backup time
 	private SettingsManager settingsManager;
 	
 	@Override
 	public void onBackup(ParcelFileDescriptor oldState, BackupDataOutput data,
 			ParcelFileDescriptor newState) throws IOException {
-		
-		settingsManager = new SettingsManager(this);
-		String sharedPrefsPath = "/data/data/" + this.getPackageName() + "/shared_prefs/" + "GTalkSMS.xml";
-		mDataFile = new File(sharedPrefsPath);
-		
+        settingsManager = new SettingsManager(this);
+        String sharedPrefsPath = Tools.getSharedPrefDir(this) + "/" + "GTalkSMS.xml";
+        File mDataFile = new File(sharedPrefsPath);
 		try {
 			// step 1 - check if update necessary
 			FileInputStream instream = new FileInputStream(oldState
@@ -53,6 +50,7 @@ public class MyBackupAgent extends BackupAgent {
 				return;
 			}
 		} catch (IOException e) {
+		    Exception ex = e;
 			// Unable to read state file... be safe and do a backup
 		} catch (Exception e1) {
 			
@@ -72,12 +70,9 @@ public class MyBackupAgent extends BackupAgent {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onRestore(BackupDataInput data, int appVersionCode,
-			ParcelFileDescriptor newState) throws IOException {
-		settingsManager = new SettingsManager(this);
-		String sharedPrefsPath = "/data/data/" + this.getPackageName() + "/shared_prefs/" + "GTalkSMS.xml";
-		mDataFile = new File(sharedPrefsPath);
-		
-		Class cls;
+			ParcelFileDescriptor newState) throws IOException {        
+	    settingsManager = new SettingsManager(this);
+        Class cls;
 		try {
 			cls = Class.forName("com.googlecode.gtalksms.SettingsManager");
 		} catch (ClassNotFoundException e) {
