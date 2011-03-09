@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.jivesoftware.smack.XMPPException;
+
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -169,20 +171,30 @@ public class MainService extends Service {
             if (initialState == XmppManager.CONNECTED) {
                 String number = intent.getStringExtra("sender");
                 String name = ContactsManager.getContactName(this, number);
+                String message = intent.getStringExtra("message");
                 
                 if (_settingsMgr.notifySmsInSameConversation) {
                     XmppMsg msg = new XmppMsg();
-                    msg.appendBold(getString(R.string.chat_sms_from, ContactsManager.getContactName(this, number)));
-                    msg.append(intent.getStringExtra("message"));
+                    msg.appendBold(getString(R.string.chat_sms_from, name));
+                    msg.append(message);
                     _xmppMgr.send(msg);
+                    if (_commands.containsKey("sms")) {
+                        ((SmsCmd)_commands.get("sms")).setLastRecipient(number);
+                    }
                 }
                 if (_settingsMgr.notifySmsInChatRooms || _xmppMgr.roomExists(number, name)) {
-                    _xmppMgr.writeRoom(number, name, intent.getStringExtra("message"));
-                }
-                
-                if (_commands.containsKey("sms")) {
-                    ((SmsCmd)_commands.get("sms")).setLastRecipient(number);
-                }
+                    try {
+                        _xmppMgr.writeRoom(number, name, message);
+                    } catch (XMPPException e) {
+                        //room creation failed - notify about this error
+                        // and send the message to the notification address
+                        XmppMsg msg = new XmppMsg();
+                        msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
+                        msg.appendBold(getString(R.string.chat_sms_from, name));
+                        msg.append(message);
+                        _xmppMgr.send(msg);
+                    }
+                }                
             }
         } else if (a.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);

@@ -7,6 +7,7 @@ import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -492,7 +493,7 @@ public class XmppManager {
         return _xmppBuddies.retrieveFriendList();
     }
     
-    public void writeRoom(String number, String sender, String message) {
+    public void writeRoom(String number, String sender, String message) throws XMPPException {
         _xmppMuc.writeRoom(number, sender, message);
     }
     
