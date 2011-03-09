@@ -21,6 +21,7 @@ import org.jivesoftware.smackx.bytestreams.ibb.provider.CloseIQProvider;
 import org.jivesoftware.smackx.bytestreams.ibb.provider.DataPacketProvider;
 import org.jivesoftware.smackx.bytestreams.ibb.provider.OpenIQProvider;
 import org.jivesoftware.smackx.bytestreams.socks5.provider.BytestreamsProvider;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
 import org.jivesoftware.smackx.packet.LastActivity;
 import org.jivesoftware.smackx.packet.OfflineMessageInfo;
@@ -126,7 +127,7 @@ public class XmppManager {
         if (_connection != null && _connection.isConnected()) {
             updateStatus(DISCONNECTING);
             if (_settings.notifyApplicationConnection) {
-                send(_context.getString(R.string.chat_app_stop));
+                send(new XmppMsg(_context.getString(R.string.chat_app_stop)), null);
             }
         }
         
@@ -381,12 +382,15 @@ public class XmppManager {
                 
                 if(_settings.debugLog) Log.d(Tools.LOG_TAG, "Xmpp packet received");
                 
-                if ( message.getFrom().toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") && 
+                String from = message.getFrom();                
+                if ( from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") && 
                      !message.getFrom().equals(_connection.getUser())) {
                     if (message.getBody() != null) {
                         Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+                        intent.putExtra("from", from);  // usually a full JID with resource
                         intent.putExtra("message", message.getBody());
-                        _context.sendBroadcast(intent);
+                        intent.setClass(_context, MainService.class);
+                        _context.startService(intent);
                     }
                 }
             }
@@ -395,7 +399,7 @@ public class XmppManager {
         updateStatus(CONNECTED);
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
-            send(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context)));
+            send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);
         }
         
         // Manage Xmpp presence status
@@ -432,37 +436,50 @@ public class XmppManager {
     public boolean getCompressionStatus() {
     	return _connection == null ? false : _connection.isUsingCompression();
     }
-
-    /** 
-     * sends a message to the user
-     * 
-     */
-    public void send(String message) {
-            send(new XmppMsg(message));
-    }
     
-    /** 
-     * sends a message to the user 
-     * but only if we connected
-     * does nothing if we are not connected 
+    /**
+     * Sends a XMPP Message, but only if we are connected
+     * 
+     * @param message
+     * @param to - the receiving JID - if null the default notification address will be used
+     * @return true, if we were connected and the message was handeld over to the connection - otherwise false
      */
-    public void send(XmppMsg message) {
+    public boolean send(XmppMsg message, String to) {
         if (isConnected()) {
-            Message msg = new Message(_settings.notifiedAddress, Message.Type.chat);
+            Message msg;
+            MultiUserChat muc = null;
+            if (to == null) {
+                msg = new Message(_settings.notifiedAddress, Message.Type.chat);
+            } else {
+                msg = new Message(to);
+                muc = _xmppMuc.getRoom(to);
+            }
             
             if (_settings.formatResponses) {
                 msg.setBody(message.generateFmtTxt());
             } else {
                 msg.setBody(message.generateTxt());
             }
-          //TODO does not work. jid with presence? asmack problem?
+          //TODO does not work, should check if XHTML is enabled on receiver side. jid with resource? asmack problem?
 //            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) { 
                 String xhtmlBody = message.generateXHTMLText().toString();
                 xhtmlBody = xhtmlBody.replace("<br>", "<br/>");  //fix for smackx problem
                 XHTMLManager.addBody(msg, xhtmlBody);
 //            }
-
-            _connection.sendPacket(msg);
+            if(muc == null) {
+                msg.setType(Message.Type.chat);
+                _connection.sendPacket(msg);
+            } else {
+                msg.setType(Message.Type.groupchat);
+                try {
+                    muc.sendMessage(msg);
+                } catch (XMPPException e) {
+                    return false;
+                }
+            }            
+            return true;
+        } else {
+            return false;
         }
     }
     
@@ -488,10 +505,27 @@ public class XmppManager {
         return _xmppBuddies.retrieveFriendList();
     }
     
-    public void writeRoom(String number, String sender, String message) throws XMPPException {
-        _xmppMuc.writeRoom(number, sender, message);
+    /**
+     * Writes a message to a room and creates the room if necessary,
+     * followed by an invite to the default notification address 
+     * to join the room
+     * 
+     * @param number
+     * @param contact
+     * @param message
+     * @throws XMPPException
+     */
+    public void writeRoom(String number, String contact, String message) throws XMPPException {
+        _xmppMuc.writeRoom(number, contact, message);
     }
     
+    /**
+     * Invites the user to a room for the given contact name and number
+     * if the user (or someone else) writes to this room, a SMS is send to the number
+     * 
+     * @param number
+     * @param name
+     */
     public void inviteRoom(String number, String name) {
     	_xmppMuc.inviteRoom(number, name);
     }

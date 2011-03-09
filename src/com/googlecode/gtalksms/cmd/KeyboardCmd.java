@@ -10,7 +10,7 @@ public class KeyboardCmd extends Command {
     }
     
     @Override
-    public void execute(String cmd, String args) {
+    protected void execute(String cmd, String args) {
         KeyboardInputMethod keyboard = _mainService.getKeyboard();
         
         if (keyboard != null) {

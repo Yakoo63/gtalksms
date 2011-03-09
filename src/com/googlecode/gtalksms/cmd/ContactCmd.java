@@ -16,7 +16,7 @@ public class ContactCmd extends Command {
     }
    
     @Override
-    public void execute(String cmd, String searchedText) {
+    protected void execute(String cmd, String searchedText) {
     
         ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(_context, searchedText);
 

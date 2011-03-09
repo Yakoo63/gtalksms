@@ -12,7 +12,7 @@ public class UrlsCmd extends Command {
     }
     
     @Override
-    public void execute(String cmd, String args) {
+    protected void execute(String cmd, String args) {
         Intent target = new Intent(Intent.ACTION_VIEW, Uri.parse(cmd + ":" + args));
         Intent intent = Intent.createChooser(target, getString(R.string.chat_choose_activity));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

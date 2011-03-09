@@ -32,7 +32,7 @@ public class HelpCmd extends Command {
     }
 
     @Override
-    public void execute(String cmd, String args) {
+    protected void execute(String cmd, String args) {
         if (args.equals("all")) {
             send(_msgAll);
         } else if (commands.containsKey(args)) {

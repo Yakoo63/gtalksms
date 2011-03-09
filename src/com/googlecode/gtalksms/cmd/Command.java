@@ -13,39 +13,55 @@ public abstract class Command {
     protected Context _context;
     protected MainService _mainService;
     protected final String[] _commands;
+    protected String _answerTo;
         
     Command(MainService mainService, String[] commands) {
         _mainService = mainService;
         _settingsMgr = mainService.getSettingsManager();
         _context = mainService.getBaseContext();
         _commands = commands;
+        _answerTo = null;
     }
     
     protected String getString(int id, Object... args) {
         return _context.getString(id, args);
-    }
+    }   
     
     protected void send(String message) {
-        _mainService.send(message);
+        send(message, _answerTo);
     }
     
     protected void send(XmppMsg message) {
-        _mainService.send(message);
+        send(message, _answerTo);
+    }
+    
+    protected void send(String message, String to) {
+        _mainService.send(message, to);
+    }
+
+    protected void send(XmppMsg message, String to) {
+        _mainService.send(message, to);
     }
     
     public String[] getCommands() {
         return _commands;
+    }   
+    
+    public void execute(String cmd, String args, String answerTo) {
+        this._answerTo = answerTo;
+        execute(cmd,args);
     }
-   
+    
     /**
      * Executes the given command
-     * has no return value, the method has to do the error reporting by itself
+     * sends the results, if any, back to the given JID
      * 
-     * @param cmd command
-     * @param args substring after the first ":" 
+     * @param cmd the base command
+     * @param args the arguments - substring after the first ":" 
+     * @param answerTo JID for command output, null to send to default notification address
      */
-    public abstract void execute(String cmd, String args);
-    
+    protected abstract void execute(String cmd, String args); 
+        
     /**
      * Stop all ongoing actions caused by a command
      * gets called in mainService when "stop" command recieved

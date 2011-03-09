@@ -257,7 +257,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
 
             public void onClick(View v) {
                 if (_mainService != null) {
-                    _mainService.executeCommand("copy", "");
+                    _mainService.executeCommand("copy", "", null);
                 }
             }
         });

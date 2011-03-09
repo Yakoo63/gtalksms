@@ -47,7 +47,7 @@ public class SmsCmd extends Command {
     private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>()); 
     
     private AliasHelper _aliasHelper;
-    
+        
     public SmsCmd(MainService mainService) {
         super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"});
         _smsMgr = new SmsMmsManager(_settingsMgr, _context);
@@ -63,6 +63,7 @@ public class SmsCmd extends Command {
                     Sms s = _smsMap.get(SmsID);
 
                     if (s != null) {  // we could find the sms in the smsMap
+                        _answerTo = s.answerTo; // I surely hope that broadcastReceiver don result in concurrent calls;
                         s.sentIntents[partNum] = true;
                         boolean sentIntComplete = s.sentIntentsComplete();
                         String to;
@@ -96,6 +97,7 @@ public class SmsCmd extends Command {
                         }
                         
                     } else { // we could NOT find the sms in the smsMap - fall back to old behavior
+                        _answerTo = null;
                         GoogleAnalyticsHelper.trackAndLogWarning("sms in smsMap missing");
                         switch (res) {
                         case Activity.RESULT_OK:
@@ -131,6 +133,7 @@ public class SmsCmd extends Command {
                     Sms s = _smsMap.get(SmsID);
 
                     if (s != null) { // we could find the sms in the smsMap
+                        _answerTo = s.answerTo;
                         s.delIntents[partNum] = true;
                         boolean delIntComplete = s.delIntentsComplete();
                         String to;
@@ -153,6 +156,7 @@ public class SmsCmd extends Command {
                         }
 
                     } else { // we could NOT find the sms in the smsMap - fall back to old the behavior
+                        _answerTo = null;
                         GoogleAnalyticsHelper.trackAndLogWarning("sms in smsMap missing");
                         switch (res) {
                         case Activity.RESULT_OK:
@@ -172,7 +176,7 @@ public class SmsCmd extends Command {
     }
 
     @Override
-    public void execute(String command, String args) {
+    protected void execute(String command, String args) {
     	String contact;
         if (command.equals("sms")) {
             int separatorPos = args.indexOf(":");
@@ -229,7 +233,7 @@ public class SmsCmd extends Command {
         	if (args.length() > 0) {
                 inviteRoom(_aliasHelper.convertAliasToNumber(args));
         	} else if (_lastRecipient != null) {
-        			_xmppMgr.inviteRoom(_lastRecipient, _lastRecipientName);
+        	    _xmppMgr.inviteRoom(_lastRecipient, _lastRecipientName);
         	}
         } else if (command.equals("delsms")) {
             if (args.length() == 0) {
@@ -354,7 +358,7 @@ public class SmsCmd extends Command {
                 _xmppMgr.inviteRoom(phone.cleanNumber, phone.contactName);
 //                setLastRecipient(phone.cleanNumber); // issue 117
             } else {
-                send(getString(R.string.chat_no_match_for, contact));
+                send( getString(R.string.chat_no_match_for, contact) );
             }
         }
     }
@@ -606,7 +610,7 @@ public class SmsCmd extends Command {
         if(_settingsMgr.notifySmsSentDelivered) {
             String shortendMessage = shortenMessage(message);
             int smsID = _smsCount++;
-            Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size());
+            Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size(), _answerTo);
             _smsMap.put(new Integer(smsID), s);
             if(_settingsMgr.notifySmsSent) {
                 SentPenIntents = createSPendingIntents(messages.size(), smsID);

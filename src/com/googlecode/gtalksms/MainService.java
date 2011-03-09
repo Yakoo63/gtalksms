@@ -51,8 +51,9 @@ public class MainService extends Service {
     public final static String ACTION_CONNECT = "com.googlecode.gtalksms.action.CONNECT";
     public final static String ACTION_TOGGLE = "com.googlecode.gtalksms.action.TOGGLE";
     public final static String ACTION_SEND = "com.googlecode.gtalksms.action.SEND";
-    // The following actions are undocumented and internal to our implementation.
     public final static String ACTION_COMMAND = "com.googlecode.gtalksms.action.COMMAND";
+
+    // The following actions are undocumented and internal to our implementation.
     public final static String ACTION_BROADCAST_STATUS = "com.googlecode.gtalksms.action.BROADCAST_STATUS";
     public final static String ACTION_SMS_RECEIVED = "com.googlecode.gtalksms.action.SMS_RECEIVED";
     public final static String ACTION_NETWORK_CHANGED = "com.googlecode.gtalksms.action.NETWORK_CHANGED";
@@ -71,7 +72,7 @@ public class MainService extends Service {
 
     private SettingsManager _settingsMgr;
     private XmppManager _xmppMgr;
-    private BroadcastReceiver _xmppreceiver;
+    private BroadcastReceiver _xmppConChangedReceiver;
     private KeyboardInputMethod _keyboard;
     
     private Map<String, Command> _commands = new HashMap<String, Command>();
@@ -106,7 +107,7 @@ public class MainService extends Service {
         }
     }
     
-    // TODO move the following method into the subclass above
+    // TODO move the following method into the subclass above ?
     /**
      * The IntentService(-like) implementation manages taking the intents passed
      * to startService and delivering them to this function which runs in its
@@ -120,11 +121,10 @@ public class MainService extends Service {
      * @param id
      */
     protected void onHandleIntent(final Intent intent, int id) {
-        if (intent == null) {
-            GoogleAnalyticsHelper.trackAndLogError("onHandleIntent: Intent null");
+        if (intent == null) {  // TODO remove this if block
+            GoogleAnalyticsHelper.trackAndLogError("onHandleIntent: Intent null");  
             return;
         }
-        //TODO do we need to check _xmppMgr == null?
         
         // Set Disconnected state by force to manage pending tasks
         if (intent.getBooleanExtra("force", false) && intent.getBooleanExtra("disconnect", false)) {
@@ -140,9 +140,9 @@ public class MainService extends Service {
         int initialState = getConnectionStatus(); 
         updateListenersToCurrentState(initialState);
         
-        String a = intent.getAction();
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "handling action '" + a + "' while in state " + initialState);
-        if (a.equals(ACTION_CONNECT)) {
+        String action = intent.getAction();
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "handling action '" + action + "' while in state " + initialState);
+        if (action.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // request to disconnect.
                 _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
@@ -150,7 +150,7 @@ public class MainService extends Service {
                 // a simple 'connect' request.
                 _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             }
-        } else if (a.equals(ACTION_TOGGLE)) {
+        } else if (action.equals(ACTION_TOGGLE)) {     
             switch (initialState) {
                 case XmppManager.CONNECTED:
                 case XmppManager.WAITING_TO_CONNECT:
@@ -163,16 +163,16 @@ public class MainService extends Service {
                     Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ initialState);
                     break;
             }
-        } else if (a.equals(ACTION_SEND)) {
+        } else if (action.equals(ACTION_SEND)) {
             if (initialState == XmppManager.CONNECTED) {
-                _xmppMgr.send(intent.getStringExtra("message"));
+                _xmppMgr.send(new XmppMsg(intent.getStringExtra("message")), intent.getStringExtra("to"));
             }
-        } else if (a.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
+        } else if (action.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
             String message = intent.getStringExtra("message");
             if (message != null) {
-                onMessageReceived(intent.getStringExtra("message"));
+                onCommandReceived(message, intent.getStringExtra("from"));
             }
-        } else if (a.equals(ACTION_SMS_RECEIVED)) {
+        } else if (action.equals(ACTION_SMS_RECEIVED)) {
             if (initialState == XmppManager.CONNECTED) {
                 String number = intent.getStringExtra("sender");
                 String name = ContactsManager.getContactName(this, number);
@@ -182,7 +182,7 @@ public class MainService extends Service {
                     XmppMsg msg = new XmppMsg();
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
-                    _xmppMgr.send(msg);
+                    _xmppMgr.send(msg, null);
                     if (_commands.containsKey("sms")) {
                         ((SmsCmd)_commands.get("sms")).setLastRecipient(number);
                     }
@@ -197,11 +197,11 @@ public class MainService extends Service {
                         msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
                         msg.appendBold(getString(R.string.chat_sms_from, name));
                         msg.append(message);
-                        _xmppMgr.send(msg);
+                        _xmppMgr.send(msg, null);
                     }
                 }                
             }
-        } else if (a.equals(ACTION_NETWORK_CHANGED)) {
+        } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
             if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
             if(available) {
@@ -217,10 +217,17 @@ public class MainService extends Service {
                 // notification that a network is available.
                 _xmppMgr.xmppRequestStateChange(XmppManager.WAITING_TO_CONNECT);
             }
+        } else if (action.equals(ACTION_COMMAND)) {
+            String cmd = intent.getStringExtra("cmd");
+            String args = intent.getStringExtra("args");
+            String from = intent.getStringExtra("from");
+            if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc)
+                from = null;
+            executeCommand(cmd, args, from);
         } else {
-            Log.w(Tools.LOG_TAG, "Unexpected intent: " + a);
+            GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "handled action '" + a + "' - state now " + getConnectionStatus());
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "handled action '" + action + "' - state now " + getConnectionStatus());
         // stop the service if we are disconnected (but stopping the service
         // doesn't mean the process is terminated - onStart can still happen.)
         if (getConnectionStatus() == XmppManager.DISCONNECTED) {
@@ -365,23 +372,16 @@ public class MainService extends Service {
                     return START_STICKY;
                 }
 
-                _xmppreceiver = new BroadcastReceiver() {
+                _xmppConChangedReceiver = new BroadcastReceiver() {
                     public void onReceive(Context context, Intent intent) {
-                        String action = intent.getAction();
-                        if (action.equals(MainService.ACTION_XMPP_MESSAGE_RECEIVED)) {
-                            // as this comes in on the main thread and not the worker thread,
-                            // we just push the message onto the worker thread queue.
-                            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStart: ACTION_XMPP_MESSAGE_RECEIVED - \"" + Tools.shortenString(intent.getStringExtra("message")));
-                            startService(intent);
-                        } else if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
-                            onConnectionStatusChanged(intent.getIntExtra("old_state", 0), intent.getIntExtra("new_state", 0));
-                            startService(intent); 
-                        }
+                        intent.setClass(MainService.this, MainService.class);
+                        onConnectionStatusChanged(intent.getIntExtra("old_state", 0), intent.getIntExtra("new_state", 0));
+                        startService(intent);
                     }
                 };
-                IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
-                intentFilter.addAction(MainService.ACTION_XMPP_CONNECTION_CHANGED);
-                registerReceiver(_xmppreceiver, intentFilter);
+                IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_CONNECTION_CHANGED);
+                registerReceiver(_xmppConChangedReceiver, intentFilter);
+                
                 _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
             }
             
@@ -394,11 +394,11 @@ public class MainService extends Service {
         return START_STICKY;
     }
     
-    public void executeCommand(String cmd, String args) {
+    public void executeCommand(String cmd, String args, String answerTo) {
         if (_commands.containsKey(cmd)) {
-            _commands.get(cmd).execute(cmd, args);
+            _commands.get(cmd).execute(cmd, args, answerTo);
         } else {
-            send(getString(R.string.chat_error_unknown_cmd, cmd));
+            send(getString(R.string.chat_error_unknown_cmd, cmd), answerTo);
         }
     }
 
@@ -409,8 +409,8 @@ public class MainService extends Service {
         // If the _xmppManager is non-null, then our service was "started" (as
         // opposed to simply "created" - so tell the user it has stopped.
         if (_xmppMgr != null) {
-            unregisterReceiver(_xmppreceiver);
-            _xmppreceiver = null;
+            unregisterReceiver(_xmppConChangedReceiver);
+            _xmppConChangedReceiver = null;
             
             _xmppMgr.stop();
             _xmppMgr = null;
@@ -422,8 +422,9 @@ public class MainService extends Service {
     }
     
     /**
-     * Wrapper to send a string to the user via xmpp
+     * Wrapper to send a string to the user via XMPP
      * needed by some receivers
+     * starts the MainService with a new intent
      * 
      * @param ctx
      * @param msg
@@ -431,18 +432,26 @@ public class MainService extends Service {
     public static void send(Context ctx, String msg) {
         ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg));
     }
-
-    public void send(String msg) {
-        if (_xmppMgr != null) {
-            _xmppMgr.send(new XmppMsg(msg));
-        } else {
-            GoogleAnalyticsHelper.trackAndLogError("MainService send String: _xmppMgr == null");
-        }
+    
+    /**
+     * Wrapper for send(XmppMsg msg... method
+     * 
+     * @param msg
+     * @param to = the receiving JID, if null the default notification address is used
+     */
+    public void send(String msg, String to) {
+        _xmppMgr.send(new XmppMsg(msg), to);
     }
-
-    public void send(XmppMsg msg) {
+    
+    /**
+     * Sends an XmppMsg to the specified JID or to the default notification address
+     * 
+     * @param msg
+     * @param to - the receiving jid. if null the default notification address is used
+     */
+    public void send(XmppMsg msg, String to) {
         if (_xmppMgr != null) {
-            _xmppMgr.send(msg);
+            _xmppMgr.send(msg, to);
         } else {
             GoogleAnalyticsHelper.trackAndLogError("MainService send XmppMsg: _xmppMgr == null");
         }
@@ -505,11 +514,11 @@ public class MainService extends Service {
      * Handels the different commands
      * that came with the xmpp connection
      * usually from an intent with
-     * ACTION_HANDLE_XMPP_NOTIFY
+     * ACTION_XMPP_MESSAGE_RECEIVED
      * 
      * @param commandLine
      */
-    private void onMessageReceived(String commandLine) {
+    private void onCommandReceived(String commandLine, String from) {
         Log.v(Tools.LOG_TAG, "onMessageReceived: " + commandLine);
         try {
             String command;
@@ -526,14 +535,12 @@ public class MainService extends Service {
             command = command.toLowerCase();
             if (command.equals("stop")) {
                 stopCommands();
-            } else if (_commands.containsKey(command)) {
-                _commands.get(command).execute(command, args);
             } else {
-                send(getString(R.string.chat_error_unknown_cmd, command));
+                executeCommand(command, args, from);
             }
         } catch (Exception ex) {
             GoogleAnalyticsHelper.trackAndLogError("MainService onMessageReceived()", ex);
-            send(getString(R.string.chat_error, ex));
+            send(getString(R.string.chat_error, ex), from);
         }
     }
     

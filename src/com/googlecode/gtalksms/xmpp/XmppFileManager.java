@@ -112,6 +112,6 @@ public class XmppFileManager implements FileTransferListener {
     }
     
     private void send(String msg) {
-        _xmppMgr.send(msg);
+        _xmppMgr.send(new XmppMsg(msg), null);
     }
 }

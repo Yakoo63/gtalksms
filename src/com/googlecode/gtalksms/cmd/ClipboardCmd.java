@@ -17,7 +17,7 @@ public class ClipboardCmd extends Command {
     }
     
     @Override
-    public void execute(String cmd, String text) {
+    protected void execute(String cmd, String text) {
         try {
             if (text.length() > 0) {
                 _clipboardMgr.setText(text);

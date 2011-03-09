@@ -32,7 +32,7 @@ public class KeyboardInputMethod extends InputMethodService
 
     void send(String msg) {
         if (mainService != null) {
-            mainService.send(msg);
+            mainService.send(msg, null);
         }
     }
     

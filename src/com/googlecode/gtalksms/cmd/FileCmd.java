@@ -15,11 +15,11 @@ public class FileCmd extends Command {
     }
     
     @Override
-    public void execute(String cmd, String args) {
+    protected void execute(String cmd, String args) {
         if (new File(args).exists()) {
             _xmppMgr.sendFile(args);
         } else {
-            send("File '" + args + "' doesn't exist!" );
+            send("File '" + args + "' doesn't exist!");  // TODO localization
         }
     }
     

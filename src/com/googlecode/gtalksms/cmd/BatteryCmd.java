@@ -53,15 +53,15 @@ public class BatteryCmd extends Command {
             private void notifyAndSave(int level, String powerSource) {
                 _powerSource = powerSource;
                 _lastPercentageNotified = level;                
-                sendBatteryInfos(level, false);
+                sendBatteryInfos(level, false, null);
             }
         };
         _context.registerReceiver(_batInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
-    private void sendBatteryInfos(int level, boolean force) {
+    private void sendBatteryInfos(int level, boolean force, String answerTo) {
         if (force || (_settingsMgr.notifyBattery && level % _settingsMgr.batteryNotificationIntervalInt == 0)) {
-            send(getString(R.string.chat_battery_level, level));
+            send(getString(R.string.chat_battery_level, level), answerTo);
         }
         if (_settingsMgr.notifyBatteryInStatus) {
             _xmppMgr.setStatus("GTalkSMS - " + level + "%" + " - " + _powerSource);
@@ -69,8 +69,8 @@ public class BatteryCmd extends Command {
     }
     
     @Override
-    public void execute(String cmd, String args) {
-        sendBatteryInfos(_lastPercentageNotified, true);
+    protected void execute(String cmd, String args) {
+        sendBatteryInfos(_lastPercentageNotified, true, this._answerTo);
     }
 
     @Override

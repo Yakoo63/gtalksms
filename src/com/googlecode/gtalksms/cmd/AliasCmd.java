@@ -23,7 +23,7 @@ public class AliasCmd extends Command {
     }
 
     @Override
-    public void execute(String cmd, String args) {
+    protected void execute(String cmd, String args) {
         int sepPos = args.indexOf(":");
         if (sepPos == -1) {
             send("Alias needs more arguments");

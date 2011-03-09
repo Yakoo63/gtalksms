@@ -52,7 +52,9 @@ public class AliasDatabase extends Database {
         Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "number" }, "aliasName='" + aliasName + "'", null, null , null, null);
         if(c.getCount() == 1) {
             c.moveToFirst();
-            return c.getString(0);
+            String res = c.getString(0);
+            c.close();
+            return res;
         } else { 
             return null;
         }
@@ -60,7 +62,9 @@ public class AliasDatabase extends Database {
     
     public static boolean containsAlias(String aliasName) {
         Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "number" }, "aliasName='" + aliasName + "'", null, null , null, null);
-        return c.getCount() == 1;
+        boolean ret = c.getCount() == 1;
+        c.close();
+        return ret;
     }
     
     public static String[][] getFullDatabase() {
@@ -74,6 +78,7 @@ public class AliasDatabase extends Database {
             res[i][2] = c.getString(2);   // contactName field - may be null
             c.moveToNext();
         }
+        c.close();
         return res;
     }
     
@@ -91,6 +96,7 @@ public class AliasDatabase extends Database {
             res[1] = c.getString(1);
             res[2] = c.getString(2);
         }
+        c.close();
         return res;       
     }
     

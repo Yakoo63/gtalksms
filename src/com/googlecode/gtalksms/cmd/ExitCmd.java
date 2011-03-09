@@ -11,7 +11,7 @@ public class ExitCmd extends Command {
     }
 
     @Override
-    public void execute(String cmd, String args) {
+    protected void execute(String cmd, String args) {
        _mainService.stopSelf();
     }
     

@@ -9,6 +9,7 @@ public class Sms implements Comparable<Sms> {
     public String number;
     public String sender;
     public String to;
+    public String answerTo;
     public Date date;
     public int resSentIntent;
     public int resDelIntent;
@@ -21,7 +22,7 @@ public class Sms implements Comparable<Sms> {
     	this.date = date;
     }
     
-    public Sms(String phoneNumber, String toName, String shortendMessage, int numParts) {
+    public Sms(String phoneNumber, String toName, String shortendMessage, int numParts, String answerTo) {
         this.resSentIntent = -1;
         this.resDelIntent = -1;
         
@@ -30,6 +31,7 @@ public class Sms implements Comparable<Sms> {
         this.number = phoneNumber;
         this.to = toName;
         this.shortendMessage = shortendMessage;
+        this.answerTo = answerTo;
     }
     
     public boolean sentIntentsComplete() {

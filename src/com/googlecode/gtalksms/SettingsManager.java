@@ -61,6 +61,7 @@ public class SettingsManager {
     public boolean notifyIncomingCalls;
     public boolean notifySmsInChatRooms;
     public boolean notifySmsInSameConversation;
+    public boolean notifyInMuc;
     
     // calls
     public int callLogsNumber;
@@ -179,5 +180,6 @@ public class SettingsManager {
         }
         
         debugLog = true; // TODO make this a preference
+        notifyInMuc = notifySmsInChatRooms; // TODO for testing purpose the same as notifySmsInChatRooms
     }
 }

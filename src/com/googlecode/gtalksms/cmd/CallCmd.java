@@ -34,16 +34,16 @@ public class CallCmd extends Command {
     }
     
     @Override
-    public void execute(String cmd, String args) {
+    protected void execute(String cmd, String args) {
         if (cmd.equals("dial")) {
-            dial(args);
+            dial(args, this._answerTo);
         } else if (cmd.equals("calls")) {
-            readCallLogs();
+            readCallLogs(this._answerTo);
         }  
     }
 
     /** reads last Call Logs from all contacts */
-    private void readCallLogs() {
+    private void readCallLogs(String answerTo) {
 
         ArrayList<Call> arrayList = _phoneMgr.getPhoneLogs();
         XmppMsg all = new XmppMsg();
@@ -59,11 +59,11 @@ public class CallCmd extends Command {
         } else {
             all.appendLine(getString(R.string.chat_no_call));
         }
-        send(all);
+        send(all, answerTo);
     }
     
     /** dial the specified contact */
-    private void dial(String contactInfo) {
+    private void dial(String contactInfo, String answerTo) {
         String number = null;
         String contact = null;
 
@@ -78,20 +78,20 @@ public class CallCmd extends Command {
                 for (Phone phone : mobilePhones) {
                     phones.appendLine(phone.contactName + " - " + phone.cleanNumber);
                 }
-                send(phones);
+                send(phones, answerTo);
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 contact = phone.contactName;
                 number = phone.cleanNumber;
             } else {
-                send(getString(R.string.chat_no_match_for, contactInfo));
+                send(getString(R.string.chat_no_match_for, contactInfo), answerTo);
             }
         }
 
         if (number != null) {
-            send(getString(R.string.chat_dial, contact + " (" + number + ")"));
+            send(getString(R.string.chat_dial, contact + " (" + number + ")"), answerTo);
             if (!_phoneMgr.Dial(number)) {
-                send(getString(R.string.chat_error_dial));
+                send(getString(R.string.chat_error_dial), answerTo);
             }
         }
     }

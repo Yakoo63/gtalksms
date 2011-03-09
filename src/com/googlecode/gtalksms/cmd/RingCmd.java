@@ -29,7 +29,7 @@ public class RingCmd extends Command {
     }
     
     @Override
-    public void execute(String cmd, String args) {
+    protected void execute(String cmd, String args) {
         if (cmd.equals("ring")) {
             Integer volume = Tools.parseInt(args);
             

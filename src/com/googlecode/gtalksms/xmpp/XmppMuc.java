@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms.xmpp;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,16 +56,16 @@ public class XmppMuc {
      * Sends a message to a MUC, creates the MUC if necessary
      * 
      * @param number 	the phone number of the receiver
-     * @param sender    the name of the receiver
+     * @param contact    the name of the receiver
      * @param message   the message to send
      * @throws XMPPException 
      */
-    public void writeRoom(String number, String sender, String message) throws XMPPException {
-        String room = getRoomString(number, sender);
+    public void writeRoom(String number, String contact, String message) throws XMPPException {
+        String room = getRoomString(number, contact);
 
             MultiUserChat muc;
             if (!_rooms.containsKey(room)) {
-                muc = createRoom(number, room, sender);
+                muc = createRoom(number, room, contact);
                 
                 if (muc != null) {
                     _rooms.put(room, muc);
@@ -74,7 +75,7 @@ public class XmppMuc {
                 muc = _rooms.get(room);              
                 // TODO: test if occupants contains also the sender (in case we invite other people)
                 if (muc != null && muc.getOccupantsCount() < 2) {
-                    muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
+                    muc.invite(_settings.notifiedAddress, "SMS conversation with " + contact);
                 }
             }
         try {           
@@ -143,6 +144,25 @@ public class XmppMuc {
     }
     
     /**
+     * Returns the MultiUserChat given in roomname, 
+     * which is a full JID (e.g. room@conference.jabber.com),
+     * if the room is in your internal data structure.
+     * Return null otherwise
+     * 
+     * 
+     * @param roomname - the full roomname as JID
+     * @return the room or null
+     */
+    public MultiUserChat getRoom(String roomname) {
+        Collection<MultiUserChat> mucSet = _rooms.values();
+        for(MultiUserChat muc : mucSet) {
+            if(muc.getRoom().equals(roomname))
+                return muc;
+        }
+        return null;
+    }
+    
+    /**
      * Creates a new MUC AND invites the user
      * room name will be extended with an random number
      * 
@@ -167,7 +187,7 @@ public class XmppMuc {
         // Jwchat seems to work fine and is the default
         String cnx = "GTalkSMS_" + randomInt + "_" + _settings.login.replaceAll("@", "_") + "@" + _settings.mucServer;
         multiUserChat = new MultiUserChat(_connection, cnx);
-        multiUserChat.create(name + "(" + number + ")");
+        multiUserChat.create(name + " (" + number + ")");
 
         try {
             // Since this is a private room, make the room not public and set
@@ -205,24 +225,22 @@ public class XmppMuc {
 
         multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + name);
 
-        ChatPacketListener chatListener = new ChatPacketListener(number, name, multiUserChat, room);
+        ChatPacketListener chatListener = new ChatPacketListener(number, multiUserChat);
         multiUserChat.addMessageListener(chatListener);
         return multiUserChat;
     }
     
     class ChatPacketListener implements PacketListener {
-        private String _name;
         private String _number;
         private Date _lastDate;
         private MultiUserChat _muc;
-        private String _roomString;
+        private String _roomName;
         
-        public ChatPacketListener(String number, String name, MultiUserChat muc, String roomString) {
+        public ChatPacketListener(String number, MultiUserChat muc) {
             _number = number;
-            _name = name;
             _lastDate = new Date(0);
             _muc = muc;
-            _roomString = roomString;
+            _roomName = muc.getRoom();
         }
         
         @Override
@@ -243,18 +261,19 @@ public class XmppMuc {
                     }
                     
                     if (sentDate.compareTo(_lastDate) > 0 ) {
-                        Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+                        Intent intent = new Intent(MainService.ACTION_COMMAND);
+                        intent.setClass(_context, MainService.class);
+                       
+                        intent.putExtra("from", _roomName);
+                        intent.putExtra("cmd", "sms");
                         intent.putExtra("fromMuc", true);
-                        intent.putExtra("roomString", _roomString);
-                        intent.putExtra("number", _number);
-                        intent.putExtra("name", _name);
-                        if(_muc.getOccupantsCount() > 2) {
-                            intent.putExtra("message", "sms:" + _name + ":" + from + ": " + message.getBody());
+                        if(_muc.getOccupantsCount() > 2) {  // if there are more than 2 users in the room, we include also the from tag
+                            intent.putExtra("args", _number + ":" + from + ": " + message.getBody());  
                         } else {
-                            intent.putExtra("message", "sms:" + _name + ":" + message.getBody());
+                            intent.putExtra("args", _number + ":" + message.getBody());  
                         }
                         
-                        _context.sendBroadcast(intent);
+                        _context.startService(intent);
                         _lastDate = sentDate;
                     } else {
                         Log.w(Tools.LOG_TAG, "Receive old message: date=" + sentDate.toLocaleString() + " ; message=" + message.getBody());
@@ -266,6 +285,6 @@ public class XmppMuc {
     }
 
     private void send(String msg) {
-        _xmppMgr.send(msg);
+        _xmppMgr.send(new XmppMsg(msg), null);
     }
 }
