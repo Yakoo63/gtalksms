@@ -127,7 +127,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         _xmppreceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                if (action.equals(XmppManager.ACTION_PRESENCE_CHANGED)) {
+                if (action.equals(MainService.ACTION_XMPP_PRESENCE_CHANGED)) {
                     int stateInt = intent.getIntExtra("state", XmppFriend.OFFLINE);
                     String userId = intent.getStringExtra("userid");
                     String userFullId = intent.getStringExtra("fullid");
@@ -175,13 +175,13 @@ public class MainScreen extends Activity implements InterstitialAdListener{
                     if (_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "Update presence: " + userId + " - " + XmppFriend.stateToString(stateInt));
                     updateBuddiesList();
 
-                } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
+                } else if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
                     updateStatus(intent.getIntExtra("new_state", 0), intent.getBooleanExtra("TLS", false), intent.getBooleanExtra("Compression", false));
                 }
             }
         };
-        IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_PRESENCE_CHANGED);
-        intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
+        IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_PRESENCE_CHANGED);
+        intentFilter.addAction(MainService.ACTION_XMPP_CONNECTION_CHANGED);
         registerReceiver(_xmppreceiver, intentFilter);
         Intent intent = new Intent(MainService.ACTION_CONNECT);
         bindService(intent, _mainServiceConnection, Context.BIND_AUTO_CREATE);

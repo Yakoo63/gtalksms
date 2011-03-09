@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
@@ -204,7 +205,7 @@ public class XmppMuc {
 
         multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + name);
 
-        ChatPacketListener chatListener = new ChatPacketListener(number, name, multiUserChat);
+        ChatPacketListener chatListener = new ChatPacketListener(number, name, multiUserChat, room);
         multiUserChat.addMessageListener(chatListener);
         return multiUserChat;
     }
@@ -214,12 +215,14 @@ public class XmppMuc {
         private String _number;
         private Date _lastDate;
         private MultiUserChat _muc;
+        private String _roomString;
         
-        public ChatPacketListener(String number, String name, MultiUserChat muc) {
+        public ChatPacketListener(String number, String name, MultiUserChat muc, String roomString) {
             _number = number;
             _name = name;
             _lastDate = new Date(0);
             _muc = muc;
+            _roomString = roomString;
         }
         
         @Override
@@ -240,7 +243,11 @@ public class XmppMuc {
                     }
                     
                     if (sentDate.compareTo(_lastDate) > 0 ) {
-                        Intent intent = new Intent(XmppManager.ACTION_MESSAGE_RECEIVED);
+                        Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+                        intent.putExtra("fromMuc", true);
+                        intent.putExtra("roomString", _roomString);
+                        intent.putExtra("number", _number);
+                        intent.putExtra("name", _name);
                         if(_muc.getOccupantsCount() > 2) {
                             intent.putExtra("message", "sms:" + _name + ":" + from + ": " + message.getBody());
                         } else {
@@ -251,6 +258,7 @@ public class XmppMuc {
                         _lastDate = sentDate;
                     } else {
                         Log.w(Tools.LOG_TAG, "Receive old message: date=" + sentDate.toLocaleString() + " ; message=" + message.getBody());
+                        GoogleAnalyticsHelper.trackWarning("MUC ChatPacketListener - received old message on server " + _settings.mucServer);
                     }
                 }
             }

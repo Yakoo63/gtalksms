@@ -15,6 +15,7 @@ import org.jivesoftware.smack.util.StringUtils;
 import android.content.Context;
 import android.content.Intent;
 
+import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
@@ -80,7 +81,7 @@ public class XmppBuddies implements RosterListener {
     public void sendFriendList(ArrayList<XmppFriend> list) {
         
         for (XmppFriend xmppFriend : list) {
-            Intent intent = new Intent(XmppManager.ACTION_PRESENCE_CHANGED);
+            Intent intent = new Intent(MainService.ACTION_XMPP_PRESENCE_CHANGED);
             intent.putExtra("userid", xmppFriend.id);
             intent.putExtra("name", xmppFriend.name == null ? xmppFriend.id : xmppFriend.name);
             intent.putExtra("status", xmppFriend.status);
@@ -154,7 +155,7 @@ public class XmppBuddies implements RosterListener {
 
     @Override
     public void presenceChanged(Presence presence) {
-        Intent intent = new Intent(XmppManager.ACTION_PRESENCE_CHANGED);
+        Intent intent = new Intent(MainService.ACTION_XMPP_PRESENCE_CHANGED);
         intent.putExtra("userid", StringUtils.parseBareAddress(presence.getFrom()));
         intent.putExtra("fullid", presence.getFrom());
         intent.putExtra("state", retrieveState(presence.getMode(), presence.isAvailable()));

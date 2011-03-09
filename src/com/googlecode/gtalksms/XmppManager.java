@@ -67,11 +67,6 @@ public class XmppManager {
     // This state either means we are waiting for the network to come up,
     // or waiting for a retry attempt etc.
     public static final int WAITING_TO_CONNECT = 4;
-
-    // A list of intent actions we broadcast.
-    static final public String ACTION_MESSAGE_RECEIVED = "com.googlecode.gtalksms.XMPP_MESSAGE_RECEIVED";
-    static final public String ACTION_PRESENCE_CHANGED = "com.googlecode.gtalksms.XMPP_PRESENCE_CHANGED";
-    static final public String ACTION_CONNECTION_CHANGED = "com.googlecode.gtalksms.XMPP_CONNECTION_CHANGED";
     
     // Indicates the current state of the service (disconnected/connecting/connected)
     private int _status = DISCONNECTED;
@@ -230,7 +225,7 @@ public class XmppManager {
 
     /** Updates the status about the service state (and the statusbar)*/
     public static void broadcastStatus(Context ctx, int old_state, int new_state) {  // TODO remove the context in the signature
-        Intent intent = new Intent(ACTION_CONNECTION_CHANGED);                       // and use the one in the class field
+        Intent intent = new Intent(MainService.ACTION_XMPP_CONNECTION_CHANGED);                       // and use the one in the class field
         intent.putExtra("old_state", old_state);
         intent.putExtra("new_state", new_state);
         if(new_state == CONNECTED) {
@@ -389,7 +384,7 @@ public class XmppManager {
                 if ( message.getFrom().toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") && 
                      !message.getFrom().equals(_connection.getUser())) {
                     if (message.getBody() != null) {
-                        Intent intent = new Intent(ACTION_MESSAGE_RECEIVED);
+                        Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
                         intent.putExtra("message", message.getBody());
                         _context.sendBroadcast(intent);
                     }
@@ -440,17 +435,17 @@ public class XmppManager {
 
     /** 
      * sends a message to the user
-     * but only if we connected
-     * does nothing if we are not connected 
      * 
      */
     public void send(String message) {
-        if (isConnected()) {
             send(new XmppMsg(message));
-        }
     }
     
-    /** sends a message to the user */
+    /** 
+     * sends a message to the user 
+     * but only if we connected
+     * does nothing if we are not connected 
+     */
     public void send(XmppMsg message) {
         if (isConnected()) {
             Message msg = new Message(_settings.notifiedAddress, Message.Type.chat);
@@ -460,7 +455,8 @@ public class XmppManager {
             } else {
                 msg.setBody(message.generateTxt());
             }
-//            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) {  //TODO does not work. jid with presence? asmack problem?
+          //TODO does not work. jid with presence? asmack problem?
+//            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) { 
                 String xhtmlBody = message.generateXHTMLText().toString();
                 xhtmlBody = xhtmlBody.replace("<br>", "<br/>");  //fix for smackx problem
                 XHTMLManager.addBody(msg, xhtmlBody);
@@ -471,12 +467,11 @@ public class XmppManager {
     }
     
     /**
-     * Sets the xmpp presence status
+     * Sets the XMPP presence status
      * @param status
      */
     public void setStatus(String status) {
-        _presenceMessage = status;
-        
+        _presenceMessage = status;      
         if (isConnected()) {
             Presence presence = new Presence(Presence.Type.available);
             presence.setStatus(_presenceMessage);

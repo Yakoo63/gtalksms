@@ -14,7 +14,7 @@ public class SetLastRecipientRunnable implements Runnable {
     public SetLastRecipientRunnable(SmsCmd smsCmd, String number) {
         this.smsCmd = smsCmd;
         this.number = number;
-        outdated = false;
+        this.outdated = false;
     }
     
     @Override
@@ -22,7 +22,7 @@ public class SetLastRecipientRunnable implements Runnable {
         try {
             Thread.sleep(sleepTimeMs);
         } catch (InterruptedException e) {
-            /* Ignore - we don't send interupts to this thread */
+            /* Ignore - we don't send interrupts to this thread */
         }
         if (!outdated)
             smsCmd.setLastRecipientNow(number);

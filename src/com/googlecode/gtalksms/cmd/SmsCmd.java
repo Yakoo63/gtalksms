@@ -569,6 +569,13 @@ public class SmsCmd extends Command {
         t.start();
     }
     
+    /**
+     * Sets the last Recipient/Reply contact
+     * if the contact has changed
+     * and calls displayLastRecipient()
+     * 
+     * @param phoneNumber
+     */
     public synchronized void setLastRecipientNow(String phoneNumber) {
         if (_lastRecipient == null || !phoneNumber.equals(_lastRecipient)) {
             _lastRecipient = phoneNumber;

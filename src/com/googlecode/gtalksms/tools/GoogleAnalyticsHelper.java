@@ -80,6 +80,18 @@ public class GoogleAnalyticsHelper {
         }
         Log.w(Tools.LOG_TAG, warningMsg + " " + e);
     }
+    
+    public static void trackWarning(String warningMsg) {
+        if (gAnalytics != null) {
+            gAnalytics.trackEvent(Tools.APP_NAME, "warning", warningMsg, 0);
+        }
+    }
+    
+    public static void trackError(String errorMsg) {
+        if (gAnalytics != null) {
+            gAnalytics.trackEvent(Tools.APP_NAME, "error", errorMsg, 0);
+        }
+    }
 
     public void trackInstalls() {
         if (!run && (gAnalytics != null)) {

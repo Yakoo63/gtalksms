@@ -52,12 +52,17 @@ public class MainService extends Service {
     public final static String ACTION_TOGGLE = "com.googlecode.gtalksms.action.TOGGLE";
     public final static String ACTION_SEND = "com.googlecode.gtalksms.action.SEND";
     // The following actions are undocumented and internal to our implementation.
+    public final static String ACTION_COMMAND = "com.googlecode.gtalksms.action.COMMAND";
     public final static String ACTION_BROADCAST_STATUS = "com.googlecode.gtalksms.action.BROADCAST_STATUS";
     public final static String ACTION_SMS_RECEIVED = "com.googlecode.gtalksms.action.SMS_RECEIVED";
     public final static String ACTION_NETWORK_CHANGED = "com.googlecode.gtalksms.action.NETWORK_CHANGED";
-    public final static String ACTION_HANDLE_XMPP_NOTIFY = "com.googlecode.gtalksms.action.HANDLE_XMPP_NOTIFY";
     public final static String ACTION_SMS_SENT = "com.googlecode.gtalksms.action.SMS_SENT";
     public final static String ACTION_SMS_DELIVERED = "com.googlecode.gtalksms.action.SMS_DELIVERED";
+    
+    // A list of intent actions that the XmppManager broadcasts.
+    static final public String ACTION_XMPP_MESSAGE_RECEIVED = "com.googlecode.gtalksms.action.XMPP.MESSAGE_RECEIVED";
+    static final public String ACTION_XMPP_PRESENCE_CHANGED = "com.googlecode.gtalksms.action.XMPP.PRESENCE_CHANGED";
+    static final public String ACTION_XMPP_CONNECTION_CHANGED = "com.googlecode.gtalksms.action.XMPP.CONNECTION_CHANGED";
 
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
@@ -107,6 +112,9 @@ public class MainService extends Service {
      * to startService and delivering them to this function which runs in its
      * own thread (so can block Pretty-much everything using the _xmppMgr is
      * here...
+     * 
+     * ACTION_XMPP_CONNECTION_CHANGED is handled implicitly, by every call of 
+     * this method.
      * 
      * @param intent
      * @param id
@@ -159,10 +167,7 @@ public class MainService extends Service {
             if (initialState == XmppManager.CONNECTED) {
                 _xmppMgr.send(intent.getStringExtra("message"));
             }
-        } else if (a.equals(ACTION_HANDLE_XMPP_NOTIFY)) {
-            // If there is a message, then it is what we received.
-            // If there is no message, it just means the xmpp connection state
-            // changed - and we already handled that earlier in this method.
+        } else if (a.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
             String message = intent.getStringExtra("message");
             if (message != null) {
                 onMessageReceived(intent.getStringExtra("message"));
@@ -173,7 +178,7 @@ public class MainService extends Service {
                 String name = ContactsManager.getContactName(this, number);
                 String message = intent.getStringExtra("message");
                 
-                if (_settingsMgr.notifySmsInSameConversation) {
+                if (_settingsMgr.notifySmsInSameConversation && !_xmppMgr.roomExists(number, name)) {
                     XmppMsg msg = new XmppMsg();
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
@@ -363,22 +368,19 @@ public class MainService extends Service {
                 _xmppreceiver = new BroadcastReceiver() {
                     public void onReceive(Context context, Intent intent) {
                         String action = intent.getAction();
-                        if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
+                        if (action.equals(MainService.ACTION_XMPP_MESSAGE_RECEIVED)) {
                             // as this comes in on the main thread and not the worker thread,
                             // we just push the message onto the worker thread queue.
-                            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStart: ACTION_MESSAGE_RECEIVED - \"" + Tools.shortenString(intent.getStringExtra("message")));
-                            startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY, intent.getStringExtra("message")));
-                        } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
+                            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStart: ACTION_XMPP_MESSAGE_RECEIVED - \"" + Tools.shortenString(intent.getStringExtra("message")));
+                            startService(intent);
+                        } else if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
                             onConnectionStatusChanged(intent.getIntExtra("old_state", 0), intent.getIntExtra("new_state", 0));
-                            startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY)); 
-                            // TODO the intent handling could be improved at this point
-                            // we currently transform ACTION_MESSAGE_RECEIVED and ACTION_CONNECTION_CHANGED into a new intent
-                            // this is imho unnecessary, confusing and introduces some more work overhead
+                            startService(intent); 
                         }
                     }
                 };
-                IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
-                intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
+                IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+                intentFilter.addAction(MainService.ACTION_XMPP_CONNECTION_CHANGED);
                 registerReceiver(_xmppreceiver, intentFilter);
                 _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
             }
