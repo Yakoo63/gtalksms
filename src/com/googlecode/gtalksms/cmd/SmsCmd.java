@@ -23,6 +23,7 @@ import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.data.sms.SetLastRecipientRunnable;
 import com.googlecode.gtalksms.data.sms.Sms;
 import com.googlecode.gtalksms.data.sms.SmsMmsManager;
+import com.googlecode.gtalksms.tools.AliasHelper;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -42,7 +43,10 @@ public class SmsCmd extends Command {
     // int counter used to distinguish the PendingIntents
     private int _penSIntentCount;
     private int _penDIntentCount;
-    private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
+    // synchronizedMap because the worker thread and the intent receivers work with this map
+    private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>()); 
+    
+    private AliasHelper _aliasHelper;
     
     public SmsCmd(MainService mainService) {
         super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"});
@@ -164,6 +168,7 @@ public class SmsCmd extends Command {
             mainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
         }
         _xmppMgr = _mainService.getXmppmanager();
+        _aliasHelper = mainService.createAndGetAliasHelper();
     }
 
     @Override
@@ -176,6 +181,7 @@ public class SmsCmd extends Command {
             
             if (-1 != separatorPos) {
                 contact = args.substring(0, separatorPos);
+                contact = _aliasHelper.convertAliasToNumber(contact);
                 message = args.substring(separatorPos + 1);
             }
             
@@ -205,6 +211,7 @@ public class SmsCmd extends Command {
             String message = null;
             if (-1 != separatorPos) {
                 contact = args.substring(0, separatorPos);
+                contact = _aliasHelper.convertAliasToNumber(contact);
                 message = args.substring(separatorPos + 1);
                 searchSMS(message, contact);
             } else if (args.length() > 0) {
@@ -212,7 +219,7 @@ public class SmsCmd extends Command {
             }
         } else if (command.equals("markasread") || command.equals("mar")) {
             if (args.length() > 0) {
-                markSmsAsRead(args);
+                markSmsAsRead(_aliasHelper.convertAliasToNumber(args));
             } else if (_lastRecipient == null) {
                 send(getString(R.string.chat_error_no_recipient));
             } else {
@@ -220,7 +227,7 @@ public class SmsCmd extends Command {
             }
         } else if (command.equals("chat")) {
         	if (args.length() > 0) {
-                inviteRoom(args);
+                inviteRoom(_aliasHelper.convertAliasToNumber(args));
         	} else if (_lastRecipient != null) {
         			_xmppMgr.inviteRoom(_lastRecipient, _lastRecipientName);
         	}
@@ -234,6 +241,7 @@ public class SmsCmd extends Command {
                 if (-1 != separatorPos) {
                     subCommand = args.substring(0, separatorPos);
                     search = args.substring(separatorPos + 1);
+                    search = _aliasHelper.convertAliasToNumber(search);
                 } else if (args.length() > 0) {
                     subCommand = args;
                 }
@@ -263,7 +271,7 @@ public class SmsCmd extends Command {
     }
     
     /**
-     * "delsms" cmd - deltes sms, either
+     * "delsms" cmd - deletes sms, either
      * - all sms
      * - all sent sms
      * - sms from specified contact

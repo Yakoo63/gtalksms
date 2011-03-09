@@ -20,6 +20,23 @@ import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class ContactsManager {
+    
+    public static String getContactNameOrNull(Context ctx, String phoneNumber) {
+        String res = null;
+        try {
+            ContentResolver resolver = ctx.getContentResolver();
+            Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+            Cursor c = resolver.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
+
+            if (c != null && c.moveToFirst()) {
+                res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
+                c.close();
+            }
+        } catch (Exception ex) {
+            /* Ignore */
+        }        
+        return res;
+    }
 
     /**
      * Tries to get the contact display name of the specified phone number.
@@ -49,7 +66,8 @@ public class ContactsManager {
     }
 
     /**
-     * Returns a ArrayList of <Contact> where the names/company match the argument
+     * Tries to get the contact display name of the specified phone number.
+     * If not found, returns the argument.
      */
     public static String getContactName(Context ctx, long rawId) {
         String res = ctx.getString(R.string.chat_call_unknown);
@@ -80,7 +98,10 @@ public class ContactsManager {
     }
 
     /**
-     * Returns a ArrayList of <Contact> where the names/company match the argument
+     *  
+     * @param ctx Application context
+     * @param searchedName - the name of the contact or a phone number
+     * @return a ArrayList of <Contact> where the names/company match the argument
      */
     public static ArrayList<Contact> getMatchingContacts(Context ctx, String searchedName) {
         ArrayList<Contact> res = new ArrayList<Contact>();

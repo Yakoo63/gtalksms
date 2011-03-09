@@ -15,6 +15,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
         "CREATE TABLE " + ALIAS_TABLE_NAME + " (" +
             "aliasName TEXT NOT NULL, " +
             "number TEXT NOT NULL, " +
+            "contactName TEXT, " +
             "PRIMARY KEY(aliasName)" +
          ")";
     

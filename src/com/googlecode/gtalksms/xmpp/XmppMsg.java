@@ -112,7 +112,9 @@ public class XmppMsg {
     
     public XHTMLText generateXHTMLText() {
         int pos;
-        StringBuilder m = new StringBuilder(_message.toString()); 
+        String message = _message.toString();
+        message = removeLastNewline(message);
+        StringBuilder m = new StringBuilder(message); 
         ArrayList<XmppFont> fonts = new ArrayList<XmppFont>(_fonts);
         
         XHTMLText x = new XHTMLText(null, null);
@@ -128,6 +130,15 @@ public class XmppMsg {
         return x;
         
     }
+    
+    public String toString() {
+        return removeLastNewline(generateTxt());
+    }
+    
+    public XHTMLText toXHTMLText() {
+        return generateXHTMLText();
+    }
+    
     /**
      * Returns the smallest indexposition of a internal string format tag
      * @param msg
@@ -182,6 +193,23 @@ public class XmppMsg {
                 x.appendOpenSpanTag("font:null");   
             }
             msg.delete(0, FontBegin.length());
+        }
+    }
+    
+    /**
+     * If the last char in a given string is newline,
+     * return a string without the newline as last char
+     * 
+     * @param str
+     * @return
+     */
+    private static String removeLastNewline(String str) {
+        int strlen = str.length();
+        int lastNewline = str.lastIndexOf("\n");
+        if (strlen == lastNewline + 1) {
+            return str.substring(0, strlen-1);            
+        } else {
+            return str;
         }
     }
 }

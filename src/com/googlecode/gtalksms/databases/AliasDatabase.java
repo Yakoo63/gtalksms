@@ -15,53 +15,91 @@ public class AliasDatabase extends Database {
     public AliasDatabase(Context ctx) {
         super(ctx);
     }
-
-    public static boolean setAlias(String alias, String number) {
-        ContentValues values = composeValues(alias, number);
+    
+    /**
+     * 
+     * 
+     * @param aliasName
+     * @param number
+     * @param contactName - the human readable name of the contact - may be null
+     * @return true on success, otherwise false
+     */
+    public static boolean addAlias(String aliasName, String number, String contactName) {
+        ContentValues values = composeValues(aliasName, number, contactName);
         long ret = database.insert(DatabaseOpenHelper.ALIAS_TABLE_NAME, null, values);
         return ret != -1;
     }
     
-    public static boolean updateAlias(String alias, String number) {
-        ContentValues values = composeValues(alias, number);
-        int ret = database.update(DatabaseOpenHelper.ALIAS_TABLE_NAME, values, "aliasName =" + alias, null);
+    /**
+     * 
+     * @param aliasName
+     * @param number
+     * @param contactName
+     * @return true on success, otherwise false
+     */
+    public static boolean updateAlias(String aliasName, String number, String contactName) {
+        ContentValues values = composeValues(aliasName, number, contactName);
+        int ret = database.update(DatabaseOpenHelper.ALIAS_TABLE_NAME, values, "aliasName='" + aliasName + "'", null);
         return ret == 1;
     }
     
-    public static boolean deleteAlias(String alias) {
-        int ret = database.delete(DatabaseOpenHelper.ALIAS_TABLE_NAME, "aliasName =" + alias, null);
+    public static boolean deleteAlias(String aliasName) {
+        int ret = database.delete(DatabaseOpenHelper.ALIAS_TABLE_NAME, "aliasName='" + aliasName + "'", null);
         return ret == 1;
     }
     
-    public static String getNumber(String alias) {
-        Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "number" }, alias, null, null , null, null);
+    public static String getNumber(String aliasName) {
+        Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "number" }, "aliasName='" + aliasName + "'", null, null , null, null);
         if(c.getCount() == 1) {
+            c.moveToFirst();
             return c.getString(0);
         } else { 
             return null;
         }
     }
     
-    public static boolean containsAlias(String alias) {
-        Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "number" }, alias, null, null , null, null);
+    public static boolean containsAlias(String aliasName) {
+        Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "number" }, "aliasName='" + aliasName + "'", null, null , null, null);
         return c.getCount() == 1;
     }
     
     public static String[][] getFullDatabase() {
-        Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "aliasName", "number" }, null, null, null , null, null);
+        Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "aliasName", "number", "contactName" }, null, null, null , null, null);
         int rowCount = c.getCount();
-        String[][] res = new String[rowCount][2];
+        c.moveToFirst();
+        String[][] res = new String[rowCount][3];
         for (int i = 0; i < rowCount; i++) {
-            res[i][0] = c.getString(0);
-            res[i][1] = c.getString(1);
+            res[i][0] = c.getString(0);  // aliasName field
+            res[i][1] = c.getString(1);  // number field           
+            res[i][2] = c.getString(2);   // contactName field - may be null
+            c.moveToNext();
         }
         return res;
     }
     
-    private static ContentValues composeValues(String alias, String number) {
+    public static String[] getAlias(String aliasName) {
+        String[] res;
+        Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "aliasName", "number", "contactName" }, "aliasName='" + aliasName + "'", null, null , null, null);
+        c.moveToFirst();
+        if(c.getString(2) == null) {
+            res = new String[2];
+            res[0] = c.getString(0);
+            res[1] = c.getString(1);
+        } else {
+            res = new String[3];
+            res[0] = c.getString(0);
+            res[1] = c.getString(1);
+            res[2] = c.getString(2);
+        }
+        return res;       
+    }
+    
+    private static ContentValues composeValues(String aliasName, String number, String contactName) {
         ContentValues values = new ContentValues();
-        values.put("aliasName", alias);
+        values.put("aliasName", aliasName);
         values.put("number", number);
+        if (contactName != null) 
+            values.put("contactName", contactName);
         return values;
     }
 }

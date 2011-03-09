@@ -20,6 +20,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.googlecode.gtalksms.cmd.AliasCmd;
 import com.googlecode.gtalksms.cmd.BatteryCmd;
 import com.googlecode.gtalksms.cmd.CallCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
@@ -37,6 +38,7 @@ import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
+import com.googlecode.gtalksms.tools.AliasHelper;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -78,6 +80,8 @@ public class MainService extends Service {
     // to get the helper use MainService.getAnalyticsHelper()
     private static GoogleAnalyticsHelper _gAnalytics;
     
+    private static AliasHelper _aliasHelper;
+    
 
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
@@ -94,7 +98,8 @@ public class MainService extends Service {
             onHandleIntent((Intent)msg.obj, msg.arg1);
         }
     }
-
+    
+    // TODO move the following method into the subclass above
     /**
      * The IntentService(-like) implementation manages taking the intents passed
      * to startService and delivering them to this function which runs in its
@@ -106,7 +111,7 @@ public class MainService extends Service {
      */
     protected void onHandleIntent(final Intent intent, int id) {
         if (intent == null) {
-            Log.e(Tools.LOG_TAG, "onHandleIntent: Intent null");
+            GoogleAnalyticsHelper.trackAndLogError("onHandleIntent: Intent null");
             return;
         }
         //TODO do we need to check _xmppMgr == null?
@@ -224,14 +229,21 @@ public class MainService extends Service {
     
     public boolean getTLSStatus() {
         return _xmppMgr == null ? false : _xmppMgr.getTLSStatus();
-    }
+    }           // null check necessary
     
     public boolean getCompressionStatus() {
-    	return _xmppMgr == null ? false : _xmppMgr.getCompressionStatus();
-    }
+    	return _xmppMgr == null ? false : _xmppMgr.getCompressionStatus();   	    
+    }          // null check necessary
     
     public static GoogleAnalyticsHelper getAnalyticsHelper() {
     	return _gAnalytics;
+    }
+    
+    public AliasHelper createAndGetAliasHelper() {
+        if(_aliasHelper == null) {
+            _aliasHelper = new AliasHelper(getBaseContext());
+        }
+        return _aliasHelper;
     }
 
     public void updateBuddies() {
@@ -342,15 +354,17 @@ public class MainService extends Service {
                         if (action.equals(XmppManager.ACTION_MESSAGE_RECEIVED)) {
                             // as this comes in on the main thread and not the worker thread,
                             // we just push the message onto the worker thread queue.
+                            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStart: ACTION_MESSAGE_RECEIVED - \"" + Tools.shortenString(intent.getStringExtra("message")));
                             startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY, intent.getStringExtra("message")));
                         } else if (action.equals(XmppManager.ACTION_CONNECTION_CHANGED)) {
                             onConnectionStatusChanged(intent.getIntExtra("old_state", 0), intent.getIntExtra("new_state", 0));
                             startService(newSvcIntent(MainService.this, ACTION_HANDLE_XMPP_NOTIFY)); 
                             // TODO the intent handling could be improved at this point
+                            // we currently transform ACTION_MESSAGE_RECEIVED and ACTION_CONNECTION_CHANGED into a new intent
+                            // this is imho unnecessary, confusing and introduces some more work overhead
                         }
                     }
                 };
-                if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStart: ACTION_MESSAGE_RECEIVED");
                 IntentFilter intentFilter = new IntentFilter(XmppManager.ACTION_MESSAGE_RECEIVED);
                 intentFilter.addAction(XmppManager.ACTION_CONNECTION_CHANGED);
                 registerReceiver(_xmppreceiver, intentFilter);
@@ -407,12 +421,16 @@ public class MainService extends Service {
     public void send(String msg) {
         if (_xmppMgr != null) {
             _xmppMgr.send(new XmppMsg(msg));
+        } else {
+            GoogleAnalyticsHelper.trackAndLogError("MainService send String: _xmppMgr == null");
         }
     }
 
     public void send(XmppMsg msg) {
         if (_xmppMgr != null) {
             _xmppMgr.send(msg);
+        } else {
+            GoogleAnalyticsHelper.trackAndLogError("MainService send XmppMsg: _xmppMgr == null");
         }
     }
     
@@ -500,6 +518,7 @@ public class MainService extends Service {
                 send(getString(R.string.chat_error_unknown_cmd, command));
             }
         } catch (Exception ex) {
+            GoogleAnalyticsHelper.trackAndLogError("MainService onMessageReceived()", ex);
             send(getString(R.string.chat_error, ex));
         }
     }
@@ -518,6 +537,7 @@ public class MainService extends Service {
         registerCommand(new FileCmd(this));
         registerCommand(new SmsCmd(this));
         registerCommand(new ExitCmd(this));
+        registerCommand(new AliasCmd(this));
         
         registerCommand(new HelpCmd(this));  //help command needs to be registered as last
     }
