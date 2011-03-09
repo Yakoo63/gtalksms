@@ -93,7 +93,8 @@ public class XmppMsg {
     }
     
     public String generateTxt() {
-        return _message.toString()
+        String message = removeLastNewline(_message.toString());
+        return message
                     .replaceAll(FontBegin, "")
                     .replaceAll(BoldBegin, "")
                     .replaceAll(BoldEnd, "")
@@ -102,7 +103,8 @@ public class XmppMsg {
     }
 
     public String generateFmtTxt() {
-        return _message.toString()
+        String message = removeLastNewline(_message.toString());
+        return message
                     .replaceAll(FontBegin, "")
                     .replaceAll(BoldBegin, " *")
                     .replaceAll(BoldEnd, "* ")
