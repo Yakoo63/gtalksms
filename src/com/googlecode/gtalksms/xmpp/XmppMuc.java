@@ -25,6 +25,7 @@ import android.util.Log;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMuc {
@@ -181,7 +182,7 @@ public class XmppMuc {
                     //submitForm.setAnswer("muc#roomconfig_roomadmins", owners);  //throws exception (at least on my server)
                 }
                 catch (Exception ex) {
-                    Log.e(Tools.LOG_TAG, "Unable to configure room owners. Falling back to room passwords", ex);
+                    GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + _settings.mucServer + ". Falling back to room passwords", ex);
                     submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
                     submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomPassword);
                     passwordMode = true;

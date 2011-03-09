@@ -62,7 +62,7 @@ public class GoogleAnalyticsHelper {
 
     public static void trackAndLogWarning(String warningMsg) {
         if (gAnalytics != null) {
-            gAnalytics.trackEvent(Tools.APP_NAME, "error", warningMsg, 0);
+            gAnalytics.trackEvent(Tools.APP_NAME, "warning", warningMsg, 0);
         }
         Log.w(Tools.LOG_TAG, warningMsg);
     }
@@ -76,7 +76,7 @@ public class GoogleAnalyticsHelper {
 
     public static void trackAndLogWarning(String warningMsg, Exception e) {
         if (gAnalytics != null) {
-            gAnalytics.trackEvent(Tools.APP_NAME, "error", warningMsg, 0);
+            gAnalytics.trackEvent(Tools.APP_NAME, "warning", warningMsg, 0);
         }
         Log.w(Tools.LOG_TAG, warningMsg + " " + e);
     }
