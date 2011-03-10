@@ -4,7 +4,7 @@ import java.util.Date;
 
 
 public class Sms implements Comparable<Sms> {
-    public String message;
+    public String message;          
     public String shortendMessage;
     public String number;
     public String sender;
@@ -16,12 +16,26 @@ public class Sms implements Comparable<Sms> {
     public boolean[] sentIntents;
     public boolean[] delIntents;
     
+    /**
+     * 
+     * @param phoneNumber
+     * @param message
+     * @param date
+     */
     public Sms(String phoneNumber, String message, Date date) {
     	this.number = phoneNumber;
     	this.message = message;
     	this.date = date;
     }
     
+    /**
+     * 
+     * @param phoneNumber
+     * @param toName
+     * @param shortendMessage
+     * @param numParts
+     * @param answerTo - which jid should be informed about the status (sent/delivered) of the sms
+     */
     public Sms(String phoneNumber, String toName, String shortendMessage, int numParts, String answerTo) {
         this.resSentIntent = -1;
         this.resDelIntent = -1;

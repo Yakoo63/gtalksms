@@ -21,7 +21,6 @@ public class ShellCmd extends Command {
     StringBuilder _cmdResults = new StringBuilder();
     String _currentCommand;
     XmppFont _font = new XmppFont("consolas", "red");
-    private String _answerTo;
 
     
     public ShellCmd(MainService mainService) {
@@ -71,7 +70,7 @@ public class ShellCmd extends Command {
                 readStream(myproc.getInputStream());
                 readStream(myproc.getErrorStream());
                 
-                send(_cmdResults.toString(), _answerTo);
+                send(_cmdResults.toString());
                 _cmdResults = new StringBuilder();
             }
             catch (Exception ex) {
@@ -96,7 +95,7 @@ public class ShellCmd extends Command {
                     start = end;
                     int last = _cmdResults.lastIndexOf("\n");
                     if (last != -1) {
-                        send(_cmdResults.substring(0, last + 1), _answerTo);
+                        send(_cmdResults.substring(0, last + 1));
                         _cmdResults.delete(0, last + 1);
                     }
                 }
@@ -123,13 +122,6 @@ public class ShellCmd extends Command {
         _currentCommand = cmd;
         _cmdThread = new Thread(_cmdRunnable);
         _cmdThread.start();
-    }
-    
-    @Override
-    protected void send(String message, String answerTo) {
-        XmppMsg msg = new XmppMsg(_font);
-        msg.append(message);
-        send(msg, answerTo);
     }
     
     @Override

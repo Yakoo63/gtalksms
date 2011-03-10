@@ -25,6 +25,7 @@ public class LocationService extends Service {
     private LocationManager _locationManager = null;
     private LocationListener _locationListener = null;
     private Location _currentBestLocation = null;
+    private String answerTo;
 
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     public static final String STOP_SERVICE = "com.googlecode.gtalksms.LOCATION_STOP_SERVICE";
@@ -97,7 +98,7 @@ public class LocationService extends Service {
         builder.append(getString(R.string.chat_geo_speed, location.getSpeed()));
         builder.append(Tools.LineSep);
         builder.append(getString(R.string.chat_geo_provider, location.getProvider()));
-        MainService.send(this, builder.toString());
+        MainService.send(this, builder.toString(), answerTo);
     }
 
     public void onStart(final Intent intent, int startId) {
@@ -108,6 +109,8 @@ public class LocationService extends Service {
             stopSelf();
             return;
         }
+        
+        answerTo = intent.getStringExtra("to");
 
         try {
             if (!getGPSStatus()) {
@@ -162,7 +165,7 @@ public class LocationService extends Service {
       * @param location  The new Location that you want to evaluate
       * @param currentBestLocation  The current Location fix, to which you want to compare the new one
       */
-    protected boolean isBetterLocation(Location location, Location currentBestLocation) {
+    protected static boolean isBetterLocation(Location location, Location currentBestLocation) {
         if (currentBestLocation == null) {
             // A new location is always better than no location
             return true;

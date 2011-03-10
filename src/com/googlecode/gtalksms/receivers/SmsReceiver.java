@@ -55,7 +55,7 @@ public class SmsReceiver extends BroadcastReceiver {
         
         // Finally, send all SMS via XMPP by sender
         for(String sender : msg.keySet()) {
-            Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender) + "\n");
+            Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
             svcintent.putExtra("sender", sender);
             context.startService(svcintent);
         }

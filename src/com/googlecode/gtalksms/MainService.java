@@ -281,13 +281,24 @@ public class MainService extends Service {
      *  allows you to provide that too.  Any other extras must be set manually
      */
     public static Intent newSvcIntent(Context ctx, String action) {
-        return newSvcIntent(ctx, action, null);
+        return newSvcIntent(ctx, action, null, null);
     }
-
-    public static Intent newSvcIntent(Context ctx, String action, String message) {
+    
+    /**
+     * 
+     * @param ctx
+     * @param action
+     * @param message
+     * @param to - full JID to send message to, can be null for default notification address
+     * @return
+     */
+    public static Intent newSvcIntent(Context ctx, String action, String message, String to) {
         Intent i = new Intent(action, null, ctx, MainService.class);
         if (message != null) {
             i.putExtra("message", message);
+        }
+        if (to != null) {
+            i.putExtra("to", to);
         }
         return i;
     }
@@ -430,7 +441,20 @@ public class MainService extends Service {
      * @param msg
      */
     public static void send(Context ctx, String msg) {
-        ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg));
+        ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg, null));
+    }
+    
+    /**
+     * Wrapper to send a string to the user via XMPP
+     * needed by some receivers
+     * starts the MainService with a new intent
+     * 
+     * @param ctx
+     * @param msg
+     * @param to
+     */
+    public static void send(Context ctx, String msg, String to) {
+        ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg, to));
     }
     
     /**

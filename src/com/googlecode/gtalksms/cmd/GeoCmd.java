@@ -21,7 +21,7 @@ public class GeoCmd extends Command {
     @Override
     protected void execute(String cmd, String args) {
         if (cmd.equals("geo")) {
-            geo(args, this._answerTo);
+            geo(args);
         } else if (cmd.equals("where")) {
             send(getString(R.string.chat_start_locating));
             startLocatingPhone();
@@ -29,7 +29,7 @@ public class GeoCmd extends Command {
     }
     
     /** Open geolocalization application */
-    private void geo(String text, String answerTo) {
+    private void geo(String text) {
         List<Address> addresses = geoDecode(text);
         if (addresses != null) {
             if (addresses.size() > 1) {
@@ -40,12 +40,12 @@ public class GeoCmd extends Command {
                         addr.appendLine(address.getAddressLine(i));
                     }
                 }
-                send(addr, answerTo);
+                send(addr);
             } else if (addresses.size() == 1) {
                 launchExternal(addresses.get(0).getLatitude() + "," + addresses.get(0).getLongitude());
             }
         } else {
-            send(getString(R.string.chat_no_match_for, text), answerTo);
+            send(getString(R.string.chat_no_match_for, text));
             // For emulation testing
             // GeoManager.launchExternal("48.833199,2.362232");
         }
@@ -55,6 +55,7 @@ public class GeoCmd extends Command {
     public void startLocatingPhone() {
         Intent intent = new Intent(_context, LocationService.class);
         intent.setAction(LocationService.START_SERVICE);
+        intent.putExtra("to", this._answerTo);
         _context.startService(intent);
     }
 
