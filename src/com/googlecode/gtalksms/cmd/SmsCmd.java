@@ -666,7 +666,7 @@ public class SmsCmd extends Command {
         final int shortenTo = 20;
         String shortendMessage;
         if (message.length() < shortenTo) {
-            shortendMessage = message;
+            shortendMessage = message.replace("\n", " ");
         } else {
             shortendMessage = message.substring(0, shortenTo).replace("\n", " ") + "...";
         }

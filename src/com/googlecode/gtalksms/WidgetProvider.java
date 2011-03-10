@@ -23,7 +23,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     public void doUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, int state) {
         // Create an Intent to launch activity
-        Intent intent = new Intent(".WidgetGTalkSMS.ACTION");
+        Intent intent = new Intent(MainService.ACTION_WIDGET_ACTION);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Get the layout for the AppWidget and attach an on-click listener to the button
@@ -66,10 +66,10 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.d(Tools.LOG_TAG, "widget onReceive " + action);
-        if (action.equals(".WidgetGTalkSMS.ACTION")) {
+        if (action.equals(MainService.ACTION_WIDGET_ACTION)) {
             Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_TOGGLE);
             context.startService(svcintent);
-        } else if (action.equals("com.googlecode.gtalksms.XMPP_CONNECTION_CHANGED")) {
+        } else if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
             int state = intent.getIntExtra("new_state", 0);
             // Update all AppWidget with current status
             AppWidgetManager manager = AppWidgetManager.getInstance(context);

@@ -25,6 +25,9 @@ public class Tools {
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
     
+    private static boolean donateRun = true;
+    private static boolean isDonate = false;
+    
     public static void toastMessage(Context ctx, String msg) {
         String toastMsg  = ctx.getString(R.string.app_name) + ": " + msg;
         Toast.makeText(ctx, toastMsg, Toast.LENGTH_SHORT).show();
@@ -34,12 +37,12 @@ public class Tools {
 
         try {
             PackageInfo pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            String donate = "";
+            String donated = "";
             
             if(isDonateAppInstalled(context)) {
-                donate = "Full ";
+                donated = "Full ";
             }
-            return donate + "v" + pinfo.versionName + "\n@ Yakoo";
+            return donated + "v" + pinfo.versionName + "\n@ Yakoo";
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {
             return "";
         }
@@ -124,13 +127,17 @@ public class Tools {
     }
     
     public static boolean isDonateAppInstalled(Context context) {
-        List<PackageInfo> packs = context.getPackageManager().getInstalledPackages(0);
-        for (PackageInfo p : packs) {
-            if (p.packageName.equalsIgnoreCase("com.googlecode.gtalksmsdonate")) {
-                return true;
+        if (donateRun) {
+            List<PackageInfo> packs = context.getPackageManager().getInstalledPackages(0);
+            for (PackageInfo p : packs) {
+                if (p.packageName.equalsIgnoreCase("com.googlecode.gtalksmsdonate")) {
+                    isDonate = true;
+                    break;
+                }
             }
+            donateRun = false;
         }
-        return false;
+        return isDonate;
 //        return 0 == context.getPackageManager().checkSignatures( context.getPackageName(), "com.googlecode.gtalksmsdonate");
     }
     

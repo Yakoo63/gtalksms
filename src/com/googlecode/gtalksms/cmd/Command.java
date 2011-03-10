@@ -86,6 +86,13 @@ public abstract class Command {
         return XmppMsg.makeBold(msg);
     }
     
+    /**
+     * Useful Method to split the arguments into an String Array
+     * The Arguments are split by ":"
+     * 
+     * @param args
+     * @return
+     */
     protected String[] splitArgs(String args) {
         StringTokenizer strtok = new StringTokenizer(args, ":");
         int tokenCount = strtok.countTokens();

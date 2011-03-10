@@ -3,6 +3,7 @@ package com.googlecode.gtalksms.cmd;
 import java.util.ArrayList;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.tools.AliasHelper;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -24,46 +25,65 @@ public class AliasCmd extends Command {
 
     @Override
     protected void execute(String cmd, String args) {
-        int sepPos = args.indexOf(":");
-        if (sepPos == -1) {
+        String[] subCommand = splitArgs(args);
+        if (subCommand.length < 2) {
             send("Alias needs more arguments");
         } else {
-            String[] subCommand = splitArgs(args);
             if (subCommand[0].equals("add")) {
-                if (subCommand.length == 1) {
-                    send("No name or number given");
-                } else if (Phone.isCellPhoneNumber(subCommand[2])) {
-                    aliasHelper.addAliasByNumber(subCommand[1], subCommand[2]);
-                } else {
-                    ArrayList<Phone> res = aliasHelper.addAliasByName(subCommand[1], subCommand[2]);
-                    if (res.size() != 1) {
-                        send("Contact name not distinct or unkown");
-                    } else {
-                        Phone p = res.get(0);
-                        send("Added alias \'" + subCommand[1] + "\' for \'" + p.contactName + "\' with number " + p.number);
-                    }
-                }
+                add(subCommand);
             } else if (subCommand[0].equals("del")) {
-                if (aliasHelper.deleteAlias(subCommand[1])) {
-                    send("Deleted Alias: " + subCommand[1]);
-                } else {
-                    send("Failed to delete Alias: " + subCommand[1]);
-                }
+                del(subCommand);
             } else if (subCommand[0].equals("show")) {
-                if (subCommand[1].equals("all")) {
-                    XmppMsg msg = new XmppMsg();
-                    String[][] aliases = aliasHelper.getAllAliases();
-                    for (int i = 0; i < aliases.length; i++) {
-                        msg.appendBold("Alias: " + aliases[i][0] + " ");
-                        if (aliases[i][2] == null) {
-                            msg.appendLine(aliases[i][1]);
-                        } else {
-                            msg.append(aliases[i][1] + " - ");
-                            msg.appendLine(aliases[i][2]);
-                        }
-                    }
-                    send(msg);
+                show(subCommand);
+            }
+        }
+    }
+    
+    private void add(String[] subCommand) {
+            if (Phone.isCellPhoneNumber(subCommand[2])) {
+                aliasHelper.addAliasByNumber(subCommand[1], subCommand[2]);
+                send(getString(R.string.chat_alias_add_by_number, subCommand[1], subCommand[2]));
+            } else {
+                ArrayList<Phone> res = aliasHelper.addAliasByName(subCommand[1], subCommand[2]);
+                if (res.size() != 1) {
+                    send(getString(R.string.chat_error_unkown_name));
+                } else {
+                    Phone p = res.get(0);
+                    send(getString(R.string.chat_alias_add_by_name, subCommand[1], p.contactName, p.number));
                 }
+            }
+    }
+    
+    private void del(String[] subCommand) {
+        if (aliasHelper.deleteAlias(subCommand[1])) {
+            send(getString(R.string.chat_alias_del_suc, subCommand[1]));
+        } else {
+            send(getString(R.string.chat_alias_del_suc, subCommand[1]));
+        }
+    }
+    
+    private void show(String[] subCommand) {
+        if (subCommand[1].equals("all")) {
+            XmppMsg msg = new XmppMsg();
+            String[][] aliases = aliasHelper.getAllAliases();
+            for (int i = 0; i < aliases.length; i++) {
+                msg.appendBold("Alias: " + aliases[i][0] + " ");
+                if (aliases[i][2] == null) {
+                    msg.appendLine(aliases[i][1]);
+                } else {
+                    msg.append(aliases[i][1] + " - ");
+                    msg.appendLine(aliases[i][2]);
+                }
+            }
+            send(msg);
+        } else {
+            String[] res = aliasHelper.getAliasOrNull(subCommand[1]);
+            if(res == null) {
+                send(getString(R.string.chat_alias_show_non_existent, subCommand[1]));
+            } else if (res.length == 2){
+                send("\'" + res[0] + "\' -> " + res[1]);
+            } else {
+                send("\'" + res[0] + "\' - " + res[2] +" -> " + res[1]);
             }
         }
     }

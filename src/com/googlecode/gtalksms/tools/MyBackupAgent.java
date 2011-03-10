@@ -20,6 +20,7 @@ import android.app.backup.BackupDataInput;
 import android.app.backup.BackupDataOutput;
 import android.content.SharedPreferences;
 import android.os.ParcelFileDescriptor;
+import android.util.Log;
 
 import com.googlecode.gtalksms.SettingsManager;
 
@@ -33,6 +34,7 @@ public class MyBackupAgent extends BackupAgent {
     
     @Override
     public void onBackup(ParcelFileDescriptor oldState, BackupDataOutput data, ParcelFileDescriptor newState) throws IOException {
+        Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() begin");
         settingsManager = new SettingsManager(this);
         String sharedPrefsPath = Tools.getSharedPrefDir(this) + "/" + "GTalkSMS.xml";
         File mDataFile = new File(sharedPrefsPath);
@@ -66,8 +68,9 @@ public class MyBackupAgent extends BackupAgent {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onRestore(BackupDataInput data, int appVersionCode, ParcelFileDescriptor newState) throws IOException {
+    public void onRestore(BackupDataInput data, int appVersionCode, ParcelFileDescriptor newState) throws IOException {        
         settingsManager = new SettingsManager(this);
+        Log.i(Tools.LOG_TAG, "MyBackupAgent onRestore() - starting to restore saved preferences");
         Class cls;
         try {
             cls = Class.forName("com.googlecode.gtalksms.SettingsManager");
@@ -124,6 +127,7 @@ public class MyBackupAgent extends BackupAgent {
     
     @SuppressWarnings("unchecked")
     private void writeData(BackupDataOutput data) {
+        Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() new data found - starting backup");
         Class cls;
         try {
             cls = Class.forName("com.googlecode.gtalksms.SettingsManager");

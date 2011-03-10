@@ -59,6 +59,7 @@ public class MainService extends Service {
     public final static String ACTION_NETWORK_CHANGED = "com.googlecode.gtalksms.action.NETWORK_CHANGED";
     public final static String ACTION_SMS_SENT = "com.googlecode.gtalksms.action.SMS_SENT";
     public final static String ACTION_SMS_DELIVERED = "com.googlecode.gtalksms.action.SMS_DELIVERED";
+    public final static String ACTION_WIDGET_ACTION = "com.googlecode.gtalksms.action.widget.ACTION";
     
     // A list of intent actions that the XmppManager broadcasts.
     static final public String ACTION_XMPP_MESSAGE_RECEIVED = "com.googlecode.gtalksms.action.XMPP.MESSAGE_RECEIVED";

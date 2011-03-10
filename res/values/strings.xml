@@ -107,6 +107,7 @@
     <string name="chat_error_unknown_cmd">\'%s\': unknown command. Send \"?\" for get help.</string>
     <string name="chat_error">Error: %s</string>
     <string name="chat_error_root">Can\'t have root access!</string>
+    <string name="chat_error_unkown_name">Contact name is not known or not distinct</string>
     <string name="chat_reply_contact">Reply contact is %s</string>
     <string name="chat_start_locating">Start locating phone</string>
     <string name="chat_start_ringing">Ringing phone</string>
@@ -147,7 +148,7 @@
     <string name="chat_help_calls">- %s: display call log.</string>
     <string name="chat_help_contact">- %s: display informations of a searched contact.</string>
     <string name="chat_help_geo">- %s: Open Maps or Navigation or Street view on specific address.</string>
-    <string name="chat_help_where">- %1$s: sends you google map updates about the location of the phone until you send %2$s.</string>
+    <string name="chat_help_where">- %1$s: sends you Google Maps/OSM updates about the location of the phone until you send %2$s.</string>
     <string name="chat_help_ring">- %1$s or %2$s: rings the phone until you send %3$s. Volume between 0 and 100, 0 to vibrate.</string>
     <string name="chat_help_copy">- %s: copy text to clipboard or sent phone clipboard if text is empty.</string>
     <string name="chat_help_cmd">- %s: execute shell instruction with root access if possible.</string>
@@ -201,4 +202,9 @@
     <string name="chat_del_sms_from">Deleting SMS from %s.</string>
     <string name="chat_del_sms_nb">%d SMS deleted.</string>
     <string name="chat_del_sms_error">Can\'t delete SMS.</string>
+    <string name="chat_alias_add_by_number">Added alias \'%1$s\' with number %2$s</string>
+    <string name="chat_alias_add_by_name">Added alias \'%1$s\' for %2$s with number %3$s</string>
+    <string name="chat_alias_del_suc">Deleted alias \'%1$s\' successfully</string>
+    <string name="chat_alias_del_fail">Deletion of \'%1$s\' failed</string>
+    <string name="chat_alias_show_non_existent">Alias \'%1$s\' does not exists</string>
 </resources>

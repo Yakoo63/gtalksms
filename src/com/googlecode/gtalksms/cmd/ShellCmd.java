@@ -13,7 +13,6 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFont;
-import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class ShellCmd extends Command {
     Handler _cmdHandler = new Handler();

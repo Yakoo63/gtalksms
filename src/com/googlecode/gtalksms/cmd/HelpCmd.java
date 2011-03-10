@@ -8,14 +8,16 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class HelpCmd extends Command {
-    private XmppMsg _msg = new XmppMsg();  // brief help message
-    private XmppMsg _msgAll = new XmppMsg();  // full help message    
+    private XmppMsg _msg;  // brief help message
+    private XmppMsg _msgAll;   // full help message    
     private Map<String, Command> commands;
     
     public HelpCmd(MainService mainService) {
         super(mainService, new String[] {"?", "help"});
         commands = mainService.getCommands();
         Set<Command> commandSet = mainService.getCommandSet();
+        _msg = new XmppMsg();
+        _msgAll = new XmppMsg();
         
         _msg.appendLine(getString(R.string.chat_help_title));
         _msg.appendLine(getString(R.string.chat_help_help, makeBold("\"?\""), makeBold("\"help\"")));
