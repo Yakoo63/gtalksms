@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pref_app">Application settings</string>
+    <string name="pref_app_advanced">Advanced settings</string>
     <string name="pref_app_auto_start_options">Auto-start options</string>
     <string name="pref_app_auto_stop_options">Auto-stop options</string>
     <string name="pref_app_start_at_boot">At boot</string>

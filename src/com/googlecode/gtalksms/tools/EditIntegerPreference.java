@@ -5,7 +5,7 @@ import android.preference.EditTextPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 
-/** Used to put an integer in the preferences string (for server port)*/
+/** Used to put an integer in the preferences string (e.g. for server port)*/
 
 public class EditIntegerPreference extends EditTextPreference {
 	

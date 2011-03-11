@@ -36,11 +36,7 @@
             android:key="showStatusIcon"
             android:title="@string/pref_app_show_status_icon"
             android:summary="@string/pref_app_show_status_icon_help"/>
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="formatResponses"
-            android:title="@string/pref_app_format_responses"
-            android:summary="@string/pref_app_format_responses_help"/>
+        
         <PreferenceScreen android:title="@string/pref_app_geo_link_app">
               <CheckBoxPreference
                 android:defaultValue="true"
@@ -54,32 +50,43 @@
                 android:summary="@string/pref_app_geo_link_app_openstreetmap_help"/>
         </PreferenceScreen>
         <com.googlecode.gtalksms.tools.EditIntegerPreference
-            android:title="@string/pref_app_sms_number" android:key="smsNumber" android:numeric="integer" android:defaultValue="5" android:summary="@string/pref_app_sms_number_help"/>
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="showSentSms"
-            android:title="@string/pref_app_show_sent_sms"
-            android:summary="@string/pref_app_show_sent_sms_help"/>
-        <com.googlecode.gtalksms.tools.EditIntegerPreference
-            android:numeric="integer" 
-            android:summary="@string/pref_app_call_logs_number_help" 
-            android:defaultValue="10" 
-            android:key="callLogsNumber" 
-            android:title="@string/pref_app_call_logs_number"/>
+            android:summary="@string/pref_app_sms_number_help" android:key="smsNumber" android:title="@string/pref_app_sms_number" android:defaultValue="5" android:numeric="integer"/> 
         <RingtonePreference
             android:key="ringtone"
             android:title="@string/pref_app_ringtone"
             android:summary="@string/pref_app_ringtone_help"/>
-        <ListPreference 
-            android:key="locale" 
-            android:title="@string/pref_app_locale" 
-            android:summary="@string/pref_app_locale_help" 
-            android:entryValues="@array/list_locale_entryValues" 
-            android:entries="@array/list_locale_entries" 
-            android:defaultValue="default"/>
-        <CheckBoxPreference 
-            android:key="debugLog" 
-            android:title="@string/pref_app_enable_debug" 
-            android:summary="@string/pref_app_enable_debug_help" 
-            android:defaultValue="false"/>
+        <PreferenceScreen android:title="@string/pref_app_advanced">
+            <CheckBoxPreference 
+                android:key="debugLog" 
+                android:title="@string/pref_app_enable_debug" 
+                android:summary="@string/pref_app_enable_debug_help" 
+                android:defaultValue="false" />
+            <ListPreference 
+                android:key="locale" 
+                android:title="@string/pref_app_locale" 
+                android:summary="@string/pref_app_locale_help" 
+                android:entryValues="@array/list_locale_entryValues" 
+                android:entries="@array/list_locale_entries" 
+                android:defaultValue="default" />
+            <CheckBoxPreference 
+                android:defaultValue="false" 
+                android:key="formatResponses" 
+                android:title="@string/pref_app_format_responses" 
+                android:summary="@string/pref_app_format_responses_help" />
+            <CheckBoxPreference 
+                android:defaultValue="false" 
+                android:key="showSentSms" 
+                android:title="@string/pref_app_show_sent_sms" 
+                android:summary="@string/pref_app_show_sent_sms_help" />
+            <com.googlecode.gtalksms.tools.EditIntegerPreference 
+                android:summary="@string/pref_app_call_logs_number_help" 
+                android:defaultValue="10" android:key="callLogsNumber" 
+                android:title="@string/pref_app_call_logs_number" 
+                android:numeric="integer"/>
+            <CheckBoxPreference 
+                android:key="smsReplySeparate" 
+                android:title="@string/pref_notif_sms_separate" 
+                android:summary="@string/pref_notif_sms_separate_help" 
+                android:defaultValue="false"/>
+        </PreferenceScreen>
 </PreferenceScreen>

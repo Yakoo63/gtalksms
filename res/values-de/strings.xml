@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pref_app">GTalkSMS Einstellungen</string>
+    <string name="pref_app_advanced">Erweiterte Einstellungen</string>    
     <string name="pref_app_auto_start_options">Auto-Start Optionen</string>
     <string name="pref_app_auto_stop_options">Auto-Stop Optionen</string>
     <string name="pref_app_start_at_boot">Bei Systemstart</string>
