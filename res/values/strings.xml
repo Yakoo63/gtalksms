@@ -45,6 +45,8 @@
     <string name="pref_con_login_help">Login used by the phone</string>
     <string name="pref_con_password">Password</string>
     <string name="pref_con_password_help">Enter your GMail password or the password used by the phone to connect</string>
+    <string name="pref_con_securityMode">Connection Encryption</string>
+    <string name="pref_con_securityMode_help">Enable or Disable the connection encryption</string>
     <string name="pref_con_server_settings">Server settings</string>
     <string name="pref_con_server_host">Server host</string>
     <string name="pref_con_server_host_help">Server host used by the phone</string>

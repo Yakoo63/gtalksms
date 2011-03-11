@@ -45,7 +45,13 @@
             android:defaultValue="false"
             android:summary="@string/pref_con_use_compression_help" 
             android:title="@string/pref_con_use_compression"/>
-    </PreferenceCategory>
+        <ListPreference 
+            android:key="xmppSecurityMode" 
+            android:entries="@array/list_xmppConnectionSecurity_entries" 
+            android:entryValues="@array/list_xmppConnectionSecurity_entryValues" 
+            android:title="@string/pref_con_securityMode" 
+            android:summary="@string/pref_con_securityMode_help" />
+</PreferenceCategory>
     <PreferenceScreen
         android:title="@string/pref_con_server_settings">
         <EditTextPreference

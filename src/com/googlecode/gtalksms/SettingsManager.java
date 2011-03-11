@@ -21,6 +21,10 @@ import com.googlecode.gtalksms.tools.Tools;
  *
  */
 public class SettingsManager {
+    public static final int XMPPSecurityDisabled = 1;
+    public static final int XMPPSecurityRequired = 2;
+    public static final int XMPPSecurityOptional = 3;
+    
     // XMPP connection
     public String serverHost;
     public String serviceName;
@@ -33,6 +37,9 @@ public class SettingsManager {
     public String roomPassword;
     public String mucServer;
     public boolean useCompression;
+    public String xmppSecurityMode;
+    public int xmppSecurityModeInt;
+
     
     // notifications
     public boolean notifyApplicationConnection;
@@ -124,6 +131,14 @@ public class SettingsManager {
             login = _sharedPreferences.getString("login", "");
         } else{
             login = notifiedAddress;
+        }
+        xmppSecurityMode = _sharedPreferences.getString("xmppSecurityMode", "opt");
+        if(xmppSecurityMode.equals("req")) {
+            xmppSecurityModeInt = XMPPSecurityRequired;
+        } else if (xmppSecurityMode.equals("dis")) {
+            xmppSecurityModeInt = XMPPSecurityDisabled;
+        } else {
+            xmppSecurityModeInt = XMPPSecurityOptional;
         }
         useCompression = _sharedPreferences.getBoolean("useCompression", false);
         

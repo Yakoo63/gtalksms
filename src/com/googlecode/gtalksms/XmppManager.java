@@ -312,6 +312,18 @@ public class XmppManager {
         conf.setTruststorePath("/system/etc/security/cacerts.bks");
         conf.setTruststorePassword("changeit");
         conf.setTruststoreType("bks");
+        switch (_settings.xmppSecurityModeInt) {
+            case SettingsManager.XMPPSecurityOptional:
+                conf.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
+                break;
+            case SettingsManager.XMPPSecurityRequired:
+                conf.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
+                break;
+            case SettingsManager.XMPPSecurityDisabled:
+            default:
+                conf.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+                break;            
+        }
         if(_settings.useCompression) conf.setCompressionEnabled(true); 
         
         XMPPConnection connection = new XMPPConnection(conf);

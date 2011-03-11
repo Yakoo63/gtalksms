@@ -45,6 +45,8 @@
     <string name="pref_con_login_help">Login des GTalkSMS Accounts (vollständige JID)</string>
     <string name="pref_con_password">Passwort</string>
     <string name="pref_con_password_help">GMail (oder XMPP) Passwort </string>
+    <string name="pref_con_securityMode">Verbindungsverschlüsselung</string>
+    <string name="pref_con_securityMode_help">Aktiviert oder deaktiviert die Verschlüsselung der Verbindung</string>
     <string name="pref_con_server_settings">Server Einstellungen</string>
     <string name="pref_con_server_host">Server Host</string>
     <string name="pref_con_server_host_help">Hostname des XMPP Servers</string>
