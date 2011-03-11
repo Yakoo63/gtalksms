@@ -120,7 +120,7 @@ public class XmppManager {
                 updateStatus(initialState);
                 break;
             default:
-                throw new IllegalStateException("Invalid State: " + initialState);
+                throw new IllegalStateException("xmppMgr start() Invalid State: " + initialState);
         }
     }
     
@@ -168,7 +168,7 @@ public class XmppManager {
                 start();
                 break;
             default:
-                throw new IllegalStateException("unexpected current state when moving to connected: " + currentState);
+                throw new IllegalStateException("xmppRequestStateChange() unexpected current state when moving to connected: " + currentState);
             }
             break;
         case XmppManager.DISCONNECTED:
@@ -186,11 +186,11 @@ public class XmppManager {
             case XmppManager.WAITING_TO_CONNECT:
                 break;
             default:
-                throw new IllegalStateException("unexpected current state when moving to waiting: " + currentState);
+                throw new IllegalStateException("xmppRequestStateChange() xmppRequestStateChangeunexpected current state when moving to waiting: " + currentState);
             }
             break;
         default:
-            throw new IllegalStateException("invalid state to switch to: "+newState);
+            throw new IllegalStateException("xmppRequestStateChange() invalid state to switch to: " + newState);
         }
         // Now we have requested a new state, our state receiver will see when
         // the state actually changes and update everything accordingly.
@@ -446,7 +446,7 @@ public class XmppManager {
             // see issue 126 for an example where this happens
             GoogleAnalyticsHelper.trackAndLogError("xmppMgr onConnectionComplete()", e);
             if (!_connection.isConnected()) {
-                _connection.removeConnectionListener(_connectionListener);
+                stop();
                 maybeStartReconnect();
             } else {
                 throw new IllegalStateException(e);
