@@ -225,7 +225,7 @@ public class MainService extends Service {
             if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc)
                 from = null;
             executeCommand(cmd, args, from);
-        } else {
+        } else if(!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {            
             GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
         if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "handled action '" + action + "' - state now " + getConnectionStatus());
