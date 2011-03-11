@@ -13,8 +13,22 @@ import com.googlecode.gtalksms.MainService;
 
 
 public class SmsReceiver extends BroadcastReceiver {
-
-    public static Map<String, String> RetrieveMessages(Intent intent) {
+    
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
+        // However, send long SMS of same sender in one message
+        Map<String, String> msg = RetrieveMessages(intent);
+        
+        // Finally, send all SMS via XMPP by sender
+        for(String sender : msg.keySet()) {
+            Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
+            svcintent.putExtra("sender", sender);
+            context.startService(svcintent);
+        }
+    }
+    
+    private static Map<String, String> RetrieveMessages(Intent intent) {
         Map<String, String> msg = new HashMap<String, String>();
         Bundle bundle = intent.getExtras();
         SmsMessage[] msgs = null;
@@ -45,19 +59,5 @@ public class SmsReceiver extends BroadcastReceiver {
         }
         
         return msg;
-    }
-    
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
-        // However, send long SMS of same sender in one message
-        Map<String, String> msg = RetrieveMessages(intent);
-        
-        // Finally, send all SMS via XMPP by sender
-        for(String sender : msg.keySet()) {
-            Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
-            svcintent.putExtra("sender", sender);
-            context.startService(svcintent);
-        }
     }
 }

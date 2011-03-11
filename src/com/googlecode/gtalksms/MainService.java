@@ -407,6 +407,7 @@ public class MainService extends Service {
     }
     
     public void executeCommand(String cmd, String args, String answerTo) {
+        // TODO should we check here if cmd == null and return?
         if (_commands.containsKey(cmd)) {
             _commands.get(cmd).execute(cmd, args, answerTo);
         } else {
@@ -465,7 +466,7 @@ public class MainService extends Service {
      * @param to = the receiving JID, if null the default notification address is used
      */
     public void send(String msg, String to) {
-        _xmppMgr.send(new XmppMsg(msg), to);
+       send(new XmppMsg(msg), to);
     }
     
     /**
@@ -593,6 +594,7 @@ public class MainService extends Service {
             cmd.cleanUp();
         }
         _commands.clear();
+        _commandSet.clear();
     }
     
     /**

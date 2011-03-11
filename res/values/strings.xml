@@ -39,7 +39,7 @@
     <string name="pref_con_cat">Connection settings</string>
     <string name="pref_con_use_different_account">Use a different account</string>
     <string name="pref_con_use_different_account_help">Check if you want the phone to connect from a different account</string>
-    <string name="pref_con_use_compression">Compress Connection</string>
+    <string name="pref_con_use_compression">Compress Connection Data</string>
     <string name="pref_con_use_compression_help">Enable compression of the XMPP Connection</string>
     <string name="pref_con_login">Login</string>
     <string name="pref_con_login_help">Login used by the phone</string>
@@ -157,8 +157,12 @@
     <string name="chat_help_ringmode">- %s: With mode=(normal|silent|vibrate) Set ringer mode. Shows the actual mode if no argument is given.</string>    
     <string name="chat_help_del_sms_all">- %s: Delete all SMS without confirmation!</string>    
     <string name="chat_help_del_sms_sent">- %s: Delete all sent SMS without confirmation!</string>    
-    <string name="chat_help_del_sms_last">- %1$s or %2$s or %3$s : Delete last [number] SMS, 1 by default.</string>    
-    <string name="chat_help_del_sms_contact">- %s: Delete all SMS in the thread of the specified contact without confirmation!</string>    
+    <string name="chat_help_del_sms_last">- %1$s or %2$s or %3$s: Delete last [number] SMS, 1 by default.</string>    
+    <string name="chat_help_del_sms_contact">- %s: Delete all SMS in the thread of the specified contact without confirmation!</string>
+    <string name="chat_help_alias_general">%1$s: Allows the creation/manipulation of permanent aliases, that can be use anywhere within GTalkSMS where otherwise a number of full name would be required</string>
+    <string name="chat_help_alias_add">- %1$s: Adds or updates an alias for a given contact or number.</string>
+    <string name="chat_help_alias_del">- %1$s: Deletes the specified alias.</string>
+    <string name="chat_help_alias_show">- %1$s: Shows the alias information. If #aliasname# is \"all\", every known alias will be presented.</string>    
     <string name="chat_call_unknown">Unknown</string>
     <string name="chat_call_incoming">Incoming</string>
     <string name="chat_call_outgoing">Outgoing</string>
@@ -207,4 +211,5 @@
     <string name="chat_alias_del_suc">Deleted alias \'%1$s\' successfully</string>
     <string name="chat_alias_del_fail">Deletion of \'%1$s\' failed</string>
     <string name="chat_alias_show_non_existent">Alias \'%1$s\' does not exists</string>
+    <string name="chat_alias_empty">No aliases set</string>
 </resources>

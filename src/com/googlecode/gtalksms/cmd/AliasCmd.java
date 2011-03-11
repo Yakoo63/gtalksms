@@ -64,34 +64,43 @@ public class AliasCmd extends Command {
     
     private void show(String[] subCommand) {
         if (subCommand[1].equals("all")) {
-            XmppMsg msg = new XmppMsg();
             String[][] aliases = aliasHelper.getAllAliases();
-            for (int i = 0; i < aliases.length; i++) {
-                msg.appendBold("Alias: " + aliases[i][0] + " ");
-                if (aliases[i][2] == null) {
-                    msg.appendLine(aliases[i][1]);
-                } else {
-                    msg.append(aliases[i][1] + " - ");
-                    msg.appendLine(aliases[i][2]);
+            if (aliases == null) {
+                send(getString(R.string.chat_alias_empty));
+            } else {
+                XmppMsg msg = new XmppMsg();
+                for (int i = 0; i < aliases.length; i++) {
+                    msg.appendBold("Alias: " + aliases[i][0] + " ");
+                    if (aliases[i][2] == null) {
+                        msg.appendLine(aliases[i][1]);
+                    } else {
+                        msg.append(aliases[i][1] + " - ");
+                        msg.appendLine(aliases[i][2]);
+                    }
                 }
+                send(msg);
             }
-            send(msg);
         } else {
             String[] res = aliasHelper.getAliasOrNull(subCommand[1]);
-            if(res == null) {
+            if (res == null) {
                 send(getString(R.string.chat_alias_show_non_existent, subCommand[1]));
-            } else if (res.length == 2){
+            } else if (res.length == 2) {
                 send("\'" + res[0] + "\' -> " + res[1]);
             } else {
-                send("\'" + res[0] + "\' - " + res[2] +" -> " + res[1]);
+                send("\'" + res[0] + "\' - " + res[2] + " -> " + res[1]);
             }
         }
     }
 
     @Override
     public String[] help() {
-        // TODO Auto-generated method stub
-        return null;
+        String[] s = {
+                getString(R.string.chat_help_alias_general, makeBold("\"alias:subCommand:argument")),
+                getString(R.string.chat_help_alias_add, makeBold("\"alias:add:#aliasname#:#contact#")),
+                getString(R.string.chat_help_alias_show, makeBold("\"alias:show:#aliasname#\"")),
+                getString(R.string.chat_help_alias_del, makeBold("\"alias:del:#aliasname#\""))
+        };
+        return s;
     }
 
 }

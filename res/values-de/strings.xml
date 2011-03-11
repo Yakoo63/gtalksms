@@ -159,6 +159,10 @@
     <string name="chat_help_del_sms_sent">- %s: Lösche alle gesendeten SMS Nachrichten ohne Nachfrage!</string>
     <string name="chat_help_del_sms_last">- %1$s oder %2$s oder %3$s : Löscht letzten [number] SMS. Ohne Angabe einer Wertes wird nur die letzte gelöscht.</string>
     <string name="chat_help_del_sms_contact">- %s: Lösche alle SMS Nachrichten an und von dem gewählen Kontakt ohne Nachfrage!</string>
+    <string name="chat_help_alias_general">%1$s: Ermöglicht die erzeugung und aktualisierung von Aliasen, welche anstatt Namen oder Nummern verwendet werden können</string>
+    <string name="chat_help_alias_add">- %1$s: Erzeugt oder aktulalisiert einen neuen Alias.</string>
+    <string name="chat_help_alias_del">- %1$s: Löscht den Alias.</string>
+    <string name="chat_help_alias_show">- %1$s: Zeigt die Informationen über den Alias an. Fall #aliasname# gleich \"all\", werden alle bekannten Aliases ausgegeben.</string>   
     <string name="chat_call_unknown">Unbekannt</string>
     <string name="chat_call_incoming">Eingehender Anruf</string>
     <string name="chat_call_outgoing">Ausgehender Anruf</string>
@@ -202,9 +206,10 @@
     <string name="chat_del_sms_from">Lösche SMS Nachrichten von %s.</string>
     <string name="chat_del_sms_nb">%d SMS Nachricht(n) gelöscht.</string>
     <string name="chat_del_sms_error">SMS Nachrichten(n) konnte(n) nicht gelöscht werden.</string>
-    <string name="chat_alias_add_by_number">Alias \'%1$s\' mit Telefonnummer %2$s gespeichert</string>
-    <string name="chat_alias_add_by_name">Alias \'%1$s\' für %2$s mit Telefonnummer %3$s gespeichert</string>
-    <string name="chat_alias_del_suc">Alias \'%1$s\' erfoglreicht gelöscht</string>
-    <string name="chat_alias_del_fail">Löschen von \'%1$s\' nicht erfolgreich</string>
-    <string name="chat_alias_show_non_existent">Alias \'%1$s\' exsistiert nicht</string>
+    <string name="chat_alias_add_by_number">Alias \'%1$s\' mit Telefonnummer %2$s gespeichert.</string>
+    <string name="chat_alias_add_by_name">Alias \'%1$s\' für %2$s mit Telefonnummer %3$s gespeichert.</string>
+    <string name="chat_alias_del_suc">Alias \'%1$s\' erfoglreicht gelöscht.</string>
+    <string name="chat_alias_del_fail">Löschen von \'%1$s\' nicht erfolgreich.</string>
+    <string name="chat_alias_show_non_existent">Alias \'%1$s\' exsistiert nicht.</string>
+    <string name="chat_alias_empty">Keine Aliase gesetzt.</string>
 </resources>

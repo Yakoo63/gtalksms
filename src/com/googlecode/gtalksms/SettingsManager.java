@@ -16,7 +16,7 @@ import com.googlecode.gtalksms.tools.Tools;
  * 
  * In order to work flawlessly with the BackupAgent
  * ALL settings in SettingsManager have to be of the same type
- * as within the SharedPreferences backend AND they need to have
+ * as within the SharedPreferences back-end AND they need to have
  * the same name
  *
  */

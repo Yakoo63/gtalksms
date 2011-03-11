@@ -88,8 +88,17 @@ public class AliasHelper {
         return null;
     }
     
+    /**
+     * Returns the all known aliases
+     * or null if there are none
+     * 
+     * @return
+     */
     public String[][] getAllAliases() {
-        return AliasDatabase.getFullDatabase();
+        String[][] res = AliasDatabase.getFullDatabase();
+        if (res.length == 0)
+            res = null;
+        return res;
     }
     
     private void addOrUpdate(String aliasName, String number, String contactName) {
