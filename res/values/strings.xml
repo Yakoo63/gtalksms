@@ -32,6 +32,8 @@
     <string name="pref_app_geo_link_app_gmap_help">Use Google Maps as location map provider</string>
     <string name="pref_app_geo_link_app_openstreetmap">Open Street Map</string>
     <string name="pref_app_geo_link_app_openstreetmap_help">Use Open Street Map as location map provider</string>
+    <string name="pref_app_enable_debug">Debug Log</string>
+    <string name="pref_app_enable_debug_help">Enabled debug log messages, increases log verbosity</string>    
     <string name="pref_con">Connection settings</string>
     <string name="pref_con_notified_address_cat">Address to notify</string>
     <string name="pref_con_notified_address">Address to notify</string>
@@ -75,6 +77,10 @@
     <string name="pref_notif_sms_sent_help">SMS sent notification</string>
     <string name="pref_notif_sms_delivered">SMS delivered</string>
     <string name="pref_notif_sms_delivered_help">SMS delivery notification</string>
+    <string name="pref_notif_sms_separate">Separate Messages for every SMS</string>
+    <string name="pref_notif_sms_separate_help">When reading SMS from GTalkSMS, sends for every SMS a new chat message</string>
+    <string name="pref_notif_sms_notifyInMuc">Status notifications to origin chat window</string>
+    <string name="pref_notif_sms_notifyInMuc_help">When using different chat windows, all status notifications will be send back to that window</string>    
     <string name="main_but_start_stop">Start/Stop</string>
     <string name="main_but_preferences">Preferences</string>
     <string name="main_but_send_clipboard">Send Clipboard</string>

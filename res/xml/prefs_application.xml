@@ -54,11 +54,7 @@
                 android:summary="@string/pref_app_geo_link_app_openstreetmap_help"/>
         </PreferenceScreen>
         <com.googlecode.gtalksms.tools.EditIntegerPreference
-            android:defaultValue="5" 
-            android:numeric="integer" 
-            android:summary="@string/pref_app_sms_number_help" 
-            android:key="smsNumber" 
-            android:title="@string/pref_app_sms_number"/>
+            android:title="@string/pref_app_sms_number" android:key="smsNumber" android:numeric="integer" android:defaultValue="5" android:summary="@string/pref_app_sms_number_help"/>
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="showSentSms"
@@ -81,4 +77,9 @@
             android:entryValues="@array/list_locale_entryValues" 
             android:entries="@array/list_locale_entries" 
             android:defaultValue="default"/>
+        <CheckBoxPreference 
+            android:key="debugLog" 
+            android:title="@string/pref_app_enable_debug" 
+            android:summary="@string/pref_app_enable_debug_help" 
+            android:defaultValue="false"/>
 </PreferenceScreen>

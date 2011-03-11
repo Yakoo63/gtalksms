@@ -47,4 +47,14 @@
         android:defaultValue="true"
         android:title="@string/pref_notif_sms_delivered"
         android:summary="@string/pref_notif_sms_delivered_help"/>
+    <CheckBoxPreference 
+        android:key="smsReplySeparate" 
+        android:title="@string/pref_notif_sms_separate" 
+        android:summary="@string/pref_notif_sms_separate_help" 
+        android:defaultValue="false"/>
+    <CheckBoxPreference 
+        android:key="notifyInMuc" 
+        android:title="@string/pref_notif_sms_notifyInMuc" 
+        android:summary="@string/pref_notif_sms_notifyInMuc" 
+        android:defaultValue="false"/>                    
 </PreferenceScreen>

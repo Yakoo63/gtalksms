@@ -33,6 +33,8 @@
     <string name="pref_app_geo_link_app_gmap_help">Google Maps Link</string>
     <string name="pref_app_geo_link_app_openstreetmap">Open Street Map</string>
     <string name="pref_app_geo_link_app_openstreetmap_help">Open Street Map Link</string>
+    <string name="pref_app_enable_debug">Debug Log</string>
+    <string name="pref_app_enable_debug_help">Aktiviert debug log</string>    
     <string name="pref_con_notified_address_cat">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address_help">Eigene GMail (oder XMPP JID) eingeben</string>
@@ -75,6 +77,10 @@
     <string name="pref_notif_sms_sent_help">Benachrichtigung bei versendeter SMS</string>
     <string name="pref_notif_sms_delivered">Zugestellte SMS</string>
     <string name="pref_notif_sms_delivered_help">Benachrichtigung bei erfolgreicher Zustellung der SMS</string>
+    <string name="pref_notif_sms_separate">Pro SMS eine neue Nachricht</string>
+    <string name="pref_notif_sms_separate_help">Jede SMS wird als eigene Chat Nachricht gesendet</string>
+    <string name="pref_notif_sms_notifyInMuc">Statusmeldungen an Ursprungsdialog</string>
+    <string name="pref_notif_sms_notifyInMuc_help">Statusmeldungen werden, wenn möglich, an den Urpsungsdialog gesendet</string>       
     <string name="main_but_start_stop">Start/Stop</string>
     <string name="main_but_preferences">Einstellungen</string>
     <string name="main_but_send_clipboard">Sende Clipboard</string>

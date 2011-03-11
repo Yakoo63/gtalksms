@@ -69,7 +69,7 @@ public class SettingsManager {
     public boolean notifySmsInChatRooms;
     public boolean notifySmsInSameConversation;
     public boolean notifyInMuc;
-    public boolean smsReplySeperate;
+    public boolean smsReplySeparate;
     
     // calls
     public int callLogsNumber;
@@ -195,9 +195,9 @@ public class SettingsManager {
         	backupAgentAvailable = false;
         }
         
-        debugLog = true; // TODO make this a preference
-        notifyInMuc = notifySmsInChatRooms; // TODO for testing purpose the same as notifySmsInChatRooms
-        smsReplySeperate = true; // TODO preference
+        debugLog = _sharedPreferences.getBoolean("debugLog", false);; 
+        notifyInMuc = _sharedPreferences.getBoolean("notifyInMuc", false);; 
+        smsReplySeparate = _sharedPreferences.getBoolean("smsReplySeparate", false);
         
     }
 }

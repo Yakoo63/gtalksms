@@ -552,7 +552,7 @@ public class SmsCmd extends Command {
         List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
         if (smsList.size() > 0) {
             XmppMsg message = new XmppMsg();
-            if(_settingsMgr.smsReplySeperate) {
+            if(_settingsMgr.smsReplySeparate) {
                 for (Sms sms : smsList) {
                     message.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
                     message.appendLine(sms.message);
