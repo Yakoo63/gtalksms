@@ -395,51 +395,62 @@ public class XmppManager {
 
     private void onConnectionComplete() {
         Log.v(Tools.LOG_TAG, "connection established");
-        
-        _xmppMuc.initialize(_connection);
-        _xmppBuddies.initialize(_connection);
-        _xmppFileMgr.initialize(_connection);
-               
-        _currentRetryCount = 0;
-        PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-        _packetListener = new PacketListener() {
-            public void processPacket(Packet packet) {
-                Message message = (Message) packet;
-                
-                if(_settings.debugLog) Log.d(Tools.LOG_TAG, "Xmpp packet received");
-                
-                String from = message.getFrom();                
-                if ( from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") && 
-                     !message.getFrom().equals(_connection.getUser())) {
-                    if (message.getBody() != null) {
-                        Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
-                        intent.putExtra("from", from);  // usually a full JID with resource
-                        intent.putExtra("message", message.getBody());
-                        intent.setClass(_context, MainService.class);
-                        _context.startService(intent);
+        try {
+            _xmppMuc.initialize(_connection);
+            _xmppBuddies.initialize(_connection);
+            _xmppFileMgr.initialize(_connection);
+
+            _currentRetryCount = 0;
+            PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
+            _packetListener = new PacketListener() {
+                public void processPacket(Packet packet) {
+                    Message message = (Message) packet;
+
+                    if (_settings.debugLog)
+                        Log.d(Tools.LOG_TAG, "Xmpp packet received");
+
+                    String from = message.getFrom();
+                    if (from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") && !message.getFrom().equals(_connection.getUser())) {
+                        if (message.getBody() != null) {
+                            Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+                            intent.putExtra("from", from); // usually a full JID
+                                                           // with resource
+                            intent.putExtra("message", message.getBody());
+                            intent.setClass(_context, MainService.class);
+                            _context.startService(intent);
+                        }
                     }
                 }
+            };
+            _connection.addPacketListener(_packetListener, filter);
+            updateStatus(CONNECTED);
+            // Send welcome message
+            if (_settings.notifyApplicationConnection) {
+                send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);
             }
-        };
-        _connection.addPacketListener(_packetListener, filter);
-        updateStatus(CONNECTED);
-        // Send welcome message
-        if (_settings.notifyApplicationConnection) {
-            send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);
-        }
-        
-        // Manage Xmpp presence status
-        Presence presence = new Presence(Presence.Type.available);
-        presence.setStatus(_presenceMessage);
-        presence.setPriority(24);
-        _connection.sendPacket(presence);
-        
-        try {
-            _connection.getRoster().addRosterListener(_xmppBuddies);
-            _connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
-            _xmppBuddies.retrieveFriendList();
-        } catch (Exception ex) {
-            Log.e(Tools.LOG_TAG, "Failed to setup Xmpp Friend list roster.", ex);
+
+            // Manage Xmpp presence status
+            Presence presence = new Presence(Presence.Type.available);
+            presence.setStatus(_presenceMessage);
+            presence.setPriority(24);
+            _connection.sendPacket(presence);
+
+            try {
+                _connection.getRoster().addRosterListener(_xmppBuddies);
+                _connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
+                _xmppBuddies.retrieveFriendList();
+            } catch (Exception ex) {
+                Log.e(Tools.LOG_TAG, "Failed to setup Xmpp Friend list roster.", ex);
+            }
+        } catch (Exception e) {
+            // see issue 126 for an example where this happens
+            GoogleAnalyticsHelper.trackAndLogError("xmppMgr onConnectionComplete()", e);
+            if (!_connection.isConnected()) {
+                _connection.removeConnectionListener(_connectionListener);
+                maybeStartReconnect();
+            } else {
+                throw new IllegalStateException(e);
+            }
         }
     }
     
