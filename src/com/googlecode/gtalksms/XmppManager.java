@@ -49,6 +49,7 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.util.Log;
 
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XHTMLExtensionProvider;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
@@ -224,9 +225,19 @@ public class XmppManager {
         t.start();
     }
 
-    /** Updates the status about the service state (and the statusbar)*/
-    public static void broadcastStatus(Context ctx, int old_state, int new_state) {  // TODO remove the context in the signature
-        Intent intent = new Intent(MainService.ACTION_XMPP_CONNECTION_CHANGED);                       // and use the one in the class field
+    /**
+     * Updates the status about the service state (and the statusbar)
+     * by sending an ACTION_XMPP_CONNECTION_CHANGED intent with the new
+     * and old state.
+     * needs to be static, because its called by MainService even when
+     * xmppMgr is not created yet
+     * 
+     * @param ctx
+     * @param old_state
+     * @param new_state
+     */
+    public static void broadcastStatus(Context ctx, int old_state, int new_state) {  
+        Intent intent = new Intent(MainService.ACTION_XMPP_CONNECTION_CHANGED);                      
         intent.putExtra("old_state", old_state);
         intent.putExtra("new_state", new_state);
         if(new_state == CONNECTED) {
@@ -235,7 +246,13 @@ public class XmppManager {
         }
         ctx.sendBroadcast(intent);
     }
-
+    
+    /**
+     * updates the connection status
+     * and calls broadCastStatus()
+     * 
+     * @param status
+     */
     private void updateStatus(int status) {
         if (status != _status) {
             // ensure _status is set before broadcast, just in-case
@@ -251,7 +268,7 @@ public class XmppManager {
     private void maybeStartReconnect() {
         if (_currentRetryCount > 5) {
             // we failed after all the retries - just die.
-            Log.v(Tools.LOG_TAG, "maybeStartReconnect ran out of retrys");
+            GoogleAnalyticsHelper.trackAndLogWarning("maybeStartReconnect ran out of retrys");
             stop(); // will set state to DISCONNECTED.
             return;
         } else {
@@ -273,8 +290,10 @@ public class XmppManager {
         // case for when the thread-id is zero...)
         if (_myThreadId==0)
             _myThreadId = Thread.currentThread().getId();
-        else if (_myThreadId != Thread.currentThread().getId())
+        else if (_myThreadId != Thread.currentThread().getId()) {
+            GoogleAnalyticsHelper.trackAndLogError("XmppMgr initConnection() - IllegalThreadStateException");
             throw new IllegalThreadStateException();
+        }
         if (_connection != null) {
             return;
         }
@@ -330,21 +349,16 @@ public class XmppManager {
         _connectionListener = new ConnectionListener() {
             @Override
             public void connectionClosed() {
-                // This should never happen - we always remove the listener before
-                // actually disconnecting - so something strange would be going on
-                // for this to happen - but sure enough, something strange can go on :)
-                // See issue 37 for one report where we see this - so we attempt
-                // auto-reconnect just like in an explicit error case.
-                Log.w(Tools.LOG_TAG, "xmpp got an unexpected normal disconnection");
+                // connection was closed by the foreign host
                 stop();
                 maybeStartReconnect();
             }
 
             @Override
-            public void connectionClosedOnError(Exception arg0) {
+            public void connectionClosedOnError(Exception e) {
                 // this is "unexpected" - our main service still thinks it has a 
                 // connection.
-                Log.w(Tools.LOG_TAG, "xmpp disconnected due to error: " + arg0.toString());
+                GoogleAnalyticsHelper.trackAndLogError("xmpp disconnected due to error", e);
                 // We update the state to disconnected (mainly to cleanup listeners etc)
                 // then schedule an automatic reconnect.
                 stop();

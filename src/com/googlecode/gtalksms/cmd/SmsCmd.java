@@ -543,7 +543,6 @@ public class SmsCmd extends Command {
     private void readLastSMS() {
 
         ArrayList<Sms> smsArrayList = _smsMgr.getAllReceivedSms();
-        XmppMsg allSms = new XmppMsg();
 
         if (_settingsMgr.showSentSms) {
             smsArrayList.addAll(_smsMgr.getAllSentSms());
@@ -552,14 +551,24 @@ public class SmsCmd extends Command {
 
         List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
         if (smsList.size() > 0) {
-            for (Sms sms : smsList) {
-                allSms.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                allSms.appendLine(sms.message);
+            XmppMsg message = new XmppMsg();
+            if(_settingsMgr.smsReplySeperate) {
+                for (Sms sms : smsList) {
+                    message.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
+                    message.appendLine(sms.message);
+                    send(message);
+                    message = new XmppMsg();
+                }   
+            } else {
+                for (Sms sms : smsList) {
+                    message.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
+                    message.appendLine(sms.message);
+                } 
+                send(message);
             }
         } else {
-            allSms.appendLine(getString(R.string.chat_no_sms));
+            send(getString(R.string.chat_no_sms));
         }
-        send(allSms);
     }
     
     public void setLastRecipient(String phoneNumber) {
