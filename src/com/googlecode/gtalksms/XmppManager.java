@@ -428,12 +428,7 @@ public class XmppManager {
             if (_settings.notifyApplicationConnection) {
                 send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);
             }
-
-            // Manage Xmpp presence status
-            Presence presence = new Presence(Presence.Type.available);
-            presence.setStatus(_presenceMessage);
-            presence.setPriority(24);
-            _connection.sendPacket(presence);
+            setStatus(_presenceMessage);
 
             try {
                 _connection.getRoster().addRosterListener(_xmppBuddies);
@@ -523,14 +518,18 @@ public class XmppManager {
     /**
      * Sets the XMPP presence status
      * @param status
+     * @return true if the presence could be set
      */
-    public void setStatus(String status) {
-        _presenceMessage = status;      
-        if (isConnected()) {
-            Presence presence = new Presence(Presence.Type.available);
-            presence.setStatus(_presenceMessage);
-            presence.setPriority(24);                   
+    public boolean setStatus(String status) {
+        _presenceMessage = status;
+        Presence presence = new Presence(Presence.Type.available);
+        presence.setStatus(_presenceMessage);
+        presence.setPriority(24);   
+        if (isConnected()) {                
             _connection.sendPacket(presence);
+            return true;
+        } else {
+            return false;
         }
     }
     
