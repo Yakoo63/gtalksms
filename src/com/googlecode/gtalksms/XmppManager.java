@@ -86,9 +86,7 @@ public class XmppManager {
     private int _currentRetryCount = 0;
     Runnable _reconnectRunnable = new Runnable() {
         public void run() {
-            if (_currentRetryCount > 0) {
-                Log.v(Tools.LOG_TAG, "attempting reconnection");
-            }
+            if (_settings.debugLog) Log.d(Tools.LOG_TAG, "attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
             _context.startService(MainService.newSvcIntent(_context, MainService.ACTION_CONNECT));
         }
     };
@@ -213,9 +211,10 @@ public class XmppManager {
             private XMPPConnection _x;
             public void run() {
                 try {
-                    _x.disconnect();
+                    if (_x.isConnected())
+                        _x.disconnect();
                 } catch (Exception e2) {
-                    Log.e(Tools.LOG_TAG, "xmpp disconnect failed: " + e2);
+                    GoogleAnalyticsHelper.trackAndLogWarning("xmpp disconnect failed" + e2);
                 }
             }
         }
@@ -260,7 +259,8 @@ public class XmppManager {
             // delivery.
             int old = _status;
             _status = status;
-            Log.v(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status);
+            if(_settings.debugLog)
+                Log.d(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status + "via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
             broadcastStatus(_context, old, status);
         }
     }
@@ -276,7 +276,7 @@ public class XmppManager {
             updateStatus(WAITING_TO_CONNECT);
             // a simple linear-backoff strategy.
             int timeout = 5000 * _currentRetryCount;
-            Log.i(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
+            if (_settings.debugLog) Log.d(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
             _reconnectHandler.postDelayed(_reconnectRunnable, timeout);
         }
     }
@@ -330,7 +330,7 @@ public class XmppManager {
         try {
             connection.connect();
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "xmpp connection failed: " + e);
+            Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
             Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_connection_failed));
             maybeStartReconnect();
             return;
@@ -394,7 +394,7 @@ public class XmppManager {
     }
 
     private void onConnectionComplete() {
-        Log.v(Tools.LOG_TAG, "connection established");
+        Log.i(Tools.LOG_TAG, "connection established");
         try {
             _xmppMuc.initialize(_connection);
             _xmppBuddies.initialize(_connection);
@@ -478,6 +478,13 @@ public class XmppManager {
      */
     public boolean send(XmppMsg message, String to) {
         if (isConnected()) {
+            if (_settings.debugLog) {
+                if (to == null) {
+                    Log.d(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\"");
+                } else {
+                    Log.d(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\" to " + to);
+                }
+            }
             Message msg;
             MultiUserChat muc = null;
             if (to == null) {
@@ -492,7 +499,7 @@ public class XmppManager {
             } else {
                 msg.setBody(message.generateTxt());
             }
-          //TODO does not work, should check if XHTML is enabled on receiver side. jid with resource? asmack problem?
+          // TODO does not work, should check if XHTML is enabled on receiver side. jid with resource? asmack problem?
 //            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) { 
                 String xhtmlBody = message.generateXHTMLText().toString();
                 xhtmlBody = xhtmlBody.replace("<br>", "<br/>");  //fix for smackx problem
@@ -511,6 +518,8 @@ public class XmppManager {
             }            
             return true;
         } else {
+            if (_settings.debugLog)
+                Log.d(Tools.LOG_TAG, "Not sending message \"" + message.toShortString() + "\" because we are not connected");
             return false;
         }
     }

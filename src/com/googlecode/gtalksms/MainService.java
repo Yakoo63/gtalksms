@@ -235,7 +235,7 @@ public class MainService extends Service {
             if (stopSelfResult(id) == true) {
                 if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
             } else {
-                if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "more pending intents to be delivered - service will not stop");
+                if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "we are disconnected, but more pending intents to be delivered - service will not stop");
             }
         }
     }
@@ -349,7 +349,6 @@ public class MainService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStartCommand(): begin");
         if (_gAnalytics == null) {  
             _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
             // TODO is the log msg is never seen move it to onCreate()
@@ -362,10 +361,12 @@ public class MainService extends Service {
             // The application has been killed by Android and
             // we try to restart the connection
             startService(new Intent(MainService.ACTION_CONNECT));
+            return START_STICKY;
         }
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStartCommand(): begin with " + intent.getAction());
         // A special case for the 'broadcast status' intent - we avoid setting
         // up the _xmppMgr etc
-        else if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
+        if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
             if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStart: ACTION_BROADCAST_STATUS");
             // A request to broadcast our current status even if _xmpp is null.
             // We use here the intent XMPP_CONNECTION_CHANGED send by broadcastStatus(), although there is no real connection change
@@ -398,7 +399,6 @@ public class MainService extends Service {
                 _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
             }
             
-            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStartCommand: _serviceHandler.sendMessage with intent action: " + intent.getAction());
             Message msg = _serviceHandler.obtainMessage();
             msg.arg1 = startId;
             msg.obj = intent;
@@ -546,7 +546,7 @@ public class MainService extends Service {
      * @param commandLine
      */
     private void onCommandReceived(String commandLine, String from) {
-        Log.v(Tools.LOG_TAG, "onMessageReceived: " + commandLine);
+        if (_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onCommandReceived(): " + commandLine);
         try {
             String command;
             String args;
@@ -644,7 +644,7 @@ public class MainService extends Service {
      * and only if we have a network available
      */
     private void setupListenersForConnection() {
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "setupListenersForConnection");  
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "setupListenersForConnection()");  
         _gAnalytics.trackInstalls(); //we only track if we have a data connection
 
         try {
@@ -656,7 +656,7 @@ public class MainService extends Service {
     }
     
     private void teardownListenersForConnection() {
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "teardownListenersForConnection");      
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "teardownListenersForConnection()");      
         stopForeground(true);
         stopCommands();
         cleanupCommands();

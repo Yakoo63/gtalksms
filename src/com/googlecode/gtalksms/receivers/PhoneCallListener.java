@@ -23,7 +23,7 @@ public class PhoneCallListener extends PhoneStateListener {
     public void onCallStateChanged(int state, String incomingNumber) {
         if (state == TelephonyManager.CALL_STATE_RINGING) {
             if(settingsMgr.debugLog) 
-                Log.d(Tools.LOG_TAG, "PhoneCallListener Call State Ringing with incomingNumber:" + incomingNumber);
+                Log.d(Tools.LOG_TAG, "PhoneCallListener Call State Ringing with incomingNumber: " + incomingNumber);
             String contact = ContactsManager.getContactName(svc, incomingNumber);
             svc.send(svc.getString(R.string.chat_is_calling, contact), null);
         }

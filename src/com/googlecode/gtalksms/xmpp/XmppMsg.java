@@ -134,7 +134,19 @@ public class XmppMsg {
     }
     
     public String toString() {
-        return removeLastNewline(generateTxt());
+        return generateTxt();
+    }
+    
+    public String toShortString() {
+        final int shortenTo = 20;
+        String message = this.toString();
+        String shortendMessage;
+        if (message.length() < shortenTo) {
+            shortendMessage = message.replace("\n", " ");
+        } else {
+            shortendMessage = message.substring(0, shortenTo).replace("\n", " ") + "...";
+        }
+        return shortendMessage;
     }
     
     public XHTMLText toXHTMLText() {

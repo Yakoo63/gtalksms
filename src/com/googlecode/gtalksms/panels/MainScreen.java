@@ -374,12 +374,11 @@ public class MainScreen extends Activity implements InterstitialAdListener{
 
       @Override
     public void onFailedToReceiveInterstitial(InterstitialAd interstitialAd) {
-        Log.d(Tools.LOG_TAG, "onFailedToReceiveInterstitial");
     }
 
     @Override
     public void onReceiveInterstitial(InterstitialAd interstitialAd) {
-        Log.d(Tools.LOG_TAG, "onReceiveInterstitial");
+        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onReceiveInterstitial");
         if(interstitialAd == _interstitialAd) {
             _interstitialAd.show(this);
         }

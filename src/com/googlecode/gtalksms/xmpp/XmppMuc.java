@@ -83,7 +83,7 @@ public class XmppMuc {
                 muc.sendMessage(message);
             }
         } catch (Exception ex) {
-            Log.e(Tools.LOG_TAG, "writeRoom: room = " + room, ex);
+            GoogleAnalyticsHelper.trackAndLogError("writeRoom: exception", ex);
         }
     }
     
@@ -106,7 +106,7 @@ public class XmppMuc {
                 }
             }
         } catch (Exception ex) {
-            Log.e(Tools.LOG_TAG, "writeRoom: room = " + room, ex);
+            GoogleAnalyticsHelper.trackAndLogError("inviteRoom(): exception", ex);
         }
     }
     
@@ -217,10 +217,9 @@ public class XmppMuc {
 
             multiUserChat.sendConfigurationForm(submitForm);
         } catch (XMPPException e1) {
-            Log.e(Tools.LOG_TAG, "Unable to send conference room configuration form.", e1);
+            GoogleAnalyticsHelper.trackAndLogWarning("Unable to send conference room configuration form.", e1);
             send(_context.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
-            return null; // then we also should not send an invite as the room
-                         // will be locked
+            return null; // then we also should not send an invite as the room will be locked
         }
 
         multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + name);
