@@ -47,7 +47,9 @@ public class SmsCmd extends Command {
     private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>()); 
     
     private AliasHelper _aliasHelper;
-        
+    
+    private static final int shortenTo = 20;
+      
     public SmsCmd(MainService mainService) {
         super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"});
         _smsMgr = new SmsMmsManager(_settingsMgr, _context);
@@ -672,7 +674,6 @@ public class SmsCmd extends Command {
     }
     
     private static String shortenMessage(String message) {
-        final int shortenTo = 20;
         String shortendMessage;
         if (message.length() < shortenTo) {
             shortendMessage = message.replace("\n", " ");
