@@ -192,7 +192,7 @@ public class SmsCmd extends Command {
             }
             
             if (message != null && message.length() > 0) {
-                sendSMS(message, contact, null);
+                sendSMS(message, contact);
             } else if (args.length() > 0) {
                 if (args.equals("unread")) {
                     readUnreadSMS();
@@ -209,7 +209,7 @@ public class SmsCmd extends Command {
                 send(getString(R.string.chat_error_no_recipient));
             } else {
                 _smsMgr.markAsRead(_lastRecipient);
-                sendSMS(args, _lastRecipient, _lastRecipientName);
+                sendSMS(args, _lastRecipient);
             }
         } else if (command.equals("findsms") || command.equals("fs")) {
             int separatorPos = args.indexOf(":");
@@ -426,15 +426,17 @@ public class SmsCmd extends Command {
         }
     }
 
-    /** sends a SMS to the specified contact */
-    private void sendSMS(String message, String contact, String contactName) {
+    /**
+     * Sends an SMS Message
+     * 
+     * @param message the message to send, needed
+     * @param contact the name or number
+     */
+    private void sendSMS(String message, String contact) {
         if (Phone.isCellPhoneNumber(contact)) {
-            send(getString(R.string.chat_send_sms, ContactsManager.getContactName(_context, contact)) + ": \"" + shortenMessage(message) + "\"");
-            if(contactName == null) {
-                sendSMSByPhoneNumber(message, contact, null);
-            } else {
-                sendSMSByPhoneNumber(message, contact, contactName);
-            }
+            String resolvedName = ContactsManager.getContactName(_context, contact);
+            send(getString(R.string.chat_send_sms,  resolvedName + ": \"" + shortenMessage(message) + "\""));
+            sendSMSByPhoneNumber(message, contact, resolvedName);           
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
             if (mobilePhones.size() > 1) {
