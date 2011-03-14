@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pref_app">Application</string>
+    <string name="pref_app_advanced">Paramètres avancés</string>
     <string name="pref_app_auto_start_options">Lancement auto.</string>
     <string name="pref_app_auto_stop_options">Arrêt auto.</string>
     <string name="pref_app_start_at_boot">Au démarrage</string>
@@ -32,6 +33,8 @@
     <string name="pref_app_geo_link_app_gmap_help">Utiliser Google Map pour localiser le téléphone</string>
     <string name="pref_app_geo_link_app_openstreetmap">Open Street Map</string>
     <string name="pref_app_geo_link_app_openstreetmap_help">Utiliser Open Street Map pour localiser le téléphone</string>
+    <string name="pref_app_enable_debug">Log de Debug</string>
+    <string name="pref_app_enable_debug_help">Activer les log en mode Debug</string>    
     <string name="pref_con">Connexion</string>
     <string name="pref_con_notified_address_cat">Adresse de notification</string>
     <string name="pref_con_notified_address">Adresse de notification</string>
@@ -45,6 +48,8 @@
     <string name="pref_con_login_help">Nom d\'utilisateur utilisé pour le téléphone</string>
     <string name="pref_con_password">Mot de passe</string>
     <string name="pref_con_password_help">Entrer le mot de passe correspondant</string>
+    <string name="pref_con_securityMode">Encryptage de la connexion</string>
+    <string name="pref_con_securityMode_help">Activer l\'encryptage de la connexion</string>
     <string name="pref_con_server_settings">Paramètres du serveur</string>
     <string name="pref_con_server_host">Nom du serveur</string>
     <string name="pref_con_server_host_help">Nom du serveur pour le compte utilisé pour le téléphone</string>
@@ -73,6 +78,10 @@
     <string name="pref_notif_sms_sent_help">Notification pour les SMS envoyés</string>
     <string name="pref_notif_sms_delivered">SMS délivrés</string>
     <string name="pref_notif_sms_delivered_help">Notification pour les SMS délivrés</string>
+    <string name="pref_notif_sms_separate">Message séparé pour tous les SMS</string>
+    <string name="pref_notif_sms_separate_help">Lire les SMS dans une fenêtre séparée</string>
+    <string name="pref_notif_sms_notifyInMuc">Envoyer les notifications dans des fenêtres séparées</string>
+    <string name="pref_notif_sms_notifyInMuc_help">Envoyer les notifications dans des fenêtres séparées pour chaque contact</string>    
     <string name="main_but_start_stop">Démarrer/Arrêter</string>
     <string name="main_but_preferences">Préférences</string>
     <string name="main_but_send_clipboard">Presse-papier</string>
@@ -107,6 +116,7 @@
     <string name="chat_error_unknown_cmd">\'%s\' : commande inconnue. Envoyer \"?\" afficher l\'aide.</string>
     <string name="chat_error">Erreur : %s</string>
     <string name="chat_error_root">Impossible d\'avoir l\'accès super administrateur !</string>
+    <string name="chat_error_unkown_name">Nom du contact inconnu</string>
     <string name="chat_reply_contact">Le destinataire par défaut est %s</string>
     <string name="chat_start_locating">Démarrage de la localisation du téléphone</string>
     <string name="chat_start_ringing">Le téléphone sonne</string>
@@ -158,6 +168,10 @@
     <string name="chat_help_del_sms_sent">- %s: Supprime tous les SMS envoyé sans confirmation !</string>    
     <string name="chat_help_del_sms_last">- %1$s ou %2$s ou %3$s : Supprime les [number] derniers SMS, 1 par défaut.</string>    
     <string name="chat_help_del_sms_contact">- %s: Supprime tous les SMS échangés avec le contact spécifié sans confirmation !</string>    
+    <string name="chat_help_alias_general">%1$s: Permet la gestion d\'alias permanents qui peuvent être utilisé à la place d\'un nom de contact ou d\'un numéro de téléphone dans GTalkSMS</string>
+    <string name="chat_help_alias_add">- %1$s: Ajoute ou met à jour un alias.</string>
+    <string name="chat_help_alias_del">- %1$s: Supprime un alias.</string>
+    <string name="chat_help_alias_show">- %1$s: Affiche le détail d\'un alias. Si #aliasname# est \"all\", tous les alias sont affichés.</string>    
     <string name="chat_call_unknown">Inconnu</string>
     <string name="chat_call_incoming">Entrant</string>
     <string name="chat_call_outgoing">Sortant</string>
@@ -201,4 +215,10 @@
     <string name="chat_del_sms_from">Supprime les SMS de %s.</string>
     <string name="chat_del_sms_nb">%d SMS supprimés.</string>
     <string name="chat_del_sms_error">Erreur lors de la suppression des SMS.</string>
+    <string name="chat_alias_add_by_number">Ajout de l\'alias \'%1$s\' avec le numéro %2$s</string>
+    <string name="chat_alias_add_by_name">Ajout de l\'alias \'%1$s\' pour %2$s avec le numéro %3$s</string>
+    <string name="chat_alias_del_suc">Alias \'%1$s\' supprimé</string>
+    <string name="chat_alias_del_fail">Impossible de supprimer l\'alias \'%1$s\'</string>
+    <string name="chat_alias_show_non_existent">L\'alias \'%1$s\' n\'existe pas</string>
+    <string name="chat_alias_empty">No aliases set</string>
 </resources>

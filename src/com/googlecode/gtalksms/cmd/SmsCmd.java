@@ -197,7 +197,7 @@ public class SmsCmd extends Command {
                 if (args.equals("unread")) {
                     readUnreadSMS();
                 } else {
-                    readSMS(args);
+                    readSMS(_aliasHelper.convertAliasToNumber(args));
                 }
             } else {
                 readLastSMS();
@@ -415,7 +415,6 @@ public class SmsCmd extends Command {
                 smsContact.appendLine(sms.message);
                 nbResults++;
             }
-            
             send(smsContact);
         } 
         
@@ -435,7 +434,9 @@ public class SmsCmd extends Command {
     private void sendSMS(String message, String contact) {
         if (Phone.isCellPhoneNumber(contact)) {
             String resolvedName = ContactsManager.getContactName(_context, contact);
-            send(getString(R.string.chat_send_sms,  resolvedName + ": \"" + shortenMessage(message) + "\""));
+            if (_settingsMgr.notifySmsSent) {
+                send(getString(R.string.chat_send_sms,  resolvedName + ": \"" + shortenMessage(message) + "\""));
+            }
             sendSMSByPhoneNumber(message, contact, resolvedName);           
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
@@ -447,7 +448,9 @@ public class SmsCmd extends Command {
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
-                send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")")  + ": \"" + shortenMessage(message) + "\"");
+                if (_settingsMgr.notifySmsSent) {
+                    send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")")  + ": \"" + shortenMessage(message) + "\"");
+                }
                 setLastRecipient(phone.cleanNumber);
                 sendSMSByPhoneNumber(message, phone.cleanNumber, phone.contactName);
             } else {
