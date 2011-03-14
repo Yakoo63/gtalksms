@@ -142,7 +142,7 @@ public class GoogleAnalyticsHelper {
             FileInputStream fIn = ctx.openFileInput(datefile);
             InputStreamReader isr = new InputStreamReader(fIn);
             isr.read(inputBuffer);
-        } catch (IOException e) {
+        } catch (Exception e) {
 //            trackAndLogError("Reading datefile", e);  //commented out - just spams the event on fresh installs
         }
         if ((new String(inputBuffer)).equals(currentDate())) {
@@ -158,7 +158,7 @@ public class GoogleAnalyticsHelper {
             OutputStreamWriter osw = new OutputStreamWriter(fOut);
             osw.write(currentDate());
             osw.close();
-        } catch (IOException ioe) {
+        } catch (Exception e) {
             return false;
         }
         return true;
