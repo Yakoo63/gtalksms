@@ -78,8 +78,8 @@
     <string name="pref_notif_sms_sent_help">Notification pour les SMS envoyés</string>
     <string name="pref_notif_sms_delivered">SMS délivrés</string>
     <string name="pref_notif_sms_delivered_help">Notification pour les SMS délivrés</string>
-    <string name="pref_notif_sms_separate">Message séparé pour tous les SMS</string>
-    <string name="pref_notif_sms_separate_help">Lire les SMS dans une fenêtre séparée</string>
+    <string name="pref_notif_sms_separate">Messages séparés pour chaque SMS</string>
+    <string name="pref_notif_sms_separate_help">Lire les SMS dans des messages séparés</string>
     <string name="pref_notif_sms_notifyInMuc">Envoyer les notifications dans des fenêtres séparées</string>
     <string name="pref_notif_sms_notifyInMuc_help">Envoyer les notifications dans des fenêtres séparées pour chaque contact</string>    
     <string name="main_but_start_stop">Démarrer/Arrêter</string>
@@ -168,7 +168,7 @@
     <string name="chat_help_del_sms_sent">- %s: Supprime tous les SMS envoyé sans confirmation !</string>    
     <string name="chat_help_del_sms_last">- %1$s ou %2$s ou %3$s : Supprime les [number] derniers SMS, 1 par défaut.</string>    
     <string name="chat_help_del_sms_contact">- %s: Supprime tous les SMS échangés avec le contact spécifié sans confirmation !</string>    
-    <string name="chat_help_alias_general">%1$s: Permet la gestion d\'alias permanents qui peuvent être utilisé à la place d\'un nom de contact ou d\'un numéro de téléphone dans GTalkSMS</string>
+    <string name="chat_help_alias_general">%1$s: Permet la gestion d\'alias permanents qui peuvent être utilisés à la place d\'un nom de contact ou d\'un numéro de téléphone dans GTalkSMS</string>
     <string name="chat_help_alias_add">- %1$s: Ajoute ou met à jour un alias.</string>
     <string name="chat_help_alias_del">- %1$s: Supprime un alias.</string>
     <string name="chat_help_alias_show">- %1$s: Affiche le détail d\'un alias. Si #aliasname# est \"all\", tous les alias sont affichés.</string>    
