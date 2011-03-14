@@ -284,11 +284,15 @@ public class MainScreen extends Activity implements InterstitialAdListener{
                 sb.append(Tools.LineSep);
                 sb.append(Tools.LineSep);
                 for (String key : map.keySet()) {
-                    if (key.startsWith("location_")) {
-                        sb.append(key.substring(10 + user.length()));
-                        sb.append(": ");
-                        sb.append(map.get(key));
-                        sb.append(Tools.LineSep);
+                    try {
+                        if (key.startsWith("location_")) {
+                            sb.append(key.substring(10 + user.length()));
+                            sb.append(": ");
+                            sb.append(map.get(key));
+                            sb.append(Tools.LineSep);
+                        }
+                    } catch(Exception e) {
+                        Log.e(Tools.LOG_TAG, "Failed to decode buddy name", e);
                     }
                 }
                 adb.setMessage(sb.toString());
