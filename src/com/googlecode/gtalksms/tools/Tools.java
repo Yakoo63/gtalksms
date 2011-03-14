@@ -25,9 +25,6 @@ public class Tools {
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
     
-    private static boolean donateRun = true;
-    private static boolean isDonate = false;
-    
     public static void toastMessage(Context ctx, String msg) {
         String toastMsg  = ctx.getString(R.string.app_name) + ": " + msg;
         Toast.makeText(ctx, toastMsg, Toast.LENGTH_SHORT).show();
@@ -127,18 +124,7 @@ public class Tools {
     }
     
     public static boolean isDonateAppInstalled(Context context) {
-        if (donateRun) {
-            List<PackageInfo> packs = context.getPackageManager().getInstalledPackages(0);
-            for (PackageInfo p : packs) {
-                if (p.packageName.equalsIgnoreCase("com.googlecode.gtalksmsdonate")) {
-                    isDonate = true;
-                    break;
-                }
-            }
-            donateRun = false;
-        }
-        return isDonate;
-//        return 0 == context.getPackageManager().checkSignatures( context.getPackageName(), "com.googlecode.gtalksmsdonate");
+        return 0 == context.getPackageManager().checkSignatures( context.getPackageName(), "com.googlecode.gtalksmsdonate");
     }
     
     public static boolean copyFile(File from, File to) {
