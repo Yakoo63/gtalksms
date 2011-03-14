@@ -4,7 +4,7 @@
 * Admob banner added (Just click without follow the link)
 * Current charge status in XMPP presence message
 * Donate application version becomes a key
-* GTalkSMS now backups and restores it's configuration automatically 
+* GTalkSMS now backups and restores its configuration automatically 
 
 1.9
 * Ringmode command added
