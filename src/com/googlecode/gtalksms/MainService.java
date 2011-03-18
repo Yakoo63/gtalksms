@@ -566,7 +566,7 @@ public class MainService extends Service {
                 executeCommand(command, args, from);
             }
         } catch (Exception ex) {
-            GoogleAnalyticsHelper.trackAndLogError("MainService onMessageReceived()", ex);
+            GoogleAnalyticsHelper.trackAndLogError("MainService onCommandReceived exception", ex);
             send(getString(R.string.chat_error, ex), from);
         }
     }

@@ -214,7 +214,7 @@ public class XmppManager {
                     if (_x.isConnected())
                         _x.disconnect();
                 } catch (Exception e2) {
-                    GoogleAnalyticsHelper.trackAndLogWarning("xmpp disconnect failed" + e2);
+                    GoogleAnalyticsHelper.trackAndLogWarning("xmpp disconnect failed: " + e2);
                 }
             }
         }
@@ -260,7 +260,7 @@ public class XmppManager {
             int old = _status;
             _status = status;
             if(_settings.debugLog)
-                Log.d(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status + "via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
+                Log.d(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
             broadcastStatus(_context, old, status);
         }
     }
@@ -370,7 +370,7 @@ public class XmppManager {
             public void connectionClosedOnError(Exception e) {
                 // this is "unexpected" - our main service still thinks it has a 
                 // connection.
-                GoogleAnalyticsHelper.trackAndLogError("xmpp disconnected due to error", e);
+                Log.e(Tools.LOG_TAG, "xmpp disconnected due to error", e);
                 // We update the state to disconnected (mainly to cleanup listeners etc)
                 // then schedule an automatic reconnect.
                 stop();
