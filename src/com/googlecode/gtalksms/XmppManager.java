@@ -323,8 +323,8 @@ public class XmppManager {
             return;
         }
 
-        ConnectionConfiguration conf = new ConnectionConfiguration(_settings.serverHost, _settings.serverPort, _settings.serviceName);
-        conf.setTruststorePath("/system/etc/security/cacerts.bks");
+        ConnectionConfiguration conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
+        conf.setTruststorePath("/system/etc/security/cacerts.bks");             // we trim the serverHost here because of Issue 122
         conf.setTruststorePassword("changeit");
         conf.setTruststoreType("bks");
         switch (_settings.xmppSecurityModeInt) {
