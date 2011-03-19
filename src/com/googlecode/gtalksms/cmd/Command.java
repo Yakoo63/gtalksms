@@ -57,7 +57,7 @@ public abstract class Command {
      * sends the results, if any, back to the given JID
      * 
      * @param cmd the base command
-     * @param args the arguments - substring after the first ":" 
+     * @param args the arguments - substring after the first ":", if no other arguments where given this will be ""
      * @param answerTo JID for command output, null to send to default notification address
      */
     protected abstract void execute(String cmd, String args); 

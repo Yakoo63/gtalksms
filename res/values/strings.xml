@@ -154,7 +154,7 @@
     <string name="chat_help_find_sms">- %1$s or %2$s: search specific message in all SMS from searched contacts.</string>
     <string name="chat_help_mark_as_read">- %1$s or %2$s: mark SMS as read for last recipient or given contact.</string>
     <string name="chat_help_battery">- %1$s or %2$s: show battery level in percent.</string>
-    <string name="chat_help_calls">- %s: display call log.</string>
+    <string name="chat_help_calls">- %s: display call log. The number argument is optional</string>
     <string name="chat_help_contact">- %s: display informations of a searched contact.</string>
     <string name="chat_help_geo">- %s: Open Maps or Navigation or Street view on specific address.</string>
     <string name="chat_help_where">- %1$s: sends you Google Maps/OSM updates about the location of the phone until you send %2$s.</string>
