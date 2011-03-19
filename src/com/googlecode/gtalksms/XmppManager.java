@@ -122,7 +122,22 @@ public class XmppManager {
         }
     }
     
+    /**
+     * calls cleanupConnection and 
+     * sets _status to DISCONNECTED
+     */
     protected void stop() {
+        cleanupConnection();
+        updateStatus(DISCONNECTED);
+    }
+    
+    /**
+     * Removes all references to the old connection
+     * packetListeners and removes Callbacks for the reconnectHandler
+     * Does *not* set the _status flag
+     * 
+     */
+    private void cleanupConnection() {
         if (_connection != null && _connection.isConnected()) {
             updateStatus(DISCONNECTING);
             if (_settings.notifyApplicationConnection) {
@@ -147,12 +162,13 @@ public class XmppManager {
         _connection = null;
         _packetListener = null;
         _connectionListener = null;
-        updateStatus(DISCONNECTED);
     }
     
-    // This method *requests* a state change - what state things actually
-    // wind up in is impossible to know (eg, a request to connect may wind up
-    // with a state of CONNECTED, DISCONNECTED or WAITING_TO_CONNECT...
+    /** 
+     * This method *requests* a state change - what state things actually
+     * wind up in is impossible to know (eg, a request to connect may wind up
+     * with a state of CONNECTED, DISCONNECTED or WAITING_TO_CONNECT...
+     */
     protected void xmppRequestStateChange(int newState) {
         int currentState = getConnectionStatus();
         switch (newState) {
@@ -162,7 +178,7 @@ public class XmppManager {
                 break;
             case XmppManager.DISCONNECTED:
             case XmppManager.WAITING_TO_CONNECT:
-                stop();
+                cleanupConnection();
                 start();
                 break;
             default:
@@ -266,14 +282,15 @@ public class XmppManager {
     }
 
     private void maybeStartReconnect() {
-        if (_currentRetryCount > 5) {
+        if (_currentRetryCount > 10) {
             // we failed after all the retries - just die.
             GoogleAnalyticsHelper.trackAndLogWarning("maybeStartReconnect ran out of retrys");
             stop(); // will set state to DISCONNECTED.
             return;
         } else {
-            _currentRetryCount += 1;
             updateStatus(WAITING_TO_CONNECT);
+            cleanupConnection();
+            _currentRetryCount += 1;
             // a simple linear-backoff strategy.
             int timeout = 5000 * _currentRetryCount;
             if (_settings.debugLog) Log.d(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
@@ -362,7 +379,6 @@ public class XmppManager {
             @Override
             public void connectionClosed() {
                 // connection was closed by the foreign host
-                stop();
                 maybeStartReconnect();
             }
 
@@ -373,7 +389,6 @@ public class XmppManager {
                 Log.e(Tools.LOG_TAG, "xmpp disconnected due to error", e);
                 // We update the state to disconnected (mainly to cleanup listeners etc)
                 // then schedule an automatic reconnect.
-                stop();
                 maybeStartReconnect();
             }
 
@@ -395,12 +410,12 @@ public class XmppManager {
 
     private void onConnectionComplete() {
         Log.i(Tools.LOG_TAG, "connection established");
+        _currentRetryCount = 0;
         try {
             _xmppMuc.initialize(_connection);
             _xmppBuddies.initialize(_connection);
             _xmppFileMgr.initialize(_connection);
 
-            _currentRetryCount = 0;
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
             _packetListener = new PacketListener() {
                 public void processPacket(Packet packet) {
@@ -413,8 +428,7 @@ public class XmppManager {
                     if (from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") && !message.getFrom().equals(_connection.getUser())) {
                         if (message.getBody() != null) {
                             Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
-                            intent.putExtra("from", from); // usually a full JID
-                                                           // with resource
+                            intent.putExtra("from", from); // usually a full JID with resource
                             intent.putExtra("message", message.getBody());
                             intent.setClass(_context, MainService.class);
                             _context.startService(intent);
@@ -439,9 +453,8 @@ public class XmppManager {
             }
         } catch (Exception e) {
             // see issue 126 for an example where this happens
-            GoogleAnalyticsHelper.trackAndLogError("xmppMgr onConnectionComplete()", e);
+            GoogleAnalyticsHelper.trackAndLogError("xmppMgr onConnectionComplete() exception caught", e);
             if (!_connection.isConnected()) {
-                stop();
                 maybeStartReconnect();
             } else {
                 throw new IllegalStateException(e);
