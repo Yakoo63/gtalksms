@@ -563,27 +563,12 @@ public class XmppManager {
         return _xmppBuddies.retrieveFriendList();
     }
     
-    /**
-     * Writes a message to a room and creates the room if necessary,
-     * followed by an invite to the default notification address 
-     * to join the room
-     * 
-     * @param number
-     * @param contact
-     * @param message
-     * @throws XMPPException
-     */
+
     public void writeRoom(String number, String contact, String message) throws XMPPException {
         _xmppMuc.writeRoom(number, contact, message);
     }
     
-    /**
-     * Invites the user to a room for the given contact name and number
-     * if the user (or someone else) writes to this room, a SMS is send to the number
-     * 
-     * @param number
-     * @param name
-     */
+
     public void inviteRoom(String number, String name) {
     	_xmppMuc.inviteRoom(number, name);
     }

@@ -53,60 +53,56 @@ public class XmppMuc {
     }
     
     /**
-     * Sends a message to a MUC, creates the MUC if necessary
+     * Writes a message to a room and creates the room if necessary,
+     * followed by an invite to the default notification address 
+     * to join the room
      * 
-     * @param number 	the phone number of the receiver
-     * @param contact    the name of the receiver
-     * @param message   the message to send
-     * @throws XMPPException 
+     * @param number
+     * @param contact
+     * @param message
+     * @throws XMPPException
      */
     public void writeRoom(String number, String contact, String message) throws XMPPException {
         String room = getRoomString(number, contact);
-
-            MultiUserChat muc;
-            if (!_rooms.containsKey(room)) {
-                muc = createRoom(number, room, contact);
-                
-                if (muc != null) {
-                    _rooms.put(room, muc);
-                }
-                
-            } else {
-                muc = _rooms.get(room);              
-                // TODO: test if occupants contains also the sender (in case we invite other people)
-                if (muc != null && muc.getOccupantsCount() < 2) {
-                    muc.invite(_settings.notifiedAddress, "SMS conversation with " + contact);
-                }
+        MultiUserChat muc;
+        if (!_rooms.containsKey(room)) {
+            muc = createRoom(number, room, contact);
+            _rooms.put(room, muc);
+        } else {
+            muc = _rooms.get(room);
+            // TODO: test if occupants contains also the sender (in case we
+            // invite other people)
+            if (muc != null && muc.getOccupantsCount() < 2) {
+                muc.invite(_settings.notifiedAddress, "SMS conversation with " + contact);
             }
-        try {           
-            if (muc != null) {
-                muc.sendMessage(message);
-            }
-        } catch (Exception ex) {
-            GoogleAnalyticsHelper.trackAndLogError("writeRoom: exception", ex);
         }
+        muc.sendMessage(message);
     }
     
+    /**
+     * Invites the user to a room for the given contact name and number
+     * if the user (or someone else) writes to this room, a SMS is send to the number
+     * 
+     * @param number
+     * @param name
+     */
     public void inviteRoom(String number, String sender) {
         String room = getRoomString(number, sender);
         try {
             MultiUserChat muc;
             if (!_rooms.containsKey(room)) {
                 muc = createRoom(number, room, sender);             
-                if (muc != null) {  //create successful
-                    _rooms.put(room, muc);
-                }
+                _rooms.put(room, muc);
                 
             } else {
-                muc = _rooms.get(room);
-                
+                muc = _rooms.get(room);                
                 // TODO: test if occupants contains also the sender (in case we invite other people)
                 if (muc != null && muc.getOccupantsCount() < 2) {
                     muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
                 }
             }
         } catch (Exception ex) {
-            GoogleAnalyticsHelper.trackAndLogError("inviteRoom(): exception", ex);
+            GoogleAnalyticsHelper.trackAndLogError("XmppMuc inviteRoom: exception", ex);
         }
     }
     
@@ -219,7 +215,7 @@ public class XmppMuc {
         } catch (XMPPException e1) {
             GoogleAnalyticsHelper.trackAndLogWarning("Unable to send conference room configuration form.", e1);
             send(_context.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
-            return null; // then we also should not send an invite as the room will be locked
+            throw e1; // then we also should not send an invite as the room will be locked
         }
 
         multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + name);
