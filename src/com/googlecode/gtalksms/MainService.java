@@ -546,7 +546,9 @@ public class MainService extends Service {
      * @param commandLine
      */
     private void onCommandReceived(String commandLine, String from) {
-        if (_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onCommandReceived(): " + commandLine);
+        if (_settingsMgr.debugLog) {
+            Log.d(Tools.LOG_TAG, "onCommandReceived(): " + Tools.shortenMessage(commandLine));
+        }
         try {
             String command;
             String args;

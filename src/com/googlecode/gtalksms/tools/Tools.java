@@ -24,6 +24,7 @@ public class Tools {
     public final static String LOG_TAG = "gtalksms";
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
+    public final static int shortenTo = 20;
     
     public static void toastMessage(Context ctx, String msg) {
         String toastMsg  = ctx.getString(R.string.app_name) + ": " + msg;
@@ -181,5 +182,15 @@ public class Tools {
         } else {
             return s;
         }
+    }
+    
+    public static String shortenMessage(String message) {
+        String shortendMessage;
+        if (message.length() < shortenTo) {
+            shortendMessage = message.replace("\n", " ");
+        } else {
+            shortendMessage = message.substring(0, shortenTo).replace("\n", " ") + "...";
+        }
+        return shortendMessage;
     }
 }

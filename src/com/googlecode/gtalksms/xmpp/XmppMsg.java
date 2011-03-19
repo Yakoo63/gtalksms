@@ -21,8 +21,6 @@ public class XmppMsg {
     private StringBuilder _message = new StringBuilder();
     private ArrayList<XmppFont> _fonts = new ArrayList<XmppFont>();
     
-    private static final int shortenTo = 20;
-
     public XmppMsg() {
         _mainFont = DefaultFont;
     }
@@ -141,13 +139,7 @@ public class XmppMsg {
     
     public String toShortString() {
         String message = this.toString();
-        String shortendMessage;
-        if (message.length() < shortenTo) {
-            shortendMessage = message.replace("\n", " ");
-        } else {
-            shortendMessage = message.substring(0, shortenTo).replace("\n", " ") + "...";
-        }
-        return shortendMessage;
+        return Tools.shortenMessage(message);
     }
     
     public XHTMLText toXHTMLText() {
