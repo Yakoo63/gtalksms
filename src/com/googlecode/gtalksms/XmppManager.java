@@ -131,7 +131,8 @@ public class XmppManager {
     /**
      * Removes all references to the old connection
      * packetListeners and removes Callbacks for the reconnectHandler
-     * Does *not* set the _status flag
+     * If there is a connection, the status flag will be set to 
+     * "DISCONNECTING"
      * 
      */
     private void cleanupConnection() {

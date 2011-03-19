@@ -8,10 +8,10 @@ import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import com.googlecode.gtalksms.SettingsManager;
@@ -23,10 +23,21 @@ public class XmppFileManager implements FileTransferListener {
     private XMPPConnection _connection;
     private FileTransferManager _fileTransferManager = null;
     private XmppManager _xmppMgr;
+    private String answerTo;
+    private static File externalFilesDir;
+    private static File landingDir;
+    
+    private static final String gtalksmsDir = "GTalkSMS";
     
     public XmppFileManager(Context context, SettingsManager settings, XmppManager xmppMgr) {
         _settings = settings;
         _xmppMgr = xmppMgr;
+        if (_settings.backupAgentAvailable) {  // API Level >= 8 check
+            externalFilesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        } else {
+            externalFilesDir = Environment.getExternalStorageDirectory();
+        }
+        landingDir = new File(externalFilesDir, gtalksmsDir);
     }
     
     public void initialize(XMPPConnection connection) {
@@ -34,62 +45,56 @@ public class XmppFileManager implements FileTransferListener {
         _fileTransferManager = new FileTransferManager(_connection);
         _fileTransferManager.addFileTransferListener(this);
    }
-    
-    public void sendFile(String path) {
-        OutgoingFileTransfer transfer = _fileTransferManager.createOutgoingFileTransfer(_settings.notifiedAddress);
-
-        try {
-            transfer.sendFile(new File(path), "Sending you: " + path);
-            send("File transfer: " + path + " - " + transfer.getFileSize() / 1024 + " KB");
-            
-            while (!transfer.isDone()) {
-                if (transfer.getStatus() == FileTransfer.Status.refused) {
-                    send("Could not send the file. Refused by peer.");
-                    return;
-                }
-                if (transfer.getStatus() == FileTransfer.Status.error) {
-                    printError(transfer);
-                    return;
-               }
-               Thread.sleep(1000);
-            }
-        } catch (Exception ex) {
-            String message = "Cannot send the file because an error occured during the process." 
-                + Tools.LineSep + ex.getMessage();
-            Log.e(Tools.LOG_TAG, message, ex);
-            send(message);
-        }
-    }
+   
+   /**
+    * returns the FileTransferManager for the current connection
+    * @return
+    */
+   public FileTransferManager getFileTransferManager() {
+       return _fileTransferManager;
+   }
 
     @Override
     public void fileTransferRequest(FileTransferRequest request) {
-        if (!request.getRequestor().startsWith(_settings.notifiedAddress)) { 
-            send("File transfert from " + request.getRequestor() + " rejected.");
+        File saveTo;
+        answerTo = request.getRequestor();  // set answerTo for replies and send()        
+        if (!answerTo.startsWith(_settings.notifiedAddress)) { 
+            send("File transfer from " + answerTo+ " rejected.");
+            return;                
+        } else if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            send("External Media not mounted read/write");
+            return;
+        } else if (!landingDir.isDirectory()) {
+            send("The directory " + landingDir.getAbsolutePath() + " does not exist");
             return;
         }
-            
+        
+        saveTo = new File(landingDir, request.getFileName());
+        if (saveTo.exists()) {
+            send("The file " + saveTo.getAbsolutePath() + " already exists");
+            return;
+        }
+        
         IncomingFileTransfer transfer = request.accept();
-        //TODO check if destination dir exists, create if not   
-        String filePath = "/sdcard/GTalkSMS/" + request.getFileName();
-        send("File transfer: " + filePath + " - " + request.getFileSize() / 1024 + " KB");
+        send("File transfer: " + saveTo.getName() + " - " + request.getFileSize() / 1024 + " KB");
         try {
-            transfer.recieveFile(new File(filePath));
-            send("File transfert: " + filePath + " - " + transfer.getStatus());
+            transfer.recieveFile(saveTo);
+            send("File transfer: " + saveTo.getName() + " - " + transfer.getStatus());
             double percents = 0.0;
             while (!transfer.isDone()) {
                 if (transfer.getStatus().equals(Status.in_progress)) {
                     percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
-                    send("File transfer: " + filePath + " - " + percents + "%");
+                    send("File transfer: " + saveTo.getName() + " - " + percents + "%");
                 } else if (transfer.getStatus().equals(Status.error)) {
-                    printError(transfer);
+                    send(returnAndLogError(transfer));
                     return;
                 }
                 Thread.sleep(1000);
             }
             if (transfer.getStatus().equals(Status.complete)) {
-                send("File transfert: " + filePath + " - 100%");
+                send("File transfert: " + saveTo.getName() + " - 100%");
             } else {
-                printError(transfer);
+                send(returnAndLogError(transfer));
             }
         } catch (Exception ex) {
             String message = "Cannot receive the file because an error occured during the process." 
@@ -99,7 +104,7 @@ public class XmppFileManager implements FileTransferListener {
         }
     }
 
-    private void printError(FileTransfer transfer) {
+    public static XmppMsg returnAndLogError(FileTransfer transfer) {
         String message = "Cannot process the file because an error occured during the process." + Tools.LineSep;
         if (transfer.getError() != null) {
             message += transfer.getError() + Tools.LineSep;
@@ -108,10 +113,14 @@ public class XmppFileManager implements FileTransferListener {
             message += transfer.getException() + Tools.LineSep;
         }
         Log.w(Tools.LOG_TAG, message);
-        send(message);
+        return new XmppMsg(message);
     }
     
     private void send(String msg) {
-        _xmppMgr.send(new XmppMsg(msg), null);
+        _xmppMgr.send(new XmppMsg(msg), answerTo);
+    }
+    
+    private void send(XmppMsg msg) {
+        _xmppMgr.send(msg, answerTo);
     }
 }
