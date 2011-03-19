@@ -19,7 +19,12 @@ import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
+
+
 public class ContactsManager {
+    // constants used by getMatchingContacts(Context, String)
+    private static final String[] projection = { Contacts._ID, Contacts.DISPLAY_NAME };
+    private static final String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
     
     public static String getContactNameOrNull(Context ctx, String phoneNumber) {
         String res = null;
@@ -111,8 +116,6 @@ public class ContactsManager {
 
         if (!searchedName.equals("")) {
             ContentResolver resolver = ctx.getContentResolver();
-            String[] projection = new String[] { Contacts._ID, Contacts.DISPLAY_NAME };
-            String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
 
             Uri contactUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI, StringFmt.encodeSQL(searchedName));
             Cursor c = resolver.query(contactUri, projection, null, null, sortOrder);
