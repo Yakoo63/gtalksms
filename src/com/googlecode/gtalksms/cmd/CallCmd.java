@@ -14,6 +14,7 @@ import com.googlecode.gtalksms.data.phone.Call;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.data.phone.PhoneManager;
 import com.googlecode.gtalksms.receivers.PhoneCallListener;
+import com.googlecode.gtalksms.tools.AliasHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -21,6 +22,8 @@ public class CallCmd extends Command {
     private PhoneManager _phoneMgr;
     private PhoneCallListener _phoneListener = null;
     private TelephonyManager _telephonyMgr = null;
+    
+    private AliasHelper _aliasHelper;
     
     public CallCmd(MainService mainService) {
         super(mainService, new String[] {"calls", "dial"});
@@ -31,24 +34,35 @@ public class CallCmd extends Command {
             _phoneListener = new PhoneCallListener(mainService);
             _telephonyMgr.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
         }
+        _aliasHelper = mainService.createAndGetAliasHelper();
     }
     
     @Override
     protected void execute(String cmd, String args) {
         if (cmd.equals("dial")) {
-            dial(args, this._answerTo);
+            dial(args);
         } else if (cmd.equals("calls")) {
-            readCallLogs(this._answerTo);
+            readCallLogs(args);
         }  
     }
 
     /** reads last Call Logs from all contacts */
-    private void readCallLogs(String answerTo) {
+    private void readCallLogs(String args) {
 
         ArrayList<Call> arrayList = _phoneMgr.getPhoneLogs();
         XmppMsg all = new XmppMsg();
-
-        List<Call> callList = Tools.getLastElements(arrayList, _settingsMgr.callLogsNumber);
+        int callLogsNumber;
+        if (args.equals("")) {
+            callLogsNumber = _settingsMgr.callLogsNumber;
+        } else {
+            try {
+            callLogsNumber = Integer.parseInt(args);
+            } catch (Exception e) {
+                callLogsNumber = _settingsMgr.callLogsNumber;
+            }
+        }
+        
+        List<Call> callList = Tools.getLastElements(arrayList, callLogsNumber);
         if (callList.size() > 0) {
             for (Call call : callList) {
                 all.appendItalic(call.date.toLocaleString());
@@ -59,14 +73,15 @@ public class CallCmd extends Command {
         } else {
             all.appendLine(getString(R.string.chat_no_call));
         }
-        send(all, answerTo);
+        send(all);
     }
     
     /** dial the specified contact */
-    private void dial(String contactInfo, String answerTo) {
+    private void dial(String contactInfo) {
         String number = null;
         String contact = null;
-
+        contactInfo = _aliasHelper.convertAliasToNumber(contactInfo);
+        
         if (Phone.isCellPhoneNumber(contactInfo)) {
             number = contactInfo;
             contact = ContactsManager.getContactName(_context, number);
@@ -78,20 +93,20 @@ public class CallCmd extends Command {
                 for (Phone phone : mobilePhones) {
                     phones.appendLine(phone.contactName + " - " + phone.cleanNumber);
                 }
-                send(phones, answerTo);
+                send(phones);
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 contact = phone.contactName;
                 number = phone.cleanNumber;
             } else {
-                send(getString(R.string.chat_no_match_for, contactInfo), answerTo);
+                send(getString(R.string.chat_no_match_for, contactInfo));
             }
         }
 
         if (number != null) {
-            send(getString(R.string.chat_dial, contact + " (" + number + ")"), answerTo);
+            send(getString(R.string.chat_dial, contact + " (" + number + ")"));
             if (!_phoneMgr.Dial(number)) {
-                send(getString(R.string.chat_error_dial), answerTo);
+                send(getString(R.string.chat_error_dial));
             }
         }
     }
@@ -107,7 +122,7 @@ public class CallCmd extends Command {
     @Override
     public String[] help() {
         String[] s = { 
-                getString(R.string.chat_help_calls, makeBold("\"calls\"")),
+                getString(R.string.chat_help_calls, makeBold("\"calls:#count#\"")),
                 getString(R.string.chat_help_dial, makeBold("\"dial:#contact#\"")) 
                 };
         return s;
