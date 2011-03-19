@@ -59,12 +59,12 @@ public class XmppFileManager implements FileTransferListener {
         File saveTo;
         answerTo = request.getRequestor();  // set answerTo for replies and send()        
         if (!answerTo.startsWith(_settings.notifiedAddress)) { 
-            send("File transfer from " + answerTo+ " rejected.");
+            send("File transfer from " + answerTo + " rejected.");
             return;                
         } else if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             send("External Media not mounted read/write");
             return;
-        } else if (!landingDir.isDirectory()) {
+        } else if (!landingDir.isDirectory() && !landingDir.mkdirs()) {
             send("The directory " + landingDir.getAbsolutePath() + " does not exist");
             return;
         }

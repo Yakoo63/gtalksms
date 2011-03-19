@@ -8,6 +8,7 @@ import java.util.Set;
 import org.jivesoftware.smack.XMPPException;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -46,7 +47,8 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MainService extends Service {
-
+    public final static int ID = 0;
+    
     // The following actions are documented and registered in our manifest
     public final static String ACTION_CONNECT = "com.googlecode.gtalksms.action.CONNECT";
     public final static String ACTION_TOGGLE = "com.googlecode.gtalksms.action.TOGGLE";
@@ -91,6 +93,7 @@ public class MainService extends Service {
     
     private static AliasHelper _aliasHelper;
     
+    private NotificationManager _notificationMgr;
 
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
@@ -329,6 +332,9 @@ public class MainService extends Service {
         super.onCreate();
         _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         
+        _notificationMgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        startForeground(ID, null);
+        
         _settingsMgr = new SettingsManager(this) {
             @Override public void OnPreferencesUpdated() {
             	super.OnPreferencesUpdated();
@@ -432,6 +438,9 @@ public class MainService extends Service {
         teardownListenersForConnection();
         GoogleAnalyticsHelper.stop();
         _serviceLooper.quit();
+        
+        _notificationMgr.cancelAll();
+        stopForeground(true);
         super.onDestroy();
     }
     
@@ -531,9 +540,11 @@ public class MainService extends Service {
         notification.setLatestEventInfo(getApplicationContext(), appName, msg, _contentIntent);
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
         notification.flags |= Notification.FLAG_NO_CLEAR;
-        stopForeground(true);
+        
+        notification.tickerText = "";
+        
         if (_settingsMgr.showStatusIcon) {
-            startForeground(status, notification);
+            _notificationMgr.notify(ID, notification);
         }
     }
     
