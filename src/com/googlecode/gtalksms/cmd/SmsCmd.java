@@ -235,7 +235,7 @@ public class SmsCmd extends Command {
         	if (args.length() > 0) {
                 inviteRoom(_aliasHelper.convertAliasToNumber(args));
         	} else if (_lastRecipient != null) {
-        	    _xmppMgr.inviteRoom(_lastRecipient, _lastRecipientName);
+        	    _xmppMgr.getXmppMuc().inviteRoom(_lastRecipient, _lastRecipientName);
         	}
         } else if (command.equals("delsms")) {
             if (args.length() == 0) {
@@ -347,7 +347,7 @@ public class SmsCmd extends Command {
         if (Phone.isCellPhoneNumber(contact)) {
                 number = contact;
                 name = ContactsManager.getContactName(_context, contact);
-                _xmppMgr.inviteRoom(number, name);
+                _xmppMgr.getXmppMuc().inviteRoom(number, name);
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
             if (mobilePhones.size() > 1) {
@@ -357,7 +357,7 @@ public class SmsCmd extends Command {
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
-                _xmppMgr.inviteRoom(phone.cleanNumber, phone.contactName);
+                _xmppMgr.getXmppMuc().inviteRoom(phone.cleanNumber, phone.contactName);
 //                setLastRecipient(phone.cleanNumber); // issue 117
             } else {
                 send( getString(R.string.chat_no_match_for, contact) );

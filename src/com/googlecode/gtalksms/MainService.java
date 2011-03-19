@@ -179,7 +179,7 @@ public class MainService extends Service {
                 String name = ContactsManager.getContactName(this, number);
                 String message = intent.getStringExtra("message");
                 
-                if (_settingsMgr.notifySmsInSameConversation && !_xmppMgr.roomExists(number, name)) {
+                if (_settingsMgr.notifySmsInSameConversation && !_xmppMgr.getXmppMuc().roomExists(number, name)) {
                     XmppMsg msg = new XmppMsg();
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
@@ -188,9 +188,9 @@ public class MainService extends Service {
                         ((SmsCmd)_commands.get("sms")).setLastRecipient(number);
                     }
                 }
-                if (_settingsMgr.notifySmsInChatRooms || _xmppMgr.roomExists(number, name)) {
+                if (_settingsMgr.notifySmsInChatRooms || _xmppMgr.getXmppMuc().roomExists(number, name)) {
                     try {
-                        _xmppMgr.writeRoom(number, name, message);
+                        _xmppMgr.getXmppMuc().writeRoom(number, name, message);
                     } catch (XMPPException e) {
                         //room creation failed - notify about this error
                         // and send the message to the notification address
@@ -273,7 +273,7 @@ public class MainService extends Service {
 
     public void updateBuddies() {
         if (_xmppMgr != null) {
-            _xmppMgr.retrieveFriendList();
+            _xmppMgr.getXmppBuddies().retrieveFriendList();
         }
     }
     

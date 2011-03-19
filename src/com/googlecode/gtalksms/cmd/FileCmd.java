@@ -17,7 +17,7 @@ public class FileCmd extends Command {
     @Override
     protected void execute(String cmd, String args) {
         if (new File(args).exists()) {
-            _xmppMgr.sendFile(args);
+            _xmppMgr.getXmppFileMgr().sendFile(args);
         } else {
             send("File '" + args + "' doesn't exist!");  // TODO localization
         }

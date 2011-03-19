@@ -1,7 +1,5 @@
 package com.googlecode.gtalksms;
 
-import java.util.ArrayList;
-
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
@@ -54,7 +52,6 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XHTMLExtensionProvider;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
-import com.googlecode.gtalksms.xmpp.XmppFriend;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
 
@@ -555,28 +552,17 @@ public class XmppManager {
         }
     }
     
-    public boolean roomExists(String number, String name) {
-    	return _xmppMuc.roomExists(number, name);
+    public XmppFileManager getXmppFileMgr() {
+        return _xmppFileMgr;        
     }
     
-    public ArrayList<XmppFriend> retrieveFriendList() {
-        return _xmppBuddies.retrieveFriendList();
+    public XmppMuc getXmppMuc() {
+        return _xmppMuc;
     }
     
-
-    public void writeRoom(String number, String contact, String message) throws XMPPException {
-        _xmppMuc.writeRoom(number, contact, message);
+    public XmppBuddies getXmppBuddies() {
+        return _xmppBuddies;
     }
-    
-
-    public void inviteRoom(String number, String name) {
-    	_xmppMuc.inviteRoom(number, name);
-    }
-    
-    public void sendFile(String path) {
-        _xmppFileMgr.sendFile(path);
-    }
-    
 
     public void configure(ProviderManager pm) {
         //  Private Data Storage
