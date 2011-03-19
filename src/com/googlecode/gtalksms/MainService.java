@@ -563,6 +563,7 @@ public class MainService extends Service {
             // Not case sensitive commands
             command = command.toLowerCase();
             if (command.equals("stop")) {
+                send(getString(R.string.chat_stop_actions), from);
                 stopCommands();
             } else {
                 executeCommand(command, args, from);
