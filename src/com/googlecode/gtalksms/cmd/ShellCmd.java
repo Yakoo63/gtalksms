@@ -13,6 +13,7 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFont;
+import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class ShellCmd extends Command {
     Handler _cmdHandler = new Handler();
@@ -69,8 +70,7 @@ public class ShellCmd extends Command {
                 readStream(myproc.getInputStream());
                 readStream(myproc.getErrorStream());
                 
-                send(_cmdResults.toString());
-                _cmdResults = new StringBuilder();
+                sendResults();
             }
             catch (Exception ex) {
                 Log.w(Tools.LOG_TAG, "Shell command error", ex);
@@ -114,13 +114,24 @@ public class ShellCmd extends Command {
             
             try { _cmdThread.stop(); } catch (Exception e) {}
             
-            send(_cmdResults.toString());
-            _cmdResults = new StringBuilder();
+            sendResults();
         }
 
         _currentCommand = cmd;
         _cmdThread = new Thread(_cmdRunnable);
         _cmdThread.start();
+    }
+    
+    private void sendResults() {
+        send(_cmdResults.toString());
+        _cmdResults = new StringBuilder();
+    }
+    
+    @Override
+    protected void send(String text) {
+        XmppMsg msg = new XmppMsg(_font);
+        msg.append(_cmdResults.toString());
+        send(msg);
     }
     
     @Override
