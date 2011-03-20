@@ -499,10 +499,11 @@ public class MainService extends Service {
     
     /** Updates the status about the service state (and the status bar) */
     private void onConnectionStatusChanged(int oldStatus, int status) {
-        Notification notification = new Notification();
-        String appName = getString(R.string.app_name);
-        String msg = null;
-        switch (status) {
+        if (_settingsMgr.showStatusIcon) {
+            Notification notification = new Notification();
+            final String appName = getString(R.string.app_name);
+            String msg = null;
+            switch (status) {
             case XmppManager.CONNECTED:
                 msg = getString(R.string.main_service_connected);
                 notification = new Notification(R.drawable.status_green, msg, System.currentTimeMillis());
@@ -527,14 +528,13 @@ public class MainService extends Service {
             default:
                 GoogleAnalyticsHelper.trackAndLogError("onConnectionStatusChanged(): unkown status int");
                 return;
-        }
-        
-        notification.setLatestEventInfo(getApplicationContext(), appName, msg, _contentIntent);
-        notification.flags |= Notification.FLAG_ONGOING_EVENT;
-        notification.flags |= Notification.FLAG_NO_CLEAR;
-        notification.tickerText = null;
- 
-        if (_settingsMgr.showStatusIcon) {
+            }
+
+            notification.setLatestEventInfo(getApplicationContext(), appName, msg, _contentIntent);
+            notification.flags |= Notification.FLAG_ONGOING_EVENT;
+            notification.flags |= Notification.FLAG_NO_CLEAR;
+            notification.tickerText = null;
+
             startForeground(ID, notification);
         }
     }

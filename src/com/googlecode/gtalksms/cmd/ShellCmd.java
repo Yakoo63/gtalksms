@@ -123,16 +123,11 @@ public class ShellCmd extends Command {
     }
     
     private void sendResults() {
-        send(_cmdResults.toString());
-        _cmdResults = new StringBuilder();
-    }
-    
-    @Override
-    protected void send(String text) {
         XmppMsg msg = new XmppMsg(_font);
         msg.append(_cmdResults.toString());
         send(msg);
-    }
+        _cmdResults = new StringBuilder();
+    }    
     
     @Override
     public String[] help() {
