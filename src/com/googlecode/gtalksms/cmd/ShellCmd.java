@@ -94,7 +94,9 @@ public class ShellCmd extends Command {
                     start = end;
                     int last = _cmdResults.lastIndexOf("\n");
                     if (last != -1) {
-                        send(_cmdResults.substring(0, last + 1));
+                        XmppMsg msg = new XmppMsg(_font);
+                        msg.append(_cmdResults.substring(0, last + 1));
+                        send(msg);
                         _cmdResults.delete(0, last + 1);
                     }
                 }

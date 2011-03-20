@@ -43,10 +43,8 @@ public class BatteryCmd extends Command {
                 }                                       
                 if (_lastPercentageNotified == -1) {
                     notifyAndSave(level, pSourceStr);
-                } else {
-                    if (level != _lastPercentageNotified) {
-                        notifyAndSave(level, pSourceStr);
-                    }
+                } else if (level != _lastPercentageNotified || _powerSource.compareTo(pSourceStr) != 0) {
+                    notifyAndSave(level, pSourceStr);
                 }
             }
 
