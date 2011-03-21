@@ -61,6 +61,8 @@
     <string name="pref_con_muc_password_help">Passwort des Group Chats für SMS Benachrichtigungen (Ein Passwort wird nur gesetzt, wenn der Group Chat nicht als privat konfiguriert werden kann)</string>
     <string name="pref_con_muc_server">MUC Server</string>
     <string name="pref_con_muc_server_help">Server für XMPP Groupchat (für erfahrene Benutzer)</string>
+    <string name="pref_con_manually_specify_server_settings">Manuelle Server Einstellungen</string>
+    <string name="pref_con_manually_specify_server_settings_help">XMPP Server Einstellungen manuell konfigurieren</string>
     <string name="pref_notif">Benachrichtigungsoptionen</string>
     <string name="pref_notif_application_connection">Bei erfolgreicher Verbindung</string>
     <string name="pref_notif_application_connection_help">Benachrichtigung bei erfolgreicher XMPP Verbindung durch GTalkSMS</string>

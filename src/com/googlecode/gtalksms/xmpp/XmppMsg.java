@@ -4,8 +4,7 @@ import java.util.ArrayList;
 
 import org.jivesoftware.smackx.XHTMLText;
 
-import android.util.Log;
-
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMsg {
@@ -16,7 +15,7 @@ public class XmppMsg {
     public final static String FontBegin = "##FONT_BEGIN##";
     
     // TODO to be initialized by SettingsMgr
-    public static XmppFont DefaultFont = new XmppFont();
+    private static final XmppFont DefaultFont = new XmppFont();
     private XmppFont _mainFont;
     private StringBuilder _message = new StringBuilder();
     private ArrayList<XmppFont> _fonts = new ArrayList<XmppFont>();
@@ -44,10 +43,6 @@ public class XmppMsg {
     
     public void setFont(XmppFont font) {
         _message.append(FontBegin);
-        _fonts.add(font);
-    }
-
-    public void insertFont(XmppFont font) {
         _fonts.add(font);
     }
 
@@ -172,8 +167,8 @@ public class XmppMsg {
         msg.delete(0, i);
         x.append(s);
         if (msg.indexOf("\n") == 0) {                   // newline
-            x.appendBrTag();                            // smack appends "<br>" where the XEP-71 postulates "<br/>" 
-            msg.delete(0, "\n".length());               //  we fix this in XmppManager
+            x.appendBrTag();                                // smack appends "<br>" where the XEP-71 postulates "<br/>" 
+            msg.delete(0, "\n".length());                   // we fix this in XmppManager
         } else if (msg.indexOf(BoldBegin) == 0) {       // bold
             x.appendOpenSpanTag("font-weight:bold");  
 //            x.appendOpenStrongTag();
@@ -196,7 +191,7 @@ public class XmppMsg {
                 XmppFont font = fonts.remove(0);
                 x.appendOpenSpanTag(font.toString());
             } else {
-                Log.e(Tools.LOG_TAG, "XmppMsg.generateXhtml: Font tags doesn't match");
+                GoogleAnalyticsHelper.trackAndLogError("XmppMsg.generateXhtml: Font tags doesn't match");
                 x.appendOpenSpanTag("font:null");   
             }
             msg.delete(0, FontBegin.length());

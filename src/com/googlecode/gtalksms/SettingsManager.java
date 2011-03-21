@@ -39,7 +39,7 @@ public class SettingsManager {
     public boolean useCompression;
     public String xmppSecurityMode;
     public int xmppSecurityModeInt;
-
+    public boolean manuallySpecifyServerSettings;
     
     // notifications
     public boolean notifyApplicationConnection;
@@ -78,7 +78,6 @@ public class SettingsManager {
     public Locale locale;
     
     public boolean backupAgentAvailable;
-    
     public boolean debugLog;
     
     private SharedPreferences _sharedPreferences;
@@ -123,15 +122,23 @@ public class SettingsManager {
 	private void importPreferences() {
         serverHost = _sharedPreferences.getString("serverHost", "");
         serverPort = _sharedPreferences.getInt("serverPort", 0);
-        serviceName = _sharedPreferences.getString("serviceName", "");
-        notifiedAddress = _sharedPreferences.getString("notifiedAddress", "");
-        password =  _sharedPreferences.getString("password", "");
+        
         useDifferentAccount = _sharedPreferences.getBoolean("useDifferentAccount", false);
         if (useDifferentAccount) {
             login = _sharedPreferences.getString("login", "");
         } else{
             login = notifiedAddress;
         }
+        
+        manuallySpecifyServerSettings = _sharedPreferences.getBoolean("manuallySpecifyServerSettings", true);
+        if (manuallySpecifyServerSettings) {
+            serviceName = _sharedPreferences.getString("serviceName", "");
+        } else {
+            serviceName = Tools.getDomain(login);
+        }
+        
+        notifiedAddress = _sharedPreferences.getString("notifiedAddress", "");
+        password =  _sharedPreferences.getString("password", "");
         xmppSecurityMode = _sharedPreferences.getString("xmppSecurityMode", "opt");
         if(xmppSecurityMode.equals("req")) {
             xmppSecurityModeInt = XMPPSecurityRequired;

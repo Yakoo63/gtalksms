@@ -27,11 +27,33 @@
             android:summary="@string/pref_con_login_help"/>
         <EditTextPreference
             android:key="password"
-            android:password="true"
             android:title="@string/pref_con_password"
-            android:summary="@string/pref_con_password_help"/>
-    </PreferenceCategory>
-    
+            android:summary="@string/pref_con_password_help" android:password="true"/>
+        <CheckBoxPreference 
+            android:key="manuallySpecifyServerSettings" 
+            android:defaultValue="true" 
+            android:title="@string/pref_con_manually_specify_server_settings" 
+            android:summary="@string/pref_con_manually_specify_server_settings_help"/>
+            <PreferenceScreen 
+                android:title="@string/pref_con_server_settings" 
+                android:dependency="manuallySpecifyServerSettings">
+                <EditTextPreference android:key="serverHost" 
+                    android:defaultValue="talk.google.com" 
+                    android:title="@string/pref_con_server_host" 
+                    android:summary="@string/pref_con_server_host_help" />
+                <com.googlecode.gtalksms.tools.EditIntegerPreference 
+                    android:key="serverPort" 
+                    android:numeric="integer" 
+                    android:defaultValue="5222" 
+                    android:title="@string/pref_con_server_port" 
+                    android:summary="@string/pref_con_server_port_help" />
+                <EditTextPreference 
+                    android:key="serviceName" 
+                    android:defaultValue="gmail.com" 
+                    android:title="@string/pref_con_service_name" 
+                    android:summary="@string/pref_con_service_name_help" />
+            </PreferenceScreen>
+    </PreferenceCategory>    
     <PreferenceScreen android:title="@string/pref_app_advanced">
         <EditTextPreference 
             android:key="roomPassword" 
@@ -54,23 +76,6 @@
             android:entryValues="@array/list_xmppConnectionSecurity_entryValues" 
             android:title="@string/pref_con_securityMode" 
             android:summary="@string/pref_con_securityMode_help" />
-        <PreferenceScreen android:title="@string/pref_con_server_settings">
-            <EditTextPreference 
-                android:key="serverHost" 
-                android:defaultValue="talk.google.com"
-                android:title="@string/pref_con_server_host"
-                android:summary="@string/pref_con_server_host_help" />
-            <com.googlecode.gtalksms.tools.EditIntegerPreference 
-                android:key="serverPort" 
-                android:numeric="integer" 
-                android:defaultValue="5222" 
-                android:title="@string/pref_con_server_port" 
-                android:summary="@string/pref_con_server_port_help" />
-            <EditTextPreference 
-                android:key="serviceName" 
-                android:defaultValue="gmail.com" 
-                android:title="@string/pref_con_service_name" 
-                android:summary="@string/pref_con_service_name_help" />
-        </PreferenceScreen>
+        
     </PreferenceScreen>
 </PreferenceScreen>

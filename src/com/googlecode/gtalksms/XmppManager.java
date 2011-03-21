@@ -316,15 +316,20 @@ public class XmppManager {
         updateStatus(CONNECTING);
         NetworkInfo active = ((ConnectivityManager)_context.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (active == null || !active.isAvailable()) {
-            Log.e(Tools.LOG_TAG, "connection request, but no network available");
+            Log.e(Tools.LOG_TAG, "initConnection: connection request, but no network available");
             // we don't destroy the service here - our network receiver will notify us when
             // the network comes up and we try again then.
             updateStatus(WAITING_TO_CONNECT);
             return;
         }
 
-        ConnectionConfiguration conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
-        conf.setTruststorePath("/system/etc/security/cacerts.bks");             // we trim the serverHost here because of Issue 122
+        ConnectionConfiguration conf;
+        if (_settings.manuallySpecifyServerSettings) { // we trim the serverHost here because of Issue 122
+            conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
+        } else {
+            conf = new ConnectionConfiguration(_settings.serviceName);   // DNS SRV lookup, yeah! :)
+        }
+        conf.setTruststorePath("/system/etc/security/cacerts.bks");             
         conf.setTruststorePassword("changeit");
         conf.setTruststoreType("bks");
         switch (_settings.xmppSecurityModeInt) {
@@ -382,9 +387,9 @@ public class XmppManager {
 
             @Override
             public void connectionClosedOnError(Exception e) {
-                // this is "unexpected" - our main service still thinks it has a 
-                // connection.
-                Log.e(Tools.LOG_TAG, "xmpp disconnected due to error", e);
+                // this happens mainly because of on IOException
+                // eg. connection timeouts because of lost connectivity
+                if (_settings.debugLog) Log.d(Tools.LOG_TAG, "xmpp disconnected due to error: ", e);
                 // We update the state to disconnected (mainly to cleanup listeners etc)
                 // then schedule an automatic reconnect.
                 maybeStartReconnect();
