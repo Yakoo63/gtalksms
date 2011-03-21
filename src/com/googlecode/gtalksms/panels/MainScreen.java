@@ -172,7 +172,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
                         
                         _friends.add(map);
                     }
-                    if (_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "Update presence: " + userId + " - " + XmppFriend.stateToString(stateInt));
+                    if (_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "Update presence: " + userId + " - " + XmppFriend.stateToString(stateInt));
                     updateBuddiesList();
 
                 } else if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
@@ -382,7 +382,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
 
     @Override
     public void onReceiveInterstitial(InterstitialAd interstitialAd) {
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onReceiveInterstitial");
+        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onReceiveInterstitial");
         if(interstitialAd == _interstitialAd) {
             _interstitialAd.show(this);
         }

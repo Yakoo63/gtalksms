@@ -65,7 +65,6 @@ public class WidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d(Tools.LOG_TAG, "widget onReceive " + action);
         if (action.equals(MainService.ACTION_WIDGET_ACTION)) {
             Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_TOGGLE);
             context.startService(svcintent);

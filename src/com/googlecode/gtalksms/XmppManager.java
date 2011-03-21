@@ -83,7 +83,7 @@ public class XmppManager {
     private int _currentRetryCount = 0;
     Runnable _reconnectRunnable = new Runnable() {
         public void run() {
-            if (_settings.debugLog) Log.d(Tools.LOG_TAG, "attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
+            if (_settings.debugLog) Log.i(Tools.LOG_TAG, "attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
             _context.startService(MainService.newSvcIntent(_context, MainService.ACTION_CONNECT));
         }
     };
@@ -274,7 +274,7 @@ public class XmppManager {
             int old = _status;
             _status = status;
             if(_settings.debugLog)
-                Log.d(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
+                Log.i(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
             broadcastStatus(_context, old, status);
         }
     }
@@ -291,7 +291,7 @@ public class XmppManager {
             _currentRetryCount += 1;
             // a simple linear-backoff strategy.
             int timeout = 5000 * _currentRetryCount;
-            if (_settings.debugLog) Log.d(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
+            if (_settings.debugLog) Log.i(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
             _reconnectHandler.postDelayed(_reconnectRunnable, timeout);
         }
     }
@@ -389,7 +389,7 @@ public class XmppManager {
             public void connectionClosedOnError(Exception e) {
                 // this happens mainly because of on IOException
                 // eg. connection timeouts because of lost connectivity
-                if (_settings.debugLog) Log.d(Tools.LOG_TAG, "xmpp disconnected due to error: ", e);
+                if (_settings.debugLog) Log.i(Tools.LOG_TAG, "xmpp disconnected due to error: ", e);
                 // We update the state to disconnected (mainly to cleanup listeners etc)
                 // then schedule an automatic reconnect.
                 maybeStartReconnect();
@@ -429,7 +429,7 @@ public class XmppManager {
                             && !message.getFrom().equals(_connection.getUser())
                             && message.getBody() != null) {
                         if (_settings.debugLog)
-                            Log.d(Tools.LOG_TAG, "XMPP packet received - sending Intent: " + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+                            Log.i(Tools.LOG_TAG, "XMPP packet received - sending Intent: " + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
                         
                         Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
                         intent.putExtra("from", from); // usually a full JID with resource
@@ -438,12 +438,12 @@ public class XmppManager {
                         _context.startService(intent);
                     } else if (_settings.debugLog) {
                         if (!from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/")) {
-                            Log.d(Tools.LOG_TAG, "XMPP packet received - but from address \"" + from.toLowerCase() + "\" does not match notification address \"" 
+                            Log.i(Tools.LOG_TAG, "XMPP packet received - but from address \"" + from.toLowerCase() + "\" does not match notification address \"" 
                                     + _settings.notifiedAddress.toLowerCase() + "\"");
                         } else if (message.getFrom().equals(_connection.getUser())) {
-                            Log.d(Tools.LOG_TAG, "XMPP packet received - but from the same user as the XMPP connection");
+                            Log.i(Tools.LOG_TAG, "XMPP packet received - but from the same user as the XMPP connection");
                         } else if (message.getBody() == null) {
-                            Log.d(Tools.LOG_TAG, "XMPP Packet received - but without body (body == null)");
+                            Log.i(Tools.LOG_TAG, "XMPP Packet received - but without body (body == null)");
                         }
                     }
                 }
@@ -505,9 +505,9 @@ public class XmppManager {
         if (isConnected()) {
             if (_settings.debugLog) {
                 if (to == null) {
-                    Log.d(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\"");
+                    Log.i(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\"");
                 } else {
-                    Log.d(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\" to " + to);
+                    Log.i(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\" to " + to);
                 }
             }
             Message msg;

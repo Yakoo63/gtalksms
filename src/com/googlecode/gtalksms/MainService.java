@@ -143,7 +143,7 @@ public class MainService extends Service {
         updateListenersToCurrentState(initialState);
         
         String action = intent.getAction();
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "handling action '" + action + "' while in state " + initialState);
+        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "handling action '" + action + "' while in state " + initialState);
         if (action.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // request to disconnect.
@@ -205,7 +205,7 @@ public class MainService extends Service {
             }
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
-            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
+            if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
             if(available) {
                 GoogleAnalyticsHelper.dispatch();
             }
@@ -229,14 +229,14 @@ public class MainService extends Service {
         } else if(!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {            
             GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "handled action '" + action + "' - state now " + getConnectionStatus());
+        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "handled action '" + action + "' - state now " + getConnectionStatus());
         // stop the service if we are disconnected (but stopping the service
         // doesn't mean the process is terminated - onStart can still happen.)
         if (getConnectionStatus() == XmppManager.DISCONNECTED) {
             if (stopSelfResult(id) == true) {
-                if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
+                if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
             } else {
-                if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "we are disconnected, but more pending intents to be delivered - service will not stop");
+                if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "we are disconnected, but more pending intents to be delivered - service will not stop");
             }
         }
     }
@@ -343,7 +343,7 @@ public class MainService extends Service {
         _handlerThreadId = thread.getId();
         _serviceLooper = thread.getLooper();
         _serviceHandler = new ServiceHandler(_serviceLooper);
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onCreate(): service thread created");
+        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onCreate(): service thread created");
         IsRunning = true; 
         _gAnalytics.trackServiceStartsPerDay();
     }
@@ -364,11 +364,10 @@ public class MainService extends Service {
             startService(new Intent(MainService.ACTION_CONNECT));
             return START_STICKY;
         }
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStartCommand(): begin with " + intent.getAction());
+        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onStartCommand(): begin with " + intent.getAction());
         // A special case for the 'broadcast status' intent - we avoid setting
         // up the _xmppMgr etc
         if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
-            if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "onStart: ACTION_BROADCAST_STATUS");
             // A request to broadcast our current status even if _xmpp is null.
             // We use here the intent XMPP_CONNECTION_CHANGED send by broadcastStatus(), although there is no real connection change
             int state = getConnectionStatus();
@@ -549,7 +548,7 @@ public class MainService extends Service {
      */
     private void onCommandReceived(String commandLine, String from) {
         if (_settingsMgr.debugLog) {
-            Log.d(Tools.LOG_TAG, "onCommandReceived(): " + Tools.shortenMessage(commandLine));
+            Log.i(Tools.LOG_TAG, "onCommandReceived(): " + Tools.shortenMessage(commandLine));
         }
         try {
             String command;
@@ -649,7 +648,7 @@ public class MainService extends Service {
      * and only if we have a network available
      */
     private void setupListenersForConnection() {
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "setupListenersForConnection()");  
+        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "setupListenersForConnection()");  
         _gAnalytics.trackInstalls(); //we only track if we have a data connection
 
         try {
@@ -661,7 +660,7 @@ public class MainService extends Service {
     }
     
     private void teardownListenersForConnection() {
-        if(_settingsMgr.debugLog) Log.d(Tools.LOG_TAG, "teardownListenersForConnection()");      
+        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "teardownListenersForConnection()");      
         stopForeground(true);
         stopCommands();
         cleanupCommands();
