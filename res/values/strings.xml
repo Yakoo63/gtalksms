@@ -147,8 +147,8 @@
     <string name="chat_help_stop">- %s: stop application on your phone.</string>
     <string name="chat_help_dial">- %s: dial the specified contact.</string>
     <string name="chat_help_sms_reply">- %s: send a SMS to your last recipient with content message.</string>
-    <string name="chat_help_sms_show_all">- %s: display last sent SMS from all contact.</string>
-    <string name="chat_help_sms_show_unread">- %s: display unread SMS from all contact.</string>
+    <string name="chat_help_sms_show_all">- %s: display last sent SMS from every contact.</string>
+    <string name="chat_help_sms_show_unread">- %s: display unread SMS from every contact.</string>
     <string name="chat_help_sms_show_contact">- %s: display last sent SMS from searched contacts.</string>
     <string name="chat_help_sms_send">- %s: sends a SMS to number with content message.</string>
     <string name="chat_help_sms_chat">- %s: creates a new Chat with the contact and invites you to that chat. Leave contact empty to use last contact</string>

@@ -64,7 +64,7 @@ public class BatteryCmd extends Command {
      */
     private void sendBatteryInfos(int level, boolean force) {
         if (force || (_settingsMgr.notifyBattery && level % _settingsMgr.batteryNotificationIntervalInt == 0)) {
-            send(getString(R.string.chat_battery_level, level));
+            send(R.string.chat_battery_level, level);
         }
         if (_settingsMgr.notifyBatteryInStatus) {
             _xmppMgr.setStatus("GTalkSMS - " + level + "%" + " - " + _powerSource);

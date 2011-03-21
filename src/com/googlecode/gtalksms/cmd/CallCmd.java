@@ -99,14 +99,14 @@ public class CallCmd extends Command {
                 contact = phone.contactName;
                 number = phone.cleanNumber;
             } else {
-                send(getString(R.string.chat_no_match_for, contactInfo));
+                send(R.string.chat_no_match_for, contactInfo);
             }
         }
 
         if (number != null) {
-            send(getString(R.string.chat_dial, contact + " (" + number + ")"));
+            send(R.string.chat_dial, contact + " (" + number + ")");
             if (!_phoneMgr.Dial(number)) {
-                send(getString(R.string.chat_error_dial));
+                send(R.string.chat_error_dial);
             }
         }
     }

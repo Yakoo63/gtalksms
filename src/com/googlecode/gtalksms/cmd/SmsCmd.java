@@ -40,8 +40,8 @@ public class SmsCmd extends Command {
     private SetLastRecipientRunnable _setLastrecipientRunnable;
     
     // int counter used to distinguish the PendingIntents
-    private int _penSIntentCount;
-    private int _penDIntentCount;
+    private static int _penSIntentCount;
+    private static int _penDIntentCount;
     // synchronizedMap because the worker thread and the intent receivers work with this map
     private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>()); 
     
@@ -52,16 +52,16 @@ public class SmsCmd extends Command {
         _smsMgr = new SmsMmsManager(_settingsMgr, _context);
 
         if (_settingsMgr.notifySmsSent) {
-            _sentSmsReceiver = new SentIntentReceiver(mainService, _smsMap);
-            mainService.registerReceiver(_sentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
+            _sentSmsReceiver = new SentIntentReceiver(_mainService, _smsMap);
+            _mainService.registerReceiver(_sentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
         }
 
         if (_settingsMgr.notifySmsDelivered) {
-            _deliveredSmsReceiver = new DeliveredIntentReceiver(mainService, _smsMap);
-            mainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
+            _deliveredSmsReceiver = new DeliveredIntentReceiver(_mainService, _smsMap);
+            _mainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
         }
         _xmppMgr = _mainService.getXmppmanager();
-        _aliasHelper = mainService.createAndGetAliasHelper();
+        _aliasHelper = _mainService.createAndGetAliasHelper();
     }
 
     @Override
@@ -93,7 +93,7 @@ public class SmsCmd extends Command {
             if (args.length() == 0) {
                 displayLastRecipient();
             } else if (_lastRecipient == null) {
-                send(getString(R.string.chat_error_no_recipient));
+                send(R.string.chat_error_no_recipient);
             } else {
                 _smsMgr.markAsRead(_lastRecipient);
                 sendSMS(args, _lastRecipient);
@@ -114,7 +114,7 @@ public class SmsCmd extends Command {
             if (args.length() > 0) {
                 markSmsAsRead(_aliasHelper.convertAliasToNumber(args));
             } else if (_lastRecipient == null) {
-                send(getString(R.string.chat_error_no_recipient));
+                send(R.string.chat_error_no_recipient);
             } else {
                 markSmsAsRead(_lastRecipient);
             }
@@ -126,7 +126,7 @@ public class SmsCmd extends Command {
         	}
         } else if (command.equals("delsms")) {
             if (args.length() == 0) {
-                send(getString(R.string.chat_del_sms_syntax));
+                send(R.string.chat_del_sms_syntax);
             } else {
                 int separatorPos = args.indexOf(":");
                 String subCommand = null;
@@ -217,7 +217,7 @@ public class SmsCmd extends Command {
             } else if (cmd.equals("lastout")) { 
                 nbDeleted = _smsMgr.deleteLastOutSms(number);
             } else {
-                send(getString(R.string.chat_del_sms_error));
+                send(R.string.chat_del_sms_error);
             }
         } else if (cmd.equals("contact") && search != null) {
             ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(_context, search);
@@ -231,19 +231,19 @@ public class SmsCmd extends Command {
                 send(sb.toString());
             } else if (contacts.size() == 1) {
                 Contact contact = contacts.get(0);
-                send(getString(R.string.chat_del_sms_from, contact.name));
+                send(R.string.chat_del_sms_from, contact.name);
                 nbDeleted = _smsMgr.deleteSmsByContact(contact.rawIds);
             } else {
-                send(getString(R.string.chat_no_match_for, search));
+                send(R.string.chat_no_match_for, search);
             }
         } else {
-            send(getString(R.string.chat_del_sms_syntax));
+            send(R.string.chat_del_sms_syntax);
         }
         
         if (nbDeleted >= 0) {
-            send(getString(R.string.chat_del_sms_nb, nbDeleted));
+            send(R.string.chat_del_sms_nb, nbDeleted);
         } else if (nbDeleted == -1) {
-            send(getString(R.string.chat_del_sms_error));
+            send(R.string.chat_del_sms_error);
         }
     }
     
@@ -264,7 +264,7 @@ public class SmsCmd extends Command {
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
             if (mobilePhones.size() > 1) {
-                send(getString(R.string.chat_specify_details));
+                send(R.string.chat_specify_details);
                 for (Phone phone : mobilePhones) {
                     send(phone.contactName + " - " + phone.cleanNumber);
                 }
@@ -273,17 +273,23 @@ public class SmsCmd extends Command {
                 _xmppMgr.getXmppMuc().inviteRoom(phone.cleanNumber, phone.contactName);
 //                setLastRecipient(phone.cleanNumber); // issue 117
             } else {
-                send( getString(R.string.chat_no_match_for, contact) );
+                send(R.string.chat_no_match_for, contact);
             }
         }
     }
     
-    /** search SMS */
+    /**
+     * Search for SMS Mesages 
+     * and sends them back to the user
+     * 
+     * @param message
+     * @param contactName - optional, may be null
+     */
     private void searchSMS(String message, String contactName) {
-        ArrayList<Contact> contacts = new ArrayList<Contact>();
+        ArrayList<Contact> contacts;
         ArrayList<Sms> sentSms = null;
         
-        send(getString(R.string.chat_sms_search_start));
+        send(R.string.chat_sms_search_start);
         
         contacts = ContactsManager.getMatchingContacts(_context, contactName != null ? contactName : "*");
         
@@ -291,13 +297,12 @@ public class SmsCmd extends Command {
             sentSms = _smsMgr.getAllSentSms(message);
         }
         
-        int nbResults = 0;
         if (contacts.size() > 0) {
-            send(getString(R.string.chat_sms_search, message, contacts.size()));
+            send(R.string.chat_sms_search, message, contacts.size());
             
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name, message);
-                if (_settingsMgr.showSentSms) {
+                if (sentSms != null) {
                     smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(_context, contact.id), sentSms));
                 }
                 Collections.sort(smsArrayList);
@@ -307,14 +312,19 @@ public class SmsCmd extends Command {
                     smsContact.appendBold(contact.name);
                     smsContact.append(" - ");
                     smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, smsArrayList.size()));
-                    
-                    for (Sms sms : smsArrayList) {
-                        smsContact.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                        smsContact.appendLine(sms.message);
-                        nbResults++;
+                    if (_settingsMgr.smsReplySeparate) {
+                        send(smsContact);
+                        for (Sms sms : smsArrayList) {
+                            smsContact = new XmppMsg();
+                            appendSMS(smsContact, sms);
+                            send(smsContact);
+                        }
+                    } else {
+                        for (Sms sms : smsArrayList) {
+                            appendSMS(smsContact, sms);
+                        }
+                        send(smsContact);
                     }
-                    
-                    send(smsContact);
                 }
             }
         } else if (sentSms.size() > 0) {
@@ -322,39 +332,54 @@ public class SmsCmd extends Command {
             smsContact.appendBold(getString(R.string.chat_me));
             smsContact.append(" - ");
             smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, sentSms.size()));
-            
-            for (Sms sms : sentSms) {
-                smsContact.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                smsContact.appendLine(sms.message);
-                nbResults++;
+            if (_settingsMgr.smsReplySeparate) {
+                send(smsContact);
+                for (Sms sms : sentSms) {
+                    smsContact = new XmppMsg();
+                    appendSMS(smsContact, sms);
+                    send(smsContact);
+                }
+            } else {
+                for (Sms sms : sentSms) {
+                    appendSMS(smsContact, sms);
+                }
+                send(smsContact);
             }
-            send(smsContact);
-        } 
-        
-        if (nbResults > 0) {
-            send(getString(R.string.chat_sms_search_results, nbResults));
         } else {
-            send(getString(R.string.chat_no_match_for, message));
+                send(R.string.chat_no_match_for, message);
         }
+    }
+    
+    /**
+     * Appends an SMS to an XmppMsg with formating
+     * does not send the XmppMsg!
+     * 
+     * @param msg
+     * @param sms
+     */
+    private static void appendSMS(XmppMsg msg, Sms sms) {
+        msg.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
+        msg.appendLine(sms.message);
     }
 
     /**
      * Sends an SMS Message
+     * returns an error to the user if the contact could not be found
      * 
-     * @param message the message to send, needed
+     * @param message the message to send
      * @param contact the name or number
      */
     private void sendSMS(String message, String contact) {
         if (Phone.isCellPhoneNumber(contact)) {
             String resolvedName = ContactsManager.getContactName(_context, contact);
             if (_settingsMgr.notifySmsSent) {
-                send(getString(R.string.chat_send_sms,  resolvedName + ": \"" + Tools.shortenMessage(message) + "\""));
+                send(R.string.chat_send_sms,  resolvedName + ": \"" + Tools.shortenMessage(message) + "\"");
             }
             sendSMSByPhoneNumber(message, contact, resolvedName);           
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
             if (mobilePhones.size() > 1) {
-                send(getString(R.string.chat_specify_details));
+                send(R.string.chat_specify_details);
 
                 for (Phone phone : mobilePhones) {
                     send(phone.contactName + " - " + phone.cleanNumber);
@@ -362,12 +387,12 @@ public class SmsCmd extends Command {
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 if (_settingsMgr.notifySmsSent) {
-                    send(getString(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")")  + ": \"" + Tools.shortenMessage(message) + "\"");
+                    send(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")"  + ": \"" + Tools.shortenMessage(message) + "\"");
                 }
                 setLastRecipient(phone.cleanNumber);
                 sendSMSByPhoneNumber(message, phone.cleanNumber, phone.contactName);
             } else {
-                send(getString(R.string.chat_no_match_for, contact));
+                send(R.string.chat_no_match_for, contact);
             }
         }
     }
@@ -375,23 +400,27 @@ public class SmsCmd extends Command {
     private void markSmsAsRead(String contact) {
 
         if (Phone.isCellPhoneNumber(contact)) {
-            send(getString(R.string.chat_mark_as_read, ContactsManager.getContactName(_context, contact)));
+            send(R.string.chat_mark_as_read, ContactsManager.getContactName(_context, contact));
             _smsMgr.markAsRead(contact);
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
             if (mobilePhones.size() > 0) {
-                send(getString(R.string.chat_mark_as_read, mobilePhones.get(0).contactName));
+                send(R.string.chat_mark_as_read, mobilePhones.get(0).contactName);
 
                 for (Phone phone : mobilePhones) {
                     _smsMgr.markAsRead(phone.number);
                 }
             } else {
-                send(getString(R.string.chat_no_match_for, contact));
+                send(R.string.chat_no_match_for, contact);
             }
         }
     }
 
-    /** reads (count) SMS from all contacts matching pattern */
+    /**
+     * reads (count) SMS from all contacts matching pattern
+     * 
+     *  @param searchedText 
+     */
     private void readSMS(String searchedText) {
 
         ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(_context, searchedText);
@@ -403,7 +432,7 @@ public class SmsCmd extends Command {
         if (contacts.size() > 0) {
 
             XmppMsg noSms = new XmppMsg();
-            Boolean hasMatch = false;
+            boolean hasMatch = false;
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name);
                 if (_settingsMgr.showSentSms) {
@@ -420,8 +449,7 @@ public class SmsCmd extends Command {
                     smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, smsArrayList.size()));
                     
                     for (Sms sms : smsList) {
-                        smsContact.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                        smsContact.appendLine(sms.message);
+                        appendSMS(smsContact, sms);
                     }
                     if (smsList.size() < _settingsMgr.smsNumber) {
                         smsContact.appendItalicLine(getString(R.string.chat_only_got_n_sms, smsList.size()));
@@ -437,7 +465,7 @@ public class SmsCmd extends Command {
                 send(noSms);
             }
         } else {
-            send(getString(R.string.chat_no_match_for, searchedText));
+            send(R.string.chat_no_match_for, searchedText);
         }
     }
 
@@ -450,8 +478,7 @@ public class SmsCmd extends Command {
         List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
         if (smsList.size() > 0) {
             for (Sms sms : smsList) {
-                allSms.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                allSms.appendLine(sms.message);
+                appendSMS(allSms, sms);
             }
         } else {
             allSms.appendLine(getString(R.string.chat_no_sms));
@@ -474,32 +501,30 @@ public class SmsCmd extends Command {
             XmppMsg message = new XmppMsg();
             if (_settingsMgr.smsReplySeparate) {
                 for (Sms sms : smsList) {
-                    message.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                    message.appendLine(sms.message);
+                    appendSMS(message, sms);
                     send(message);
                     message = new XmppMsg();
                 }   
             } else {
                 for (Sms sms : smsList) {
-                    message.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-                    message.appendLine(sms.message);
+                    appendSMS(message, sms);
                 } 
                 send(message);
             }
         } else {
-            send(getString(R.string.chat_no_sms));
+            send(R.string.chat_no_sms);
         }
     }
     
     private void displayLastRecipient() {
         if (_lastRecipient == null) {
-            send(getString(R.string.chat_error_no_recipient));
+            send(R.string.chat_error_no_recipient);
         } else {
             String contact = ContactsManager.getContactName(_context, _lastRecipient);
             if (Phone.isCellPhoneNumber(_lastRecipient) && contact.compareTo(_lastRecipient) != 0) {
                 contact += " (" + _lastRecipient + ")";
             }
-            send(getString(R.string.chat_reply_contact, contact));
+            send(R.string.chat_reply_contact, contact);
         }
     }
 
@@ -539,7 +564,7 @@ public class SmsCmd extends Command {
         _deliveredSmsReceiver = null;
     }
     
-    private ArrayList<PendingIntent> createSPendingIntents(int size, int smsID) {
+    private static ArrayList<PendingIntent> createSPendingIntents(int size, int smsID) {
         ArrayList<PendingIntent> SentPenIntents = new ArrayList<PendingIntent>();
         for (int i = 0; i < size; i++) {
             int p = _penSIntentCount++;
@@ -552,7 +577,7 @@ public class SmsCmd extends Command {
         return SentPenIntents;
     }
     
-    private ArrayList<PendingIntent> createDPendingIntents(int size, int smsID) {
+    private static ArrayList<PendingIntent> createDPendingIntents(int size, int smsID) {
         ArrayList<PendingIntent> DelPenIntents = new ArrayList<PendingIntent>();
         for (int i = 0; i < size; i++) {
             int p = _penDIntentCount++;

@@ -42,23 +42,23 @@ public class AliasCmd extends Command {
     private void add(String[] subCommand) {
             if (Phone.isCellPhoneNumber(subCommand[2])) {
                 aliasHelper.addAliasByNumber(subCommand[1], subCommand[2]);
-                send(getString(R.string.chat_alias_add_by_number, subCommand[1], subCommand[2]));
+                send(R.string.chat_alias_add_by_number, subCommand[1], subCommand[2]);
             } else {
                 ArrayList<Phone> res = aliasHelper.addAliasByName(subCommand[1], subCommand[2]);
                 if (res.size() != 1) {
-                    send(getString(R.string.chat_error_unkown_name));
+                    send(R.string.chat_error_unkown_name);
                 } else {
                     Phone p = res.get(0);
-                    send(getString(R.string.chat_alias_add_by_name, subCommand[1], p.contactName, p.number));
+                    send(R.string.chat_alias_add_by_name, subCommand[1], p.contactName, p.number);
                 }
             }
     }
     
     private void del(String[] subCommand) {
         if (aliasHelper.deleteAlias(subCommand[1])) {
-            send(getString(R.string.chat_alias_del_suc, subCommand[1]));
+            send(R.string.chat_alias_del_suc, subCommand[1]);
         } else {
-            send(getString(R.string.chat_alias_del_suc, subCommand[1]));
+            send(R.string.chat_alias_del_suc, subCommand[1]);
         }
     }
     
@@ -66,7 +66,7 @@ public class AliasCmd extends Command {
         if (subCommand[1].equals("all")) {
             String[][] aliases = aliasHelper.getAllAliases();
             if (aliases == null) {
-                send(getString(R.string.chat_alias_empty));
+                send(R.string.chat_alias_empty);
             } else {
                 XmppMsg msg = new XmppMsg();
                 for (int i = 0; i < aliases.length; i++) {
@@ -83,7 +83,7 @@ public class AliasCmd extends Command {
         } else {
             String[] res = aliasHelper.getAliasOrNull(subCommand[1]);
             if (res == null) {
-                send(getString(R.string.chat_alias_show_non_existent, subCommand[1]));
+                send(R.string.chat_alias_show_non_existent, subCommand[1]);
             } else if (res.length == 2) {
                 send("\'" + res[0] + "\' -> " + res[1]);
             } else {

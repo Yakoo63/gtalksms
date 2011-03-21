@@ -23,7 +23,7 @@ public class ContactCmd extends Command {
         if (contacts.size() > 0) {
 
             if (contacts.size() > 1) {
-                send(getString(R.string.chat_contact_found, contacts.size(), searchedText));
+                send(R.string.chat_contact_found, contacts.size(), searchedText);
             }
 
             for (Contact contact : contacts) {
@@ -60,7 +60,7 @@ public class ContactCmd extends Command {
                 send(strContact);
             }
         } else {
-            send(getString(R.string.chat_no_match_for, searchedText));
+            send(R.string.chat_no_match_for, searchedText);
         }
     }
     

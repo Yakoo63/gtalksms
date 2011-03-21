@@ -9,23 +9,38 @@ import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public abstract class Command {    
-    protected SettingsManager _settingsMgr;
-    protected Context _context;
-    protected MainService _mainService;
+    protected static SettingsManager _settingsMgr;
+    protected static Context _context;
+    protected static MainService _mainService;
+    protected static boolean initialized = false;
     protected final String[] _commands;
     protected String _answerTo;
         
     Command(MainService mainService, String[] commands) {
-        _mainService = mainService;
-        _settingsMgr = mainService.getSettingsManager();
-        _context = mainService.getBaseContext();
+        if (!initialized) {
+            _mainService = mainService;
+            _settingsMgr = mainService.getSettingsManager();
+            _context = mainService.getBaseContext();
+            initialized = true;
+        }
         _commands = commands;
         _answerTo = null;
     }
-    
+
     protected String getString(int id, Object... args) {
         return _context.getString(id, args);
     }   
+    
+    /**
+     * Nice send() wrapper that includes
+     * the context.getString Method
+     * 
+     * @param id
+     * @param args
+     */
+    protected void send(int id, Object... args) {
+        send(getString(id, args));
+    }    
     
     protected void send(String message) {
         send(message, _answerTo);
