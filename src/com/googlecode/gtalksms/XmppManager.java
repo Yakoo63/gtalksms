@@ -423,18 +423,27 @@ public class XmppManager {
             _packetListener = new PacketListener() {
                 public void processPacket(Packet packet) {
                     Message message = (Message) packet;
-
-                    if (_settings.debugLog)
-                        Log.d(Tools.LOG_TAG, "Xmpp packet received");
-
                     String from = message.getFrom();
-                    if (from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") && !message.getFrom().equals(_connection.getUser())) {
-                        if (message.getBody() != null) {
-                            Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
-                            intent.putExtra("from", from); // usually a full JID with resource
-                            intent.putExtra("message", message.getBody());
-                            intent.setClass(_context, MainService.class);
-                            _context.startService(intent);
+                    
+                    if (from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") 
+                            && !message.getFrom().equals(_connection.getUser())
+                            && message.getBody() != null) {
+                        if (_settings.debugLog)
+                            Log.d(Tools.LOG_TAG, "XMPP packet received - sending Intent: " + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+                        
+                        Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+                        intent.putExtra("from", from); // usually a full JID with resource
+                        intent.putExtra("message", message.getBody());
+                        intent.setClass(_context, MainService.class);
+                        _context.startService(intent);
+                    } else if (_settings.debugLog) {
+                        if (!from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/")) {
+                            Log.d(Tools.LOG_TAG, "XMPP packet received - but from address \"" + from.toLowerCase() + "\" does not match notification address \"" 
+                                    + _settings.notifiedAddress.toLowerCase() + "\"");
+                        } else if (message.getFrom().equals(_connection.getUser())) {
+                            Log.d(Tools.LOG_TAG, "XMPP packet received - but from the same user as the XMPP connection");
+                        } else if (message.getBody() == null) {
+                            Log.d(Tools.LOG_TAG, "XMPP Packet received - but without body (body == null)");
                         }
                     }
                 }
