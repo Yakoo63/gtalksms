@@ -11,17 +11,15 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 public abstract class Command {    
     protected static SettingsManager _settingsMgr;
     protected static Context _context;
-    protected static MainService _mainService;
-    protected static boolean initialized = false;
+    protected static MainService _mainService = null;
     protected final String[] _commands;
     protected String _answerTo;
         
     Command(MainService mainService, String[] commands) {
-        if (!initialized) {
+        if (_mainService == null) {
             _mainService = mainService;
             _settingsMgr = mainService.getSettingsManager();
             _context = mainService.getBaseContext();
-            initialized = true;
         }
         _commands = commands;
         _answerTo = null;
