@@ -89,7 +89,6 @@
     <string name="main_but_send_clipboard">Send Clipboard</string>
     <string name="main_but_about">About</string>
     <string name="main_but_donate">Donate</string>
-    <string name="app_name">GTalkSMS</string>
     <string name="about_panel">About GTalkSMS</string>
     <string name="main_panel">GTalkSMS</string>
     <string name="preference_panel">Preferences</string>

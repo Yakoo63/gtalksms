@@ -41,6 +41,7 @@ import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.tools.AliasHelper;
+import com.googlecode.gtalksms.tools.DisplayToast;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -63,10 +64,10 @@ public class MainService extends Service {
     public final static String ACTION_WIDGET_ACTION = "com.googlecode.gtalksms.action.widget.ACTION";
     
     // A list of intent actions that the XmppManager broadcasts.
-    static final public String ACTION_XMPP_MESSAGE_RECEIVED = "com.googlecode.gtalksms.action.XMPP.MESSAGE_RECEIVED";
-    static final public String ACTION_XMPP_PRESENCE_CHANGED = "com.googlecode.gtalksms.action.XMPP.PRESENCE_CHANGED";
-    static final public String ACTION_XMPP_CONNECTION_CHANGED = "com.googlecode.gtalksms.action.XMPP.CONNECTION_CHANGED";
-
+    public static final String ACTION_XMPP_MESSAGE_RECEIVED = "com.googlecode.gtalksms.action.XMPP.MESSAGE_RECEIVED";
+    public static final String ACTION_XMPP_PRESENCE_CHANGED = "com.googlecode.gtalksms.action.XMPP.PRESENCE_CHANGED";
+    public static final String ACTION_XMPP_CONNECTION_CHANGED = "com.googlecode.gtalksms.action.XMPP.CONNECTION_CHANGED";
+    
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
     // about some events
@@ -92,6 +93,9 @@ public class MainService extends Service {
     
     private static AliasHelper _aliasHelper;
     
+    private static Context _uiContext;
+    
+    private static volatile Handler _toastHandler;  
 
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
@@ -338,11 +342,16 @@ public class MainService extends Service {
         };
         
         Tools.setLocale(_settingsMgr, this);
+        
         HandlerThread thread = new HandlerThread("GTalkSMS.Service");
         thread.start();
         _handlerThreadId = thread.getId();
         _serviceLooper = thread.getLooper();
         _serviceHandler = new ServiceHandler(_serviceLooper);
+        
+        _uiContext = this;
+        _toastHandler = new Handler();
+        
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onCreate(): service thread created");
         IsRunning = true; 
         _gAnalytics.trackServiceStartsPerDay();
@@ -352,7 +361,7 @@ public class MainService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (_gAnalytics == null) {  
             _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
-            // TODO is the log msg is never seen move it to onCreate()
+            // TODO if the log msg is never seen remove the block
             GoogleAnalyticsHelper.trackAndLogWarning("onStartCommand(): _gAnalytics == null");
         }
         if (_contentIntent == null) {
@@ -496,11 +505,24 @@ public class MainService extends Service {
         return _keyboard;
     }
     
+    /**
+     * Provides a clean way to display toast messages that don't get stuck
+     * 
+     * @param text
+     * @param ctx
+     */
+    public static void displayToast(String text) {      
+        _toastHandler.post(new DisplayToast(text, _uiContext));
+    }
+    
+    public static void displayToast(int i) {
+        displayToast(_uiContext.getString(i));
+    }
+    
     /** Updates the status about the service state (and the status bar) */
     private void onConnectionStatusChanged(int oldStatus, int status) {
         if (_settingsMgr.showStatusIcon) {
             Notification notification = new Notification();
-            final String appName = getString(R.string.app_name);
             String msg = null;
             switch (status) {
             case XmppManager.CONNECTED:
@@ -529,7 +551,7 @@ public class MainService extends Service {
                 return;
             }
 
-            notification.setLatestEventInfo(getApplicationContext(), appName, msg, _contentIntent);
+            notification.setLatestEventInfo(getApplicationContext(), Tools.APP_NAME, msg, _contentIntent);
             notification.flags |= Notification.FLAG_ONGOING_EVENT;
             notification.flags |= Notification.FLAG_NO_CLEAR;
             notification.tickerText = null;

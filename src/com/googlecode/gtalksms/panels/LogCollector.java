@@ -56,7 +56,7 @@ public class LogCollector extends Activity {
 
     protected Dialog onCreateDialog(int id) {
         return new AlertDialog.Builder(this)
-        .setTitle(getString(R.string.app_name))
+        .setTitle(Tools.APP_NAME)
         .setIcon(android.R.drawable.ic_dialog_info)
         // we don't really want these turning up directly on the gtalksms mailing lists, so
         // don't default a 'to' address and tell the user to send it to themself.
@@ -157,7 +157,7 @@ public class LogCollector extends Activity {
    
     void showErrorDialog(String errorMessage){
         new AlertDialog.Builder(this)
-        .setTitle(getString(R.string.app_name))
+        .setTitle(Tools.APP_NAME)
         .setMessage(errorMessage)
         .setIcon(android.R.drawable.ic_dialog_alert)
         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){

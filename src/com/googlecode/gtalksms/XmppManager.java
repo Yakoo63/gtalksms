@@ -351,7 +351,7 @@ public class XmppManager {
             connection.connect();
         } catch (Exception e) {
             Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
-            Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_connection_failed));
+            MainService.displayToast(R.string.xmpp_manager_connection_failed);
             maybeStartReconnect();
             return;
         }
@@ -368,10 +368,10 @@ public class XmppManager {
             // hard-coded string.
             if (e.getMessage().indexOf("SASL authentication") == -1) {
                 // doesn't look like a bad username/password, so retry
-                Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_login_failed));
+                MainService.displayToast(R.string.xmpp_manager_login_failed);
                 maybeStartReconnect();
             } else {
-                Tools.toastMessage(_context, _context.getString(R.string.xmpp_manager_invalid_credentials));
+                MainService.displayToast(R.string.xmpp_manager_invalid_credentials);
                 stop();
             }
             return;

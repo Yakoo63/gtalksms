@@ -15,9 +15,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.widget.Toast;
 
-import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 
 public class Tools {
@@ -25,11 +23,6 @@ public class Tools {
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
     public final static int shortenTo = 20;
-    
-    public final static void toastMessage(Context ctx, String msg) {
-        String toastMsg  = ctx.getString(R.string.app_name) + ": " + msg;
-        Toast.makeText(ctx, toastMsg, Toast.LENGTH_SHORT).show();
-    }
         
     public final static String getVersionName(Context context) {
 
