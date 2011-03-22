@@ -352,6 +352,8 @@ public class MainService extends Service {
         _uiContext = this;
         _toastHandler = new Handler();
         
+        _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
+        
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onCreate(): service thread created");
         IsRunning = true; 
         _gAnalytics.trackServiceStartsPerDay();
@@ -359,14 +361,6 @@ public class MainService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (_gAnalytics == null) {  
-            _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
-            // TODO if the log msg is never seen remove the block
-            GoogleAnalyticsHelper.trackAndLogWarning("onStartCommand(): _gAnalytics == null");
-        }
-        if (_contentIntent == null) {
-            _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
-        }
         if (intent == null) { 
             // The application has been killed by Android and
             // we try to restart the connection
@@ -473,7 +467,7 @@ public class MainService extends Service {
      * Wrapper for send(XmppMsg msg... method
      * 
      * @param msg
-     * @param to = the receiving JID, if null the default notification address is used
+     * @param to The receiving JID, if null the default notification address is used
      */
     public void send(String msg, String to) {
        send(new XmppMsg(msg), to);

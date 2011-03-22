@@ -25,7 +25,7 @@ public class SentIntentReceiver extends SmsPendingIntentReceiver {
         Sms s = getSms(smsID);
 
         if (s != null) {  // we could find the sms in the smsMap
-            answerTo = s.answerTo; // I surely hope that broadcastReceiver don result in concurrent calls;
+            answerTo = s.answerTo;
             s.sentIntents[partNum] = true;
             boolean sentIntComplete = s.sentIntentsComplete();
             String to;
