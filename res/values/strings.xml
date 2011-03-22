@@ -101,10 +101,10 @@
     <string name="main_service_disconnecting">Disconnecting...</string>
     <string name="main_service_waiting">Waiting...</string>
     <string name="main_service_waiting_to_connect">Waiting to connect...</string>
-    <string name="main_service_stop">GTalkSMS stopped</string>
+    <!-- <string name="main_service_stop">GTalkSMS stopped</string>
     <string name="xmpp_manager_reconnecting">Reconnecting…</string>
     <string name="xmpp_manager_failed_max_attempts">Failed to connect.</string>
-    <string name="xmpp_manager_waiting">Waiting for network to become available.</string>
+    <string name="xmpp_manager_waiting">Waiting for network to become available.</string> -->
     <string name="xmpp_manager_connection_failed">Connection failed.</string>
     <string name="xmpp_manager_login_failed">Login failed.</string>
     <string name="xmpp_manager_invalid_credentials">Invalid username or password.</string>

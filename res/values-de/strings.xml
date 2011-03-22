@@ -101,10 +101,10 @@
     <string name="main_service_disconnecting">Trenne...</string>
     <string name="main_service_waiting">Wartend...</string>
     <string name="main_service_waiting_to_connect">Warte auf Verbindung...</string>
-    <string name="main_service_stop">GTalkSMS Dienst angehalten</string>
+    <!-- <string name="main_service_stop">GTalkSMS Dienst angehalten</string>
     <string name="xmpp_manager_reconnecting">Erneuter Verbindungsversuch…</string>
-    <string name="xmpp_manager_failed_max_attempts">Alle Verbindungsversuche gescheitert.</string>
-    <string name="xmpp_manager_waiting">Warten bis Datennetzwerk verfügbar wird.</string>
+    <string name="xmpp_manager_failed_max_attempts">Alle Verbindungsversuche gescheitert.</string> 
+    <string name="xmpp_manager_waiting">Warten bis Datennetzwerk verfügbar wird.</string> -->
     <string name="xmpp_manager_connection_failed">Verbindungsversuch gescheitert.</string>
     <string name="xmpp_manager_login_failed">GTalk/XMPP Login fehlgeschlagen.</string>
     <string name="xmpp_manager_invalid_credentials">Falscher Benutzername oder Passwort</string>
