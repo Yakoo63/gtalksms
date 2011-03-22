@@ -333,6 +333,7 @@ public class MainService extends Service {
     public void onCreate() {
         super.onCreate();
         _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
+        _gAnalytics.trackInstalls();
         
         _settingsMgr = new SettingsManager(this) {
             @Override public void OnPreferencesUpdated() {
@@ -356,11 +357,11 @@ public class MainService extends Service {
         
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onCreate(): service thread created");
         IsRunning = true; 
-        _gAnalytics.trackServiceStartsPerDay();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        _gAnalytics.trackServiceStartsPerDay();
         if (intent == null) { 
             // The application has been killed by Android and
             // we try to restart the connection
@@ -665,8 +666,7 @@ public class MainService extends Service {
      */
     private void setupListenersForConnection() {
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "setupListenersForConnection()");  
-        _gAnalytics.trackInstalls(); //we only track if we have a data connection
-
+        
         try {
             setupCommands();
         } catch (Exception e) {

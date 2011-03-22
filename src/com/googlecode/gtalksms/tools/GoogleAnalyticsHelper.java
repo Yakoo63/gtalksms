@@ -23,6 +23,7 @@ public class GoogleAnalyticsHelper {
     private final Context ctx;
     private final String version;
     private final String datefile;
+    private static String lastRun = null;
     private static GoogleAnalyticsTracker gAnalytics;
     private static boolean statisticsEnabled;
     private static boolean run = false;
@@ -114,7 +115,7 @@ public class GoogleAnalyticsHelper {
     }
     
     public void trackServiceStartsPerDay() {
-       if(!datefileHasCurrentDate()) {
+       if(!hasBeenRunToday() && !datefileHasCurrentDate()) {
            gAnalytics.trackEvent("GTalkSMS", // Category
                    "Service", // Action
                    "StartPerDay", // Label
@@ -133,6 +134,7 @@ public class GoogleAnalyticsHelper {
     /**
      * checks the contents of the datefile
      * and updates the datefile if its outdated
+     * used by trackServiceStartsPerDay
      * 
      * @return false if datefile is outdated, true otherwise
      */
@@ -152,6 +154,25 @@ public class GoogleAnalyticsHelper {
         return false;
     }
     
+    /**
+     * checks if the method trackServiceStartsPerDay()
+     * to avoid filesystem lookups where possible
+     * 
+     * @return
+     */
+    private boolean hasBeenRunToday() {
+        final String currentDate = currentDate();
+        if (lastRun == null) {
+            lastRun = currentDate;
+            return false;
+        } else if (lastRun.equals(currentDate)) {
+            return true;
+        } else {
+            lastRun = currentDate;
+            return false;
+        }
+    }
+    
     private boolean createDatefile() {
         try {
             FileOutputStream fOut = ctx.openFileOutput(datefile, Context.MODE_PRIVATE); //MODE_APPEND not set, should be ok
@@ -165,7 +186,7 @@ public class GoogleAnalyticsHelper {
     }
     
     private String currentDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Calendar cal = Calendar.getInstance();
         return dateFormat.format(cal.getTime());
     }
