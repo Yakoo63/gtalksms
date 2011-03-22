@@ -23,7 +23,7 @@ public class RingCmd extends Command {
     private long[] _pattern = {0, 1000, 100};
    
     public RingCmd(MainService mainService) {
-        super(mainService, new String[] {"ring", "ringmode"});
+        super(mainService, new String[] {"ring", "ringmode"}, Command.TYPE_SYSTEM);
         _audioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         _vibrator = (Vibrator) mainService.getSystemService(Context.VIBRATOR_SERVICE);
     }

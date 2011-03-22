@@ -7,7 +7,7 @@ import com.googlecode.gtalksms.R;
 public class ExitCmd extends Command {
 
     public ExitCmd(MainService mainService) {
-        super(mainService, new String[] {"exit"});
+        super(mainService, new String[] {"exit"}, Command.TYPE_SYSTEM);
     }
 
     @Override

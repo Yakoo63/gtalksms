@@ -12,7 +12,7 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class ContactCmd extends Command {
     public ContactCmd(MainService mainService) {
-        super(mainService, new String[] {"contact"});
+        super(mainService, new String[] {"contact"}, Command.TYPE_CONTACTS);
     }
    
     @Override

@@ -17,7 +17,7 @@ public class BatteryCmd extends Command {
     private XmppManager _xmppMgr;
     
     public BatteryCmd(MainService mainService) {
-        super(mainService, new String[] {"battery", "batt"});
+        super(mainService, new String[] {"battery", "batt"}, Command.TYPE_SYSTEM);
         _xmppMgr = mainService.getXmppmanager();
         _powerSource = "Unknown";
         

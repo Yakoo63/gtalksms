@@ -12,7 +12,7 @@ public class ClipboardCmd extends Command {
     ClipboardManager _clipboardMgr;
     
     public ClipboardCmd(MainService mainService) {
-        super(mainService, new String[] {"copy"});
+        super(mainService, new String[] {"copy"}, Command.TYPE_COPY);
         _clipboardMgr = (ClipboardManager) mainService.getSystemService(Service.CLIPBOARD_SERVICE);
     }
     

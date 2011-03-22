@@ -26,7 +26,7 @@ public class CallCmd extends Command {
     private AliasHelper _aliasHelper;
     
     public CallCmd(MainService mainService) {
-        super(mainService, new String[] {"calls", "dial"});
+        super(mainService, new String[] {"calls", "dial"}, Command.TYPE_CONTACTS);
         _phoneMgr = new PhoneManager(_context);
         _telephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
         

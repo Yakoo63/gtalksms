@@ -144,7 +144,8 @@
     <string name="chat_help_title">Available commands:</string>
     <string name="chat_help_help">- %1$s or %2$s: shows this help.</string>
     <string name="chat_help_help_all">- %s: shows full help.</string>
-    <string name="chat_help_stop">- %s: stop application on your phone.</string>
+    <string name="chat_help_help_categories">- %1$s or %2$s: shows the help categories.</string>
+    <string name="chat_help_stop">- %s: quits the application on your phone.</string>
     <string name="chat_help_dial">- %s: dial the specified contact.</string>
     <string name="chat_help_sms_reply">- %s: send a SMS to your last recipient with content message.</string>
     <string name="chat_help_sms_show_all">- %s: display last sent SMS from every contact.</string>

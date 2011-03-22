@@ -24,7 +24,7 @@ public class ShellCmd extends Command {
 
     
     public ShellCmd(MainService mainService) {
-        super(mainService, new String[] {"cmd"});
+        super(mainService, new String[] {"cmd"}, Command.TYPE_SYSTEM);
     }
     
     private boolean askRootAccess() {

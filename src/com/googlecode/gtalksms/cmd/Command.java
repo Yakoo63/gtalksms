@@ -8,21 +8,29 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public abstract class Command {    
+public abstract class Command { 
+    protected static final int TYPE_MESSAGE = 1;
+    protected static final int TYPE_CONTACTS = 2;
+    protected static final int TYPE_GEO = 3;
+    protected static final int TYPE_SYSTEM = 4;
+    protected static final int TYPE_COPY = 5;
+    
     protected static SettingsManager _settingsMgr;
     protected static Context _context;
     protected static MainService _mainService = null;
     protected final String[] _commands;
+    protected final int _cmdType;
     protected String _answerTo;
         
-    Command(MainService mainService, String[] commands) {
+    Command(MainService mainService, String[] commands, int cmdType) {
         if (_mainService == null) {
             _mainService = mainService;
             _settingsMgr = mainService.getSettingsManager();
             _context = mainService.getBaseContext();
         }
-        _commands = commands;
-        _answerTo = null;
+        this._commands = commands;
+        this._cmdType = cmdType;
+        this._answerTo = null;
     }
 
     protected String getString(int id, Object... args) {
@@ -112,6 +120,20 @@ public abstract class Command {
         String[] res = new String[tokenCount];
         for(int i = 0; i < tokenCount; i++)
             res[i] = strtok.nextToken();
+        return res;
+    }
+    
+    /**
+     * Returns a nice formated String of the Commands this class handles
+     * 
+     * @return
+     */
+    protected final String getCommandsAsString() {
+        String res = "";
+        for(String c : _commands) {
+            res  = res + c + ", ";
+        }
+        res = res.substring(0, res.length() - 1);
         return res;
     }
 }

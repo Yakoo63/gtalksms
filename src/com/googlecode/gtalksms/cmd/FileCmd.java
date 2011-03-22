@@ -18,7 +18,7 @@ public class FileCmd extends Command {
 
     
     public FileCmd(MainService mainService) {
-        super(mainService, new String[] {"send"});
+        super(mainService, new String[] {"send"}, Command.TYPE_SYSTEM);
         _xmppMgr = _mainService.getXmppmanager();
     }
     

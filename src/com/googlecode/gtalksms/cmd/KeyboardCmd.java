@@ -6,7 +6,7 @@ import com.googlecode.gtalksms.R;
 
 public class KeyboardCmd extends Command {
     public KeyboardCmd(MainService mainService) {
-        super(mainService, new String[] {"write", "w"});
+        super(mainService, new String[] {"write", "w"}, Command.TYPE_COPY);
     }
     
     @Override

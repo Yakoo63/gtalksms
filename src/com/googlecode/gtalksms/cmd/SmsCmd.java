@@ -48,7 +48,7 @@ public class SmsCmd extends Command {
     private AliasHelper _aliasHelper;
           
     public SmsCmd(MainService mainService) {
-        super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"});
+        super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"}, Command.TYPE_MESSAGE);
         _smsMgr = new SmsMmsManager(_settingsMgr, _context);
 
         if (_settingsMgr.notifySmsSent) {
