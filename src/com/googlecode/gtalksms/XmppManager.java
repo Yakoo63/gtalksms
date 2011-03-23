@@ -136,14 +136,12 @@ public class XmppManager {
      * 
      */
     private void cleanupConnection() {
+        _reconnectHandler.removeCallbacks(_reconnectRunnable);
+
         if (_connection != null && _connection.isConnected()) {
             updateStatus(DISCONNECTING);
-            if (_settings.notifyApplicationConnection) {
-                send(new XmppMsg(_context.getString(R.string.chat_app_stop)), null);
-            }
+            xmppDisconnect(_connection);
         }
-        
-        _reconnectHandler.removeCallbacks(_reconnectRunnable);
         
         if (_connection != null) {
             if (_packetListener != null) {
@@ -152,13 +150,8 @@ public class XmppManager {
             if (_connectionListener != null) {
                 _connection.removeConnectionListener(_connectionListener);
             }
-            // don't try to disconnect if already disconnected
-            if (isConnected()) {
-                xmppDisconnect(_connection);
-            }
         }
-        _connection = null;
-        _packetListener = null;
+        _packetListener = null; 
         _connectionListener = null;
     }
     
@@ -299,6 +292,8 @@ public class XmppManager {
 
     /** init the XMPP connection */
     private void initConnection() {
+        XMPPConnection connection;
+    
 
         // assert we are only ever called from one thread (which is
         // sadly not the thread we are constructed on, hence the special
@@ -308,9 +303,6 @@ public class XmppManager {
         else if (_myThreadId != Thread.currentThread().getId()) {
             GoogleAnalyticsHelper.trackAndLogError("XmppMgr initConnection() - IllegalThreadStateException");
             throw new IllegalThreadStateException();
-        }
-        if (_connection != null) {
-            return;
         }
         
         updateStatus(CONNECTING);
@@ -322,17 +314,20 @@ public class XmppManager {
             updateStatus(WAITING_TO_CONNECT);
             return;
         }
-
-        ConnectionConfiguration conf;
-        if (_settings.manuallySpecifyServerSettings) { // we trim the serverHost here because of Issue 122
-            conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
-        } else {
-            conf = new ConnectionConfiguration(_settings.serviceName);   // DNS SRV lookup, yeah! :)
-        }
-        conf.setTruststorePath("/system/etc/security/cacerts.bks");             
-        conf.setTruststorePassword("changeit");
-        conf.setTruststoreType("bks");
-        switch (_settings.xmppSecurityModeInt) {
+        
+        if (SettingsManager.connectionSettingsObsolete || _connection == null || _connection.isConnected()) {
+            ConnectionConfiguration conf;
+            if (_settings.manuallySpecifyServerSettings) {
+                // we trim the serverHost here because of Issue 122
+                conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
+            } else {
+                // DNS SRV lookup, yeah! :)
+                conf = new ConnectionConfiguration(_settings.serviceName);
+            }
+            conf.setTruststorePath("/system/etc/security/cacerts.bks");
+            conf.setTruststorePassword("changeit");
+            conf.setTruststoreType("bks");
+            switch (_settings.xmppSecurityModeInt) {
             case SettingsManager.XMPPSecurityOptional:
                 conf.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
                 break;
@@ -342,40 +337,54 @@ public class XmppManager {
             case SettingsManager.XMPPSecurityDisabled:
             default:
                 conf.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-                break;            
-        }
-        if(_settings.useCompression) conf.setCompressionEnabled(true); 
-        
-        XMPPConnection connection = new XMPPConnection(conf);
-        try {
-            connection.connect();
-        } catch (Exception e) {
-            Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
-            MainService.displayToast(R.string.xmpp_manager_connection_failed);
-            maybeStartReconnect();
-            return;
-        }
-        
-        try {
-            connection.login(_settings.login, _settings.password, "GTalkSMS");
-        } catch (Exception e) {
-            xmppDisconnect(connection);
-            Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
-            // sadly, smack throws the same generic XMPPException for network
-            // related messages (eg "no response from the server") as for
-            // authoritative login errors (ie, bad password).  The only
-            // differentiator is the message itself which starts with this
-            // hard-coded string.
-            if (e.getMessage().indexOf("SASL authentication") == -1) {
-                // doesn't look like a bad username/password, so retry
-                MainService.displayToast(R.string.xmpp_manager_login_failed);
-                maybeStartReconnect();
-            } else {
-                MainService.displayToast(R.string.xmpp_manager_invalid_credentials);
-                stop();
+                break;
             }
-            return;
-        }
+            if (_settings.useCompression)
+                conf.setCompressionEnabled(true);
+
+            connection = new XMPPConnection(conf);
+            SettingsManager.connectionSettingsObsolete = false;
+            try {
+                connection.connect();
+            } catch (Exception e) {
+                Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
+                MainService.displayToast(R.string.xmpp_manager_connection_failed);
+                maybeStartReconnect();
+                return;
+            }
+            try {
+                connection.login(_settings.login, _settings.password, "GTalkSMS");
+            } catch (Exception e) {
+                xmppDisconnect(connection);
+                Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
+                // sadly, smack throws the same generic XMPPException for network
+                // related messages (eg "no response from the server") as for
+                // authoritative login errors (ie, bad password).  The only
+                // differentiator is the message itself which starts with this
+                // hard-coded string.
+                if (e.getMessage().indexOf("SASL authentication") == -1) {
+                    // doesn't look like a bad username/password, so retry
+                    MainService.displayToast(R.string.xmpp_manager_login_failed);
+                    maybeStartReconnect();
+                } else {
+                    MainService.displayToast(R.string.xmpp_manager_invalid_credentials);
+                    stop();
+                }
+                return;
+            }
+        } else {
+            // reuse the old connection settings
+            connection = _connection;
+            // we reuse the xmpp connection so only connect() is needed
+            try {
+                connection.connect();
+            } catch (Exception e) {
+                Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
+                MainService.displayToast(R.string.xmpp_manager_connection_failed);
+                maybeStartReconnect();
+                return;
+            }
+        }                
         
         _connection = connection;
         _connectionListener = new ConnectionListener() {
@@ -408,12 +417,7 @@ public class XmppManager {
             }
         };
         _connection.addConnectionListener(_connectionListener);            
-        onConnectionComplete();
-    }
 
-    private void onConnectionComplete() {
-        Log.i(Tools.LOG_TAG, "connection established");
-        _currentRetryCount = 0;
         try {
             _xmppMuc.initialize(_connection);
             _xmppBuddies.initialize(_connection);
@@ -449,11 +453,6 @@ public class XmppManager {
                 }
             };
             _connection.addPacketListener(_packetListener, filter);
-            updateStatus(CONNECTED);
-            // Send welcome message
-            if (_settings.notifyApplicationConnection) {
-                send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);
-            }
             setStatus(_presenceMessage);
 
             try {
@@ -461,17 +460,26 @@ public class XmppManager {
                 _connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
                 _xmppBuddies.retrieveFriendList();
             } catch (Exception ex) {
-                Log.e(Tools.LOG_TAG, "Failed to setup Xmpp Friend list roster.", ex);
+                GoogleAnalyticsHelper.trackAndLogError("Failed to setup XMPP friend list roster.", ex);
             }
         } catch (Exception e) {
-            // see issue 126 for an example where this happens
-            GoogleAnalyticsHelper.trackAndLogError("xmppMgr onConnectionComplete() exception caught", e);
+            // see issue 126 for an example where this happens because
+            // the connection drops while we are in initConnection()
+            GoogleAnalyticsHelper.trackAndLogError("xmppMgr exception caught", e);
             if (!_connection.isConnected()) {
                 maybeStartReconnect();
             } else {
                 throw new IllegalStateException(e);
             }
         }
+        Log.i(Tools.LOG_TAG, "connection established");
+        // Send welcome message
+        if (_settings.notifyApplicationConnection) {
+            send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);
+        }
+        _currentRetryCount = 0;
+        updateStatus(CONNECTED);
+
     }
     
     /** returns true if the service is correctly connected */

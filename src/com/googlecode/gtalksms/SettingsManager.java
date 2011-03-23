@@ -21,6 +21,10 @@ import com.googlecode.gtalksms.tools.Tools;
  *
  */
 public class SettingsManager {
+    public static final String[] xmppConnectionSettings = { "serverHost", "serviceName", "serverPort", 
+                                                            "login", "password", "useDifferentAccount",
+                                                            "xmppSecurityMode", "manuallySpecifyServerSettings"};
+    
     public static final int XMPPSecurityDisabled = 1;
     public static final int XMPPSecurityRequired = 2;
     public static final int XMPPSecurityOptional = 3;
@@ -40,6 +44,8 @@ public class SettingsManager {
     public String xmppSecurityMode;
     public int xmppSecurityModeInt;
     public boolean manuallySpecifyServerSettings;
+    
+    public static boolean connectionSettingsObsolete;
     
     // notifications
     public boolean notifyApplicationConnection;
@@ -87,7 +93,7 @@ public class SettingsManager {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             Log.d(Tools.LOG_TAG,"Preferences updated: key=" + key);
             importPreferences();
-            OnPreferencesUpdated();
+            OnPreferencesUpdated(key);
         }
     };
     
@@ -111,10 +117,13 @@ public class SettingsManager {
     	return _sharedPreferences.contains(key);
     }
 
-    public void OnPreferencesUpdated() {
+    public void OnPreferencesUpdated(String key) {
     	if(backupAgentAvailable) {
     		BackupManager.dataChanged(_context.getPackageName());
     	}
+    	for (String s : xmppConnectionSettings)
+    	    if (s.equals(key))
+    	        connectionSettingsObsolete = true;
     }
     
     /** imports the preferences */

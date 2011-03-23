@@ -177,7 +177,6 @@
     <string name="chat_call_missed">Manqué</string>
     <string name="chat_call_duration">&#xA0;de&#xA0;</string>
     <string name="chat_welcome">Bienvenue dans GTalkSMS %s. Envoyer \"?\" pour afficher l\'aide.</string>
-    <string name="chat_app_stop">Arrêt de GTalkSMS.</string>
     <string name="chat_is_calling">Appel de %s…</string>
     <string name="chat_call_hidden">[Appel Masqué]</string>
     <string name="chat_me">Moi</string>

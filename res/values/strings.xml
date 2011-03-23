@@ -180,7 +180,6 @@
     <string name="chat_call_missed">Missed</string>
     <string name="chat_call_duration">&#xA0;of&#xA0;</string>
     <string name="chat_welcome">Welcome to GTalkSMS %s. Send \"?\" for getting help.</string>
-    <string name="chat_app_stop">GTalkSMS stopped.</string>
     <string name="chat_is_calling">%s is calling…</string>
     <string name="chat_call_hidden">[hidden number]</string>
     <string name="chat_me">Me</string>

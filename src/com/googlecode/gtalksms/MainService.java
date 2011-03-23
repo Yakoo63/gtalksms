@@ -336,8 +336,8 @@ public class MainService extends Service {
         _gAnalytics.trackInstalls();
         
         _settingsMgr = new SettingsManager(this) {
-            @Override public void OnPreferencesUpdated() {
-            	super.OnPreferencesUpdated();
+            @Override public void OnPreferencesUpdated(String key) {
+            	super.OnPreferencesUpdated(key);
                 Tools.setLocale(_settingsMgr, getBaseContext());
             }
         };

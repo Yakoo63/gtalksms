@@ -156,7 +156,7 @@ public class GoogleAnalyticsHelper {
     
     /**
      * checks if the method trackServiceStartsPerDay()
-     * to avoid filesystem lookups where possible
+     * to avoid filesystem lookups when possible
      * 
      * @return
      */

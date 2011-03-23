@@ -180,7 +180,6 @@
     <string name="chat_call_missed">Verpasster Anruf</string>
     <string name="chat_call_duration"> Anrufdauer: </string>
     <string name="chat_welcome">Willkommen bei GTalkSMS %s. \&quot;?\&quot; für Hilfe.</string>
-    <string name="chat_app_stop">GTalkSMS angehalten.</string>
     <string name="chat_is_calling">%s ruft an.</string>
     <string name="chat_call_hidden">[verborgene Telefonnummer]</string>
     <string name="chat_me">Ich</string>
