@@ -36,6 +36,7 @@ import com.googlecode.gtalksms.cmd.KeyboardCmd;
 import com.googlecode.gtalksms.cmd.RingCmd;
 import com.googlecode.gtalksms.cmd.ShellCmd;
 import com.googlecode.gtalksms.cmd.SmsCmd;
+import com.googlecode.gtalksms.cmd.SystemCmd;
 import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
@@ -607,6 +608,7 @@ public class MainService extends Service {
         registerCommand(new SmsCmd(this));
         registerCommand(new ExitCmd(this));
         registerCommand(new AliasCmd(this));
+        registerCommand(new SystemCmd(this)); // used for debugging
         
         registerCommand(new HelpCmd(this));  //help command needs to be registered as last
     }

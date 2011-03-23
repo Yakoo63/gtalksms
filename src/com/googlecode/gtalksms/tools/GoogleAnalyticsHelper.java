@@ -73,6 +73,7 @@ public class GoogleAnalyticsHelper {
             gAnalytics.trackEvent(Tools.APP_NAME, "error", errorMsg, 0);
         }
         Log.e(Tools.LOG_TAG, errorMsg + " " + e);
+        Log.e(Tools.LOG_TAG, Log.getStackTraceString(e));
     }
 
     public static void trackAndLogWarning(String warningMsg, Exception e) {
