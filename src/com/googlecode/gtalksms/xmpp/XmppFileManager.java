@@ -38,6 +38,9 @@ public class XmppFileManager implements FileTransferListener {
             externalFilesDir = Environment.getExternalStorageDirectory();
         }
         landingDir = new File(externalFilesDir, gtalksmsDir);
+        if (!landingDir.exists()) {
+            landingDir.mkdirs();
+        }
     }
     
     public void initialize(XMPPConnection connection) {
@@ -64,8 +67,8 @@ public class XmppFileManager implements FileTransferListener {
         } else if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             send("External Media not mounted read/write");
             return;
-        } else if (!landingDir.isDirectory() && !landingDir.mkdirs()) {
-            send("The directory " + landingDir.getAbsolutePath() + " does not exist");
+        } else if (!landingDir.isDirectory()) {
+            send("The directory " + landingDir.getAbsolutePath() + " is not a directory");
             return;
         }
         
@@ -92,7 +95,7 @@ public class XmppFileManager implements FileTransferListener {
                 Thread.sleep(1000);
             }
             if (transfer.getStatus().equals(Status.complete)) {
-                send("File transfert: " + saveTo.getName() + " - 100%");
+                send("File transfer complete. File saved as " + saveTo.getAbsolutePath());
             } else {
                 send(returnAndLogError(transfer));
             }
@@ -114,6 +117,10 @@ public class XmppFileManager implements FileTransferListener {
         }
         Log.w(Tools.LOG_TAG, message);
         return new XmppMsg(message);
+    }
+    
+    public File getLandingDir() {
+        return landingDir;
     }
     
     private void send(String msg) {

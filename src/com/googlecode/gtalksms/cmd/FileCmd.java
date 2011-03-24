@@ -12,29 +12,49 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
+import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class FileCmd extends Command {
     private XmppManager _xmppMgr;
+    private File landingDir;
 
     
     public FileCmd(MainService mainService) {
-        super(mainService, new String[] {"send"}, Command.TYPE_SYSTEM);
+        super(mainService, new String[] {"send", "ls"}, Command.TYPE_SYSTEM);
         _xmppMgr = _mainService.getXmppmanager();
+        landingDir = _xmppMgr.getXmppFileMgr().getLandingDir();
     }
     
     @Override
     protected void execute(String cmd, String args) {
-        File file = new File(args);
-        if (file.exists()) {
-            sendFile(file);
-        } else {
-            send("File '" + file.getAbsolutePath() + "' doesn't exist!");  // TODO localization
+        if (cmd.equals("send")) {
+            sendFile(args);
+        } else if (cmd.equals("ls")) {
+            listLandingDir();
         }
     }
     
     @Override
     public String[] help() {
         return null;
+    }
+    
+    private void sendFile(String args) {
+        if (args.equals(""))
+            return;        
+    
+        File file;
+        if (args.startsWith("/")) {
+            file = new File(args);
+        } else {
+            file = new File(landingDir, args);
+        }
+        
+        if (file.exists()) {
+            sendFile(file);
+        } else {
+            send("File '" + file.getAbsolutePath() + "' doesn't exist!");  // TODO localization
+        }
     }
     
     private void sendFile(File file) {
@@ -62,6 +82,27 @@ public class FileCmd extends Command {
             Log.e(Tools.LOG_TAG, message, ex);
             send(message);
         }
+    }
+    
+    private void listLandingDir() {
+        File[] files = landingDir.listFiles();
+        if (files == null) {
+            return;
+        } else {
+            XmppMsg res = new XmppMsg();
+            res.appendBoldLine("Files within " + landingDir.getAbsolutePath());
+            for (File f : files) {
+                appendFileInfo(res, f);
+            }
+            send(res);
+        }
+        
+    }
+    
+    private static void appendFileInfo(XmppMsg msg, File f) {
+        long kib = f.length() / 1024;
+        String name = f.getName();
+        msg.appendLine(name + " - " + kib + " KiB");
     }
 
 }

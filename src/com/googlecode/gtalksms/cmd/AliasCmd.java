@@ -48,12 +48,12 @@ public class AliasCmd extends Command {
                 if (aliasHelper.addAliasByNumber(subCommand[1], subCommand[2])) {
                     send(R.string.chat_alias_add_by_number, subCommand[1], subCommand[2]);
                 } else {
-                    send("invalid character");
+                    send(R.string.chat_alias_invalid_char);
                 }
             } else {
                 ArrayList<Phone> res = aliasHelper.addAliasByName(subCommand[1], subCommand[2]);
                 if (res == null) {
-                    send("invalid character");
+                    send(R.string.chat_alias_invalid_char);
                 } else if (res.size() != 1) {
                     send(R.string.chat_error_unkown_name);
                 } else {

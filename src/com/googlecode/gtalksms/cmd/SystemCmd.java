@@ -37,38 +37,10 @@ public class SystemCmd extends Command {
         ActivityManager.MemoryInfo memInfoSystem = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(memInfoSystem);
         MemoryInfo[] memInfoProc = activityManager.getProcessMemoryInfo(myPidArray);
+
+        appendMemInfo(res, memInfoProc[0]);
         
-        res.appendBoldLine("System Memory Information");
-        res.appendLine("AvailMem: " + memInfoSystem.availMem);
-        if (memInfoSystem.lowMemory) {
-            res.appendLine("System is IN low memory situation");
-        } else {
-            res.appendLine("System is NOT in low memory situation");
-        }
-        res.appendLine("Low memory situation if AvailMem is under " + memInfoSystem.threshold);
-        
-        res.appendBoldLine("GTalkSMS Memory Information");
-        res.appendItalicLine("Total");
-        res.appendLine("Private dirty: " + memInfoProc[0].getTotalPrivateDirty()
-                        + " Proportial set size: " + memInfoProc[0].getTotalPss()
-                        + " Shared dirty: " + memInfoProc[0].getTotalSharedDirty());
-        res.appendItalicLine("Detailed");
-        res.appendLine("private dirty pages used by dalvik: " + memInfoProc[0].dalvikPrivateDirty);
-        res.appendLine("proportional set size for dalvik: " + memInfoProc[0].dalvikPss);
-        res.appendLine("shared dirty pages used by dalvik: " + memInfoProc[0].dalvikSharedDirty);
-        res.appendLine("private dirty pages by the native heap: " + memInfoProc[0].nativePrivateDirty);
-        res.appendLine("proportional set size for the native heap: " + memInfoProc[0].nativePss);
-        res.appendLine("shared dirty pages used by the native heap: " + memInfoProc[0].nativeSharedDirty);
-        res.appendLine("private dirty pages used by everything else: " + memInfoProc[0].otherPrivateDirty);
-        res.appendLine("proportional set size for everything else: " + memInfoProc[0].otherPss);
-        res.appendLine("shared dirty pages uses by everything else: " + memInfoProc[0].otherSharedDirty);
-        
-        res.appendBoldLine("Are you a Monkey test");
-        if (ActivityManager.isUserAMonkey()) {
-            res.appendLine("You ARE a Monkey");
-        } else {
-            res.appendLine("Sadly, you are someting else. Maybe even human");
-        }
+        appendSystemMemInfo(res, memInfoSystem);
         
         res.appendBold("Importance: ");
         res.appendLine(getMyImportance());
@@ -79,6 +51,8 @@ public class SystemCmd extends Command {
         appendXMPPConnectionData(res);
         
         appendSystemUptimeData(res);
+        
+        appendMonkeyTest(res);
         
         send(res);
     }
@@ -172,5 +146,45 @@ public class SystemCmd extends Command {
         int res = (int) percent;
         return res + "%";
     }
-
+    
+    private static void appendMonkeyTest(XmppMsg msg) {
+        msg.appendBoldLine("Are you a Monkey test");
+        if (ActivityManager.isUserAMonkey()) {
+            msg.appendLine("You ARE a Monkey");
+        } else {
+            msg.appendLine("Sadly, you are someting else. Maybe even human");
+        }
+    }
+    
+    private static void appendMemInfo(XmppMsg msg, MemoryInfo memInfoProc) {
+        if (memInfoProc == null) 
+            return;
+        
+        msg.appendBoldLine("GTalkSMS Memory Information");
+        msg.appendItalicLine("Total");
+        msg.appendLine("Private dirty: " + memInfoProc.getTotalPrivateDirty()
+                        + XmppMsg.makeBold(" Proportial set size: ") + memInfoProc.getTotalPss()
+                        + " Shared dirty: " + memInfoProc.getTotalSharedDirty());
+        msg.appendItalicLine("Detailed");
+        msg.appendLine("private dirty pages used by dalvik: " + memInfoProc.dalvikPrivateDirty);
+        msg.appendLine("proportional set size for dalvik: " + memInfoProc.dalvikPss);
+        msg.appendLine("shared dirty pages used by dalvik: " + memInfoProc.dalvikSharedDirty);
+        msg.appendLine("private dirty pages by the native heap: " + memInfoProc.nativePrivateDirty);
+        msg.appendLine("proportional set size for the native heap: " + memInfoProc.nativePss);
+        msg.appendLine("shared dirty pages used by the native heap: " + memInfoProc.nativeSharedDirty);
+        msg.appendLine("private dirty pages used by everything else: " + memInfoProc.otherPrivateDirty);
+        msg.appendLine("proportional set size for everything else: " + memInfoProc.otherPss);
+        msg.appendLine("shared dirty pages uses by everything else: " + memInfoProc.otherSharedDirty);  
+    }
+    
+    private static void appendSystemMemInfo(XmppMsg msg, ActivityManager.MemoryInfo memInfoSystem) {
+        msg.appendBoldLine("System Memory Information");
+        msg.appendLine("AvailMem: " + memInfoSystem.availMem);
+        if (memInfoSystem.lowMemory) {
+            msg.appendLine("System is IN low memory situation");
+        } else {
+            msg.appendLine("System is NOT in low memory situation");
+        }
+        msg.appendLine("Low memory situation if AvailMem is under " + memInfoSystem.threshold);      
+    }
 }

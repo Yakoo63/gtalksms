@@ -46,7 +46,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
             context.startService(new Intent(MainService.ACTION_CONNECT));
         } else if (prefs.getBoolean("stopOnWifiDisconnected", false) && !connected && networkType.equals("WIFI")) {            
             // Stop GTalkSMS
-            if (debugLog) Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: stopOnWifiDisconnected enabled, wifi disconncted, sending intent");
+            if (debugLog) Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: stopOnWifiDisconnected enabled, wifi disconnected, sending intent");
             Intent serviceIntent = new Intent(MainService.ACTION_CONNECT);
             serviceIntent.putExtra("force", true);
             serviceIntent.putExtra("disconnect", true);

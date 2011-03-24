@@ -152,8 +152,8 @@ public abstract class Command {
     
     /**
      * Sends the help messages from the current command
-     * to the user, does nothing if there where no help
-     * messages
+     * to the user, does nothing if there are no help
+     * messages available
      * 
      */
     protected final void sendHelp() {

@@ -3,3 +3,7 @@ bin
 gen
 Releases
 lib/asmack-issue-13/
+syntax: regexp
+^local\.properties$
+syntax: regexp
+^proguard\.cfg$

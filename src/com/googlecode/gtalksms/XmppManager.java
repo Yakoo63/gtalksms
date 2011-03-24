@@ -103,6 +103,8 @@ public class XmppManager {
         _xmppBuddies = new XmppBuddies(context, settings);
         _xmppFileMgr = new XmppFileManager(context, settings, this);
         _xmppMuc = new XmppMuc(context, settings, this);
+        reusedConnectionCount = 0;
+        newConnectionCount = 0;
     }
     
     private void start(int initialState) {
