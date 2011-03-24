@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.data.phone.Phone;
-import com.googlecode.gtalksms.tools.AliasHelper;
+import com.googlecode.gtalksms.databases.AliasHelper;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 /**
@@ -25,27 +25,36 @@ public class AliasCmd extends Command {
 
     @Override
     protected void execute(String cmd, String args) {
-        String[] subCommand = splitArgs(args);
-        if (subCommand.length < 2) {
-            send("Alias needs more arguments");
+        if (args.equals("")) {
+            sendHelp();
         } else {
+            String[] subCommand = splitArgs(args);
             if (subCommand[0].equals("add")) {
                 add(subCommand);
             } else if (subCommand[0].equals("del")) {
                 del(subCommand);
             } else if (subCommand[0].equals("show")) {
                 show(subCommand);
+            } else {
+                sendHelp();
             }
         }
     }
     
     private void add(String[] subCommand) {
-            if (Phone.isCellPhoneNumber(subCommand[2])) {
-                aliasHelper.addAliasByNumber(subCommand[1], subCommand[2]);
-                send(R.string.chat_alias_add_by_number, subCommand[1], subCommand[2]);
+        if (subCommand.length < 3) {
+            send(R.string.chat_error_more_arguments, subCommand[0]);
+        } else if (Phone.isCellPhoneNumber(subCommand[2])) {
+                if (aliasHelper.addAliasByNumber(subCommand[1], subCommand[2])) {
+                    send(R.string.chat_alias_add_by_number, subCommand[1], subCommand[2]);
+                } else {
+                    send("invalid character");
+                }
             } else {
                 ArrayList<Phone> res = aliasHelper.addAliasByName(subCommand[1], subCommand[2]);
-                if (res.size() != 1) {
+                if (res == null) {
+                    send("invalid character");
+                } else if (res.size() != 1) {
                     send(R.string.chat_error_unkown_name);
                 } else {
                     Phone p = res.get(0);
@@ -55,15 +64,19 @@ public class AliasCmd extends Command {
     }
     
     private void del(String[] subCommand) {
-        if (aliasHelper.deleteAlias(subCommand[1])) {
+        if (subCommand.length < 2) {
+            send(R.string.chat_error_more_arguments, subCommand[0]);
+        } else if (aliasHelper.deleteAlias(subCommand[1])) {
             send(R.string.chat_alias_del_suc, subCommand[1]);
         } else {
-            send(R.string.chat_alias_del_suc, subCommand[1]);
+            send(R.string.chat_alias_del_fail, subCommand[1]);
         }
     }
     
     private void show(String[] subCommand) {
-        if (subCommand[1].equals("all")) {
+        if (subCommand.length < 2) {
+            send(R.string.chat_error_more_arguments, subCommand[0]);
+        } else if (subCommand[1].equals("all")) {
             String[][] aliases = aliasHelper.getAllAliases();
             if (aliases == null) {
                 send(R.string.chat_alias_empty);

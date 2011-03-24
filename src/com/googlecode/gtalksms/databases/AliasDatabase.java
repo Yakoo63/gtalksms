@@ -61,6 +61,7 @@ public class AliasDatabase extends Database {
     }
     
     public static boolean containsAlias(String aliasName) {
+        
         Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "number" }, "aliasName='" + aliasName + "'", null, null , null, null);
         boolean ret = c.getCount() == 1;
         c.close();

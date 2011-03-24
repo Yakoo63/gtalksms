@@ -200,7 +200,7 @@ public class XmppManager {
         // the state actually changes and update everything accordingly.
     }
 
-    private static void xmppDisconnect(XMPPConnection connection) {
+    private void xmppDisconnect(XMPPConnection connection) {
         // In some cases the 'disconnect' may hang - see
         // http://code.google.com/p/gtalksms/issues/detail?id=12 for an
         // example.  We worm around this by leveraging the fact that we 
@@ -214,13 +214,18 @@ public class XmppManager {
             public DisconnectRunnable(XMPPConnection x) {
                 _x = x;
             }
+            
             private XMPPConnection _x;
             public void run() {
                 try {
                     if (_x.isConnected())
                         _x.disconnect();
                 } catch (Exception e2) {
-                    GoogleAnalyticsHelper.trackAndLogWarning("xmpp disconnect failed: " + e2);
+                    // Even if we double check that the connection is still connected
+                    // sometimes the connection timeout occurs when disconnect method 
+                    // is running, so we just log that here 
+                    if (_settings.debugLog)
+                        Log.w(Tools.LOG_TAG, "xmpp disconnect failed: " + e2);
                 }
             }
         }
@@ -317,7 +322,7 @@ public class XmppManager {
         if (SettingsManager.connectionSettingsObsolete || _connection == null || _connection.isConnected()) {
             ConnectionConfiguration conf;
             if (_settings.manuallySpecifyServerSettings) {
-                // we trim the serverHost here because of Issue 122
+                // trim the serverHost here because of Issue 122
                 conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
             } else {
                 // DNS SRV lookup, yeah! :)
@@ -352,7 +357,7 @@ public class XmppManager {
                 return;
             }
             try {
-                connection.login(_settings.login, _settings.password, "GTalkSMS");
+                connection.login(_settings.login, _settings.password, Tools.APP_NAME);
             } catch (Exception e) {
                 xmppDisconnect(connection);
                 Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
@@ -378,6 +383,7 @@ public class XmppManager {
             // we reuse the xmpp connection so only connect() is needed
             try {
                 connection.connect();
+                connection.login(_settings.login, _settings.password, Tools.APP_NAME);
             } catch (Exception e) {
                 Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
                 MainService.displayToast(R.string.xmpp_manager_connection_failed);
@@ -387,7 +393,7 @@ public class XmppManager {
             reusedConnectionCount++;
         }                
         
-        _connection = connection;
+        _connection = connection;               
         _connectionListener = new ConnectionListener() {
             @Override
             public void connectionClosed() {
@@ -474,6 +480,13 @@ public class XmppManager {
             }
         }
         Log.i(Tools.LOG_TAG, "connection established");
+        if (_settings.debugLog) {
+            boolean con = _connection.isConnected();
+            boolean auth = _connection.isAuthenticated();
+            boolean enc = _connection.isUsingTLS();
+            boolean comp = _connection.isUsingCompression();
+            Log.i(Tools.LOG_TAG, "conn parameters: con= " + con + " auth=" + auth + " enc=" + enc + " comp=" + comp);
+        }
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
             send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);

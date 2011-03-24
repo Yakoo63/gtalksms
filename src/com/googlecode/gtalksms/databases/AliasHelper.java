@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms.tools;
+package com.googlecode.gtalksms.databases;
 
 import java.util.ArrayList;
 
@@ -6,7 +6,6 @@ import android.content.Context;
 
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
-import com.googlecode.gtalksms.databases.AliasDatabase;
 
 /**
  * Middle-end Helper, if we ever want to integrate the Alias function also in
@@ -28,22 +27,40 @@ public class AliasHelper {
         new AliasDatabase(ctx);
         this.ctx = ctx;
     }
-
-    public void addAliasByNumber(String aliasName, String number) {
+    
+    /**
+     * Adds an alias by a phone number
+     * if the alias contains an invalid character, false will be returned
+     * 
+     * @param aliasName
+     * @param number
+     * @return
+     */
+    public boolean addAliasByNumber(String aliasName, String number) {
+        if (aliasName.contains("'"))
+            return false;
+        
         String contactName = ContactsManager.getContactNameOrNull(ctx, number);
-        addOrUpdate(aliasName, number, contactName);      
+        addOrUpdate(aliasName, number, contactName);
+        return true;
     }
     
     /**
      * Tries to add or update a alias
+     * Returns null if the aliasName contains invalid characters
      * Returns an ArrayList of Phones with matching names
-     * The List has the size 1 if the name was distinct enough top
+     * If the list has a size of 1 the name was distinct enough to
+     * and the alias was added. Otherwise the user should specify more details
+     * with help from the list
      * 
      * @param aliasName
      * @param name
      * @return
      */
     public ArrayList<Phone> addAliasByName(String aliasName, String name) {
+        if (aliasName.contains("'"))
+            return null;
+        
         ArrayList<Phone> res;
         res = ContactsManager.getMobilePhones(ctx, name);
             if(res.size() == 1) {
@@ -60,7 +77,7 @@ public class AliasHelper {
      * @return true if successful, otherwise false
      */
     public boolean deleteAlias(String aliasName) {
-        if(AliasDatabase.containsAlias(aliasName)) {
+        if(!aliasName.contains("'") && AliasDatabase.containsAlias(aliasName)) {
             return AliasDatabase.deleteAlias(aliasName);
         } else {
             return false;

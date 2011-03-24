@@ -23,7 +23,7 @@ import com.googlecode.gtalksms.cmd.smsCmd.SmsMmsManager;
 import com.googlecode.gtalksms.data.contacts.Contact;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
-import com.googlecode.gtalksms.tools.AliasHelper;
+import com.googlecode.gtalksms.databases.AliasHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 

@@ -151,7 +151,7 @@ public class SystemCmd extends Command {
         msg.appendBoldLine("System Uptime Information");
         msg.appendLine("System has been up for " + msToDaysHoursMins(elapsedRealtime));
         msg.appendLine("System was in deep sleep for " + msToDaysHoursMins(deepSleepMillis));
-        msg.appendLine("System was awake " + getPercent(elapsedRealtime, uptimeMillis) + " the time");
+        msg.appendLine("System was awake " + getPercent(elapsedRealtime, uptimeMillis) + " of the time");
     }
     
     private static String msToDaysHoursMins(long milliseconds) {

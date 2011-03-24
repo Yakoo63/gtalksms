@@ -136,4 +136,33 @@ public abstract class Command {
         res = res.substring(0, res.length() - 1);
         return res;
     }
+    
+    /**
+     * Adds the Strings in the given Arrary to the XmppMsg
+     * One String per line
+     * 
+     * @param msg
+     * @param s
+     */
+    protected final static void addStringArraytoXmppMsg(XmppMsg msg, String[] s) {
+        for(String line : s) {
+            msg.appendLine(line);
+        }
+    }
+    
+    /**
+     * Sends the help messages from the current command
+     * to the user, does nothing if there where no help
+     * messages
+     * 
+     */
+    protected final void sendHelp() {
+        String[] help = help();
+        if (help == null)
+            return;
+        
+        XmppMsg msg = new XmppMsg();
+        addStringArraytoXmppMsg(msg, help);
+        send(msg);
+    }
 }

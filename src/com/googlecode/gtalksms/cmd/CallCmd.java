@@ -13,8 +13,8 @@ import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Call;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.data.phone.PhoneManager;
+import com.googlecode.gtalksms.databases.AliasHelper;
 import com.googlecode.gtalksms.receivers.PhoneCallListener;
-import com.googlecode.gtalksms.tools.AliasHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 

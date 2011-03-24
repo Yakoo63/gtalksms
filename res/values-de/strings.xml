@@ -118,6 +118,7 @@
     <string name="chat_error">Fehler: %s</string>
     <string name="chat_error_root">Fehler: Root nicht möglich!</string>
     <string name="chat_error_unkown_name">Kontakt ist nicht bekannt oder eindeutig</string>    
+    <string name="chat_error_more_arguments">Befehl \"%1$s\" benötigt mehr Argumente</string>    
     <string name="chat_reply_contact">Nachrichten gehen an %s</string>
     <string name="chat_start_locating">Telefon wird lokalisiert</string>
     <string name="chat_start_ringing">Telefon klingelt</string>
@@ -222,4 +223,5 @@
     <string name="chat_alias_del_fail">Löschen von \'%1$s\' nicht erfolgreich.</string>
     <string name="chat_alias_show_non_existent">Alias \'%1$s\' exsistiert nicht.</string>
     <string name="chat_alias_empty">Keine Aliase gesetzt.</string>
+    <string name="chat_alias_invalid_char">Alias Name darf kein Apostroph enthalten ("'").</string>    
 </resources>

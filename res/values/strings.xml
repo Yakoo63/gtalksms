@@ -118,6 +118,7 @@
     <string name="chat_error">Error: %s</string>
     <string name="chat_error_root">Can\'t have root access!</string>
     <string name="chat_error_unkown_name">Contact name is not known or not distinct</string>
+    <string name="chat_error_more_arguments">Command \"%1$s\" needs more arguments</string>
     <string name="chat_reply_contact">Reply contact is %s</string>
     <string name="chat_start_locating">Start locating phone</string>
     <string name="chat_start_ringing">Ringing phone</string>
@@ -216,10 +217,11 @@
     <string name="chat_del_sms_from">Deleting SMS from %s.</string>
     <string name="chat_del_sms_nb">%d SMS deleted.</string>
     <string name="chat_del_sms_error">Can\'t delete SMS.</string>
-    <string name="chat_alias_add_by_number">Added alias \'%1$s\' with number %2$s</string>
-    <string name="chat_alias_add_by_name">Added alias \'%1$s\' for %2$s with number %3$s</string>
-    <string name="chat_alias_del_suc">Deleted alias \'%1$s\' successfully</string>
-    <string name="chat_alias_del_fail">Deletion of \'%1$s\' failed</string>
-    <string name="chat_alias_show_non_existent">Alias \'%1$s\' does not exists</string>
-    <string name="chat_alias_empty">No aliases set</string>
+    <string name="chat_alias_add_by_number">Added alias \'%1$s\' with number %2$s.</string>
+    <string name="chat_alias_add_by_name">Added alias \'%1$s\' for %2$s with number %3$s.</string>
+    <string name="chat_alias_del_suc">Deleted alias \'%1$s\' successfully.</string>
+    <string name="chat_alias_del_fail">Deletion of \'%1$s\' failed.</string>
+    <string name="chat_alias_show_non_existent">Alias \'%1$s\' does not exists.</string>
+    <string name="chat_alias_empty">No aliases set.</string>
+    <string name="chat_alias_invalid_char">Alias name can not contain a single quote ("'").</string>
 </resources>
