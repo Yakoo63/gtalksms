@@ -8,9 +8,11 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Process;
+import android.os.SystemClock;
 import android.os.Debug.MemoryInfo;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class SystemCmd extends Command {
@@ -19,11 +21,14 @@ public class SystemCmd extends Command {
     private final static int myPidArray[] = { myPid };
     private static ActivityManager activityManager; 
     private static ConnectivityManager connectivityManager;
+    private static XmppManager xmppMgr;
     
     public SystemCmd(MainService mainService) {
-        super(mainService, new String[] {"system"}, Command.TYPE_SYSTEM); 
-        activityManager = (ActivityManager) mainService.getBaseContext().getSystemService(Context.ACTIVITY_SERVICE);
-        connectivityManager = (ConnectivityManager) mainService.getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        super(mainService, new String[] {"system"}, Command.TYPE_SYSTEM);
+        Context ctx = mainService.getBaseContext();
+        activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+        connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        xmppMgr = mainService.getXmppmanager();
     }
 
     @Override
@@ -71,7 +76,9 @@ public class SystemCmd extends Command {
         res.appendBoldLine("Data connection status");
         res.appendLine(getDataConnectionStatus());
         
+        appendXMPPConnectionData(res);
         
+        appendSystemUptimeData(res);
         
         send(res);
     }
@@ -126,6 +133,44 @@ public class SystemCmd extends Command {
             + "'";
         
         return res;
+    }
+    
+    private static void appendXMPPConnectionData(XmppMsg msg) {
+        int reused = xmppMgr.getReusedConnectionCount();
+        int newcons = xmppMgr.getNewConnectionCount();
+        int total = reused + newcons;
+        msg.appendBoldLine("XMPP Connection Data");
+        msg.appendLine("Total connections: " + total + " thereof " + reused + " reused and " + newcons + " new");
+    }
+    
+    private static void appendSystemUptimeData(XmppMsg msg) {
+        long elapsedRealtime = SystemClock.elapsedRealtime();
+        long uptimeMillis = SystemClock.uptimeMillis();
+        long deepSleepMillis = elapsedRealtime - uptimeMillis;
+        
+        msg.appendBoldLine("System Uptime Information");
+        msg.appendLine("System has been up for " + msToDaysHoursMins(elapsedRealtime));
+        msg.appendLine("System was in deep sleep for " + msToDaysHoursMins(deepSleepMillis));
+        msg.appendLine("System was awake " + getPercent(elapsedRealtime, uptimeMillis) + " the time");
+    }
+    
+    private static String msToDaysHoursMins(long milliseconds) {
+        long seconds = milliseconds / 1000;
+        long minutes = seconds / 60;
+        seconds %= 60;
+        long hours = minutes / 60;
+        minutes %= 60;
+        long days = hours / 24;
+        hours %= 24;
+        
+        return days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+    }
+    
+    private static String getPercent(long full, long part) {
+        float percent = (float) part / (float) full;
+        percent = percent * 100;
+        int res = (int) percent;
+        return res + "%";
     }
 
 }

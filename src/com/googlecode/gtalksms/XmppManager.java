@@ -79,6 +79,9 @@ public class XmppManager {
     private XmppBuddies _xmppBuddies;
     private XmppFileManager _xmppFileMgr;
     
+    private static int reusedConnectionCount = 0;
+    private static int newConnectionCount = 0;
+    
     // Our current retry attempt, plus a runnable and handler to implement retry
     private int _currentRetryCount = 0;
     Runnable _reconnectRunnable = new Runnable() {
@@ -100,10 +103,6 @@ public class XmppManager {
         _xmppBuddies = new XmppBuddies(context, settings);
         _xmppFileMgr = new XmppFileManager(context, settings, this);
         _xmppMuc = new XmppMuc(context, settings, this);
-    }
-
-    private void start() {
-        start(CONNECTED);
     }
     
     private void start(int initialState) {
@@ -170,7 +169,7 @@ public class XmppManager {
             case XmppManager.DISCONNECTED:
             case XmppManager.WAITING_TO_CONNECT:
                 cleanupConnection();
-                start();
+                start(XmppManager.CONNECTED);
                 break;
             default:
                 throw new IllegalStateException("xmppRequestStateChange() unexpected current state when moving to connected: " + currentState);
@@ -372,6 +371,7 @@ public class XmppManager {
                 }
                 return;
             }
+            newConnectionCount++;
         } else {
             // reuse the old connection settings
             connection = _connection;
@@ -384,6 +384,7 @@ public class XmppManager {
                 maybeStartReconnect();
                 return;
             }
+            reusedConnectionCount++;
         }                
         
         _connection = connection;
@@ -585,6 +586,14 @@ public class XmppManager {
     
     public XmppBuddies getXmppBuddies() {
         return _xmppBuddies;
+    }
+    
+    public int getNewConnectionCount() {
+        return newConnectionCount;
+    }
+    
+    public int getReusedConnectionCount() {
+        return reusedConnectionCount;
     }
 
     public void configure(ProviderManager pm) {
