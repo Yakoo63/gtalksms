@@ -134,6 +134,8 @@ public class SettingsManager {
         serverHost = _sharedPreferences.getString("serverHost", "");
         serverPort = _sharedPreferences.getInt("serverPort", 0);
         
+        notifiedAddress = _sharedPreferences.getString("notifiedAddress", "");
+        
         useDifferentAccount = _sharedPreferences.getBoolean("useDifferentAccount", false);
         if (useDifferentAccount) {
             login = _sharedPreferences.getString("login", "");
@@ -148,7 +150,6 @@ public class SettingsManager {
             serviceName = StringUtils.parseServer(login);
         }
         
-        notifiedAddress = _sharedPreferences.getString("notifiedAddress", "");
         password =  _sharedPreferences.getString("password", "");
         xmppSecurityMode = _sharedPreferences.getString("xmppSecurityMode", "opt");
         if(xmppSecurityMode.equals("req")) {
