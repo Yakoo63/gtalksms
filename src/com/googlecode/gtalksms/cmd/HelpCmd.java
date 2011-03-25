@@ -57,7 +57,7 @@ public class HelpCmd extends Command {
         for (Command c : commandSet) {
             String[] helpLines = c.help();
             if (helpLines == null)  // do nothing if the command provides no help
-                break;
+                continue;
             
             addLinesToMsg(_msgAll, helpLines);
             
