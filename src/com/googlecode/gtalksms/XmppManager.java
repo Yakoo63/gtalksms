@@ -74,7 +74,6 @@ public class XmppManager {
     private static XMPPConnection _connection = null;
     private PacketListener _packetListener = null;
     private ConnectionListener _connectionListener = null;
-    private long _myThreadId = 0;
     private XmppMuc _xmppMuc;
     private XmppBuddies _xmppBuddies;
     private XmppFileManager _xmppFileMgr;
@@ -299,17 +298,9 @@ public class XmppManager {
     /** init the XMPP connection */
     private void initConnection() {
         XMPPConnection connection;
-    
 
-        // assert we are only ever called from one thread (which is
-        // sadly not the thread we are constructed on, hence the special
-        // case for when the thread-id is zero...)
-        if (_myThreadId==0)
-            _myThreadId = Thread.currentThread().getId();
-        else if (_myThreadId != Thread.currentThread().getId()) {
-            GoogleAnalyticsHelper.trackAndLogError("XmppMgr initConnection() - IllegalThreadStateException");
-            throw new IllegalThreadStateException("XmppMgr initConnection() - IllegalThreadStateException");
-        }
+        // assert we are only ever called from one thread
+        assert (!Thread.currentThread().getName().equals(MainService.SERVICE_THREAD_NAME));
         
         updateStatus(CONNECTING);
         NetworkInfo active = ((ConnectivityManager)_context.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
@@ -328,6 +319,10 @@ public class XmppManager {
                 conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
             } else {
                 // DNS SRV lookup, yeah! :)
+                // Note: The Emulator will throw here an BadAddressFamily Exception
+                // but on a real device it just works fine
+                // see: http://stackoverflow.com/questions/2879455/android-2-2-and-bad-address-family-on-socket-connect
+                // and http://code.google.com/p/android/issues/detail?id=9431
                 conf = new ConnectionConfiguration(_settings.serviceName);
             }
             conf.setTruststorePath("/system/etc/security/cacerts.bks");

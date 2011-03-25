@@ -68,6 +68,9 @@ public class MainService extends Service {
     public static final String ACTION_XMPP_MESSAGE_RECEIVED = "com.googlecode.gtalksms.action.XMPP.MESSAGE_RECEIVED";
     public static final String ACTION_XMPP_PRESENCE_CHANGED = "com.googlecode.gtalksms.action.XMPP.PRESENCE_CHANGED";
     public static final String ACTION_XMPP_CONNECTION_CHANGED = "com.googlecode.gtalksms.action.XMPP.CONNECTION_CHANGED";
+       
+    // 
+    public static final String SERVICE_THREAD_NAME = Tools.APP_NAME + ".Service";
     
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
@@ -345,7 +348,7 @@ public class MainService extends Service {
         
         Tools.setLocale(_settingsMgr, this);
         
-        HandlerThread thread = new HandlerThread("GTalkSMS.Service");
+        HandlerThread thread = new HandlerThread(SERVICE_THREAD_NAME);
         thread.start();
         _handlerThreadId = thread.getId();
         _serviceLooper = thread.getLooper();
