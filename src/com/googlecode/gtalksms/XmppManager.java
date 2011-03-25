@@ -308,7 +308,7 @@ public class XmppManager {
             _myThreadId = Thread.currentThread().getId();
         else if (_myThreadId != Thread.currentThread().getId()) {
             GoogleAnalyticsHelper.trackAndLogError("XmppMgr initConnection() - IllegalThreadStateException");
-            throw new IllegalThreadStateException();
+            throw new IllegalThreadStateException("XmppMgr initConnection() - IllegalThreadStateException");
         }
         
         updateStatus(CONNECTING);
@@ -350,48 +350,15 @@ public class XmppManager {
 
             connection = new XMPPConnection(conf);
             SettingsManager.connectionSettingsObsolete = false;
-            try {
-                connection.connect();
-            } catch (Exception e) {
-                Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
-                MainService.displayToast(R.string.xmpp_manager_connection_failed);
-                maybeStartReconnect();
-                return;
-            }
-            try {
-                connection.login(_settings.login, _settings.password, Tools.APP_NAME);
-            } catch (Exception e) {
-                xmppDisconnect(connection);
-                Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
-                // sadly, smack throws the same generic XMPPException for network
-                // related messages (eg "no response from the server") as for
-                // authoritative login errors (ie, bad password).  The only
-                // differentiator is the message itself which starts with this
-                // hard-coded string.
-                if (e.getMessage().indexOf("SASL authentication") == -1) {
-                    // doesn't look like a bad username/password, so retry
-                    MainService.displayToast(R.string.xmpp_manager_login_failed);
-                    maybeStartReconnect();
-                } else {
-                    MainService.displayToast(R.string.xmpp_manager_invalid_credentials);
-                    stop();
-                }
-                return;
-            }
+            if (!connectAndAuth(connection))
+                return;  // connection failure
             newConnectionCount++;
         } else {
             // reuse the old connection settings
             connection = _connection;
             // we reuse the xmpp connection so only connect() is needed
-            try {
-                connection.connect();
-                connection.login(_settings.login, _settings.password, Tools.APP_NAME);
-            } catch (Exception e) {
-                Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
-                MainService.displayToast(R.string.xmpp_manager_connection_failed);
-                maybeStartReconnect();
-                return;
-            }
+            if (!connectAndAuth(connection))
+                return; // connection failure
             reusedConnectionCount++;
         }                
         
@@ -496,6 +463,45 @@ public class XmppManager {
         _currentRetryCount = 0;
         updateStatus(CONNECTED);
 
+    }
+    
+    /**
+     * Tries to fully establish the given XMPPConnection
+     * Calls maybeStartReconnect() or stop() in an error case
+     * 
+     * @param connection
+     * @return true if we are connected and authenticated, false otherwise
+     */
+    private boolean connectAndAuth(XMPPConnection connection) {
+        try {
+            connection.connect();
+        } catch (Exception e) {
+            Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
+            MainService.displayToast(R.string.xmpp_manager_connection_failed, e.getLocalizedMessage());
+            maybeStartReconnect();
+            return false;
+        }
+        try {
+            connection.login(_settings.login, _settings.password, Tools.APP_NAME);
+        } catch (Exception e) {
+            xmppDisconnect(connection);
+            Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
+            // sadly, smack throws the same generic XMPPException for network
+            // related messages (eg "no response from the server") as for
+            // authoritative login errors (ie, bad password).  The only
+            // differentiator is the message itself which starts with this
+            // hard-coded string.
+            if (e.getMessage().indexOf("SASL authentication") == -1) {
+                // doesn't look like a bad username/password, so retry
+                MainService.displayToast(R.string.xmpp_manager_login_failed, e.getLocalizedMessage());
+                maybeStartReconnect();
+            } else {
+                MainService.displayToast(R.string.xmpp_manager_invalid_credentials, null);
+                stop();
+            }
+            return false;
+        }
+        return true;
     }
     
     /** returns true if the service is correctly connected */

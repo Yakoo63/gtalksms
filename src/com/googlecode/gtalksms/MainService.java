@@ -505,14 +505,21 @@ public class MainService extends Service {
      * Provides a clean way to display toast messages that don't get stuck
      * 
      * @param text
+     * @parm extraInfo can be null
      * @param ctx
      */
-    public static void displayToast(String text) {      
-        _toastHandler.post(new DisplayToast(text, _uiContext));
+    public static void displayToast(String text, String extraInfo) {      
+        _toastHandler.post(new DisplayToast(text, extraInfo, _uiContext));
     }
     
-    public static void displayToast(int i) {
-        displayToast(_uiContext.getString(i));
+    /**
+     * Display a string resource i as toast messages
+     * 
+     * @param i
+     * @param extraInfo can be null
+     */
+    public static void displayToast(int i, String extraInfo) {
+        displayToast(_uiContext.getString(i), extraInfo);
     }
     
     /** Updates the status about the service state (and the status bar) */

@@ -15,14 +15,16 @@ import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class FileCmd extends Command {
-    private XmppManager _xmppMgr;
+    private XmppManager xmppMgr;
     private File landingDir;
+    private File sendDir;  // where the files come from if send:filename is given
 
     
     public FileCmd(MainService mainService) {
         super(mainService, new String[] {"send", "ls"}, Command.TYPE_SYSTEM);
-        _xmppMgr = _mainService.getXmppmanager();
-        landingDir = _xmppMgr.getXmppFileMgr().getLandingDir();
+        xmppMgr = _mainService.getXmppmanager();
+        landingDir = xmppMgr.getXmppFileMgr().getLandingDir();
+        sendDir = landingDir;
     }
     
     @Override
@@ -30,7 +32,7 @@ public class FileCmd extends Command {
         if (cmd.equals("send")) {
             sendFile(args);
         } else if (cmd.equals("ls")) {
-            listLandingDir();
+            ls(args);
         }
     }
     
@@ -47,7 +49,7 @@ public class FileCmd extends Command {
         if (args.startsWith("/")) {
             file = new File(args);
         } else {
-            file = new File(landingDir, args);
+            file = new File(sendDir, args);
         }
         
         if (file.exists()) {
@@ -58,7 +60,7 @@ public class FileCmd extends Command {
     }
     
     private void sendFile(File file) {
-        FileTransferManager fileTransferManager = _xmppMgr.getXmppFileMgr().getFileTransferManager();
+        FileTransferManager fileTransferManager = xmppMgr.getXmppFileMgr().getFileTransferManager();
         OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(_answerTo);
 
         try {
@@ -84,8 +86,18 @@ public class FileCmd extends Command {
         }
     }
     
-    private void listLandingDir() {
-        File[] files = landingDir.listFiles();
+    private void ls(String args) {
+        if (args.equals("")) {
+            listDir(landingDir);
+        } else if (args.startsWith("\\")) {
+            File dir = new File(args);
+            listDir(dir);
+        }
+    }
+    
+    private void listDir(File dir) {
+        sendDir = dir;
+        File[] files = dir.listFiles();
         if (files == null) {
             return;
         } else {
