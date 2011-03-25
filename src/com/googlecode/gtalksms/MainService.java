@@ -152,6 +152,7 @@ public class MainService extends Service {
         
         String action = intent.getAction();
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "handling action '" + action + "' while in state " + initialState);
+        
         if (action.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // request to disconnect.

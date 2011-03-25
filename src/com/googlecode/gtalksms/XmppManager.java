@@ -80,7 +80,7 @@ public class XmppManager {
     
     private static int reusedConnectionCount = 0;
     private static int newConnectionCount = 0;
-    
+        
     // Our current retry attempt, plus a runnable and handler to implement retry
     private int _currentRetryCount = 0;
     Runnable _reconnectRunnable = new Runnable() {
@@ -124,26 +124,25 @@ public class XmppManager {
      * sets _status to DISCONNECTED
      */
     protected void stop() {
+        updateStatus(DISCONNECTING);
         cleanupConnection();
         updateStatus(DISCONNECTED);
     }
     
     /**
-     * Removes all references to the old connection
-     * packetListeners and removes Callbacks for the reconnectHandler
-     * If there is a connection, the status flag will be set to 
-     * "DISCONNECTING"
+     * Removes all references to the old connection.
      * 
+     * Spawns a new disconnect runnable if the connection
+     * is still connected and removes packetListeners and 
+     * Callbacks for the reconnectHandler
      */
     private void cleanupConnection() {
         _reconnectHandler.removeCallbacks(_reconnectRunnable);
 
-        if (_connection != null && _connection.isConnected()) {
-            updateStatus(DISCONNECTING);
-            xmppDisconnect(_connection);
-        }
-        
         if (_connection != null) {
+            if (_connection.isConnected()) {
+                xmppDisconnect(_connection);
+            }
             if (_packetListener != null) {
                 _connection.removePacketListener(_packetListener);
             }
@@ -278,20 +277,19 @@ public class XmppManager {
     }
 
     private void maybeStartReconnect() {
-        if (_currentRetryCount > 10) {
-            // we failed after all the retries - just die.
-            GoogleAnalyticsHelper.trackAndLogWarning("maybeStartReconnect ran out of retrys");
-            stop(); // will set state to DISCONNECTED.
-            return;
-        } else {
+            int timeout;
             updateStatus(WAITING_TO_CONNECT);
             cleanupConnection();
             _currentRetryCount += 1;
-            // a simple linear-backoff strategy.
-            int timeout = 5000 * _currentRetryCount;
+            if (_currentRetryCount < 20) {
+                // a simple linear-backoff strategy.
+                timeout = 5000 * _currentRetryCount;
+            } else {
+                // every 5 min
+                timeout = 1000 * 60 * 5;
+            }
             if (_settings.debugLog) Log.i(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
             _reconnectHandler.postDelayed(_reconnectRunnable, timeout);
-        }
     }
     
 
@@ -476,6 +474,9 @@ public class XmppManager {
             maybeStartReconnect();
             return false;
         }
+        // we reuse the connection and the auth was done with the connect()
+        if (connection.isAuthenticated())
+            return true;
         try {
             connection.login(_settings.login, _settings.password, Tools.APP_NAME);
         } catch (Exception e) {
@@ -610,7 +611,7 @@ public class XmppManager {
     
     public int getReusedConnectionCount() {
         return reusedConnectionCount;
-    }
+    }    
 
     public void configure(ProviderManager pm) {
         //  Private Data Storage

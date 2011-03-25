@@ -50,6 +50,13 @@ public class XmppBuddies implements RosterListener {
         return;
     }
     
+    /**
+     * retrieves the current xmpp rooster
+     * and sends a broadcast ACTION_XMPP_PRESENCE_CHANGED
+     * for every friend
+     * 
+     * @return
+     */
     public ArrayList<XmppFriend> retrieveFriendList() {
         
         ArrayList<XmppFriend> friends = new ArrayList<XmppFriend>();

@@ -2,6 +2,8 @@ package com.googlecode.gtalksms;
 
 import java.util.Locale;
 
+import org.jivesoftware.smack.util.StringUtils;
+
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -143,7 +145,7 @@ public class SettingsManager {
         if (manuallySpecifyServerSettings) {
             serviceName = _sharedPreferences.getString("serviceName", "");
         } else {
-            serviceName = Tools.getDomain(login);
+            serviceName = StringUtils.parseServer(login);
         }
         
         notifiedAddress = _sharedPreferences.getString("notifiedAddress", "");

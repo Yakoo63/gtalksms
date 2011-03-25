@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms.cmd;
 
 import java.io.File;
+import java.io.FileFilter;
 
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
@@ -89,32 +90,62 @@ public class FileCmd extends Command {
     private void ls(String args) {
         if (args.equals("")) {
             listDir(landingDir);
-        } else if (args.startsWith("\\")) {
+        } else if (args.startsWith("/")) {
             File dir = new File(args);
+            listDir(dir);
+        } else if (args.startsWith("./")) {  // emulate the cwd with help of sendDir
+            File dir = new File(sendDir, args.substring(1));
             listDir(dir);
         }
     }
     
     private void listDir(File dir) {
-        sendDir = dir;
-        File[] files = dir.listFiles();
-        if (files == null) {
-            return;
-        } else {
+        if (dir.isDirectory()) {
+            sendDir = dir;
             XmppMsg res = new XmppMsg();
-            res.appendBoldLine("Files within " + landingDir.getAbsolutePath());
-            for (File f : files) {
-                appendFileInfo(res, f);
+            File[] dirs = dir.listFiles(new FileCmd.DirFileFilter());
+            File[] files = dir.listFiles(new FileCmd.FileFileFilter());
+
+            if (dirs.length != 0) {
+                res.appendBoldLine("Directories within " + dir.getAbsolutePath());
+                for (File d : dirs) {
+                    res.appendLine(d.getName() + "/");
+                }
+            }
+            if (files.length != 0) {
+                res.appendBoldLine("Files within " + dir.getAbsolutePath());
+                for (File f : files) {
+                    appendFileInfo(res, f);
+                }
             }
             send(res);
-        }
-        
+        } else {
+            send(dir.getAbsolutePath() + " is not a direcotry");
+        }      
     }
     
     private static void appendFileInfo(XmppMsg msg, File f) {
-        long kib = f.length() / 1024;
         String name = f.getName();
-        msg.appendLine(name + " - " + kib + " KiB");
+        long size = f.length(); // the size of the file in bytes
+        if (size > 1023) {
+            msg.appendLine(name + " - " + size / 1024 + " KiB");
+        } else {
+            msg.appendLine(name + " - " + size + " Bytes");  
+        }
+    }
+    
+    public class DirFileFilter implements FileFilter {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isDirectory();
+        }      
+    }
+    
+    public class FileFileFilter implements FileFilter {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isFile();
+        }      
     }
 
 }

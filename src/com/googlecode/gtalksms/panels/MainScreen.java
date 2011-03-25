@@ -64,13 +64,11 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            //TODO should we call updateBuddies() here, as sometimes the service if offline (red)
-            //but the buddy is still shown as online
             _mainService = null;
         }
     };
 
-    public void updateStatus(int status, boolean tls, boolean compression) {
+    private void updateStatus(int status, boolean tls, boolean compression) {
         ImageView statusImg = (ImageView) findViewById(R.id.StatusImage);
         ImageView tlsStatus = (ImageView) findViewById(R.id.TLSsecured);
         ImageView compressionStatus = (ImageView) findViewById(R.id.compression);
@@ -103,7 +101,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         unregisterReceiver(_xmppreceiver);
     }
 
-    public String getStateImg(int stateType) {
+    private static String getStateImg(int stateType) {
         String state = String.valueOf(R.drawable.buddy_offline);
         switch (stateType) {
             case XmppFriend.AWAY:
@@ -138,7 +136,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
                     boolean exist = false;
                     for (HashMap<String, String> map : _friends) {
                         if (map.get("userid").equals(userId)) {
-                            
+                            exist = true;                          
                             if (stateInt == XmppFriend.OFFLINE) {
                                 map.remove("location_" + userFullId);
                                 
@@ -155,7 +153,6 @@ public class MainScreen extends Activity implements InterstitialAdListener{
                             }
                             map.put("state", stateImg);
                             map.put("status", status);
-                            exist = true;                          
                             break;
                         }
                     }
@@ -312,10 +309,8 @@ public class MainScreen extends Activity implements InterstitialAdListener{
                 return object1.get("userid").compareTo(object2.get("userid"));
             }});
         
-        
-        SimpleAdapter mSchedule = new SimpleAdapter(getBaseContext(), _friends, 
-                R.layout.buddyitem, new String[] { "state", "name", "status" }, 
-                new int[] { R.id.buddyState, R.id.buddyName, R.id.buddyStatus });
+        SimpleAdapter mSchedule = new SimpleAdapter(getBaseContext(), _friends, R.layout.buddyitem, new String[] { "state", "name", "status" }, new int[] {
+                R.id.buddyState, R.id.buddyName, R.id.buddyStatus });
 
         _buddiesListView.setAdapter(mSchedule);
     }
@@ -376,11 +371,8 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         return super.onKeyLongPress(keyCode, event);
     }
 
-      @Override
-    public void onFailedToReceiveInterstitial(InterstitialAd interstitialAd) {
-    }
+    public void onFailedToReceiveInterstitial(InterstitialAd interstitialAd) {}
 
-    @Override
     public void onReceiveInterstitial(InterstitialAd interstitialAd) {
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onReceiveInterstitial");
         if(interstitialAd == _interstitialAd) {

@@ -110,11 +110,14 @@ public class SystemCmd extends Command {
     }
     
     private static void appendXMPPConnectionData(XmppMsg msg) {
+        Exception e = xmppMgr.getLastConEx();
         int reused = xmppMgr.getReusedConnectionCount();
         int newcons = xmppMgr.getNewConnectionCount();
         int total = reused + newcons;
         msg.appendBoldLine("XMPP Connection Data");
         msg.appendLine("Total connections: " + total + " thereof " + reused + " reused and " + newcons + " new");
+        if (e != null)
+            msg.appendLine("Last XMPP Connection Error: " + e.getLocalizedMessage());
     }
     
     private static void appendSystemUptimeData(XmppMsg msg) {
