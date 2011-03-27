@@ -373,7 +373,7 @@ public class MainService extends Service {
             startService(new Intent(MainService.ACTION_CONNECT));
             return START_STICKY;
         }
-        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onStartCommand(): begin with " + intent.getAction());
+        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onStartCommand(): Intent " + intent.getAction());
         // A special case for the 'broadcast status' intent - we avoid setting
         // up the _xmppMgr etc
         if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
@@ -435,7 +435,7 @@ public class MainService extends Service {
             unregisterReceiver(_xmppConChangedReceiver);
             _xmppConChangedReceiver = null;
             
-            _xmppMgr.stop();
+            _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
             _xmppMgr = null;
         }
         teardownListenersForConnection();

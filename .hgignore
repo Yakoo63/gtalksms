@@ -7,3 +7,5 @@ syntax: regexp
 ^local\.properties$
 syntax: regexp
 ^proguard\.cfg$
+syntax: regexp
+^reports$

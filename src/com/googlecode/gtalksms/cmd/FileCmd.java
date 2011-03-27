@@ -66,7 +66,7 @@ public class FileCmd extends Command {
 
         try {
             transfer.sendFile(file, "Sending you: " + file.getAbsolutePath() + " to: " + _answerTo);
-            send("File transfer: " + file.getAbsolutePath() + " - " + transfer.getFileSize() / 1024 + " KB");
+            send("File transfer starting: " + file.getAbsolutePath() + " - " + transfer.getFileSize() / 1024 + " KB");
             
             while (!transfer.isDone()) {
                 if (transfer.getStatus() == FileTransfer.Status.refused) {

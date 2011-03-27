@@ -30,13 +30,6 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
             return;
         }
 
-        if (debugLog) 
-            Log.d(Tools.LOG_TAG, 
-                    "NetworkConnectivityReceiver: " +
-                    "connected=" + connected + 
-                    ", failover=" + failover + 
-                    ", networkName=" + network.getTypeName());
-
         if (prefs.getBoolean("startOnWifiConnected", false) && connected && networkType.equals("WIFI")) {
             // Start GTalkSMS
             if (debugLog) Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: startOnWifiConnected enabled, wifi connected, sending intent");
@@ -54,7 +47,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
         } else if (MainService.IsRunning) {
             if (debugLog)
                 Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: Broadcasting intent " + MainService.ACTION_NETWORK_CHANGED 
-                        + " with available=" + connected + ", failover=" + failover);
+                        + " with available=" + connected + ", failover=" + failover + ", networkName=" + network.getTypeName());
             Intent svcintent = new Intent(MainService.ACTION_NETWORK_CHANGED);
             svcintent.putExtra("available", connected);
             svcintent.putExtra("failover", failover);
