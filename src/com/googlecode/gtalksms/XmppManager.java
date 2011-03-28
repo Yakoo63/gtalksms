@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms;
 
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
@@ -14,6 +15,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.GroupChatInvitation;
 import org.jivesoftware.smackx.PrivateDataManager;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.bytestreams.ibb.provider.CloseIQProvider;
 import org.jivesoftware.smackx.bytestreams.ibb.provider.DataPacketProvider;
@@ -56,7 +58,7 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class XmppManager {
-
+    
     public static final int DISCONNECTED = 0;
     // A "transient" state - will only be CONNECTING *during* a call to start()
     public static final int CONNECTING = 1;
@@ -77,6 +79,7 @@ public class XmppManager {
     private XmppMuc _xmppMuc;
     private XmppBuddies _xmppBuddies;
     private XmppFileManager _xmppFileMgr;
+    private ServiceDiscoveryManager serviceDiscoMgr;
     
     private static int reusedConnectionCount = 0;
     private static int newConnectionCount = 0;
@@ -104,6 +107,9 @@ public class XmppManager {
         _xmppMuc = new XmppMuc(context, settings, this);
         reusedConnectionCount = 0;
         newConnectionCount = 0;
+        ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
+        ServiceDiscoveryManager.setIdentityType("bot"); // http://xmpp.org/registrar/disco-categories.html
+//        Connection.DEBUG_ENABLED = true;
     }
     
     private void start(int initialState) {
@@ -323,6 +329,7 @@ public class XmppManager {
                 // and http://code.google.com/p/android/issues/detail?id=9431
                 conf = new ConnectionConfiguration(_settings.serviceName);
             }
+            
             conf.setTruststorePath("/system/etc/security/cacerts.bks");
             conf.setTruststorePassword("changeit");
             conf.setTruststoreType("bks");
@@ -469,11 +476,16 @@ public class XmppManager {
         try {
             connection.connect();
         } catch (Exception e) {
-            Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e);
+            Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e.getMessage());
             MainService.displayToast(R.string.xmpp_manager_connection_failed, e.getLocalizedMessage());
             maybeStartReconnect();
             return false;
         }
+        
+        serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
+        serviceDiscoMgr.addFeature("http://jabber.org/protocol/muc");
+        XHTMLManager.setServiceEnabled(connection, false);        
+        
         // we reuse the connection and the auth was done with the connect()
         if (connection.isAuthenticated())
             return true;
@@ -481,7 +493,7 @@ public class XmppManager {
             connection.login(_settings.login, _settings.password, Tools.APP_NAME);
         } catch (Exception e) {
             xmppDisconnect(connection);
-            Log.e(Tools.LOG_TAG, "xmpp login failed: " + e);
+            Log.e(Tools.LOG_TAG, "xmpp login failed: " + e.getMessage());
             // sadly, smack throws the same generic XMPPException for network
             // related messages (eg "no response from the server") as for
             // authoritative login errors (ie, bad password).  The only
@@ -550,12 +562,11 @@ public class XmppManager {
             } else {
                 msg.setBody(message.generateTxt());
             }
-          // TODO does not work, should check if XHTML is enabled on receiver side. jid with resource? asmack problem?
-//            if (XHTMLManager.isServiceEnabled(_connection, _settings.notifiedAddress)) { 
+            if ((to == null) || XHTMLManager.isServiceEnabled(_connection, to)) { 
                 String xhtmlBody = message.generateXHTMLText().toString();
-                xhtmlBody = xhtmlBody.replace("<br>", "<br/>");  //fix for smackx problem
+                xhtmlBody = xhtmlBody.replace("<br>", "<br/>");  //fix for smack problem
                 XHTMLManager.addBody(msg, xhtmlBody);
-//            }
+            }
             if(muc == null) {
                 msg.setType(Message.Type.chat);
                 _connection.sendPacket(msg);

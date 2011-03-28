@@ -435,7 +435,7 @@ public class MainService extends Service {
             unregisterReceiver(_xmppConChangedReceiver);
             _xmppConChangedReceiver = null;
             
-            _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+            _xmppMgr.stop();
             _xmppMgr = null;
         }
         teardownListenersForConnection();
@@ -577,7 +577,7 @@ public class MainService extends Service {
      */
     private void onCommandReceived(String commandLine, String from) {
         if (_settingsMgr.debugLog) {
-            Log.i(Tools.LOG_TAG, "onCommandReceived(): " + Tools.shortenMessage(commandLine));
+            Log.i(Tools.LOG_TAG, "onCommandReceived(): \"" + Tools.shortenMessage(commandLine) + "\"");
         }
         try {
             String command;
