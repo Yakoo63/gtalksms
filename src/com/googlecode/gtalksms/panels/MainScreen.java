@@ -253,8 +253,11 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         clipboardBtn.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
-                if (_mainService != null) {
-                    _mainService.executeCommand("copy", "", null);
+                if (MainService.IsRunning) {
+                    Intent intent = new Intent(MainService.ACTION_COMMAND);
+                    intent.putExtra("cmd", "copy");
+                    intent.setClassName("com.googlecode.gtalksms", "com.googlecode.gtalksms.MainService");
+                    startService(intent);
                 }
             }
         });

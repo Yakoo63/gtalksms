@@ -100,7 +100,7 @@ public class MainService extends Service {
     private static Context _uiContext;
     
     private static volatile Handler _toastHandler;  
-
+    
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
     // control for "foreground" services.
@@ -230,11 +230,15 @@ public class MainService extends Service {
             }
         } else if (action.equals(ACTION_COMMAND)) {
             String cmd = intent.getStringExtra("cmd");
-            String args = intent.getStringExtra("args");
-            String from = intent.getStringExtra("from");
-            if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc)
-                from = null;
-            executeCommand(cmd, args, from);
+            if (cmd != null) {
+                String args = intent.getStringExtra("args");
+                String from = intent.getStringExtra("from");
+                if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc)
+                    from = null;
+                executeCommand(cmd, args, from);
+            } else {
+                Log.w(Tools.LOG_TAG, "Intent " + MainService.ACTION_COMMAND + " without extra cmd");
+            }
         } else if(!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {            
             GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
@@ -414,18 +418,7 @@ public class MainService extends Service {
             _serviceHandler.sendMessage(msg);
         }
         return START_STICKY;
-    }
-    
-    public void executeCommand(String cmd, String args, String answerTo) {
-        // TODO should we check here if cmd == null and return?
-        if (_settingsMgr.debugLog)
-            Log.i(Tools.LOG_TAG, "executeCommand: _commands.size=" + _commands.size());
-        if (_commands.containsKey(cmd)) {
-            _commands.get(cmd).execute(cmd, args, answerTo);
-        } else {
-            send(getString(R.string.chat_error_unknown_cmd, cmd), answerTo);
-        }
-    }
+    }    
 
     @Override
     public void onDestroy() {
@@ -526,6 +519,17 @@ public class MainService extends Service {
      */
     public static void displayToast(int i, String extraInfo) {
         displayToast(_uiContext.getString(i), extraInfo);
+    }
+    
+    private void executeCommand(String cmd, String args, String answerTo) {
+        assert(cmd != null);
+        if (_settingsMgr.debugLog)
+            Log.i(Tools.LOG_TAG, "executeCommand: _commands.size=" + _commands.size());
+        if (_commands.containsKey(cmd)) {
+            _commands.get(cmd).execute(cmd, args, answerTo);
+        } else {
+            send(getString(R.string.chat_error_unknown_cmd, cmd), answerTo);
+        }
     }
     
     /** Updates the status about the service state (and the status bar) */

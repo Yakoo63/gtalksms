@@ -68,7 +68,18 @@ public abstract class Command {
         return _commands;
     }   
     
+    /**
+     * Executes the given command
+     * args and answerTo may be null
+     * 
+     * @param cmd
+     * @param args
+     * @param answerTo
+     */
     public void execute(String cmd, String args, String answerTo) {
+        if (args == null) {
+            args = "";
+        }
         this._answerTo = answerTo;
         execute(cmd,args);
     }
