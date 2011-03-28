@@ -59,6 +59,8 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class XmppManager {
     
+    private static final boolean debug = false;
+    
     public static final int DISCONNECTED = 0;
     // A "transient" state - will only be CONNECTING *during* a call to start()
     public static final int CONNECTING = 1;
@@ -80,6 +82,7 @@ public class XmppManager {
     private XmppBuddies _xmppBuddies;
     private XmppFileManager _xmppFileMgr;
     private ServiceDiscoveryManager serviceDiscoMgr;
+    private static final boolean disconnectInThread = false;
     
     private static int reusedConnectionCount = 0;
     private static int newConnectionCount = 0;
@@ -109,7 +112,8 @@ public class XmppManager {
         newConnectionCount = 0;
         ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
         ServiceDiscoveryManager.setIdentityType("bot"); // http://xmpp.org/registrar/disco-categories.html
-//        Connection.DEBUG_ENABLED = true;
+        if (debug)
+            Connection.DEBUG_ENABLED = true;
     }
     
     private void start(int initialState) {
@@ -235,10 +239,17 @@ public class XmppManager {
                 }
             }
         }
-        Thread t = new Thread(new DisconnectRunnable(connection), "xmpp-disconnector");
-        // we don't want this thread to hold up process shutdown so mark as daemonic.
-        t.setDaemon(true);
-        t.start();
+        if (disconnectInThread) {
+            Thread t = new Thread(new DisconnectRunnable(connection), "xmpp-disconnector");
+            // we don't want this thread to hold up process shutdown so mark as
+            // daemonic.
+            t.setDaemon(true);
+            t.start();
+        } else {
+            Log.i(Tools.LOG_TAG, "disconnectING xmpp connection WITHOUT an extra thread");
+            connection.disconnect();
+            Log.i(Tools.LOG_TAG, "disconnectED xmpp connection WITHOUT an extra thread");
+        }
     }
 
     /**
@@ -316,7 +327,9 @@ public class XmppManager {
             return;
         }
         
-        if (SettingsManager.connectionSettingsObsolete || _connection == null || _connection.isConnected()) {
+        if (SettingsManager.connectionSettingsObsolete 
+                || _connection == null 
+                || _connection.isConnected() ) {
             ConnectionConfiguration conf;
             if (_settings.manuallySpecifyServerSettings) {
                 // trim the serverHost here because of Issue 122
@@ -478,6 +491,12 @@ public class XmppManager {
         } catch (Exception e) {
             Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e.getMessage());
             MainService.displayToast(R.string.xmpp_manager_connection_failed, e.getLocalizedMessage());
+            // "No response from server" usually means that the connection is somehow in an undefined state
+            // so we throw away the XMPPConnection by setting the XMPP connection settings obsolete
+            if (e.getMessage().startsWith("Connection failed. No response from server")) {
+                Log.w(Tools.LOG_TAG, "xmpp connection in an unusable state, marking it as obsolete");
+                SettingsManager.connectionSettingsObsolete = true;
+            }
             maybeStartReconnect();
             return false;
         }

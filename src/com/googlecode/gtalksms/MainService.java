@@ -418,6 +418,8 @@ public class MainService extends Service {
     
     public void executeCommand(String cmd, String args, String answerTo) {
         // TODO should we check here if cmd == null and return?
+        if (_settingsMgr.debugLog)
+            Log.i(Tools.LOG_TAG, "executeCommand: _commands.size=" + _commands.size());
         if (_commands.containsKey(cmd)) {
             _commands.get(cmd).execute(cmd, args, answerTo);
         } else {
@@ -674,8 +676,8 @@ public class MainService extends Service {
     }
     
     /**
-     * this method is called once in the lifetime of the service
-     * and only if we have a network available
+     * registers the commands, executing their constructor
+     *  
      */
     private void setupListenersForConnection() {
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "setupListenersForConnection()");  
