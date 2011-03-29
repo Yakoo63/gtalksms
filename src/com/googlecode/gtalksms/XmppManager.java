@@ -246,9 +246,17 @@ public class XmppManager {
             t.setDaemon(true);
             t.start();
         } else {
-            Log.i(Tools.LOG_TAG, "disconnectING xmpp connection WITHOUT an extra thread");
+            if (_settings.debugLog) {
+                Log.i(Tools.LOG_TAG, "disconnectING xmpp connection WITHOUT an thread");
+            }
+                float start = System.currentTimeMillis();
             connection.disconnect();
-            Log.i(Tools.LOG_TAG, "disconnectED xmpp connection WITHOUT an extra thread");
+            if (_settings.debugLog) {
+                float stop = System.currentTimeMillis();
+                float diff = stop - start;
+                diff = diff / 1000;
+                Log.i(Tools.LOG_TAG, "disconnectED xmpp connection WITHOUT an thread. Took: " + diff + " s");
+            }
         }
     }
 
@@ -374,13 +382,15 @@ public class XmppManager {
                 return; // connection failure
             reusedConnectionCount++;
         }                
-        
+        // this code is only executed if we have an connection established
         _connection = connection;               
         _connectionListener = new ConnectionListener() {
             @Override
             public void connectionClosed() {
                 // connection was closed by the foreign host
-                maybeStartReconnect();
+                // or we have closed the connection
+                // maybeStartReconnect();
+                if (_settings.debugLog) Log.i(Tools.LOG_TAG, "ConnectionListener: connectionClosed() called");
             }
 
             @Override
@@ -467,13 +477,20 @@ public class XmppManager {
             boolean auth = _connection.isAuthenticated();
             boolean enc = _connection.isUsingTLS();
             boolean comp = _connection.isUsingCompression();
-            Log.i(Tools.LOG_TAG, "conn parameters: con= " + con + " auth=" + auth + " enc=" + enc + " comp=" + comp);
+            Log.i(Tools.LOG_TAG, "conn parameters: con=" + con + " auth=" + auth + " enc=" + enc + " comp=" + comp);
         }
+                
+        serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
+        serviceDiscoMgr.addFeature("http://jabber.org/protocol/disco#info");
+        serviceDiscoMgr.addFeature("http://jabber.org/protocol/muc");
+        XHTMLManager.setServiceEnabled(connection, false);   
+        
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
             send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);
         }
-        _currentRetryCount = 0;
+        _currentRetryCount = 0;  
+        
         updateStatus(CONNECTED);
 
     }
@@ -499,11 +516,7 @@ public class XmppManager {
             }
             maybeStartReconnect();
             return false;
-        }
-        
-        serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
-        serviceDiscoMgr.addFeature("http://jabber.org/protocol/muc");
-        XHTMLManager.setServiceEnabled(connection, false);        
+        }          
         
         // we reuse the connection and the auth was done with the connect()
         if (connection.isAuthenticated())
@@ -531,7 +544,10 @@ public class XmppManager {
         return true;
     }
     
-    /** returns true if the service is correctly connected */
+    /** 
+     * returns true if the service is correctly connected
+     * and authenticated
+     */
     private boolean isConnected() {
         return    (_connection != null
                 && _connection.isConnected()

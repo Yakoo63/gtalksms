@@ -117,9 +117,9 @@ public class GoogleAnalyticsHelper {
     
     public void trackServiceStartsPerDay() {
        if(!hasBeenRunToday() && !datefileHasCurrentDate()) {
-           gAnalytics.trackEvent("GTalkSMS", // Category
-                   "Service", // Action
-                   "StartPerDay", // Label
+           gAnalytics.trackEvent("Service", // Category
+                   "StartPerDay", // Action
+                   Tools.getVersionName(ctx), // Label
                    0); // Value
        }
     }

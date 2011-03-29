@@ -175,9 +175,7 @@ public class MainService extends Service {
                     break;
             }
         } else if (action.equals(ACTION_SEND)) {
-            if (initialState == XmppManager.CONNECTED) {
-                _xmppMgr.send(new XmppMsg(intent.getStringExtra("message")), intent.getStringExtra("to"));
-            }
+            _xmppMgr.send(new XmppMsg(intent.getStringExtra("message")), intent.getStringExtra("to"));
         } else if (action.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
             String message = intent.getStringExtra("message");
             if (message != null) {
@@ -611,7 +609,7 @@ public class MainService extends Service {
     }
     
     private void setupCommands() {
-        
+        Log.i(Tools.LOG_TAG, "Registering Commands. _commands size: " + _commands.size());
         registerCommand(new KeyboardCmd(this));
         registerCommand(new BatteryCmd(this));
         registerCommand(new GeoCmd(this));
@@ -628,13 +626,21 @@ public class MainService extends Service {
         registerCommand(new SystemCmd(this)); // used for debugging
         
         registerCommand(new HelpCmd(this));  //help command needs to be registered as last
+        Log.i(Tools.LOG_TAG, "Registered Commands. _commands size: " + _commands.size());
     }
     
+    /**
+     * Calls cleanUp() for every registered command
+     * and removes the references for every registered command
+     * by calling clear() 
+     */
     private void cleanupCommands() {
         for (Command cmd : _commandSet) {
             cmd.cleanUp();
         }
+        Log.i(Tools.LOG_TAG, "Clearing _commands. Size: " + _commands.size());
         _commands.clear();
+        Log.i(Tools.LOG_TAG, "Cleared  _commands. Size: " + _commands.size());
         _commandSet.clear();
     }
     
