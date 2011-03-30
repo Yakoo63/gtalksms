@@ -380,7 +380,6 @@ public class MainService extends Service {
         // up the _xmppMgr etc
         if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
             // A request to broadcast our current status even if _xmpp is null.
-            // We use here the intent XMPP_CONNECTION_CHANGED send by broadcastStatus(), although there is no real connection change
             int state = getConnectionStatus();
             XmppManager.broadcastStatus(this, state, state);
         } else {

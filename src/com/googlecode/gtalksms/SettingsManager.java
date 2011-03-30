@@ -25,7 +25,8 @@ import com.googlecode.gtalksms.tools.Tools;
 public class SettingsManager {
     public static final String[] xmppConnectionSettings = { "serverHost", "serviceName", "serverPort", 
                                                             "login", "password", "useDifferentAccount",
-                                                            "xmppSecurityMode", "manuallySpecifyServerSettings"};
+                                                            "xmppSecurityMode", "manuallySpecifyServerSettings",
+                                                            "useCompression"};
     
     public static final int XMPPSecurityDisabled = 1;
     public static final int XMPPSecurityRequired = 2;

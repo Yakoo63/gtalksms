@@ -94,6 +94,12 @@ public class GoogleAnalyticsHelper {
             gAnalytics.trackEvent(Tools.APP_NAME, "error", errorMsg, 0);
         }
     }
+    
+    public static void trackDisconTime(float time) {
+        if (gAnalytics != null) {
+            gAnalytics.trackEvent("Service", "Connection", "DisconTime", (int) time);
+        }
+    }
 
     public void trackInstalls() {
         if (!run && (gAnalytics != null)) {

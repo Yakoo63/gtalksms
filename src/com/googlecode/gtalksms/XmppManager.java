@@ -59,7 +59,12 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class XmppManager {
     
-    private static final boolean debug = false;
+    private static final boolean DEBUG = false;
+    
+    // my first measurings showed that the disconnect in fact does not hang
+    // but takes sometimes a lot of time
+    // disconnectED xmpp connection. Took: 1048.576 s
+    public static final int DISCON_TIMEOUT = 1000 * 10; // 10s
     
     public static final int DISCONNECTED = 0;
     // A "transient" state - will only be CONNECTING *during* a call to start()
@@ -81,8 +86,7 @@ public class XmppManager {
     private XmppMuc _xmppMuc;
     private XmppBuddies _xmppBuddies;
     private XmppFileManager _xmppFileMgr;
-    private ServiceDiscoveryManager serviceDiscoMgr;
-    private static final boolean disconnectInThread = false;
+//    private ServiceDiscoveryManager serviceDiscoMgr;
     
     private static int reusedConnectionCount = 0;
     private static int newConnectionCount = 0;
@@ -112,7 +116,7 @@ public class XmppManager {
         newConnectionCount = 0;
         ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
         ServiceDiscoveryManager.setIdentityType("bot"); // http://xmpp.org/registrar/disco-categories.html
-        if (debug)
+        if (DEBUG)
             Connection.DEBUG_ENABLED = true;
     }
     
@@ -153,11 +157,14 @@ public class XmppManager {
             if (_connection.isConnected()) {
                 xmppDisconnect(_connection);
             }
-            if (_packetListener != null) {
-                _connection.removePacketListener(_packetListener);
-            }
-            if (_connectionListener != null) {
-                _connection.removeConnectionListener(_connectionListener);
+            // xmppDisconnect may has set _connection = null, so we have to double check
+            if (_connection != null) {
+                if (_packetListener != null) {
+                    _connection.removePacketListener(_packetListener);
+                }
+                if (_connectionListener != null) {
+                    _connection.removeConnectionListener(_connectionListener);
+                }
             }
         }
         _packetListener = null; 
@@ -221,43 +228,51 @@ public class XmppManager {
         // at least we are still working and it should go away 
         // eventually...
         class DisconnectRunnable implements Runnable {
-            public DisconnectRunnable(XMPPConnection x) {
-                _x = x;
+            private XMPPConnection con;
+
+            public DisconnectRunnable(XMPPConnection con) {
+                this.con = con;
             }
             
-            private XMPPConnection _x;
             public void run() {
-                try {
-                    if (_x.isConnected())
-                        _x.disconnect();
-                } catch (Exception e2) {
-                    // Even if we double check that the connection is still connected
-                    // sometimes the connection timeout occurs when disconnect method 
-                    // is running, so we just log that here 
-                    if (_settings.debugLog)
-                        Log.w(Tools.LOG_TAG, "xmpp disconnect failed: " + e2);
+                if (con.isConnected()) {
+                    if (_settings.debugLog) {
+                        Log.i(Tools.LOG_TAG, "disconnectING xmpp connection");
+                    }
+                    float start = System.currentTimeMillis();
+                    try {
+                        con.disconnect();
+                    } catch (Exception e2) {
+                        // Even if we double check that the connection is still connected
+                        // sometimes the connection timeout occurs when the disconnect method
+                        // is running, so we just log that here
+                        if (_settings.debugLog)
+                            Log.w(Tools.LOG_TAG, "xmpp disconnect failed: " + e2);
+                    }
+                    float stop = System.currentTimeMillis();
+                    float diff = stop - start;
+                    diff = diff / 1000;
+                    if (_settings.debugLog) {
+                        Log.i(Tools.LOG_TAG, "disconnectED xmpp connection. Took: " + diff + " s");
+                    }
+                    GoogleAnalyticsHelper.trackDisconTime(diff);
                 }
             }
         }
-        if (disconnectInThread) {
             Thread t = new Thread(new DisconnectRunnable(connection), "xmpp-disconnector");
             // we don't want this thread to hold up process shutdown so mark as
             // daemonic.
             t.setDaemon(true);
             t.start();
-        } else {
-            if (_settings.debugLog) {
-                Log.i(Tools.LOG_TAG, "disconnectING xmpp connection WITHOUT an thread");
+            
+            try {
+                t.join(DISCON_TIMEOUT);
+            } catch (InterruptedException e) {}
+            // the thread is still alive, this means that the disconnect is still running
+            // we don't have the time, so prepare for a new connection
+            if (t.isAlive()) {
+                _connection = null;
             }
-                float start = System.currentTimeMillis();
-            connection.disconnect();
-            if (_settings.debugLog) {
-                float stop = System.currentTimeMillis();
-                float diff = stop - start;
-                diff = diff / 1000;
-                Log.i(Tools.LOG_TAG, "disconnectED xmpp connection WITHOUT an thread. Took: " + diff + " s");
-            }
-        }
     }
 
     /**
@@ -338,6 +353,7 @@ public class XmppManager {
         if (SettingsManager.connectionSettingsObsolete 
                 || _connection == null 
                 || _connection.isConnected() ) {
+            
             ConnectionConfiguration conf;
             if (_settings.manuallySpecifyServerSettings) {
                 // trim the serverHost here because of Issue 122
@@ -369,7 +385,7 @@ public class XmppManager {
             if (_settings.useCompression)
                 conf.setCompressionEnabled(true);
 
-            connection = new XMPPConnection(conf);
+            connection = new XMPPConnection(conf);            
             SettingsManager.connectionSettingsObsolete = false;
             if (!connectAndAuth(connection))
                 return;  // connection failure
@@ -397,7 +413,10 @@ public class XmppManager {
             public void connectionClosedOnError(Exception e) {
                 // this happens mainly because of on IOException
                 // eg. connection timeouts because of lost connectivity
-                if (_settings.debugLog) Log.i(Tools.LOG_TAG, "xmpp disconnected due to error: ", e);
+                Log.w(Tools.LOG_TAG, "xmpp disconnected due to error: ", e);
+                if (e.getMessage().startsWith("Attr.value missing")) {
+                    Log.w(Tools.LOG_TAG, (Log.getStackTraceString(e)));
+                }
                 // We update the state to disconnected (mainly to cleanup listeners etc)
                 // then schedule an automatic reconnect.
                 maybeStartReconnect();
@@ -478,12 +497,7 @@ public class XmppManager {
             boolean enc = _connection.isUsingTLS();
             boolean comp = _connection.isUsingCompression();
             Log.i(Tools.LOG_TAG, "conn parameters: con=" + con + " auth=" + auth + " enc=" + enc + " comp=" + comp);
-        }
-                
-        serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
-        serviceDiscoMgr.addFeature("http://jabber.org/protocol/disco#info");
-        serviceDiscoMgr.addFeature("http://jabber.org/protocol/muc");
-        XHTMLManager.setServiceEnabled(connection, false);   
+        }                
         
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
@@ -509,10 +523,10 @@ public class XmppManager {
             Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e.getMessage());
             MainService.displayToast(R.string.xmpp_manager_connection_failed, e.getLocalizedMessage());
             // "No response from server" usually means that the connection is somehow in an undefined state
-            // so we throw away the XMPPConnection by setting the XMPP connection settings obsolete
+            // so we throw away the XMPPConnection by null ing it
             if (e.getMessage().startsWith("Connection failed. No response from server")) {
                 Log.w(Tools.LOG_TAG, "xmpp connection in an unusable state, marking it as obsolete");
-                SettingsManager.connectionSettingsObsolete = true;
+                _connection = null;
             }
             maybeStartReconnect();
             return false;
@@ -521,6 +535,16 @@ public class XmppManager {
         // we reuse the connection and the auth was done with the connect()
         if (connection.isAuthenticated())
             return true;
+        
+        ServiceDiscoveryManager serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
+        XHTMLManager.setServiceEnabled(connection, false);   
+        serviceDiscoMgr.addFeature("http://jabber.org/protocol/disco#info");
+        serviceDiscoMgr.addFeature("http://jabber.org/protocol/muc");
+        serviceDiscoMgr.addFeature("bug-fix-gtalksms");
+//        try {
+//            Thread.sleep(300);
+//        } catch (InterruptedException e1) {}
+        
         try {
             connection.login(_settings.login, _settings.password, Tools.APP_NAME);
         } catch (Exception e) {
