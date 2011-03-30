@@ -12,6 +12,7 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.GroupChatInvitation;
 import org.jivesoftware.smackx.PrivateDataManager;
@@ -384,7 +385,11 @@ public class XmppManager {
             }
             if (_settings.useCompression)
                 conf.setCompressionEnabled(true);
-
+            
+            // disable the built-in ReconnectionManager
+            // since we handle this
+            conf.setReconnectionAllowed(false);
+            
             connection = new XMPPConnection(conf);            
             SettingsManager.connectionSettingsObsolete = false;
             if (!connectAndAuth(connection))
@@ -524,9 +529,20 @@ public class XmppManager {
             MainService.displayToast(R.string.xmpp_manager_connection_failed, e.getLocalizedMessage());
             // "No response from server" usually means that the connection is somehow in an undefined state
             // so we throw away the XMPPConnection by null ing it
+            // see also issue 133 - http://code.google.com/p/gtalksms/issues/detail?id=133
             if (e.getMessage().startsWith("Connection failed. No response from server")) {
-                Log.w(Tools.LOG_TAG, "xmpp connection in an unusable state, marking it as obsolete");
+                // track how often we see this, maybe it is/was a problem with the built-in reconnection manager
+                // which is now disabled by default
+                GoogleAnalyticsHelper.trackAndLogWarning("xmpp connection in an unusable state, marking it as obsolete", e);
                 _connection = null;
+                if (e instanceof XMPPException) {
+                    XMPPException xmppEx = (XMPPException) e;
+                    StreamError error = xmppEx.getStreamError();
+                    // Make sure the error is not null
+                    if (error != null) {
+                        Log.w(Tools.LOG_TAG, error.toString());
+                    }
+                }
             }
             maybeStartReconnect();
             return false;
