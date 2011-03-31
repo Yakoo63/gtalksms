@@ -89,6 +89,8 @@ public class SettingsManager {
     public boolean backupAgentAvailable;
     public boolean debugLog;
     
+    private static SettingsManager settingsManager = null;
+    
     private SharedPreferences _sharedPreferences;
     private Context _context;
     private OnSharedPreferenceChangeListener _changeListener = new OnSharedPreferenceChangeListener() {
@@ -100,12 +102,19 @@ public class SettingsManager {
         }
     };
     
-    public SettingsManager(Context context) {
+    private SettingsManager(Context context) {
         _context = context;
         _sharedPreferences = _context.getSharedPreferences("GTalkSMS", 0);
         _sharedPreferences.registerOnSharedPreferenceChangeListener(_changeListener);
         
         importPreferences();
+    }
+    
+    public static SettingsManager getSettingsManager(Context context) {
+        if (settingsManager == null) {
+            settingsManager = new SettingsManager(context);           
+        } 
+        return settingsManager;        
     }
     
     public void Destroy() {
@@ -127,6 +136,9 @@ public class SettingsManager {
     	for (String s : xmppConnectionSettings)
     	    if (s.equals(key))
     	        connectionSettingsObsolete = true;
+    	if (key.equals("locale")) {
+            Tools.setLocale(this, _context);
+    	}
     }
     
     /** imports the preferences */

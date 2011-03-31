@@ -35,7 +35,7 @@ public class MyBackupAgent extends BackupAgent {
     @Override
     public void onBackup(ParcelFileDescriptor oldState, BackupDataOutput data, ParcelFileDescriptor newState) throws IOException {
         Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() begin");
-        settingsManager = new SettingsManager(this);
+        settingsManager = SettingsManager.getSettingsManager(this);
         String sharedPrefsPath = Tools.getSharedPrefDir(this) + "/" + "GTalkSMS.xml";
         File mDataFile = new File(sharedPrefsPath);
         try {
@@ -69,7 +69,7 @@ public class MyBackupAgent extends BackupAgent {
     @SuppressWarnings("unchecked")
     @Override
     public void onRestore(BackupDataInput data, int appVersionCode, ParcelFileDescriptor newState) throws IOException {        
-        settingsManager = new SettingsManager(this);
+        settingsManager = SettingsManager.getSettingsManager(this);
         Log.i(Tools.LOG_TAG, "MyBackupAgent onRestore() - starting to restore saved preferences");
         Class cls;
         try {

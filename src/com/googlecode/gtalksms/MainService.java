@@ -342,12 +342,7 @@ public class MainService extends Service {
         _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
         _gAnalytics.trackInstalls();
         
-        _settingsMgr = new SettingsManager(this) {
-            @Override public void OnPreferencesUpdated(String key) {
-            	super.OnPreferencesUpdated(key);
-                Tools.setLocale(_settingsMgr, getBaseContext());
-            }
-        };
+        _settingsMgr = SettingsManager.getSettingsManager(this);
         
         Tools.setLocale(_settingsMgr, this);
         

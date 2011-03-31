@@ -39,7 +39,7 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        _settingsManager = new SettingsManager(this);
+        _settingsManager = SettingsManager.getSettingsManager(this);
     }
 
     /*

@@ -272,6 +272,9 @@ public class XmppManager {
             // the thread is still alive, this means that the disconnect is still running
             // we don't have the time, so prepare for a new connection
             if (t.isAlive()) {
+                if (_settings.debugLog) {
+                    Log.i(Tools.LOG_TAG, t.getName() + " was still alive: connection will be set to null");
+                }
                 _connection = null;
             }
     }

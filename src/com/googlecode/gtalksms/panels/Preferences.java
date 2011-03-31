@@ -12,7 +12,7 @@ public class Preferences extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Tools.setLocale(new SettingsManager(this), this);
+        Tools.setLocale(SettingsManager.getSettingsManager(this), this);
         
         getPreferenceManager().setSharedPreferencesName("GTalkSMS");
         Intent intent = getIntent();

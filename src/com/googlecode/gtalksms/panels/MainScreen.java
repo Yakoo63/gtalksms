@@ -188,7 +188,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        _settingsMgr = new SettingsManager(this);
+        _settingsMgr = SettingsManager.getSettingsManager(this);
         createView();
         
         _interstitialAd.requestAd(this);
