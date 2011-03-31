@@ -531,17 +531,15 @@ public class XmppManager {
             // so we throw away the XMPPConnection by null ing it
             // see also issue 133 - http://code.google.com/p/gtalksms/issues/detail?id=133
             if (e.getMessage().startsWith("Connection failed. No response from server")) {
-                // track how often we see this, maybe it is/was a problem with the built-in reconnection manager
-                // which is now disabled by default
-                GoogleAnalyticsHelper.trackAndLogWarning("xmpp connection in an unusable state, marking it as obsolete", e);
+                Log.w(Tools.LOG_TAG, "xmpp connection in an unusable state, marking it as obsolete", e);
                 _connection = null;
-                if (e instanceof XMPPException) {
-                    XMPPException xmppEx = (XMPPException) e;
-                    StreamError error = xmppEx.getStreamError();
-                    // Make sure the error is not null
-                    if (error != null) {
-                        Log.w(Tools.LOG_TAG, error.toString());
-                    }
+            }
+            if (e instanceof XMPPException) {
+                XMPPException xmppEx = (XMPPException) e;
+                StreamError error = xmppEx.getStreamError();
+                // Make sure the error is not null
+                if (error != null) {
+                    Log.w(Tools.LOG_TAG, error.toString());
                 }
             }
             maybeStartReconnect();
