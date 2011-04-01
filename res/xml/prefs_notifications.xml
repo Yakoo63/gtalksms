@@ -44,7 +44,7 @@
         android:summary="@string/pref_notif_sms_sent_help"/>
     <CheckBoxPreference
         android:key="notifySmsDelivered"
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:title="@string/pref_notif_sms_delivered"
         android:summary="@string/pref_notif_sms_delivered_help"/>
     <CheckBoxPreference 
