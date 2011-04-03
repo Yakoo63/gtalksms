@@ -22,17 +22,19 @@ public class SystemCmd extends Command {
     private static ActivityManager activityManager; 
     private static ConnectivityManager connectivityManager;
     private static XmppManager xmppMgr;
+    private static MainService _mainService;
     
     public SystemCmd(MainService mainService) {
         super(mainService, new String[] {"system"}, Command.TYPE_SYSTEM);
         Context ctx = mainService.getBaseContext();
         activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
         connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-        xmppMgr = mainService.getXmppmanager();
+        _mainService = mainService;
     }
 
     @Override
     protected void execute(String cmd, String args) {
+        xmppMgr = _mainService.getXmppmanager();
         XmppMsg res = new XmppMsg(); 
         ActivityManager.MemoryInfo memInfoSystem = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(memInfoSystem);

@@ -207,6 +207,10 @@ public class XmppMsg {
      */
     private static String removeLastNewline(String str) {
         int strlen = str.length();
+        if (strlen == 0) {
+            return str;
+        }
+        
         int lastNewline = str.lastIndexOf("\n");
         if (strlen == lastNewline + 1) {
             return str.substring(0, strlen-1);            

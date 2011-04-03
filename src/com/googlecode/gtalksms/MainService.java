@@ -518,7 +518,13 @@ public class MainService extends Service {
         if (_settingsMgr.debugLog)
             Log.i(Tools.LOG_TAG, "executeCommand: _commands.size=" + _commands.size());
         if (_commands.containsKey(cmd)) {
-            _commands.get(cmd).execute(cmd, args, answerTo);
+            try {
+                _commands.get(cmd).execute(cmd, args, answerTo);
+            } catch (Exception e) {
+                String error = cmd + " (" + args + ") " + e.getLocalizedMessage();
+                Log.e(Tools.LOG_TAG, "executeCommand: " + error, e);    
+                send(getString(R.string.chat_error, error), answerTo);
+            }
         } else {
             send(getString(R.string.chat_error_unknown_cmd, cmd), answerTo);
         }
@@ -617,6 +623,7 @@ public class MainService extends Service {
         registerCommand(new SmsCmd(this));
         registerCommand(new ExitCmd(this));
         registerCommand(new AliasCmd(this));
+        
         registerCommand(new SystemCmd(this)); // used for debugging
         
         registerCommand(new HelpCmd(this));  //help command needs to be registered as last

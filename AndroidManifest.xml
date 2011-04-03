@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.googlecode.gtalksms" android:versionName="2.1.1" android:versionCode="29">
-    <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="8"/>
-    <application android:icon="@drawable/icon_green" android:label="GTalkSMS" android:restoreAnyVersion="true" android:backupAgent="com.googlecode.gtalksms.tools.MyBackupAgent" android:debuggable="false">
+<manifest 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.googlecode.gtalksms" 
+    android:versionName="2.1.2" 
+    android:versionCode="30">
+    <uses-sdk 
+        android:minSdkVersion="7" 
+        android:targetSdkVersion="8"/>
+    <application 
+        android:icon="@drawable/icon_green" 
+        android:label="GTalkSMS" 
+        android:restoreAnyVersion="true" 
+        android:backupAgent="com.googlecode.gtalksms.tools.MyBackupAgent" 
+        android:debuggable="false">
         <activity android:name="com.googlecode.gtalksms.panels.MainScreen"
                   android:label="@string/main_panel">
             <intent-filter>
@@ -104,8 +114,6 @@
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <!-- Do we really use this atm ? --> 
-    <!-- <uses-permission android:name="android.permission.RECEIVE_MMS" /> -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.SEND_SMS" />

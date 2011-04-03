@@ -23,13 +23,16 @@ public class FileCmd extends Command {
     
     public FileCmd(MainService mainService) {
         super(mainService, new String[] {"send", "ls"}, Command.TYPE_SYSTEM);
-        xmppMgr = _mainService.getXmppmanager();
-        landingDir = xmppMgr.getXmppFileMgr().getLandingDir();
-        sendDir = landingDir;
     }
     
     @Override
     protected void execute(String cmd, String args) {
+        if (landingDir == null) {
+            xmppMgr = _mainService.getXmppmanager();
+            landingDir = xmppMgr.getXmppFileMgr().getLandingDir();
+            sendDir = landingDir;
+        }
+
         if (cmd.equals("send")) {
             sendFile(args);
         } else if (cmd.equals("ls")) {
@@ -118,6 +121,11 @@ public class FileCmd extends Command {
                     appendFileInfo(res, f);
                 }
             }
+            
+            if (files.length == 0 && dirs.length == 0) {
+                res.append("No file in " + dir.getAbsolutePath());
+            }
+            
             send(res);
         } else {
             send(dir.getAbsolutePath() + " is not a direcotry");
