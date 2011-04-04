@@ -20,19 +20,25 @@ public class FileCmd extends Command {
     private File landingDir;
     private File sendDir;  // where the files come from if send:filename is given
 
+    private Exception ex;
     
     public FileCmd(MainService mainService) {
         super(mainService, new String[] {"send", "ls"}, Command.TYPE_SYSTEM);
+        try {
+            xmppMgr = _mainService.getXmppmanager();
+            XmppFileManager fileMgr = xmppMgr.getXmppFileMgr();
+            landingDir = fileMgr.getLandingDir();
+            sendDir = landingDir;
+        } catch (Exception e) {
+            ex = e;
+        }
     }
     
     @Override
     protected void execute(String cmd, String args) {
-        if (landingDir == null) {
-            xmppMgr = _mainService.getXmppmanager();
-            landingDir = xmppMgr.getXmppFileMgr().getLandingDir();
-            sendDir = landingDir;
-        }
-
+        if ( ex != null)
+            throw new IllegalStateException(ex);
+        
         if (cmd.equals("send")) {
             sendFile(args);
         } else if (cmd.equals("ls")) {
@@ -96,7 +102,7 @@ public class FileCmd extends Command {
         } else if (args.startsWith("/")) {
             File dir = new File(args);
             listDir(dir);
-        } else if (args.startsWith("./")) {  // emulate the cwd with help of sendDir
+        } else if (args.startsWith("./")) {  // emulate the current working directory with help of sendDir
             File dir = new File(sendDir, args.substring(1));
             listDir(dir);
         }

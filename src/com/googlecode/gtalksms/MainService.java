@@ -522,7 +522,8 @@ public class MainService extends Service {
                 _commands.get(cmd).execute(cmd, args, answerTo);
             } catch (Exception e) {
                 String error = cmd + " (" + args + ") " + e.getLocalizedMessage();
-                Log.e(Tools.LOG_TAG, "executeCommand: " + error, e);    
+                Log.e(Tools.LOG_TAG, "executeCommand: " + error, e); 
+                GoogleAnalyticsHelper.trackAndLogError("executeCommnad: exception ", e);
                 send(getString(R.string.chat_error, error), answerTo);
             }
         } else {
@@ -572,10 +573,8 @@ public class MainService extends Service {
     }
     
     /**
-     * Handels the different commands
-     * that came with the xmpp connection
-     * usually from an intent with
-     * ACTION_XMPP_MESSAGE_RECEIVED
+     * Handels the different commands that came with the xmpp connection
+     * usually from an intent with ACTION_XMPP_MESSAGE_RECEIVED
      * 
      * @param commandLine
      */
@@ -583,33 +582,27 @@ public class MainService extends Service {
         if (_settingsMgr.debugLog) {
             Log.i(Tools.LOG_TAG, "onCommandReceived(): \"" + Tools.shortenMessage(commandLine) + "\"");
         }
-        try {
-            String command;
-            String args;
-            if (commandLine.indexOf(":") != -1) {
-                command = commandLine.substring(0, commandLine.indexOf(":"));
-                args = commandLine.substring(commandLine.indexOf(":") + 1);
-            } else {
-                command = commandLine;
-                args = "";
-            }
+        String command;
+        String args;
+        if (commandLine.indexOf(":") != -1) {
+            command = commandLine.substring(0, commandLine.indexOf(":"));
+            args = commandLine.substring(commandLine.indexOf(":") + 1);
+        } else {
+            command = commandLine;
+            args = "";
+        }
 
-            // Not case sensitive commands
-            command = command.toLowerCase();
-            if (command.equals("stop")) {
-                send(getString(R.string.chat_stop_actions), from);
-                stopCommands();
-            } else {
-                executeCommand(command, args, from);
-            }
-        } catch (Exception ex) {
-            GoogleAnalyticsHelper.trackAndLogError("MainService onCommandReceived exception", ex);
-            send(getString(R.string.chat_error, ex), from);
+        // Not case sensitive commands
+        command = command.toLowerCase();
+        if (command.equals("stop")) {
+            send(getString(R.string.chat_stop_actions), from);
+            stopCommands();
+        } else {
+            executeCommand(command, args, from);
         }
     }
     
     private void setupCommands() {
-        Log.i(Tools.LOG_TAG, "Registering Commands. _commands size: " + _commands.size());
         registerCommand(new KeyboardCmd(this));
         registerCommand(new BatteryCmd(this));
         registerCommand(new GeoCmd(this));
@@ -627,7 +620,6 @@ public class MainService extends Service {
         registerCommand(new SystemCmd(this)); // used for debugging
         
         registerCommand(new HelpCmd(this));  //help command needs to be registered as last
-        Log.i(Tools.LOG_TAG, "Registered Commands. _commands size: " + _commands.size());
     }
     
     /**
@@ -639,7 +631,6 @@ public class MainService extends Service {
         for (Command cmd : _commandSet) {
             cmd.cleanUp();
         }
-        Log.i(Tools.LOG_TAG, "Clearing _commands. Size: " + _commands.size());
         _commands.clear();
         Log.i(Tools.LOG_TAG, "Cleared  _commands. Size: " + _commands.size());
         _commandSet.clear();
