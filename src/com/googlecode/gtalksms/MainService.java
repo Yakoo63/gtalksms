@@ -77,14 +77,15 @@ public class MainService extends Service {
     // about some events
     public static boolean IsRunning = false;
 
-    private SettingsManager _settingsMgr;
-    private XmppManager _xmppMgr;
-    private BroadcastReceiver _xmppConChangedReceiver;
-    private KeyboardInputMethod _keyboard;
+    private static SettingsManager _settingsMgr;
+    private static XmppManager _xmppMgr;
+    private static BroadcastReceiver _xmppConChangedReceiver;
+    private static KeyboardInputMethod _keyboard;
+    private static PendingIntent _contentIntent = null;
+
     
     private Map<String, Command> _commands = new HashMap<String, Command>();
     private Set<Command> _commandSet = new HashSet<Command>();
-    private PendingIntent _contentIntent = null;
 
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
