@@ -82,7 +82,6 @@ public class MainService extends Service {
     private static BroadcastReceiver _xmppConChangedReceiver;
     private static KeyboardInputMethod _keyboard;
     private static PendingIntent _contentIntent = null;
-
     
     private static Map<String, Command> _commands = new HashMap<String, Command>();
     private static Set<Command> _commandSet = new HashSet<Command>();
@@ -629,7 +628,7 @@ public class MainService extends Service {
      * and removes the references for every registered command
      * by calling clear() 
      */
-    private void cleanupCommands() {
+    private static void cleanupCommands() {
         for (Command cmd : _commandSet) {
             cmd.cleanUp();
         }
@@ -641,12 +640,12 @@ public class MainService extends Service {
     /**
      * used to stop ongoing actions, like gps updates, ringing, ... 
      */
-    private void stopCommands() {
+    private static void stopCommands() {
         for(Command c : _commandSet)
             c.stop();
     }
     
-    private void registerCommand(Command cmd) {
+    private static void registerCommand(Command cmd) {
         String[] commands = cmd.getCommands();
         for (String c : commands) {
             _commands.put(c, cmd);

@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 // From android-log-collector - http://code.google.com/p/android-log-collector
@@ -58,8 +61,6 @@ public class LogCollector extends Activity {
         return new AlertDialog.Builder(this)
         .setTitle(Tools.APP_NAME)
         .setIcon(android.R.drawable.ic_dialog_info)
-        // we don't really want these turning up directly on the gtalksms mailing lists, so
-        // don't default a 'to' address and tell the user to send it to themself.
         .setMessage(getString(R.string.log_panel_collect))
         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
             public void onClick(DialogInterface dialog, int whichButton){
@@ -73,8 +74,8 @@ public class LogCollector extends Activity {
     private void sendLog(String logString) {
         try {
             Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "GTalkSMS log");
-            //emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {"me@whereever.com"});
+            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "GTalkSMS log - <Enter Issue # Here>");
+            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {"gtalksms-logs@googlegroups.com"});
             emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, logString);
             emailIntent.setType("text/plain");
             startActivity(emailIntent);
@@ -143,6 +144,8 @@ public class LogCollector extends Activity {
                 log.insert(0, "Kernel info: " + getFormattedKernelVersion());
                 log.insert(0, LINE_SEPARATOR);
                 log.insert(0, "Version: " + getVersionNumber(LogCollector.this));
+                log.insert(0, LINE_SEPARATOR);
+                log.insert(0, getPreferences());
 
                 sendLog(log.toString());
                 dismissProgressDialog();
@@ -257,5 +260,23 @@ public class LogCollector extends Activity {
             Log.e(Tools.LOG_TAG, "IO Exception when getting kernel version for Device Info screen", e);
         }
         return getString(R.string.chat_log_unavailable);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private String getPreferences() {
+        StringBuilder res = new StringBuilder();
+        res.append(Tools.APP_NAME + " Preferences" + LINE_SEPARATOR);
+        SettingsManager settings = SettingsManager.getSettingsManager(getBaseContext());
+        Map<String, ?> allSharedPrefs = settings.getAllSharedPreferences();
+        Iterator i = allSharedPrefs.entrySet().iterator();
+        while (i.hasNext()) {
+            Map.Entry<String, ?> pairs = (Map.Entry<String, ?>) i.next();
+            String key = pairs.getKey();
+            String value = pairs.getValue().toString();
+            if (!key.equals("password")) {
+                res.append(key + ": " + value + LINE_SEPARATOR);
+            }
+        }
+        return res.toString();
     }
 }

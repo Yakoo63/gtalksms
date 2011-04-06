@@ -132,7 +132,6 @@ public class MyBackupAgent extends BackupAgent {
         try {
             cls = Class.forName("com.googlecode.gtalksms.SettingsManager");
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return;
         }
@@ -161,9 +160,7 @@ public class MyBackupAgent extends BackupAgent {
                 int len = buffer.length;
                 data.writeEntityHeader(key, len);
                 data.writeEntityData(buffer, len);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-            }
+            } catch (IOException e) { /* Ignore */ }
         }
         //then int
         Map<String, Object> intMap = convertToMap(getAllTypeFields(cls, int.class));
@@ -180,9 +177,7 @@ public class MyBackupAgent extends BackupAgent {
                 int len = buffer.length;
                 data.writeEntityHeader(key, len);
                 data.writeEntityData(buffer, len);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-            }
+            } catch (IOException e) { /* Ignore */ }
         }
         
         //then boolean
@@ -200,14 +195,12 @@ public class MyBackupAgent extends BackupAgent {
                 int len = buffer.length;
                 data.writeEntityHeader(key, len);
                 data.writeEntityData(buffer, len);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-            }
+            } catch (IOException e) { /* Ignore */ }
         }
     }
     
     @SuppressWarnings("unchecked")
-    private ArrayList<Field> getAllTypeFields(Class fromCls, Class typeCls) {
+    private static ArrayList<Field> getAllTypeFields(Class fromCls, Class typeCls) {
         ArrayList<Field> typeFields = new ArrayList<Field>();
         try {
             Field fieldList[] = fromCls.getFields();
@@ -217,9 +210,7 @@ public class MyBackupAgent extends BackupAgent {
                     typeFields.add(fld);
             }
         }
-        catch (Throwable e) {
-            /* TODO add error case */
-        }        
+        catch (Throwable e) { /* Ignore */ }
         return typeFields;
     }
     
@@ -231,10 +222,8 @@ public class MyBackupAgent extends BackupAgent {
             try {
                 map.put(f.getName(), f.get(settingsManager));
             } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }        

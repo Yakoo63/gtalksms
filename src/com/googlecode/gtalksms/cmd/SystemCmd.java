@@ -1,6 +1,8 @@
 package com.googlecode.gtalksms.cmd;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -12,7 +14,9 @@ import android.os.SystemClock;
 import android.os.Debug.MemoryInfo;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class SystemCmd extends Command {
@@ -22,39 +26,41 @@ public class SystemCmd extends Command {
     private static ActivityManager activityManager; 
     private static ConnectivityManager connectivityManager;
     private static XmppManager xmppMgr;
-    private static MainService _mainService;
+    private static MainService mainService;
     
     public SystemCmd(MainService mainService) {
         super(mainService, new String[] {"system"}, Command.TYPE_SYSTEM);
-        Context ctx = mainService.getBaseContext();
-        activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
-        connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-        _mainService = mainService;
+        if (SystemCmd.mainService == null) {
+            Context ctx = mainService.getBaseContext();
+            activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+            connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+            SystemCmd.mainService = mainService;
+            xmppMgr = mainService.getXmppmanager();
+        }
     }
 
     @Override
     protected void execute(String cmd, String args) {
-        xmppMgr = _mainService.getXmppmanager();
         XmppMsg res = new XmppMsg(); 
         ActivityManager.MemoryInfo memInfoSystem = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(memInfoSystem);
         MemoryInfo[] memInfoProc = activityManager.getProcessMemoryInfo(myPidArray);
 
         appendMemInfo(res, memInfoProc[0]);
-        
+        res.newLine();
         appendSystemMemInfo(res, memInfoSystem);
-        
-        res.appendBold("Importance: ");
-        res.appendLine(getMyImportance());
-        
-        res.appendBoldLine("Data connection status");
-        res.appendLine(getDataConnectionStatus());
-        
+        res.newLine();
+        appendImportance(res);
+        res.newLine();
+        appendDataConnectionStatus(res);
+        res.newLine();
         appendXMPPConnectionData(res);
-        
+        res.newLine();
         appendSystemUptimeData(res);
-        
+        res.newLine();
         appendMonkeyTest(res);
+        res.newLine();
+        appendPreferences(res);
         
         send(res);
     }
@@ -64,7 +70,7 @@ public class SystemCmd extends Command {
         return null;
     }
     
-    private String getMyImportance() {
+    private static String getMyImportance() {
         String res = "unkown";
         RunningAppProcessInfo myInfo = null;
         List<RunningAppProcessInfo> apps = activityManager.getRunningAppProcesses();
@@ -98,7 +104,7 @@ public class SystemCmd extends Command {
         return res;
     }
     
-    private String getDataConnectionStatus() {
+    private static String getDataConnectionStatus() {
         String res = null;
         
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
@@ -188,5 +194,31 @@ public class SystemCmd extends Command {
             msg.appendLine("System is NOT in low memory situation");
         }
         msg.appendLine("Low memory situation if AvailMem is under " + memInfoSystem.threshold);      
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static void appendPreferences(XmppMsg msg) {
+        msg.appendBoldLine(Tools.APP_NAME + " Preferences");
+        SettingsManager settings = mainService.getSettingsManager();
+        Map<String, ?> allSharedPrefs = settings.getAllSharedPreferences();
+        Iterator i = allSharedPrefs.entrySet().iterator();
+        while (i.hasNext()) {
+            Map.Entry<String, ?> pairs = (Map.Entry<String, ?>) i.next();
+            String key = pairs.getKey();
+            String value = pairs.getValue().toString();
+            if (!key.equals("password")) {
+                msg.appendLine(key + ": " + value);
+            }
+        }
+    }
+    
+    private static void appendImportance(XmppMsg msg) {
+        msg.appendBold("Importance: ");
+        msg.appendLine(getMyImportance());
+    }
+    
+    private static void appendDataConnectionStatus(XmppMsg msg) {
+        msg.appendBoldLine("Data connection status");
+        msg.appendLine(getDataConnectionStatus());
     }
 }

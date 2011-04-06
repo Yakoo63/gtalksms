@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms;
 
 import java.util.Locale;
+import java.util.Map;
 
 import org.jivesoftware.smack.util.StringUtils;
 
@@ -123,6 +124,10 @@ public class SettingsManager {
     
     public SharedPreferences.Editor getEditor() {
     	return _sharedPreferences.edit();
+    }
+    
+    public Map<String, ?> getAllSharedPreferences() {
+        return _sharedPreferences.getAll();
     }
     
     public boolean SharedPreferencesContains(String key) {
