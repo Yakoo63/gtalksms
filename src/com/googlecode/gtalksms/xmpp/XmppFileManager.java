@@ -29,8 +29,8 @@ public class XmppFileManager implements FileTransferListener {
     
     private static final String gtalksmsDir = "GTalkSMS";
     
-    public XmppFileManager(Context context, SettingsManager settings, XmppManager xmppMgr) {
-        _settings = settings;
+    public XmppFileManager(Context context, XmppManager xmppMgr) {
+        _settings = SettingsManager.getSettingsManager(context);
         _xmppMgr = xmppMgr;
         if (_settings.backupAgentAvailable) {  // API Level >= 8 check
             externalFilesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);

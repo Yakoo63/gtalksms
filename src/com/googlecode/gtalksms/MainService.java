@@ -84,8 +84,8 @@ public class MainService extends Service {
     private static PendingIntent _contentIntent = null;
 
     
-    private Map<String, Command> _commands = new HashMap<String, Command>();
-    private Set<Command> _commandSet = new HashSet<Command>();
+    private static Map<String, Command> _commands = new HashMap<String, Command>();
+    private static Set<Command> _commandSet = new HashSet<Command>();
 
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
@@ -105,8 +105,9 @@ public class MainService extends Service {
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
     // control for "foreground" services.
-    private volatile Looper _serviceLooper;
-    private volatile ServiceHandler _serviceHandler;
+    private static volatile Looper _serviceLooper;
+    private static volatile ServiceHandler _serviceHandler;
+    
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
@@ -402,7 +403,7 @@ public class MainService extends Service {
                 IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_CONNECTION_CHANGED);
                 registerReceiver(_xmppConChangedReceiver, intentFilter);
                 
-                _xmppMgr = new XmppManager(_settingsMgr, getBaseContext());
+                _xmppMgr = new XmppManager(getBaseContext());
             }
             
             Message msg = _serviceHandler.obtainMessage();

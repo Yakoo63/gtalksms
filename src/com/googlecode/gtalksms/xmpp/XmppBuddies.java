@@ -24,7 +24,7 @@ public class XmppBuddies implements RosterListener {
     private Context _context;
     private XMPPConnection _connection;
     
-    public XmppBuddies(Context context, SettingsManager settings) {
+    public XmppBuddies(Context context) {
         _context = context;
     }
     

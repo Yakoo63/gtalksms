@@ -106,13 +106,13 @@ public class XmppManager {
     private SettingsManager _settings;
     private Context _context;
     
-    public XmppManager(SettingsManager settings, Context context) {
-        _settings = settings;
+    public XmppManager(Context context) {
+        _settings = SettingsManager.getSettingsManager(context);
         _context = context;
         configure(ProviderManager.getInstance());
-        _xmppBuddies = new XmppBuddies(context, settings);
-        _xmppFileMgr = new XmppFileManager(context, settings, this);
-        _xmppMuc = new XmppMuc(context, settings, this);
+        _xmppBuddies = new XmppBuddies(context);
+        _xmppFileMgr = new XmppFileManager(context, this);
+        _xmppMuc = new XmppMuc(context, this);
         reusedConnectionCount = 0;
         newConnectionCount = 0;
         ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);

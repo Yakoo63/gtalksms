@@ -40,9 +40,9 @@ public class XmppMuc {
     private XmppManager _xmppMgr;
 
     
-    public XmppMuc(Context context, SettingsManager settings, XmppManager xmppMgr) {
+    public XmppMuc(Context context, XmppManager xmppMgr) {
         _context = context;
-        _settings = settings;
+        _settings = SettingsManager.getSettingsManager(context);
         _xmppMgr = xmppMgr;
     }
     
