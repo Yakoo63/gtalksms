@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 public class XmppBuddies implements RosterListener {
