@@ -85,6 +85,7 @@ public class XmppMuc {
      * 
      * @param number
      * @param name
+     * @return true if successful, otherwise false
      */
     public void inviteRoom(String number, String sender) {
         String room = getRoomString(number, sender);
@@ -182,9 +183,15 @@ public class XmppMuc {
         // With "@conference.jabber.org" messages are sent several times...
         // Jwchat seems to work fine and is the default
         String cnx = "GTalkSMS_" + randomInt + "_" + _settings.login.replaceAll("@", "_") + "@" + _settings.mucServer;
-        multiUserChat = new MultiUserChat(_connection, cnx);
-        multiUserChat.create(name + " (" + number + ")");
-
+        
+        // See issue 136
+        try {
+            multiUserChat = new MultiUserChat(_connection, cnx);
+            multiUserChat.create(name + " (" + number + ")");
+        } catch (Exception e) {  
+            throw new XMPPException("MUC create failed", e);
+        }
+        
         try {
             // Since this is a private room, make the room not public and set
             // user as owner of the room.
