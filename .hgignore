@@ -7,3 +7,4 @@ syntax: regexp
 ^local\.properties$
 syntax: regexp
 ^proguard\.cfg$
+.DS_Store

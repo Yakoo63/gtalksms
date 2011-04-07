@@ -129,7 +129,6 @@ public class SettingsManager {
     }
     
     /** imports the preferences */
-    @SuppressWarnings("unchecked")
 	private void importPreferences() {
         serverHost = _sharedPreferences.getString("serverHost", "");
         serverPort = _sharedPreferences.getInt("serverPort", 0);
@@ -207,8 +206,7 @@ public class SettingsManager {
         }
         
         try {
-        	@SuppressWarnings("unused")
-			Class c = Class.forName("android.app.backup.BackupAgent");
+        	Class.forName("android.app.backup.BackupAgent");
         	backupAgentAvailable = true;
         } catch (Exception e) {
         	backupAgentAvailable = false;
