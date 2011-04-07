@@ -12,8 +12,8 @@ public class UrlsCmd extends Command {
     }
     
     @Override
-    protected void execute(String cmd, String args) {
-        Intent target = new Intent(Intent.ACTION_VIEW, Uri.parse(cmd + ":" + args));
+    public void execute(UserCommand c) {
+        Intent target = new Intent(Intent.ACTION_VIEW, Uri.parse(c.getOriginalCommand()));
         Intent intent = Intent.createChooser(target, getString(R.string.chat_choose_activity));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         _context.startActivity(intent);

@@ -111,6 +111,7 @@
         <meta-data 
             android:value="a14d73bb1e4a729" 
             android:name="ADMOB_INTERSTITIAL_PUBLISHER_ID" />
+    <uses-library android:name="android.test.runner" />
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
@@ -124,4 +125,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    
+    <!--
+    This declares that this app uses the instrumentation test runner targeting
+    the package of com.example.android.apis.  To run the tests use the command:
+    "adb shell am instrument -w com.example.android.apis.tests/android.test.InstrumentationTestRunner"
+    -->
+    <instrumentation android:name="android.test.InstrumentationTestRunner"
+                     android:label="Tests GTalkSMS" android:targetPackage="com.googlecode.gtalksms"/>
 </manifest>

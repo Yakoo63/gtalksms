@@ -17,13 +17,14 @@ public class ClipboardCmd extends Command {
     }
     
     @Override
-    protected void execute(String cmd, String text) {
+    public void execute(UserCommand cmd) {
         try {
+        	String text = cmd.getAllArguments();
             if (text.length() > 0) {
                 _clipboardMgr.setText(text);
-                send(R.string.chat_text_copied);
+                cmd.respond(getString(R.string.chat_text_copied));
             } else {
-                send(R.string.chat_clipboard, _clipboardMgr.getText());
+            	cmd.respond(getString(R.string.chat_clipboard, _clipboardMgr.getText()));
             }
         } catch (Exception ex) {
             Log.w(Tools.LOG_TAG, "Clipboard error", ex);

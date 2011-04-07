@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -262,15 +261,12 @@ public class LogCollector extends Activity {
         return getString(R.string.chat_log_unavailable);
     }
     
-    @SuppressWarnings("unchecked")
     private String getPreferences() {
         StringBuilder res = new StringBuilder();
         res.append(Tools.APP_NAME + " Preferences" + LINE_SEPARATOR);
         SettingsManager settings = SettingsManager.getSettingsManager(getBaseContext());
         Map<String, ?> allSharedPrefs = settings.getAllSharedPreferences();
-        Iterator i = allSharedPrefs.entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry<String, ?> pairs = (Map.Entry<String, ?>) i.next();
+        for (Map.Entry<String, ?> pairs : allSharedPrefs.entrySet()) {
             String key = pairs.getKey();
             String value = pairs.getValue().toString();
             if (!key.equals("password")) {

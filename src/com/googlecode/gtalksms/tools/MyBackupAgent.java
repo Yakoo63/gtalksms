@@ -66,12 +66,11 @@ public class MyBackupAgent extends BackupAgent {
         
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onRestore(BackupDataInput data, int appVersionCode, ParcelFileDescriptor newState) throws IOException {        
         settingsManager = SettingsManager.getSettingsManager(this);
         Log.i(Tools.LOG_TAG, "MyBackupAgent onRestore() - starting to restore saved preferences");
-        Class cls;
+        Class<?> cls;
         try {
             cls = Class.forName("com.googlecode.gtalksms.SettingsManager");
         } catch (ClassNotFoundException e) {
@@ -125,14 +124,12 @@ public class MyBackupAgent extends BackupAgent {
         prefEditor.commit();
     }
     
-    @SuppressWarnings("unchecked")
     private void writeData(BackupDataOutput data) {
         Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() new data found - starting backup");
-        Class cls;
+        Class<?> cls;
         try {
             cls = Class.forName("com.googlecode.gtalksms.SettingsManager");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
             return;
         }
         Set<String> keys;
@@ -199,8 +196,7 @@ public class MyBackupAgent extends BackupAgent {
         }
     }
     
-    @SuppressWarnings("unchecked")
-    private static ArrayList<Field> getAllTypeFields(Class fromCls, Class typeCls) {
+    private ArrayList<Field> getAllTypeFields(Class<?> fromCls, Class<?> typeCls) {
         ArrayList<Field> typeFields = new ArrayList<Field>();
         try {
             Field fieldList[] = fromCls.getFields();

@@ -1,6 +1,5 @@
 package com.googlecode.gtalksms.cmd;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -9,9 +8,9 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Debug.MemoryInfo;
 import android.os.Process;
 import android.os.SystemClock;
-import android.os.Debug.MemoryInfo;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
@@ -196,14 +195,11 @@ public class SystemCmd extends Command {
         msg.appendLine("Low memory situation if AvailMem is under " + memInfoSystem.threshold);      
     }
     
-    @SuppressWarnings("unchecked")
     private static void appendPreferences(XmppMsg msg) {
         msg.appendBoldLine(Tools.APP_NAME + " Preferences");
         SettingsManager settings = mainService.getSettingsManager();
         Map<String, ?> allSharedPrefs = settings.getAllSharedPreferences();
-        Iterator i = allSharedPrefs.entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry<String, ?> pairs = (Map.Entry<String, ?>) i.next();
+        for(Map.Entry<String, ?> pairs : allSharedPrefs.entrySet()) {
             String key = pairs.getKey();
             String value = pairs.getValue().toString();
             if (!key.equals("password")) {

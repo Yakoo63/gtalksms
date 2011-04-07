@@ -6,6 +6,7 @@ import android.content.Context;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public abstract class Command { 
@@ -76,12 +77,40 @@ public abstract class Command {
      * @param args
      * @param answerTo
      */
-    public void execute(String cmd, String args, String answerTo) {
-        if (args == null) {
-            args = "";
-        }
-        this._answerTo = answerTo;
-        execute(cmd,args);
+    public final void execute(String cmd, String args, String answerTo) {
+    	/*
+    	 * This method should be deprecated, and currently contains an 
+    	 * experiment to isolate Xmpp From the commands altogether.
+    	 * As the XmppUserCommand class is verified to be good, the XmppUserCommand
+    	 * initialization should be moved out to the caller of this method.
+    	 */
+    	execute(new XmppUserCommand(_mainService.getXmppmanager(), cmd, args, answerTo));
+    }
+    
+    private static class XmppUserCommand extends UserCommand {
+    	private final XmppManager xmppManager;
+		public XmppUserCommand(XmppManager xmppManager, String cmd, String args, String replyTo) {
+			super(cmd, args, replyTo);
+			this.xmppManager = xmppManager;
+		}
+
+		@Override
+		public void respond(String message) {
+			xmppManager.send(new XmppMsg(message), getReplyTo());
+		}
+    	
+    }
+    
+    public void execute(UserCommand userCommand) {
+    	/*
+    	 * Default implementation is to fall back to old behavoir with
+    	 * _answerTo variable and Xmpp awareness in sub classes.
+    	 * <p>
+    	 * Make abstract when execute(String, String) is gone, but for now default to it for
+    	 * backwards compatibility.
+    	 */
+    	this._answerTo = userCommand.getReplyTo();
+    	execute(userCommand.getCommand(), userCommand.getAllArguments());
     }
     
     /**
@@ -91,8 +120,12 @@ public abstract class Command {
      * @param cmd the base command
      * @param args the arguments - substring after the first ":", if no other arguments where given this will be ""
      * @param answerTo JID for command output, null to send to default notification address
+     * @deprecated Use {@link #execute(UserCommand)} instead
      */
-    protected abstract void execute(String cmd, String args); 
+    @Deprecated
+    protected void execute(String cmd, String args) {
+    	throw new RuntimeException("Must implement execute(UserCommand)");
+    }
         
     /**
      * Stop all ongoing actions caused by a command
@@ -175,5 +208,11 @@ public abstract class Command {
         XmppMsg msg = new XmppMsg();
         addStringArraytoXmppMsg(msg, help);
         send(msg);
+    }
+    
+    protected SettingsManager getSettingsManager() {
+    	if (_mainService == null)
+    		throw new IllegalStateException("Command._mainService is not set.");
+    	return _mainService.getSettingsManager();
     }
 }
