@@ -186,8 +186,9 @@ public class MainService extends Service {
                 String number = intent.getStringExtra("sender");
                 String name = ContactsManager.getContactName(this, number);
                 String message = intent.getStringExtra("message");
+                boolean roomExists = _xmppMgr.getXmppMuc().roomExists(number);
                 
-                if (_settingsMgr.notifySmsInSameConversation && !_xmppMgr.getXmppMuc().roomExists(number, name)) {
+                if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
                     XmppMsg msg = new XmppMsg();
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
@@ -196,7 +197,7 @@ public class MainService extends Service {
                         ((SmsCmd)_commands.get("sms")).setLastRecipient(number);
                     }
                 }
-                if (_settingsMgr.notifySmsInChatRooms || _xmppMgr.getXmppMuc().roomExists(number, name)) {
+                if (_settingsMgr.notifySmsInChatRooms || roomExists) {
                     try {
                         _xmppMgr.getXmppMuc().writeRoom(number, name, message);
                     } catch (XMPPException e) {

@@ -38,6 +38,7 @@ public class XmppMuc {
     private SettingsManager _settings;
     private XMPPConnection _connection;
     private XmppManager _xmppMgr;
+    private static Random _rndGen = new Random();
 
     
     public XmppMuc(Context context, XmppManager xmppMgr) {
@@ -48,7 +49,8 @@ public class XmppMuc {
     
     public void initialize(XMPPConnection connection) {
         _connection = connection;
-        _roomNumbers.clear();  //clear the roomNumbers and room ArrayList as we have a new connection
+        // clear the roomNumbers and room ArrayList as we have a new connection
+        _roomNumbers.clear();
         _rooms.clear();
     }
     
@@ -63,13 +65,12 @@ public class XmppMuc {
      * @throws XMPPException
      */
     public void writeRoom(String number, String contact, String message) throws XMPPException {
-        String room = getRoomString(number, contact);
         MultiUserChat muc;
-        if (!_rooms.containsKey(room)) {
-            muc = createRoom(number, room, contact);
-            _rooms.put(room, muc);
+        if (!_rooms.containsKey(number)) {
+            muc = createRoom(number, contact);
+            _rooms.put(number, muc);
         } else {
-            muc = _rooms.get(room);
+            muc = _rooms.get(number);
             // TODO: test if occupants contains also the sender (in case we
             // invite other people)
             if (muc != null && muc.getOccupantsCount() < 2) {
@@ -88,15 +89,14 @@ public class XmppMuc {
      * @return true if successful, otherwise false
      */
     public void inviteRoom(String number, String sender) {
-        String room = getRoomString(number, sender);
         try {
             MultiUserChat muc;
-            if (!_rooms.containsKey(room)) {
-                muc = createRoom(number, room, sender);             
-                _rooms.put(room, muc);
+            if (!_rooms.containsKey(number)) {
+                muc = createRoom(number, sender);             
+                _rooms.put(number, muc);
                 
             } else {
-                muc = _rooms.get(room);                
+                muc = _rooms.get(number);                
                 // TODO: test if occupants contains also the sender (in case we invite other people)
                 if (muc != null && muc.getOccupantsCount() < 2) {
                     muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
@@ -108,36 +108,25 @@ public class XmppMuc {
     }
     
     /**
-     * creates a string from number and contact
-     * for use as the room key in the rooms array
-     * (the actual room name will have another string
-     * + an randInt)
+     * creates a formated string from number and contact
      * 
      * @param number
      * @param contact
      * @return
      */
     private static String getRoomString(String number, String contact) {
-        String contactLowerCase = new String(contact);
-        contactLowerCase.toLowerCase();
-        return contactLowerCase + " (" + number + ")";
+        return contact + " (" + number + ")";
     }
     
     /**
-     * Checks if a room for the specific contact 
-     * AND corresponding number exists
+     * Checks if a room for the specific number
      * 
      * @param number
      * @param contact
      * @return true if the room exists and gtalksms is in it, otherwise false
      */
-    public boolean roomExists(String number, String contact) {
-    	String room = getRoomString(number, contact);
-    	if(_rooms.containsKey(room)) {
-    		return true;
-    	} else {
-    		return false;
-    	}
+    public boolean roomExists(String number) {
+    	return _rooms.containsKey(number);
     }
     
     /**
@@ -161,22 +150,23 @@ public class XmppMuc {
     
     /**
      * Creates a new MUC AND invites the user
-     * room name will be extended with an random number
+     * room name will be extended with an random number for security purposes
      * 
      * @param number
-     * @param room
-     * @param sender
+     * @param name - the name of the contact to chat via SMS with
      * @return
      * @throws XMPPException 
      */
-    private MultiUserChat createRoom(String number, String room, String name) throws XMPPException {
-        
+    private MultiUserChat createRoom(String number, String name) throws XMPPException {
+        String room = getRoomString(number, name);
         MultiUserChat multiUserChat = null;
         boolean passwordMode = false;
-        Integer randomInt;
+        Integer randomInt;                
+        // TODO localize
+        final String subjectInviteStr =  "SMS conversation with " + getRoomString(number, name);
 
         do {
-            randomInt = (new Random()).nextInt();
+            randomInt = _rndGen.nextInt();
         } while (_roomNumbers.contains(randomInt));
         _roomNumbers.add(randomInt);
 
@@ -187,9 +177,9 @@ public class XmppMuc {
         // See issue 136
         try {
             multiUserChat = new MultiUserChat(_connection, cnx);
-            multiUserChat.create(name + " (" + number + ")");
+            multiUserChat.create(room);
         } catch (Exception e) {  
-            throw new XMPPException("MUC create failed", e);
+            throw new XMPPException("MUC creation failed", e);
         }
         
         try {
@@ -204,8 +194,6 @@ public class XmppMuc {
                 owners.add(_settings.login);
                 owners.add(_settings.notifiedAddress);
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
-                // submitForm.setAnswer("muc#roomconfig_roomadmins", owners);
-                // //throws exception (at least on my server)
             } catch (Exception ex) {
                 GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + _settings.mucServer
                         + ". Falling back to room passwords", ex);
@@ -219,13 +207,15 @@ public class XmppMuc {
             }
 
             multiUserChat.sendConfigurationForm(submitForm);
+            multiUserChat.changeSubject(subjectInviteStr);
         } catch (XMPPException e1) {
             GoogleAnalyticsHelper.trackAndLogWarning("Unable to send conference room configuration form.", e1);
             send(_context.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
-            throw e1; // then we also should not send an invite as the room will be locked
+            // then we also should not send an invite as the room will be locked
+            throw e1;
         }
 
-        multiUserChat.invite(_settings.notifiedAddress, "SMS conversation with " + name);
+        multiUserChat.invite(_settings.notifiedAddress, subjectInviteStr);
 
         ChatPacketListener chatListener = new ChatPacketListener(number, multiUserChat);
         multiUserChat.addMessageListener(chatListener);
