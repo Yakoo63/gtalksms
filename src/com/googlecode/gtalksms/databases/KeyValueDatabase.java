@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 /**
- * Backend Class for the Key Value Database(s)
+ * Backend Class for the MUC Database(s)
  * allows manipulation of the database
  * 
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team

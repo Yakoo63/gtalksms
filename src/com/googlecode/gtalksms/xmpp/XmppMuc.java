@@ -16,7 +16,9 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.Form;
+import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.RoomInfo;
 import org.jivesoftware.smackx.packet.DelayInformation;
 
 import android.content.Context;
@@ -27,10 +29,15 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.data.contacts.ContactsManager;
+import com.googlecode.gtalksms.databases.MucHelper;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMuc {
+	
+	private static final String ROOM_START_TAG = "GTalkSMS_";
+	private static final int ROOM_START_TAG_LENGTH = ROOM_START_TAG.length();
 
     private Map<String, MultiUserChat> _rooms = new HashMap<String, MultiUserChat>();
     private Set<Integer> _roomNumbers = new HashSet<Integer>();
@@ -39,12 +46,14 @@ public class XmppMuc {
     private XMPPConnection _connection;
     private XmppManager _xmppMgr;
     private static Random _rndGen = new Random();
+    private MucHelper _mucHelper;
 
     
     public XmppMuc(Context context, XmppManager xmppMgr) {
         _context = context;
         _settings = SettingsManager.getSettingsManager(context);
         _xmppMgr = xmppMgr;
+        _mucHelper = MucHelper.getMUCHelper(context);
     }
     
     public void initialize(XMPPConnection connection) {
@@ -52,6 +61,7 @@ public class XmppMuc {
         // clear the roomNumbers and room ArrayList as we have a new connection
         _roomNumbers.clear();
         _rooms.clear();
+        rejoinRooms();
     }
     
     /**
@@ -168,16 +178,15 @@ public class XmppMuc {
         do {
             randomInt = _rndGen.nextInt();
         } while (_roomNumbers.contains(randomInt));
-        _roomNumbers.add(randomInt);
 
         // With "@conference.jabber.org" messages are sent several times...
         // Jwchat seems to work fine and is the default
-        String cnx = "GTalkSMS_" + randomInt + "_" + _settings.login.replaceAll("@", "_") + "@" + _settings.mucServer;
+        final String roomJID = ROOM_START_TAG + randomInt + "_" + _settings.login.replaceAll("@", "_") + "@" + _settings.mucServer;
         
         // See issue 136
         try {
-            multiUserChat = new MultiUserChat(_connection, cnx);
-            multiUserChat.create(room);
+            multiUserChat = new MultiUserChat(_connection, roomJID);
+            multiUserChat.create(name);
         } catch (Exception e) {  
             throw new XMPPException("MUC creation failed", e);
         }
@@ -191,8 +200,12 @@ public class XmppMuc {
 
             try {
                 List<String> owners = new ArrayList<String>();
-                owners.add(_settings.login);
-                owners.add(_settings.notifiedAddress);
+				if (_settings.useDifferentAccount) {
+					owners.add(_settings.login);
+					owners.add(_settings.notifiedAddress);
+				} else {
+					owners.add(_settings.login);
+				}
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
                 GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + _settings.mucServer
@@ -216,9 +229,10 @@ public class XmppMuc {
         }
 
         multiUserChat.invite(_settings.notifiedAddress, subjectInviteStr);
-
+        _roomNumbers.add(randomInt);
         ChatPacketListener chatListener = new ChatPacketListener(number, multiUserChat);
         multiUserChat.addMessageListener(chatListener);
+        _mucHelper.addMUC(roomJID, number);
         return multiUserChat;
     }
     
@@ -279,4 +293,87 @@ public class XmppMuc {
     private void send(String msg) {
         _xmppMgr.send(new XmppMsg(msg), null);
     }
+    
+    private void rejoinRooms() {
+    	String[][] mucDB = _mucHelper.getAllMUC();
+    	if (mucDB == null)
+    		return;
+    		
+    	for (int i = 0; i < mucDB.length; i++) {
+    		RoomInfo info = getRoomInfo(mucDB[i][0]);
+    		// if info is not null, the room exists on the server
+    		// so lets check if we can reuse it
+			if (info != null) {
+				MultiUserChat muc = new MultiUserChat(_connection, mucDB[i][0]);
+				String name = ContactsManager.getContactName(_context,
+						mucDB[i][1]);
+				try {
+					if (info.isPasswordProtected()) {
+						muc.join(name, _settings.roomPassword);
+					} else {
+						muc.join(name);
+						if (!affilateCheck(muc.getOwners())) {
+							_mucHelper.deleteMUC(mucDB[i][0]);
+							muc.leave();
+							continue;
+						}
+					}
+					if (muc.getOccupantsCount() < 2) {
+						_mucHelper.deleteMUC(mucDB[i][0]);
+						muc.leave();
+						continue;
+					}
+				} catch (XMPPException e) {
+					_mucHelper.deleteMUC(mucDB[i][0]);
+					muc.leave();
+					continue;
+				}
+				// muc has passed all tests and is fully usable
+				_rooms.put(mucDB[i][1], muc);
+				_roomNumbers.add(getRoomInt(mucDB[i][0]));
+			}
+    	}
+    }
+    
+    /**
+     * Returns the RoomInfo if the room exits
+     * Allows an simple check for existence of a room
+     * 
+     * @param room
+     * @return the roomInfo or null
+     */
+    private RoomInfo getRoomInfo(String room) {
+    	RoomInfo info;
+    	try {
+    		info = MultiUserChat.getRoomInfo(_connection, room);
+    	} catch (XMPPException e) {
+    		return null;
+    	}
+    	return info;
+    }
+    
+    /**
+     * Checks if we are in this list of Affiliates
+     * 
+     * @param affCol
+     * @return
+     */
+    private boolean affilateCheck(Collection<Affiliate> affCol) {
+    	Set<String> jids = new HashSet<String>();
+    	for (Affiliate a : affCol) {
+    		jids.add(a.getJid());
+    	}
+    	return jids.contains(_settings.login);    	
+    }
+    /**
+     * Extracts the room random integer from the room JID
+     * 
+     * @param room
+     * @return
+     */
+    private Integer getRoomInt(String room) {
+    	int intEnd = room.indexOf("_", ROOM_START_TAG_LENGTH);
+    	return new Integer(room.substring(ROOM_START_TAG_LENGTH, intEnd));    	
+    }
+    
 }
