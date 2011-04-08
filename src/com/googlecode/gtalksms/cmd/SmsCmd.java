@@ -24,6 +24,7 @@ import com.googlecode.gtalksms.data.contacts.Contact;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.databases.AliasHelper;
+import com.googlecode.gtalksms.databases.KeyValueHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -46,6 +47,7 @@ public class SmsCmd extends Command {
     private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>()); 
     
     private AliasHelper _aliasHelper;
+    private KeyValueHelper _keyValueHelper;
           
     public SmsCmd(MainService mainService) {
         super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"}, Command.TYPE_MESSAGE);
@@ -61,7 +63,9 @@ public class SmsCmd extends Command {
             _mainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
         }
         _xmppMgr = _mainService.getXmppmanager();
-        _aliasHelper = _mainService.createAndGetAliasHelper();
+        _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
+        _keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());     
+        restoreLastRecipient();
     }
 
     @Override
@@ -181,11 +185,14 @@ public class SmsCmd extends Command {
      * 
      * @param phoneNumber
      */
-    public synchronized void setLastRecipientNow(String phoneNumber) {
+    public synchronized void setLastRecipientNow(String phoneNumber, boolean silentAndUpdate) {
         if (_lastRecipient == null || !phoneNumber.equals(_lastRecipient)) {
             _lastRecipient = phoneNumber;
             _lastRecipientName = ContactsManager.getContactName(_context, phoneNumber);
-            displayLastRecipient();
+            if (!silentAndUpdate) { 
+            	displayLastRecipient();
+            	_keyValueHelper.addKey(KeyValueHelper.KEY_LAST_RECIPIENT, phoneNumber);
+            }
         }
     }
     
@@ -389,7 +396,6 @@ public class SmsCmd extends Command {
                 if (_settingsMgr.notifySmsSent) {
                     send(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")"  + ": \"" + Tools.shortenMessage(message) + "\"");
                 }
-                setLastRecipient(phone.cleanNumber);
                 sendSMSByPhoneNumber(message, phone.cleanNumber, phone.contactName);
             } else {
                 send(R.string.chat_no_match_for, contact);
@@ -549,6 +555,7 @@ public class SmsCmd extends Command {
         }
 
         sms.sendMultipartTextMessage(phoneNumber, null, messages, SentPenIntents, DelPenIntents);
+        setLastRecipient(phoneNumber);
         _smsMgr.addSmsToSentBox(message, phoneNumber);
     }
 
@@ -588,6 +595,16 @@ public class SmsCmd extends Command {
             DelPenIntents.add(deliveredPenIntent);
         }
         return DelPenIntents;
+    }
+    
+    /**
+     * restores the lastRecipient from the database if possible
+     */
+    private void restoreLastRecipient() {
+    	String phoneNumber = _keyValueHelper.getValue(KeyValueHelper.KEY_LAST_RECIPIENT);
+    	if (phoneNumber != null) {
+    		setLastRecipientNow(phoneNumber, true);
+    	}
     }
     
     @Override

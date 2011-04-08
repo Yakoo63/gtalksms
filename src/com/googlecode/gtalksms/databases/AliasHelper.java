@@ -18,14 +18,22 @@ import com.googlecode.gtalksms.data.phone.Phone;
  */
 public class AliasHelper {
     private Context ctx;
+    private static AliasHelper aliasHelper;
     
     /**
      * This constructor ensures that the database is setup correctly
      * @param ctx
      */
-    public AliasHelper(Context ctx) {
+    private AliasHelper(Context ctx) {
         new AliasDatabase(ctx);
         this.ctx = ctx;
+    }
+    
+    public static AliasHelper getAliasHelper(Context ctx) {
+    	if (aliasHelper == null) {
+    		aliasHelper = new AliasHelper(ctx);
+    	}
+    	return aliasHelper;
     }
     
     /**
@@ -118,7 +126,7 @@ public class AliasHelper {
         return res;
     }
     
-    private void addOrUpdate(String aliasName, String number, String contactName) {
+    private static void addOrUpdate(String aliasName, String number, String contactName) {
        if(AliasDatabase.containsAlias(aliasName)) {
            AliasDatabase.updateAlias(aliasName, number, contactName);
        } else {

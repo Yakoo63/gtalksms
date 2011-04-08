@@ -34,7 +34,7 @@ public class CallCmd extends Command {
             _phoneListener = new PhoneCallListener(mainService);
             _telephonyMgr.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
         }
-        _aliasHelper = mainService.createAndGetAliasHelper();
+        _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
     }
     
     @Override

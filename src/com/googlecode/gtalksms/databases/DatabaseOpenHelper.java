@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseOpenHelper extends SQLiteOpenHelper {
     
     /* general database version gtalksms uses */
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     
     /* information for the alias database */
     public static final String ALIAS_TABLE_NAME = "alias";
@@ -18,7 +18,15 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
             "contactName TEXT, " +
             "PRIMARY KEY(aliasName)" +
          ")";
-    
+        
+    /* information for the kev value string table */
+    public static final String KV_TABLE_NAME = "key_value";
+    private static final String KV_TABLE_CREATE = 
+        "CREATE TABLE " + KV_TABLE_NAME + " (" +
+            "key TEXT NOT NULL, " +
+            "value TEXT NOT NULL, " +
+            "PRIMARY KEY(key)" +
+         ")";
 
 //    public AliasOpenHelper(Context context, String name, CursorFactory factory, int version) {
 //        super(context, name, factory, version);
@@ -31,12 +39,15 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(ALIAS_TABLE_CREATE);
+        db.execSQL(KV_TABLE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // we could drop the table here 
-        // - or just sit around and do nothing (preferred :-P )
+    	// add table that came with version 2 of our database
+    	if (oldVersion < 2) {
+            db.execSQL(KV_TABLE_CREATE);
+    	}
     }
 
 }

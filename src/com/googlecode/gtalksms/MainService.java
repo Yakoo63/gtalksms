@@ -40,7 +40,6 @@ import com.googlecode.gtalksms.cmd.SmsCmd;
 import com.googlecode.gtalksms.cmd.SystemCmd;
 import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
-import com.googlecode.gtalksms.databases.AliasHelper;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.tools.DisplayToast;
@@ -95,8 +94,6 @@ public class MainService extends Service {
     
     // to get the helper use MainService.getAnalyticsHelper()
     private static GoogleAnalyticsHelper _gAnalytics;
-    
-    private static AliasHelper _aliasHelper;
     
     private static Context _uiContext;
     
@@ -276,13 +273,6 @@ public class MainService extends Service {
     
     public static GoogleAnalyticsHelper getAnalyticsHelper() {
     	return _gAnalytics;
-    }
-    
-    public AliasHelper createAndGetAliasHelper() {
-        if(_aliasHelper == null) {
-            _aliasHelper = new AliasHelper(getBaseContext());
-        }
-        return _aliasHelper;
     }
 
     public void updateBuddies() {

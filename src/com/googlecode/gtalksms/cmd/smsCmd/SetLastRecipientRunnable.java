@@ -25,7 +25,7 @@ public class SetLastRecipientRunnable implements Runnable {
             /* Ignore - we don't send interrupts to this thread */
         }
         if (!outdated)
-            smsCmd.setLastRecipientNow(number);
+            smsCmd.setLastRecipientNow(number, false);
 
     }
     
