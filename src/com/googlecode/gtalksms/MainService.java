@@ -26,7 +26,7 @@ import com.googlecode.gtalksms.cmd.AliasCmd;
 import com.googlecode.gtalksms.cmd.BatteryCmd;
 import com.googlecode.gtalksms.cmd.CallCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
-import com.googlecode.gtalksms.cmd.Command;
+import com.googlecode.gtalksms.cmd.CommandHandlerBase;
 import com.googlecode.gtalksms.cmd.ContactCmd;
 import com.googlecode.gtalksms.cmd.ExitCmd;
 import com.googlecode.gtalksms.cmd.FileCmd;
@@ -83,8 +83,8 @@ public class MainService extends Service {
     private static KeyboardInputMethod _keyboard;
     private static PendingIntent _contentIntent = null;
     
-    private static Map<String, Command> _commands = new HashMap<String, Command>();
-    private static Set<Command> _commandSet = new HashSet<Command>();
+    private static Map<String, CommandHandlerBase> _commands = new HashMap<String, CommandHandlerBase>();
+    private static Set<CommandHandlerBase> _commandSet = new HashSet<CommandHandlerBase>();
 
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
@@ -164,6 +164,7 @@ public class MainService extends Service {
             switch (initialState) {
                 case XmppManager.CONNECTED:
                 case XmppManager.WAITING_TO_CONNECT:
+                case XmppManager.WAITING_FOR_NETWORK:
                     _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
                     break;
                 case XmppManager.DISCONNECTED:
@@ -216,14 +217,15 @@ public class MainService extends Service {
                 GoogleAnalyticsHelper.dispatch();
             }
             // TODO wait few seconds if network not available ? to avoid multiple reconnections
-            if (available && initialState == XmppManager.WAITING_TO_CONNECT) {
+            if (available && ( initialState == XmppManager.WAITING_TO_CONNECT || 
+            				   initialState == XmppManager.WAITING_FOR_NETWORK )) {
                 // We are in a waiting state and have a network - try to connect.
                 _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             } else if (!available && initialState == XmppManager.CONNECTED) {
                 // We are connected but the network has gone down - disconnect and go
                 // into WAITING state so we auto-connect when we get a future 
                 // notification that a network is available.
-                _xmppMgr.xmppRequestStateChange(XmppManager.WAITING_TO_CONNECT);
+                _xmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
             }
         } else if (action.equals(ACTION_COMMAND)) {
             String cmd = intent.getStringExtra("cmd");
@@ -255,11 +257,11 @@ public class MainService extends Service {
         return _xmppMgr == null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
     }
     
-    public Map<String, Command> getCommands() {
+    public Map<String, CommandHandlerBase> getCommands() {
         return _commands;
     }
     
-    public Set<Command> getCommandSet() {
+    public Set<CommandHandlerBase> getCommandSet() {
         return _commandSet;
     }
     
@@ -414,7 +416,7 @@ public class MainService extends Service {
             unregisterReceiver(_xmppConChangedReceiver);
             _xmppConChangedReceiver = null;
             
-            _xmppMgr.stop();
+            _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
             _xmppMgr = null;
         }
         teardownListenersForConnection();
@@ -546,13 +548,13 @@ public class MainService extends Service {
                 notification = new Notification(R.drawable.status_orange, msg, System.currentTimeMillis());
                 break;
             case XmppManager.WAITING_TO_CONNECT:
+            case XmppManager.WAITING_FOR_NETWORK:
                 String msgNotif = getString(R.string.main_service_waiting);
                 msg = getString(R.string.main_service_waiting_to_connect);
                 notification = new Notification(R.drawable.status_orange, msgNotif, System.currentTimeMillis());
                 break;
             default:
-                GoogleAnalyticsHelper.trackAndLogError("onConnectionStatusChanged(): unkown status int");
-                return;
+            	throw new IllegalStateException("onConnectionSTatusChanged: Unkown status int");
             }
 
             notification.setLatestEventInfo(getApplicationContext(), Tools.APP_NAME, msg, _contentIntent);
@@ -621,7 +623,7 @@ public class MainService extends Service {
      * by calling clear() 
      */
     private static void cleanupCommands() {
-        for (Command cmd : _commandSet) {
+        for (CommandHandlerBase cmd : _commandSet) {
             cmd.cleanUp();
         }
         _commands.clear();
@@ -633,11 +635,11 @@ public class MainService extends Service {
      * used to stop ongoing actions, like gps updates, ringing, ... 
      */
     private static void stopCommands() {
-        for(Command c : _commandSet)
+        for(CommandHandlerBase c : _commandSet)
             c.stop();
     }
     
-    private static void registerCommand(Command cmd) {
+    private static void registerCommand(CommandHandlerBase cmd) {
         String[] commands = cmd.getCommands();
         for (String c : commands) {
             _commands.put(c, cmd);
@@ -655,6 +657,7 @@ public class MainService extends Service {
         case XmppManager.DISCONNECTED:
         case XmppManager.DISCONNECTING:
         case XmppManager.WAITING_TO_CONNECT:
+        case XmppManager.WAITING_FOR_NETWORK:
             wantListeners = false;
             break;
         default:

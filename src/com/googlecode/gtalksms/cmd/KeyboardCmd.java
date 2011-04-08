@@ -4,9 +4,9 @@ import com.googlecode.gtalksms.KeyboardInputMethod;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 
-public class KeyboardCmd extends Command {
+public class KeyboardCmd extends CommandHandlerBase {
     public KeyboardCmd(MainService mainService) {
-        super(mainService, new String[] {"write", "w"}, Command.TYPE_COPY);
+        super(mainService, new String[] {"write", "w"}, CommandHandlerBase.TYPE_COPY);
     }
     
     @Override

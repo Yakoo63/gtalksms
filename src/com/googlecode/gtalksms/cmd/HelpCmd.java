@@ -10,10 +10,10 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public class HelpCmd extends Command {
+public class HelpCmd extends CommandHandlerBase {
     private static XmppMsg _msg;  // brief help message
     private static XmppMsg _msgAll;   // full help message    
-    private Map<String, Command> commands;
+    private Map<String, CommandHandlerBase> commands;
     
     private static XmppMsg _msgContact;
     private static XmppMsg _msgMessage;
@@ -25,7 +25,7 @@ public class HelpCmd extends Command {
     
     
     public HelpCmd(MainService mainService) {
-        super(mainService, new String[] {"?", "help"}, Command.TYPE_SYSTEM);
+        super(mainService, new String[] {"?", "help"}, CommandHandlerBase.TYPE_SYSTEM);
         
         _msg = new XmppMsg();
         _msgAll = new XmppMsg();
@@ -43,7 +43,7 @@ public class HelpCmd extends Command {
         String copyCmds = "";
         
         commands = mainService.getCommands();
-        Set<Command> commandSet = mainService.getCommandSet();
+        Set<CommandHandlerBase> commandSet = mainService.getCommandSet();
         
         _msg.appendLine(getString(R.string.chat_help_title));
         _msg.appendLine(getString(R.string.chat_help_help, makeBold("\"?\""), makeBold("\"help\"")));
@@ -54,7 +54,7 @@ public class HelpCmd extends Command {
         
         _msg.appendLine("- " + makeBold("\"help:#command#\"") + " - " + makeBold("\"help:#category#\""));
         
-        for (Command c : commandSet) {
+        for (CommandHandlerBase c : commandSet) {
             String[] helpLines = c.help();
             if (helpLines == null)  // do nothing if the command provides no help
                 continue;
@@ -62,23 +62,23 @@ public class HelpCmd extends Command {
             addLinesToMsg(_msgAll, helpLines);
             
             switch (c._cmdType) {
-            case (Command.TYPE_CONTACTS):
+            case (CommandHandlerBase.TYPE_CONTACTS):
                 contactCmds = contactCmds + c.getCommandsAsString() + " ";
                 addLinesToMsg(_msgContact, helpLines);
                 break;
-            case (Command.TYPE_COPY):
+            case (CommandHandlerBase.TYPE_COPY):
                 copyCmds = copyCmds + c.getCommandsAsString()  + " ";
                 addLinesToMsg(_msgCopy, helpLines);
                 break;
-            case (Command.TYPE_GEO):
+            case (CommandHandlerBase.TYPE_GEO):
                 geoCmds = geoCmds + c.getCommandsAsString()  + " ";
                 addLinesToMsg(_msgGeo, helpLines);
             break;
-            case (Command.TYPE_MESSAGE):
+            case (CommandHandlerBase.TYPE_MESSAGE):
                 messageCmds = messageCmds + c.getCommandsAsString()  + " ";
                 addLinesToMsg(_msgMessage, helpLines);
                 break;
-            case (Command.TYPE_SYSTEM):
+            case (CommandHandlerBase.TYPE_SYSTEM):
                 systemCmds = systemCmds + c.getCommandsAsString()  + " ";
                 addLinesToMsg(_msgSystem, helpLines);
                 break;

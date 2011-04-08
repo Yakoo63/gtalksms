@@ -28,7 +28,7 @@ import com.googlecode.gtalksms.databases.KeyValueHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public class SmsCmd extends Command {
+public class SmsCmd extends CommandHandlerBase {
     private SmsMmsManager _smsMgr;
     private String _lastRecipient = null;
     private String _lastRecipientName = null;    
@@ -50,7 +50,7 @@ public class SmsCmd extends Command {
     private KeyValueHelper _keyValueHelper;
           
     public SmsCmd(MainService mainService) {
-        super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"}, Command.TYPE_MESSAGE);
+        super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"}, CommandHandlerBase.TYPE_MESSAGE);
         _smsMgr = new SmsMmsManager(_settingsMgr, _context);
 
         if (_settingsMgr.notifySmsSent) {

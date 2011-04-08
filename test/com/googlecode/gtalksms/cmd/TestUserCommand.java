@@ -3,7 +3,7 @@ package com.googlecode.gtalksms.cmd;
 import android.test.AndroidTestCase;
 
 public class TestUserCommand extends AndroidTestCase {
-	UserCommand cmd;
+	Command cmd;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -56,11 +56,11 @@ public class TestUserCommand extends AndroidTestCase {
 		assertEquals("", cmd("mycmd:arg1").get2());
 	}
 
-	private UserCommand cmd(String cmd) {
+	private Command cmd(String cmd) {
 		return new NonReplyingUserCommand(cmd, "replyTo");
 	}
 	
-	static class NonReplyingUserCommand extends UserCommand {
+	static class NonReplyingUserCommand extends Command {
 		public NonReplyingUserCommand(String originalCommand, String replyTo) {
 			super(originalCommand, replyTo);
 		}

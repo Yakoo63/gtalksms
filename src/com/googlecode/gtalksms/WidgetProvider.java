@@ -34,16 +34,13 @@ public class WidgetProvider extends AppWidgetProvider {
             case XmppManager.CONNECTED:
                 views.setImageViewResource(R.id.Button, R.drawable.icon_green);
                 break;
-            case XmppManager.CONNECTING:
-                views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
-                break;
             case XmppManager.DISCONNECTED:
                 views.setImageViewResource(R.id.Button, R.drawable.icon_red);
                 break;
             case XmppManager.DISCONNECTING:
-                views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
-                break;
             case XmppManager.WAITING_TO_CONNECT:
+            case XmppManager.CONNECTING:
+            case XmppManager.WAITING_FOR_NETWORK:
                 views.setImageViewResource(R.id.Button, R.drawable.icon_orange);
                 break;
             default:

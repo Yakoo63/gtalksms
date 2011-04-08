@@ -10,9 +10,9 @@ import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public class ContactCmd extends Command {
+public class ContactCmd extends CommandHandlerBase {
     public ContactCmd(MainService mainService) {
-        super(mainService, new String[] {"contact"}, Command.TYPE_CONTACTS);
+        super(mainService, new String[] {"contact"}, CommandHandlerBase.TYPE_CONTACTS);
     }
    
     @Override

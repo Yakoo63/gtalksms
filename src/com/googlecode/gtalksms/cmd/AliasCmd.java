@@ -15,11 +15,11 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
  * 
  */
-public class AliasCmd extends Command {
+public class AliasCmd extends CommandHandlerBase {
     private AliasHelper aliasHelper;
 
     public AliasCmd(MainService mainService) {
-        super(mainService, new String[] { "alias" }, Command.TYPE_CONTACTS);
+        super(mainService, new String[] { "alias" }, CommandHandlerBase.TYPE_CONTACTS);
         this.aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
     }
 

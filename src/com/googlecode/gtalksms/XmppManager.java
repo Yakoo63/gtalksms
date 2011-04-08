@@ -73,9 +73,11 @@ public class XmppManager {
     public static final int CONNECTED = 2;
     // A "transient" state - will only be DISCONNECTING *during* a call to stop()
     public static final int DISCONNECTING = 3;
-    // This state either means we are waiting for the network to come up,
-    // or waiting for a retry attempt etc.
+    // This state means we are waiting for a retry attempt etc.
+    // mostly because a connection went down
     public static final int WAITING_TO_CONNECT = 4;
+    // We are waiting for a valid data connection
+    public static final int WAITING_FOR_NETWORK = 5;
     
     // Indicates the current state of the service (disconnected/connecting/connected)
     private int _status = DISCONNECTED;
@@ -127,6 +129,7 @@ public class XmppManager {
                 initConnection();
                 break;
             case WAITING_TO_CONNECT:
+            case WAITING_FOR_NETWORK:
                 updateStatus(initialState);
                 break;
             default:
@@ -138,7 +141,7 @@ public class XmppManager {
      * calls cleanupConnection and 
      * sets _status to DISCONNECTED
      */
-    protected void stop() {
+    private void stop() {
         updateStatus(DISCONNECTING);
         cleanupConnection();
         updateStatus(DISCONNECTED);
@@ -186,6 +189,7 @@ public class XmppManager {
                 break;
             case XmppManager.DISCONNECTED:
             case XmppManager.WAITING_TO_CONNECT:
+            case XmppManager.WAITING_FOR_NETWORK:
                 cleanupConnection();
                 start(XmppManager.CONNECTED);
                 break;
@@ -206,6 +210,28 @@ public class XmppManager {
                 start(XmppManager.WAITING_TO_CONNECT);
                 break;
             case XmppManager.WAITING_TO_CONNECT:
+            	break;
+            case XmppManager.WAITING_FOR_NETWORK:
+                cleanupConnection();
+                start(XmppManager.CONNECTED);
+                break;
+            default:
+                throw new IllegalStateException("xmppRequestStateChange() xmppRequestStateChangeunexpected current state when moving to waiting: " + currentState);
+            }
+            break;
+        case XmppManager.WAITING_FOR_NETWORK:
+            switch (currentState) {
+            case XmppManager.CONNECTED:
+                stop();
+                start(XmppManager.WAITING_FOR_NETWORK);
+                break;
+            case XmppManager.DISCONNECTED:
+                start(XmppManager.WAITING_FOR_NETWORK);
+                break;
+            case XmppManager.WAITING_TO_CONNECT:
+                cleanupConnection();
+            	break;
+            case XmppManager.WAITING_FOR_NETWORK:
                 break;
             default:
                 throw new IllegalStateException("xmppRequestStateChange() xmppRequestStateChangeunexpected current state when moving to waiting: " + currentState);
@@ -350,7 +376,7 @@ public class XmppManager {
             Log.e(Tools.LOG_TAG, "initConnection: connection request, but no network available");
             // we don't destroy the service here - our network receiver will notify us when
             // the network comes up and we try again then.
-            updateStatus(WAITING_TO_CONNECT);
+            updateStatus(WAITING_FOR_NETWORK);
             return;
         }
         
@@ -700,7 +726,7 @@ public class XmppManager {
         return reusedConnectionCount;
     }    
 
-    public void configure(ProviderManager pm) {
+    private void configure(ProviderManager pm) {
         //  Private Data Storage
         pm.addIQProvider("query","jabber:iq:private", new PrivateDataManager.PrivateDataIQProvider());
  

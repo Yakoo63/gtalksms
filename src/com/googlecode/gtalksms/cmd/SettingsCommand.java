@@ -5,14 +5,14 @@ import java.util.Map;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 
-public class SettingsCommand extends Command {
+public class SettingsCommand extends CommandHandlerBase {
     
     public SettingsCommand(MainService mainService) {
-        super(mainService, new String[] {"settings"}, Command.TYPE_SYSTEM);
+        super(mainService, new String[] {"settings"}, CommandHandlerBase.TYPE_SYSTEM);
     }
 
     @Override
-    public void execute(UserCommand c) {
+    public void execute(Command c) {
     	SettingsManager smgr = getSettingsManager();
     	Map<String, ?> settings = smgr.getAllSharedPreferences();
     	String key = c.get1();

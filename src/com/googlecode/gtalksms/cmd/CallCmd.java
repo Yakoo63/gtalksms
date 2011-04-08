@@ -18,7 +18,7 @@ import com.googlecode.gtalksms.receivers.PhoneCallListener;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public class CallCmd extends Command {
+public class CallCmd extends CommandHandlerBase {
     private PhoneManager _phoneMgr;
     private PhoneCallListener _phoneListener = null;
     private TelephonyManager _telephonyMgr = null;
@@ -26,7 +26,7 @@ public class CallCmd extends Command {
     private AliasHelper _aliasHelper;
     
     public CallCmd(MainService mainService) {
-        super(mainService, new String[] {"calls", "dial"}, Command.TYPE_CONTACTS);
+        super(mainService, new String[] {"calls", "dial"}, CommandHandlerBase.TYPE_CONTACTS);
         _phoneMgr = new PhoneManager(_context);
         _telephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
         

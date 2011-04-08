@@ -4,10 +4,10 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 
 
-public class ExitCmd extends Command {
+public class ExitCmd extends CommandHandlerBase {
 
     public ExitCmd(MainService mainService) {
-        super(mainService, new String[] {"exit"}, Command.TYPE_SYSTEM);
+        super(mainService, new String[] {"exit"}, CommandHandlerBase.TYPE_SYSTEM);
     }
 
     @Override

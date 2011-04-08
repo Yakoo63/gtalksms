@@ -10,14 +10,14 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.XmppManager;
 
-public class BatteryCmd extends Command {
+public class BatteryCmd extends CommandHandlerBase {
     private BroadcastReceiver _batInfoReceiver = null;
     private int _lastPercentageNotified = -1;
     private String _powerSource;
     private XmppManager _xmppMgr;
     
     public BatteryCmd(MainService mainService) {
-        super(mainService, new String[] {"battery", "batt"}, Command.TYPE_SYSTEM);
+        super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
         _xmppMgr = mainService.getXmppmanager();
         _powerSource = "Unknown";
         

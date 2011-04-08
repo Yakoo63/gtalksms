@@ -18,7 +18,7 @@ import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public class SystemCmd extends Command {
+public class SystemCmd extends CommandHandlerBase {
     
     private final static int myPid = Process.myPid();
     private final static int myPidArray[] = { myPid };
@@ -28,7 +28,7 @@ public class SystemCmd extends Command {
     private static MainService mainService;
     
     public SystemCmd(MainService mainService) {
-        super(mainService, new String[] {"system"}, Command.TYPE_SYSTEM);
+        super(mainService, new String[] {"system"}, CommandHandlerBase.TYPE_SYSTEM);
         if (SystemCmd.mainService == null) {
             Context ctx = mainService.getBaseContext();
             activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);

@@ -8,16 +8,16 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 
-public class ClipboardCmd extends Command {
+public class ClipboardCmd extends CommandHandlerBase {
     ClipboardManager _clipboardMgr;
     
     public ClipboardCmd(MainService mainService) {
-        super(mainService, new String[] {"copy"}, Command.TYPE_COPY);
+        super(mainService, new String[] {"copy"}, CommandHandlerBase.TYPE_COPY);
         _clipboardMgr = (ClipboardManager) mainService.getSystemService(Service.CLIPBOARD_SERVICE);
     }
     
     @Override
-    public void execute(UserCommand cmd) {
+    public void execute(Command cmd) {
         try {
         	String text = cmd.getAllArguments();
             if (text.length() > 0) {

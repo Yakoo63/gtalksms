@@ -15,7 +15,7 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFont;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public class ShellCmd extends Command {
+public class ShellCmd extends CommandHandlerBase {
     Handler _cmdHandler = new Handler();
     Thread _cmdThread;
     StringBuilder _cmdResults = new StringBuilder();
@@ -24,7 +24,7 @@ public class ShellCmd extends Command {
 
     
     public ShellCmd(MainService mainService) {
-        super(mainService, new String[] {"cmd"}, Command.TYPE_SYSTEM);
+        super(mainService, new String[] {"cmd"}, CommandHandlerBase.TYPE_SYSTEM);
     }
     
     private boolean askRootAccess() {

@@ -15,7 +15,7 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public class FileCmd extends Command {
+public class FileCmd extends CommandHandlerBase {
     private XmppManager xmppMgr;
     private File landingDir;
     private File sendDir;  // where the files come from if send:filename is given
@@ -23,7 +23,7 @@ public class FileCmd extends Command {
     private Exception ex;
     
     public FileCmd(MainService mainService) {
-        super(mainService, new String[] {"send", "ls"}, Command.TYPE_SYSTEM);
+        super(mainService, new String[] {"send", "ls"}, CommandHandlerBase.TYPE_SYSTEM);
         try {
             xmppMgr = _mainService.getXmppmanager();
             XmppFileManager fileMgr = xmppMgr.getXmppFileMgr();
