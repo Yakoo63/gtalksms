@@ -5,6 +5,7 @@ import java.util.Date;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.packet.DelayInformation;
 
@@ -19,13 +20,15 @@ import com.googlecode.gtalksms.tools.Tools;
 
 class MUCPacketListener implements PacketListener {
 	private String number;
+	private String name; // the name of GTalkSMS in this room
 	private Date lastDate;
 	private MultiUserChat muc;
 	private String roomName;
 	private SettingsManager settings;
 	private Context ctx;
 
-	public MUCPacketListener(String number, MultiUserChat muc, Context ctx) {
+	public MUCPacketListener(String number, MultiUserChat muc, String name, Context ctx) {
+		this.name = name;
 		this.number = number;
 		this.lastDate = new Date(0);
 		this.muc = muc;
@@ -37,12 +40,13 @@ class MUCPacketListener implements PacketListener {
 	@Override
 	public void processPacket(Packet packet) {
 		Message message = (Message) packet;
-		String from = message.getFrom();
+		String from = StringUtils.parseResource(message.getFrom());
 
 		if (settings.debugLog)
-			Log.d(Tools.LOG_TAG, "Xmpp chat room packet received");
+			Log.d(Tools.LOG_TAG, "MUCPacketListener: packet received. messageFrom=" + message.getFrom()
+					+ " messageBody=" + message.getBody());
 
-		if (!from.contains(number)) {
+		if (!from.equals(name)) {
 			if (message.getBody() != null) {
 				DelayInformation inf = (DelayInformation) message.getExtension(
 						"x", "jabber:x:delay");
@@ -73,14 +77,16 @@ class MUCPacketListener implements PacketListener {
 					ctx.startService(intent);
 					lastDate = sentDate;
 				} else {
-					Log.w(Tools.LOG_TAG, "Receive old message: date="
+					Log.w(Tools.LOG_TAG, "MUCPacketListener: Received old message: date="
 							+ sentDate.toLocaleString() + " ; message="
 							+ message.getBody());
 					GoogleAnalyticsHelper
-							.trackWarning("MUC ChatPacketListener - received old message on server "
+							.trackWarning("MUC ChatPacketListener: received old message on server "
 									+ settings.mucServer);
 				}
 			}
+		} else if (settings.debugLog) {
+			Log.i(Tools.LOG_TAG, "MUCPacketListener: Received message which equals our room nick. message=" + message.getBody());
 		}
 	}
 }

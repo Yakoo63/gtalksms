@@ -44,6 +44,8 @@ public class SmsCmd extends CommandHandlerBase {
     private static int _penSIntentCount;
     private static int _penDIntentCount;
     // synchronizedMap because the worker thread and the intent receivers work with this map
+    // TODO move smsMap to a Database Backend, as currently if there is a xmpp reconnect in the time between a
+    // send sms and a sent/delivery notification the smsMap will be newly created, because we re-created the SmsCmd object
     private Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>()); 
     
     private AliasHelper _aliasHelper;

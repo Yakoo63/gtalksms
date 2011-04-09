@@ -510,8 +510,6 @@ public class MainService extends Service {
     
     private void executeCommand(String cmd, String args, String answerTo) {
         assert(cmd != null);
-        if (_settingsMgr.debugLog)
-            Log.i(Tools.LOG_TAG, "executeCommand: _commands.size=" + _commands.size());
         if (_commands.containsKey(cmd)) {
             try {
                 _commands.get(cmd).execute(cmd, args, answerTo);

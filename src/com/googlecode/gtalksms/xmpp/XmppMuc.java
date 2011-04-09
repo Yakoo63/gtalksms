@@ -17,6 +17,7 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.RoomInfo;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
@@ -24,6 +25,7 @@ import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.databases.MucHelper;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
+import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMuc {
 	
@@ -220,7 +222,7 @@ public class XmppMuc {
         }
 
         multiUserChat.invite(_settings.notifiedAddress, subjectInviteStr);
-        registerRoom(multiUserChat, number, randomInt);
+        registerRoom(multiUserChat, number, name, randomInt);
         return multiUserChat;
     }
 
@@ -247,35 +249,44 @@ public class XmppMuc {
 					} else {
 						muc.join(name);
 						if (!affilateCheck(muc.getOwners())) {
+							if (_settings.debugLog) 
+								Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of affilateCheck failed");
 							_mucHelper.deleteMUC(mucDB[i][0]);
 							muc.leave();
 							continue;
 						}
 					}
 					if (muc.getOccupantsCount() < 2) {
+						if (_settings.debugLog) 
+							Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
 						_mucHelper.deleteMUC(mucDB[i][0]);
 						muc.leave();
 						continue;
 					}
 				} catch (XMPPException e) {
-					_mucHelper.deleteMUC(mucDB[i][0]);
-					muc.leave();
+					if (_settings.debugLog) {
+						Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
+					}
+					// we don't delte the muc from database here					
+					// _mucHelper.deleteMUC(mucDB[i][0]);
+					if (muc.isJoined())
+						muc.leave();
 					continue;
 				}
 				// muc has passed all tests and is fully usable
-				registerRoom(muc, mucDB[i][1]);
+				registerRoom(muc, mucDB[i][1], name);
 			}
     	}
     }
     
-    private void registerRoom(MultiUserChat muc, String number) {
+    private void registerRoom(MultiUserChat muc, String number, String name) {
     	String roomJID = muc.getRoom();
     	Integer randomInt = getRoomInt(roomJID);
-    	registerRoom(muc, number, randomInt);
+    	registerRoom(muc, number, name, randomInt);
     }
     
-    private void registerRoom(MultiUserChat muc, String number, Integer randomInt) {
-        MUCPacketListener chatListener = new MUCPacketListener(number, muc, _context);
+    private void registerRoom(MultiUserChat muc, String number, String name, Integer randomInt) {
+        MUCPacketListener chatListener = new MUCPacketListener(number, muc, name,  _context);
         muc.addMessageListener(chatListener);
         _roomNumbers.add(randomInt);
         _rooms.put(number, muc);
