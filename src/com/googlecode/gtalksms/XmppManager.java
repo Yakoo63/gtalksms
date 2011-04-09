@@ -10,7 +10,6 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.provider.ProviderManager;
@@ -52,6 +51,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.XHTMLExtensionProvider;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
@@ -60,7 +60,7 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class XmppManager {
     
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     
     // my first measurings showed that the disconnect in fact does not hang
     // but takes sometimes a lot of time
@@ -476,34 +476,7 @@ public class XmppManager {
             _xmppFileMgr.initialize(_connection);
 
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-            _packetListener = new PacketListener() {
-                public void processPacket(Packet packet) {
-                    Message message = (Message) packet;
-                    String from = message.getFrom();
-                    
-                    if (from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/") 
-                            && !message.getFrom().equals(_connection.getUser())
-                            && message.getBody() != null) {
-                        if (_settings.debugLog)
-                            Log.i(Tools.LOG_TAG, "XMPP packet received - sending Intent: " + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
-                        
-                        Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
-                        intent.putExtra("from", from); // usually a full JID with resource
-                        intent.putExtra("message", message.getBody());
-                        intent.setClass(_context, MainService.class);
-                        _context.startService(intent);
-                    } else if (_settings.debugLog) {
-                        if (!from.toLowerCase().startsWith(_settings.notifiedAddress.toLowerCase() + "/")) {
-                            Log.i(Tools.LOG_TAG, "XMPP packet received - but from address \"" + from.toLowerCase() + "\" does not match notification address \"" 
-                                    + _settings.notifiedAddress.toLowerCase() + "\"");
-                        } else if (message.getFrom().equals(_connection.getUser())) {
-                            Log.i(Tools.LOG_TAG, "XMPP packet received - but from the same user as the XMPP connection");
-                        } else if (message.getBody() == null) {
-                            Log.i(Tools.LOG_TAG, "XMPP Packet received - but without body (body == null)");
-                        }
-                    }
-                }
-            };
+            _packetListener = new ChatPacketListener(_connection, _context);            
             _connection.addPacketListener(_packetListener, filter);
             setStatus(_presenceMessage);
 

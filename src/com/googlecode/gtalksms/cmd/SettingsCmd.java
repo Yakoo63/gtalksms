@@ -5,9 +5,9 @@ import java.util.Map;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 
-public class SettingsCommand extends CommandHandlerBase {
+public class SettingsCmd extends CommandHandlerBase {
     
-    public SettingsCommand(MainService mainService) {
+    public SettingsCmd(MainService mainService) {
         super(mainService, new String[] {"settings"}, CommandHandlerBase.TYPE_SYSTEM);
     }
 

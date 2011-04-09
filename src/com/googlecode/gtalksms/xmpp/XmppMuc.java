@@ -2,7 +2,6 @@ package com.googlecode.gtalksms.xmpp;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,29 +9,21 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.RoomInfo;
-import org.jivesoftware.smackx.packet.DelayInformation;
 
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 
-import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.databases.MucHelper;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
-import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMuc {
 	
@@ -229,65 +220,8 @@ public class XmppMuc {
         }
 
         multiUserChat.invite(_settings.notifiedAddress, subjectInviteStr);
-        _roomNumbers.add(randomInt);
-        ChatPacketListener chatListener = new ChatPacketListener(number, multiUserChat);
-        multiUserChat.addMessageListener(chatListener);
-        _mucHelper.addMUC(roomJID, number);
+        registerRoom(multiUserChat, number, randomInt);
         return multiUserChat;
-    }
-    
-    class ChatPacketListener implements PacketListener {
-        private String _number;
-        private Date _lastDate;
-        private MultiUserChat _muc;
-        private String _roomName;
-        
-        public ChatPacketListener(String number, MultiUserChat muc) {
-            _number = number;
-            _lastDate = new Date(0);
-            _muc = muc;
-            _roomName = muc.getRoom();
-        }
-        
-        @Override
-        public void processPacket(Packet packet) {
-            Message message = (Message) packet;
-            String from = message.getFrom();
-        
-            if (_settings.debugLog) Log.d(Tools.LOG_TAG, "Xmpp chat room packet received");
-            
-            if (!from.contains(_number)) {
-                if (message.getBody() != null) {
-                    DelayInformation inf = (DelayInformation)message.getExtension("x", "jabber:x:delay");
-                    Date sentDate;
-                    if (inf != null) {
-                        sentDate = inf.getStamp();
-                    } else {
-                        sentDate = new Date();
-                    }
-                    
-                    if (sentDate.compareTo(_lastDate) > 0 ) {
-                        Intent intent = new Intent(MainService.ACTION_COMMAND);
-                        intent.setClass(_context, MainService.class);
-                       
-                        intent.putExtra("from", _roomName);
-                        intent.putExtra("cmd", "sms");
-                        intent.putExtra("fromMuc", true);
-                        if(_muc.getOccupantsCount() > 2) {  // if there are more than 2 users in the room, we include also the from tag
-                            intent.putExtra("args", _number + ":" + from + ": " + message.getBody());  
-                        } else {
-                            intent.putExtra("args", _number + ":" + message.getBody());  
-                        }
-                        
-                        _context.startService(intent);
-                        _lastDate = sentDate;
-                    } else {
-                        Log.w(Tools.LOG_TAG, "Receive old message: date=" + sentDate.toLocaleString() + " ; message=" + message.getBody());
-                        GoogleAnalyticsHelper.trackWarning("MUC ChatPacketListener - received old message on server " + _settings.mucServer);
-                    }
-                }
-            }
-        }
     }
 
     private void send(String msg) {
@@ -329,10 +263,23 @@ public class XmppMuc {
 					continue;
 				}
 				// muc has passed all tests and is fully usable
-				_rooms.put(mucDB[i][1], muc);
-				_roomNumbers.add(getRoomInt(mucDB[i][0]));
+				registerRoom(muc, mucDB[i][1]);
 			}
     	}
+    }
+    
+    private void registerRoom(MultiUserChat muc, String number) {
+    	String roomJID = muc.getRoom();
+    	Integer randomInt = getRoomInt(roomJID);
+    	registerRoom(muc, number, randomInt);
+    }
+    
+    private void registerRoom(MultiUserChat muc, String number, Integer randomInt) {
+        MUCPacketListener chatListener = new MUCPacketListener(number, muc, _context);
+        muc.addMessageListener(chatListener);
+        _roomNumbers.add(randomInt);
+        _rooms.put(number, muc);
+        _mucHelper.addMUC(muc.getRoom(), number);
     }
     
     /**
