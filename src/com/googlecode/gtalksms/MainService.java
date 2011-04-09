@@ -626,7 +626,6 @@ public class MainService extends Service {
             cmd.cleanUp();
         }
         _commands.clear();
-        Log.i(Tools.LOG_TAG, "Cleared  _commands. Size: " + _commands.size());
         _commandSet.clear();
     }
     

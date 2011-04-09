@@ -13,6 +13,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.muc.Affiliate;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.RoomInfo;
 
@@ -31,6 +32,7 @@ public class XmppMuc {
 	
 	private static final String ROOM_START_TAG = "GTalkSMS_";
 	private static final int ROOM_START_TAG_LENGTH = ROOM_START_TAG.length();
+	private static final int REPLAY_TIMEOUT = 500;
 
     private Map<String, MultiUserChat> _rooms = new HashMap<String, MultiUserChat>();
     private Set<Integer> _roomNumbers = new HashSet<Integer>();
@@ -40,6 +42,7 @@ public class XmppMuc {
     private XmppManager _xmppMgr;
     private static Random _rndGen = new Random();
     private MucHelper _mucHelper;
+    private DiscussionHistory discussionHistory;
 
     
     public XmppMuc(Context context, XmppManager xmppMgr) {
@@ -47,6 +50,9 @@ public class XmppMuc {
         _settings = SettingsManager.getSettingsManager(context);
         _xmppMgr = xmppMgr;
         _mucHelper = MucHelper.getMUCHelper(context);
+        discussionHistory = new DiscussionHistory();
+        // this should disable history replay on MUC rooms
+        discussionHistory.setMaxChars(0);
     }
     
     public void initialize(XMPPConnection connection) {
@@ -69,18 +75,9 @@ public class XmppMuc {
      */
     public void writeRoom(String number, String contact, String message) throws XMPPException {
         MultiUserChat muc;
-        if (!_rooms.containsKey(number)) {
-            muc = createRoom(number, contact);
-            _rooms.put(number, muc);
-        } else {
-            muc = _rooms.get(number);
-            // TODO: test if occupants contains also the sender (in case we
-            // invite other people)
-            if (muc != null && muc.getOccupantsCount() < 2) {
-                muc.invite(_settings.notifiedAddress, "SMS conversation with " + contact);
-            }
-        }
-        muc.sendMessage(message);
+        muc = inviteRoom(number, contact);
+        if (muc != null)
+        	muc.sendMessage(message);
     }
     
     /**
@@ -91,22 +88,24 @@ public class XmppMuc {
      * @param name
      * @return true if successful, otherwise false
      */
-    public void inviteRoom(String number, String sender) {
+    public MultiUserChat inviteRoom(String number, String contact) {
         try {
             MultiUserChat muc;
             if (!_rooms.containsKey(number)) {
-                muc = createRoom(number, sender);             
+                muc = createRoom(number, contact);             
                 _rooms.put(number, muc);
                 
             } else {
                 muc = _rooms.get(number);                
                 // TODO: test if occupants contains also the sender (in case we invite other people)
                 if (muc != null && muc.getOccupantsCount() < 2) {
-                    muc.invite(_settings.notifiedAddress, "SMS conversation with " + sender);
+                    muc.invite(_settings.notifiedAddress, "SMS conversation with " + contact);
                 }
             }
+            return muc;
         } catch (Exception ex) {
             GoogleAnalyticsHelper.trackAndLogError("XmppMuc inviteRoom: exception", ex);
+            return null;
         }
     }
     
@@ -245,38 +244,50 @@ public class XmppMuc {
 						mucDB[i][1]);
 				try {
 					if (info.isPasswordProtected()) {
-						muc.join(name, _settings.roomPassword);
+						muc.join(name, _settings.roomPassword, discussionHistory, REPLAY_TIMEOUT);
 					} else {
-						muc.join(name);
+						muc.join(name, null, discussionHistory, REPLAY_TIMEOUT);
 						if (!affilateCheck(muc.getOwners())) {
 							if (_settings.debugLog) 
 								Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of affilateCheck failed");
-							_mucHelper.deleteMUC(mucDB[i][0]);
-							muc.leave();
+							leaveRoom(muc);
 							continue;
 						}
 					}
-					if (muc.getOccupantsCount() < 2) {
-						if (_settings.debugLog) 
-							Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
-						_mucHelper.deleteMUC(mucDB[i][0]);
-						muc.leave();
-						continue;
-					}
+					// TODO this does not work, as the information about the occupants count is not reliable 
+					// short after joining the room. We need some kind of cleanup method that leaves and removes MUC from the
+					// db if there is no one there
+//					if (muc.getOccupantsCount() < 2) {
+//						if (_settings.debugLog) 
+//							Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
+//						_mucHelper.deleteMUC(mucDB[i][0]);
+//						muc.leave();
+//						continue;
+//					}
 				} catch (XMPPException e) {
 					if (_settings.debugLog) {
 						Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
 					}
-					// we don't delte the muc from database here					
-					// _mucHelper.deleteMUC(mucDB[i][0]);
-					if (muc.isJoined())
-						muc.leave();
+					// TODO decide in which cases it would be the best to remove the room from the db, because of a persistent error
+					// and in which cases the error will not be permanent
+					leaveRoom(muc);
 					continue;
 				}
 				// muc has passed all tests and is fully usable
 				registerRoom(muc, mucDB[i][1], name);
 			}
     	}
+    }
+    
+    /**
+     * leaves the muc and deletes its record from the db
+     * 
+     * @param muc
+     */
+    private void leaveRoom(MultiUserChat muc) {
+		_mucHelper.deleteMUC(muc.getRoom());
+		if (muc.isJoined())
+			muc.leave();
     }
     
     private void registerRoom(MultiUserChat muc, String number, String name) {
