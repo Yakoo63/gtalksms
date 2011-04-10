@@ -34,7 +34,7 @@ public class MUCDatabase extends Database {
         return ret == 1;
     }
     
-    public static String getValue(String muc) {
+    public static String getNumber(String muc) {
         Cursor c = databaseRO.query(DatabaseOpenHelper.MUC_TABLE_NAME, new String[] { "number" }, "muc='" + muc + "'", null, null , null, null);
         if(c.getCount() == 1) {
             c.moveToFirst();

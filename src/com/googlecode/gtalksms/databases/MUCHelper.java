@@ -11,20 +11,20 @@ import android.content.Context;
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
  *
  */
-public class MucHelper {	
-    private static MucHelper mucHelper = null;
+public class MUCHelper {	
+    private static MUCHelper mucHelper = null;
     
     /**
      * This constructor ensures that the database is setup correctly
      * @param ctx
      */
-    private MucHelper(Context ctx) {
+    private MUCHelper(Context ctx) {
         new MUCDatabase(ctx);
     }
     
-    public static MucHelper getMUCHelper(Context ctx) {
+    public static MUCHelper getMUCHelper(Context ctx) {
     	if (mucHelper == null) {
-    		mucHelper = new MucHelper(ctx);
+    		mucHelper = new MUCHelper(ctx);
     	}
     	return mucHelper;
     }
@@ -54,11 +54,16 @@ public class MucHelper {
         
     }
      
-	public String getValue(String muc) {
+	public String getNumber(String muc) {
 		if (!muc.contains("'")) {
-			return MUCDatabase.getValue(muc);
+			String res = MUCDatabase.getNumber(muc);
+			if (res == null) {
+				return "";
+			} else {
+				return res;
+			}
 		} else {
-			return null;
+			return "";
 		}
 	}
     

@@ -24,7 +24,7 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
-import com.googlecode.gtalksms.databases.MucHelper;
+import com.googlecode.gtalksms.databases.MUCHelper;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -41,7 +41,7 @@ public class XmppMuc {
     private XMPPConnection _connection;
     private XmppManager _xmppMgr;
     private static Random _rndGen = new Random();
-    private MucHelper _mucHelper;
+    private MUCHelper _mucHelper;
     private DiscussionHistory discussionHistory;
 
     
@@ -49,7 +49,7 @@ public class XmppMuc {
         _context = context;
         _settings = SettingsManager.getSettingsManager(context);
         _xmppMgr = xmppMgr;
-        _mucHelper = MucHelper.getMUCHelper(context);
+        _mucHelper = MUCHelper.getMUCHelper(context);
         discussionHistory = new DiscussionHistory();
         // this should disable history replay on MUC rooms
         discussionHistory.setMaxChars(0);
@@ -254,24 +254,25 @@ public class XmppMuc {
 							continue;
 						}
 					}
-					// TODO this does not work, as the information about the occupants count is not reliable 
-					// short after joining the room. We need some kind of cleanup method that leaves and removes MUC from the
-					// db if there is no one there
-//					if (muc.getOccupantsCount() < 2) {
-//						if (_settings.debugLog) 
-//							Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
-//						_mucHelper.deleteMUC(mucDB[i][0]);
-//						muc.leave();
-//						continue;
-//					}
+					// looks like there is no one in the room
+					if (info.getOccupantsCount() > 0) {
+						if (_settings.debugLog)
+							Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
+						leaveRoom(muc);
+						continue;
+					}
 				} catch (XMPPException e) {
 					if (_settings.debugLog) {
 						Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
 					}
 					// TODO decide in which cases it would be the best to remove the room from the db, because of a persistent error
 					// and in which cases the error will not be permanent
-					leaveRoom(muc);
-					continue;
+					if (_connection.isAuthenticated()) {
+						leaveRoom(muc);
+						continue;
+					} else {
+						break;
+					}
 				}
 				// muc has passed all tests and is fully usable
 				registerRoom(muc, mucDB[i][1], name);
@@ -288,6 +289,13 @@ public class XmppMuc {
 		_mucHelper.deleteMUC(muc.getRoom());
 		if (muc.isJoined())
 			muc.leave();
+
+		if (_rooms.size() > 0) {
+			Integer i = getRoomInt(muc.getRoom());
+			String number = _mucHelper.getNumber(muc.getRoom());
+			_roomNumbers.remove(i);
+			_rooms.remove(number);
+		}
     }
     
     private void registerRoom(MultiUserChat muc, String number, String name) {
