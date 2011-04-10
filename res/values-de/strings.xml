@@ -35,7 +35,9 @@
     <string name="pref_app_geo_link_app_openstreetmap">Open Street Map</string>
     <string name="pref_app_geo_link_app_openstreetmap_help">Open Street Map Link</string>
     <string name="pref_app_enable_debug">Debug Log</string>
-    <string name="pref_app_enable_debug_help">Aktiviert debug log</string>    
+    <string name="pref_app_enable_debug_help">Aktiviert debug log</string>  
+    <string name="pref_app_connect_mainscreen">Verbinde bei Anwendungsstart</string>
+    <string name="pref_app_connect_mainscreen_help">Verbindet GTalkSMS automatisch wenn die Anwedung gestartet wird</string>    
     <string name="pref_con_notified_address_cat">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address_help">Eigene GMail (oder XMPP JID) eingeben</string>

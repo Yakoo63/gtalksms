@@ -88,5 +88,10 @@
                 android:title="@string/pref_notif_sms_separate" 
                 android:summary="@string/pref_notif_sms_separate_help" 
                 android:defaultValue="false"/>
+            <CheckBoxPreference 
+                android:key="connectOnMainscreenShow" 
+                android:title="@string/pref_app_connect_mainscreen" 
+                android:summary="@string/pref_app_connect_mainscreen_help" 
+                android:defaultValue="false"/>
         </PreferenceScreen>
 </PreferenceScreen>

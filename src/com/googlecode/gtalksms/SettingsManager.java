@@ -87,8 +87,10 @@ public class SettingsManager {
     // locale
     public Locale locale;
     
+    // app settings
     public boolean backupAgentAvailable;
     public boolean debugLog;
+    public boolean connectOnMainscreenShow;
     
     private static SettingsManager settingsManager = null;
     
@@ -97,7 +99,9 @@ public class SettingsManager {
     private OnSharedPreferenceChangeListener _changeListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            Log.d(Tools.LOG_TAG,"Preferences updated: key=" + key);
+			if (debugLog) {
+				Log.i(Tools.LOG_TAG, "Preferences updated: key=" + key);
+			}
             importPreferences();
             OnPreferencesUpdated(key);
         }
@@ -229,10 +233,11 @@ public class SettingsManager {
         } catch (Exception e) {
         	backupAgentAvailable = false;
         }
-        
-        debugLog = _sharedPreferences.getBoolean("debugLog", false);; 
-        notifyInMuc = _sharedPreferences.getBoolean("notifyInMuc", false);; 
+                
+        notifyInMuc = _sharedPreferences.getBoolean("notifyInMuc", false); 
         smsReplySeparate = _sharedPreferences.getBoolean("smsReplySeparate", false);
         
+        connectOnMainscreenShow = _sharedPreferences.getBoolean("connectOnMainscreenShow", false);
+        debugLog = _sharedPreferences.getBoolean("debugLog", false); 
     }
 }

@@ -203,8 +203,14 @@ public class MainScreen extends Activity implements InterstitialAdListener{
     }
 
     private void createView() {
+    	if (_settingsMgr.connectOnMainscreenShow) {
+    		Intent intent = new Intent(MainService.ACTION_CONNECT);
+    		intent.setClass(this, MainService.class);
+    		startService(intent);
+    	}
+    	
         Tools.setLocale(_settingsMgr, this);
-
+        
         setContentView(R.layout.main);
 
         TextView label = (TextView) findViewById(R.id.VersionLabel);
