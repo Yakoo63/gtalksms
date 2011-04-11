@@ -1,3 +1,6 @@
+upcoming
+* Rejoin MUC rooms on XMPP reconnect or service restart
+
 2.1
 * Alias command added
 * Settings cleanup
