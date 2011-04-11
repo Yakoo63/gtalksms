@@ -87,38 +87,26 @@ public class XmppMuc {
      * @param number
      * @param name
      * @return true if successful, otherwise false
+     * @throws XMPPException 
      */
-    public MultiUserChat inviteRoom(String number, String contact) {
-        try {
-            MultiUserChat muc;
-            if (!_rooms.containsKey(number)) {
-                muc = createRoom(number, contact);             
-                _rooms.put(number, muc);
-                
-            } else {
-                muc = _rooms.get(number);                
-                // TODO: test if occupants contains also the sender (in case we invite other people)
-                if (muc != null && muc.getOccupantsCount() < 2) {
-                    muc.invite(_settings.notifiedAddress, "SMS conversation with " + contact);
-                }
-            }
-            return muc;
-        } catch (Exception ex) {
-            GoogleAnalyticsHelper.trackAndLogError("XmppMuc inviteRoom: exception", ex);
-            return null;
-        }
-    }
-    
-    /**
-     * creates a formated string from number and contact
-     * 
-     * @param number
-     * @param contact
-     * @return
-     */
-    private static String getRoomString(String number, String contact) {
-        return contact + " (" + number + ")";
-    }
+	public MultiUserChat inviteRoom(String number, String contact)
+			throws XMPPException {
+		MultiUserChat muc;
+		if (!_rooms.containsKey(number)) {
+			muc = createRoom(number, contact);
+			_rooms.put(number, muc);
+
+		} else {
+			muc = _rooms.get(number);
+			// TODO: test if occupants contains also the sender (in case we
+			// invite other people)
+			if (muc != null && muc.getOccupantsCount() < 2) {
+				muc.invite(_settings.notifiedAddress, "SMS conversation with "
+						+ contact);
+			}
+		}
+		return muc;
+	}   
     
     /**
      * Checks if a room for the specific number
@@ -129,7 +117,7 @@ public class XmppMuc {
      */
     public boolean roomExists(String number) {
     	return _rooms.containsKey(number);
-    }
+    }    
     
     /**
      * Returns the MultiUserChat given in roomname, 
@@ -141,7 +129,7 @@ public class XmppMuc {
      * @param roomname - the full roomname as JID
      * @return the room or null
      */
-    public MultiUserChat getRoom(String roomname) {
+    public MultiUserChat getRoomViaRoomname(String roomname) {
         Collection<MultiUserChat> mucSet = _rooms.values();
         for(MultiUserChat muc : mucSet) {
             if(muc.getRoom().equals(roomname))
@@ -149,7 +137,7 @@ public class XmppMuc {
         }
         return null;
     }
-    
+	
     /**
      * Creates a new MUC AND invites the user
      * room name will be extended with an random number for security purposes
@@ -351,6 +339,17 @@ public class XmppMuc {
     private Integer getRoomInt(String room) {
     	int intEnd = room.indexOf("_", ROOM_START_TAG_LENGTH);
     	return new Integer(room.substring(ROOM_START_TAG_LENGTH, intEnd));    	
+    }
+        
+    /**
+     * creates a formated string from number and contact
+     * 
+     * @param number
+     * @param contact
+     * @return
+     */
+    private static String getRoomString(String number, String contact) {
+        return contact + " (" + number + ")";
     }
     
 }

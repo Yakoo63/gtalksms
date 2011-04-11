@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jivesoftware.smack.XMPPException;
+
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -128,7 +130,11 @@ public class SmsCmd extends CommandHandlerBase {
         	if (args.length() > 0) {
                 inviteRoom(_aliasHelper.convertAliasToNumber(args));
         	} else if (_lastRecipient != null) {
-        	    _xmppMgr.getXmppMuc().inviteRoom(_lastRecipient, _lastRecipientName);
+        	    try {
+					_xmppMgr.getXmppMuc().inviteRoom(_lastRecipient, _lastRecipientName);
+				} catch (XMPPException e) {
+					// TODO Auto-generated catch block
+				}
         	}
         } else if (command.equals("delsms")) {
             if (args.length() == 0) {
@@ -268,8 +274,12 @@ public class SmsCmd extends CommandHandlerBase {
         String name, number;
         if (Phone.isCellPhoneNumber(contact)) {
                 number = contact;
-                name = ContactsManager.getContactName(_context, contact);
-                _xmppMgr.getXmppMuc().inviteRoom(number, name);
+                name = ContactsManager.getContactName(_context, contact);                
+                try {
+					_xmppMgr.getXmppMuc().inviteRoom(number, name);
+				} catch (XMPPException e) {
+					// TODO Auto-generated catch block
+				}
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
             if (mobilePhones.size() > 1) {
@@ -279,7 +289,11 @@ public class SmsCmd extends CommandHandlerBase {
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
-                _xmppMgr.getXmppMuc().inviteRoom(phone.cleanNumber, phone.contactName);
+                try {
+					_xmppMgr.getXmppMuc().inviteRoom(phone.cleanNumber, phone.contactName);
+				} catch (XMPPException e) {
+					// TODO Auto-generated catch block
+				}
 //                setLastRecipient(phone.cleanNumber); // issue 117
             } else {
                 send(R.string.chat_no_match_for, contact);

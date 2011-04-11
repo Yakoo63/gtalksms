@@ -629,7 +629,7 @@ public class XmppManager {
                 msg = new Message(_settings.notifiedAddress, Message.Type.chat);
             } else {
                 msg = new Message(to);
-                muc = _xmppMuc.getRoom(to);
+                muc = _xmppMuc.getRoomViaRoomname(to);
             }
             
             if (_settings.formatResponses) {

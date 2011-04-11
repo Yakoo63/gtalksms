@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 class MUCPacketListener implements PacketListener {
@@ -86,10 +87,12 @@ class MUCPacketListener implements PacketListener {
 					lastDate = sentDate;
 				} else {
 					// this seems to be caused by the history replay of MUC rooms
-					// which is now disabled
+					// which is now disabled, lets get some metrics and decide later if we 
+					// can remove this check
 					Log.w(Tools.LOG_TAG, "MUCPacketListener: Received old message: date="
 							+ sentDate.toLocaleString() + " ; message="
 							+ message.getBody());
+					GoogleAnalyticsHelper.trackAndLogError("MUCPacketListener: Received old message");
 				}
 			}
 		} else if (settings.debugLog) {

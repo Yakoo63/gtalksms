@@ -188,6 +188,10 @@ public class MainService extends Service {
                 String message = intent.getStringExtra("message");
                 boolean roomExists = _xmppMgr.getXmppMuc().roomExists(number);
                 
+                if (_settingsMgr.debugLog) {
+                	Log.i(Tools.LOG_TAG, MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
+                }
+                
                 if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
                     XmppMsg msg = new XmppMsg();
                     msg.appendBold(getString(R.string.chat_sms_from, name));
@@ -201,7 +205,7 @@ public class MainService extends Service {
                     try {
                         _xmppMgr.getXmppMuc().writeRoom(number, name, message);
                     } catch (XMPPException e) {
-                        //room creation failed - notify about this error
+                        // room creation and/or writing failed - notify about this error
                         // and send the message to the notification address
                         XmppMsg msg = new XmppMsg();
                         msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
