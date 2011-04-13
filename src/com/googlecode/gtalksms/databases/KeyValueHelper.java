@@ -13,6 +13,7 @@ import android.content.Context;
  */
 public class KeyValueHelper {
 	public static final String KEY_LAST_RECIPIENT = "lastRecipient";
+	public static final String KEY_SEND_DIR = "sendDir";
 	
     private static KeyValueHelper keyValueHelper = null;
     

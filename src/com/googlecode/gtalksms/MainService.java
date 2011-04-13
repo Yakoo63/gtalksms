@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
 
 import android.app.Notification;
@@ -171,8 +172,7 @@ public class MainService extends Service {
                     _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
                     break;
                 default:
-                    Log.e(Tools.LOG_TAG, "Invalid xmpp state: "+ initialState);
-                    break;
+                    throw new IllegalStateException("Unkown initialState while handling" + MainService.ACTION_TOGGLE);
             }
         } else if (action.equals(ACTION_SEND)) {
             _xmppMgr.send(new XmppMsg(intent.getStringExtra("message")), intent.getStringExtra("to"));
@@ -357,6 +357,8 @@ public class MainService extends Service {
         _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
         
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onCreate(): service thread created");
+        SmackConfiguration.setKeepAliveInterval(60000 * 15);  // 15 mins
+        SmackConfiguration.setPacketReplyTimeout(10000);      // 10 secs
         IsRunning = true; 
     }
 

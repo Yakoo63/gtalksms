@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.databases.KeyValueHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -19,6 +20,7 @@ public class FileCmd extends CommandHandlerBase {
     private XmppManager xmppMgr;
     private File landingDir;
     private File sendDir;  // where the files come from if send:filename is given
+    private KeyValueHelper keyValueHelper;
 
     private Exception ex;
     
@@ -28,10 +30,11 @@ public class FileCmd extends CommandHandlerBase {
             xmppMgr = _mainService.getXmppmanager();
             XmppFileManager fileMgr = xmppMgr.getXmppFileMgr();
             landingDir = fileMgr.getLandingDir();
-            sendDir = landingDir;
         } catch (Exception e) {
             ex = e;
         }
+        keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());
+        restoreSendDir();
     }
     
     @Override
@@ -98,6 +101,7 @@ public class FileCmd extends CommandHandlerBase {
     
     private void ls(String args) {
         if (args.equals("")) {
+            setSendDir(landingDir);
             listDir(landingDir);
         } else if (args.startsWith("/")) {
             File dir = new File(args);
@@ -110,7 +114,7 @@ public class FileCmd extends CommandHandlerBase {
     
     private void listDir(File dir) {
         if (dir.isDirectory()) {
-            sendDir = dir;
+            setSendDir(dir);
             XmppMsg res = new XmppMsg();
             File[] dirs = dir.listFiles(new FileCmd.DirFileFilter());
             File[] files = dir.listFiles(new FileCmd.FileFileFilter());
@@ -148,18 +152,39 @@ public class FileCmd extends CommandHandlerBase {
         }
     }
     
-    public class DirFileFilter implements FileFilter {
+    /**
+     * Sets the sendDir and saves it's value into the key-store database
+     * @param dir
+     */
+    private void setSendDir(File dir) {
+        sendDir = dir;
+        String dirStr = dir.getAbsolutePath();
+        keyValueHelper.addKey(KeyValueHelper.KEY_SEND_DIR, dirStr);
+    }
+    
+    /**
+     * Restores the sendDir from the key-value database
+     */
+    private void restoreSendDir() {
+        String dir = keyValueHelper.getValue(KeyValueHelper.KEY_SEND_DIR);
+        if (dir != null) {
+            sendDir = new File(dir);
+        } else {
+            sendDir = landingDir;
+        }
+    }
+    
+    private class DirFileFilter implements FileFilter {
         @Override
         public boolean accept(File pathname) {
             return pathname.isDirectory();
         }      
     }
     
-    public class FileFileFilter implements FileFilter {
+    private class FileFileFilter implements FileFilter {
         @Override
         public boolean accept(File pathname) {
             return pathname.isFile();
         }      
     }
-
 }

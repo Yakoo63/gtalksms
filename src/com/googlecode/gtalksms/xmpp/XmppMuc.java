@@ -235,12 +235,26 @@ public class XmppMuc {
 						muc.join(name, _settings.roomPassword, discussionHistory, REPLAY_TIMEOUT);
 					} else {
 						muc.join(name, null, discussionHistory, REPLAY_TIMEOUT);
+						// check here if we are still owner of these room, in case somebody has taken over ownership
+						// sadly this (getOwners()) throws sometimes a 403 on my openfire server
+						try {
 						if (!affilateCheck(muc.getOwners())) {
 							if (_settings.debugLog) 
 								Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of affilateCheck failed");
 							leaveRoom(muc);
 							continue;
 						}
+						// catch the 403 that sometimes shows up and fall back to some easier check if the room
+						// is still under our control
+                        } catch (XMPPException e) {
+                            if (!(info.isMembersOnly() || info.isPasswordProtected())) {
+                                if (_settings.debugLog)
+                                    Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of membersOnly=" 
+                                            + info.isMembersOnly() + " passwordProteced=" + info.isPasswordProtected());
+                                leaveRoom(muc);
+                                continue;
+                            }
+                        }
 					}
 					// looks like there is no one in the room
 					if (info.getOccupantsCount() > 0) {
