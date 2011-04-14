@@ -39,6 +39,7 @@ import org.jivesoftware.smackx.provider.MultipleAddressesProvider;
 import org.jivesoftware.smackx.provider.RosterExchangeProvider;
 import org.jivesoftware.smackx.provider.StreamInitiationProvider;
 import org.jivesoftware.smackx.provider.VCardProvider;
+import org.jivesoftware.smackx.provider.XHTMLExtensionProvider;
 import org.jivesoftware.smackx.search.UserSearch;
 
 import android.app.Service;
@@ -52,7 +53,6 @@ import android.util.Log;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
-import com.googlecode.gtalksms.xmpp.XHTMLExtensionProvider;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
