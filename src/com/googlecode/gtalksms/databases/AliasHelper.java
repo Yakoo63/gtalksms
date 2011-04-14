@@ -99,7 +99,7 @@ public class AliasHelper {
      * @return the phone number, or the given alias if there is no number
      */
     public String convertAliasToNumber(String aliasName) {
-        if(AliasDatabase.containsAlias(aliasName)) {
+        if(!aliasName.contains("'") && AliasDatabase.containsAlias(aliasName)) {
             String[] res = AliasDatabase.getAlias(aliasName); 
             return res[1];
         } 
@@ -107,7 +107,7 @@ public class AliasHelper {
     }
     
     public String[] getAliasOrNull(String aliasName) {
-        if(AliasDatabase.containsAlias(aliasName)) {
+        if(!aliasName.contains("'") && AliasDatabase.containsAlias(aliasName)) {
             return AliasDatabase.getAlias(aliasName);
         } 
         return null;
