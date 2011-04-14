@@ -458,14 +458,17 @@ public class XmppManager {
 
             @Override
             public void reconnectingIn(int arg0) {
+                throw new IllegalStateException("Reconnection Manager is running");
             }
 
             @Override
             public void reconnectionFailed(Exception arg0) {
+                throw new IllegalStateException("Reconnection Manager is running");
             }
 
             @Override
             public void reconnectionSuccessful() {
+                throw new IllegalStateException("Reconnection Manager is running");
             }
         };
         _connection.addConnectionListener(_connectionListener);            
