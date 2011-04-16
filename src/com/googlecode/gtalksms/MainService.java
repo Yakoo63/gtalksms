@@ -26,6 +26,7 @@ import android.util.Log;
 import com.googlecode.gtalksms.cmd.AliasCmd;
 import com.googlecode.gtalksms.cmd.BatteryCmd;
 import com.googlecode.gtalksms.cmd.CallCmd;
+import com.googlecode.gtalksms.cmd.CameraCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
 import com.googlecode.gtalksms.cmd.CommandHandlerBase;
 import com.googlecode.gtalksms.cmd.ContactCmd;
@@ -553,6 +554,7 @@ public class MainService extends Service {
     }
     
     private void setupCommands() {
+        registerCommand(new CameraCmd(this));
         registerCommand(new KeyboardCmd(this));
         registerCommand(new BatteryCmd(this));
         registerCommand(new GeoCmd(this));
