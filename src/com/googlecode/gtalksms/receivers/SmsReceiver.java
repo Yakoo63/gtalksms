@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.tools.Tools;
 
 
 public class SmsReceiver extends BroadcastReceiver {
@@ -22,7 +23,7 @@ public class SmsReceiver extends BroadcastReceiver {
         
         // Finally, send all SMS via XMPP by sender
         for(String sender : msg.keySet()) {
-            Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
+            Intent svcintent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
             svcintent.putExtra("sender", sender);
             context.startService(svcintent);
         }

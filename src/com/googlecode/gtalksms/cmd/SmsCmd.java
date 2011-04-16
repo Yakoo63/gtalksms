@@ -16,7 +16,6 @@ import android.telephony.SmsManager;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
-import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.cmd.smsCmd.DeliveredIntentReceiver;
 import com.googlecode.gtalksms.cmd.smsCmd.SentIntentReceiver;
 import com.googlecode.gtalksms.cmd.smsCmd.SetLastRecipientRunnable;
@@ -29,12 +28,12 @@ import com.googlecode.gtalksms.databases.AliasHelper;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
+import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class SmsCmd extends CommandHandlerBase {
     private SmsMmsManager _smsMgr;
     private String _lastRecipient = null;
     private String _lastRecipientName = null;    
-    private XmppManager _xmppMgr;
     
     public BroadcastReceiver _sentSmsReceiver = null;
     public BroadcastReceiver _deliveredSmsReceiver = null;
@@ -66,7 +65,6 @@ public class SmsCmd extends CommandHandlerBase {
             _deliveredSmsReceiver = new DeliveredIntentReceiver(_mainService, _smsMap);
             _mainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
         }
-        _xmppMgr = _mainService.getXmppmanager();
         _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
         _keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());     
         restoreLastRecipient();
@@ -131,7 +129,7 @@ public class SmsCmd extends CommandHandlerBase {
                 inviteRoom(_aliasHelper.convertAliasToNumber(args));
         	} else if (_lastRecipient != null) {
         	    try {
-					_xmppMgr.getXmppMuc().inviteRoom(_lastRecipient, _lastRecipientName);
+					XmppMuc.getInstance(_context).inviteRoom(_lastRecipient, _lastRecipientName);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}
@@ -276,7 +274,7 @@ public class SmsCmd extends CommandHandlerBase {
                 number = contact;
                 name = ContactsManager.getContactName(_context, contact);                
                 try {
-					_xmppMgr.getXmppMuc().inviteRoom(number, name);
+					XmppMuc.getInstance(_context).inviteRoom(number, name);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}
@@ -290,7 +288,7 @@ public class SmsCmd extends CommandHandlerBase {
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 try {
-					_xmppMgr.getXmppMuc().inviteRoom(phone.cleanNumber, phone.contactName);
+                    XmppMuc.getInstance(_context).inviteRoom(phone.cleanNumber, phone.contactName);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}

@@ -46,7 +46,9 @@ import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.tools.DisplayToast;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
+import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class MainService extends Service {
     public final static int ID = 1;
@@ -175,7 +177,12 @@ public class MainService extends Service {
                     throw new IllegalStateException("Unkown initialState while handling" + MainService.ACTION_TOGGLE);
             }
         } else if (action.equals(ACTION_SEND)) {
-            _xmppMgr.send(new XmppMsg(intent.getStringExtra("message")), intent.getStringExtra("to"));
+            XmppMsg xmppMsg = (XmppMsg) intent.getParcelableExtra("xmppMsg");
+            if (xmppMsg == null) {
+                _xmppMgr.send(new XmppMsg(intent.getStringExtra("message")), intent.getStringExtra("to"));
+            } else {
+                _xmppMgr.send(xmppMsg, intent.getStringExtra("to"));
+            }
         } else if (action.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
             String message = intent.getStringExtra("message");
             if (message != null) {
@@ -186,7 +193,7 @@ public class MainService extends Service {
                 String number = intent.getStringExtra("sender");
                 String name = ContactsManager.getContactName(this, number);
                 String message = intent.getStringExtra("message");
-                boolean roomExists = _xmppMgr.getXmppMuc().roomExists(number);
+                boolean roomExists = XmppMuc.getInstance(this).roomExists(number);
                 
                 if (_settingsMgr.debugLog) {
                 	Log.i(Tools.LOG_TAG, MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
@@ -203,7 +210,7 @@ public class MainService extends Service {
                 }
                 if (_settingsMgr.notifySmsInChatRooms || roomExists) {
                     try {
-                        _xmppMgr.getXmppMuc().writeRoom(number, name, message);
+                        XmppMuc.getInstance(this).writeRoom(number, name, message);
                     } catch (XMPPException e) {
                         // room creation and/or writing failed - notify about this error
                         // and send the message to the notification address
@@ -284,40 +291,9 @@ public class MainService extends Service {
 
     public void updateBuddies() {
         if (_xmppMgr != null) {
-            _xmppMgr.getXmppBuddies().retrieveFriendList();
+            XmppBuddies.getInstance(this).retrieveFriendList();
         }
-    }
-    
-    /** Intent helper functions.
-     *  As many of our intent objects use a 'message' extra, we have a helper that
-     *  allows you to provide that too.  Any other extras must be set manually
-     */
-    public static Intent newSvcIntent(Context ctx, String action) {
-        return newSvcIntent(ctx, action, null, null);
-    }
-    
-    /**
-     * 
-     * @param ctx
-     * @param action
-     * @param message
-     * @param to - full JID to send message to, can be null for default notification address
-     * @return
-     */
-    public static Intent newSvcIntent(Context ctx, String action, String message, String to) {
-        Intent i = new Intent(action, null, ctx, MainService.class);
-        if (message != null) {
-            i.putExtra("message", message);
-        }
-        if (to != null) {
-            i.putExtra("to", to);
-        }
-        return i;
-    }
-    
-    public XmppManager getXmppmanager() {
-        return _xmppMgr;
-    }
+    }       
     
     /**
      * Class for clients to access.  Because we know this service always
@@ -402,7 +378,7 @@ public class MainService extends Service {
                 IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_CONNECTION_CHANGED);
                 registerReceiver(_xmppConChangedReceiver, intentFilter);
                 
-                _xmppMgr = new XmppManager(getBaseContext());
+                _xmppMgr = XmppManager.getInstance(getBaseContext());
             }
             
             Message msg = _serviceHandler.obtainMessage();
@@ -430,32 +406,7 @@ public class MainService extends Service {
         GoogleAnalyticsHelper.stop();
         _serviceLooper.quit();
         super.onDestroy();
-    }
-    
-    /**
-     * Wrapper to send a string to the user via XMPP
-     * needed by some receivers
-     * starts the MainService with a new intent
-     * 
-     * @param ctx
-     * @param msg
-     */
-    public static void send(Context ctx, String msg) {
-        ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg, null));
-    }
-    
-    /**
-     * Wrapper to send a string to the user via XMPP
-     * needed by some receivers
-     * starts the MainService with a new intent
-     * 
-     * @param ctx
-     * @param msg
-     * @param to
-     */
-    public static void send(Context ctx, String msg, String to) {
-        ctx.startService(newSvcIntent(ctx, ACTION_SEND, msg, to));
-    }
+    }    
     
     /**
      * Wrapper for send(XmppMsg msg... method

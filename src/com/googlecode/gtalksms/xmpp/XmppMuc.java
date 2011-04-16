@@ -34,33 +34,43 @@ public class XmppMuc {
 	private static final int ROOM_START_TAG_LENGTH = ROOM_START_TAG.length();
 	private static final int REPLAY_TIMEOUT = 500;
 
-    private Map<String, MultiUserChat> _rooms = new HashMap<String, MultiUserChat>();
-    private Set<Integer> _roomNumbers = new HashSet<Integer>();
-    private Context _context;
-    private SettingsManager _settings;
-    private XMPPConnection _connection;
-    private XmppManager _xmppMgr;
+    private static Map<String, MultiUserChat> _rooms = new HashMap<String, MultiUserChat>();
+    private static Set<Integer> _roomNumbers = new HashSet<Integer>();
+    private static Context ctx;
+    private static SettingsManager _settings;
+    private static XMPPConnection _connection;
     private static Random _rndGen = new Random();
-    private MUCHelper _mucHelper;
-    private DiscussionHistory discussionHistory;
-
+    private static MUCHelper _mucHelper;
+    private static DiscussionHistory discussionHistory;    
+    private static XmppMuc xmppMuc;
     
-    public XmppMuc(Context context, XmppManager xmppMgr) {
-        _context = context;
+    private XmppMuc(Context context) {
+        ctx = context;
         _settings = SettingsManager.getSettingsManager(context);
-        _xmppMgr = xmppMgr;
         _mucHelper = MUCHelper.getMUCHelper(context);
         discussionHistory = new DiscussionHistory();
         // this should disable history replay on MUC rooms
-        discussionHistory.setMaxChars(0);
+        discussionHistory.setMaxChars(0);        
     }
     
-    public void initialize(XMPPConnection connection) {
-        _connection = connection;
-        // clear the roomNumbers and room ArrayList as we have a new connection
-        _roomNumbers.clear();
-        _rooms.clear();
-        rejoinRooms();
+    public void registerListener(XmppManager xmppMgr) {
+        XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
+            public void newConnection(XMPPConnection connection) {
+                _connection = connection;
+                // clear the roomNumbers and room ArrayList as we have a new connection
+                _roomNumbers.clear();
+                _rooms.clear();
+                rejoinRooms();
+            }            
+        };
+        xmppMgr.registerConnectionChangeListener(listener);
+    }
+    
+    public static XmppMuc getInstance(Context ctx) {
+        if (xmppMuc == null) {
+            xmppMuc = new XmppMuc(ctx);
+        }
+        return xmppMuc;
     }
     
     /**
@@ -203,7 +213,7 @@ public class XmppMuc {
             multiUserChat.changeSubject(subjectInviteStr);
         } catch (XMPPException e1) {
             GoogleAnalyticsHelper.trackAndLogWarning("Unable to send conference room configuration form.", e1);
-            send(_context.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
+            send(ctx.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
             // then we also should not send an invite as the room will be locked
             throw e1;
         }
@@ -211,10 +221,6 @@ public class XmppMuc {
         multiUserChat.invite(_settings.notifiedAddress, subjectInviteStr);
         registerRoom(multiUserChat, number, name, randomInt);
         return multiUserChat;
-    }
-
-    private void send(String msg) {
-        _xmppMgr.send(new XmppMsg(msg), null);
     }
     
     private void rejoinRooms() {
@@ -228,7 +234,7 @@ public class XmppMuc {
     		// so lets check if we can reuse it
 			if (info != null) {
 				MultiUserChat muc = new MultiUserChat(_connection, mucDB[i][0]);
-				String name = ContactsManager.getContactName(_context,
+				String name = ContactsManager.getContactName(ctx,
 						mucDB[i][1]);
 				try {
 					if (info.isPasswordProtected()) {
@@ -307,7 +313,7 @@ public class XmppMuc {
     }
     
     private void registerRoom(MultiUserChat muc, String number, String name, Integer randomInt) {
-        MUCPacketListener chatListener = new MUCPacketListener(number, muc, name,  _context);
+        MUCPacketListener chatListener = new MUCPacketListener(number, muc, name,  ctx);
         muc.addMessageListener(chatListener);
         _roomNumbers.add(randomInt);
         _rooms.put(number, muc);
@@ -366,4 +372,11 @@ public class XmppMuc {
         return contact + " (" + number + ")";
     }
     
+    private static void send(String msg) {
+        Tools.send(msg, null, ctx);
+    }
+    
+//    private static void send(XmppMsg msg) {
+//        Tools.send(msg, null, ctx);
+//    }
 }

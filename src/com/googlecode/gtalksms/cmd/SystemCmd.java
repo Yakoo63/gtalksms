@@ -34,7 +34,7 @@ public class SystemCmd extends CommandHandlerBase {
             activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
             connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
             SystemCmd.mainService = mainService;
-            xmppMgr = mainService.getXmppmanager();
+            xmppMgr = XmppManager.getInstance(_context);
         }
     }
 

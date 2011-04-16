@@ -10,14 +10,12 @@ import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class FileCmd extends CommandHandlerBase {
-    private XmppManager xmppMgr;
     private File landingDir;
     private File sendDir;  // where the files come from if send:filename is given
     private KeyValueHelper keyValueHelper;
@@ -27,9 +25,7 @@ public class FileCmd extends CommandHandlerBase {
     public FileCmd(MainService mainService) {
         super(mainService, new String[] {"send", "ls"}, CommandHandlerBase.TYPE_SYSTEM);
         try {
-            xmppMgr = _mainService.getXmppmanager();
-            XmppFileManager fileMgr = xmppMgr.getXmppFileMgr();
-            landingDir = fileMgr.getLandingDir();
+            landingDir = XmppFileManager.getLandingDir();
         } catch (Exception e) {
             ex = e;
         }
@@ -73,7 +69,7 @@ public class FileCmd extends CommandHandlerBase {
     }
     
     private void sendFile(File file) {
-        FileTransferManager fileTransferManager = xmppMgr.getXmppFileMgr().getFileTransferManager();
+        FileTransferManager fileTransferManager = XmppFileManager.getInstance(_context).getFileTransferManager();
         OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(_answerTo);
 
         try {

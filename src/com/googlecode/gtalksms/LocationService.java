@@ -98,7 +98,7 @@ public class LocationService extends Service {
         builder.append(getString(R.string.chat_geo_speed, location.getSpeed()));
         builder.append(Tools.LineSep);
         builder.append(getString(R.string.chat_geo_provider, location.getProvider()));
-        MainService.send(this, builder.toString(), answerTo);
+        Tools.send(builder.toString(), answerTo, this);
     }
 
     public void onStart(final Intent intent, int startId) {
@@ -142,7 +142,7 @@ public class LocationService extends Service {
             if (location != null) {
                 if (isBetterLocation(location, _currentBestLocation)) {
                     _currentBestLocation = location;
-                    MainService.send(this, "Last known location");  //TODO localization
+                    Tools.send("Last known location", null, this);  //TODO localization
                     sendLocationUpdate(_currentBestLocation);
                 }
             }

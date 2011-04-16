@@ -1,5 +1,8 @@
 package com.googlecode.gtalksms;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
@@ -54,6 +57,7 @@ import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
+import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
@@ -83,9 +87,11 @@ public class XmppManager {
     private int _status = DISCONNECTED;
     private String _presenceMessage = "GTalkSMS";
     
+    private static Set<XmppConnectionChangeListener> connectionChangeListeners;
     private static XMPPConnection _connection = null;
+    private static XmppManager xmppManager;
     private PacketListener _packetListener = null;
-    private ConnectionListener _connectionListener = null;
+    private ConnectionListener _connectionListener = null;    
     private XmppMuc _xmppMuc;
     private XmppBuddies _xmppBuddies;
     private XmppFileManager _xmppFileMgr;
@@ -99,7 +105,7 @@ public class XmppManager {
     Runnable _reconnectRunnable = new Runnable() {
         public void run() {
             if (_settings.debugLog) Log.i(Tools.LOG_TAG, "attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
-            _context.startService(MainService.newSvcIntent(_context, MainService.ACTION_CONNECT));
+            Tools.startSvcIntent(_context, MainService.ACTION_CONNECT);
         }
     };
 
@@ -108,19 +114,30 @@ public class XmppManager {
     private SettingsManager _settings;
     private Context _context;
     
-    public XmppManager(Context context) {
+    private XmppManager(Context context) {
+        connectionChangeListeners = new HashSet<XmppConnectionChangeListener>();
         _settings = SettingsManager.getSettingsManager(context);
         _context = context;
         configure(ProviderManager.getInstance());
-        _xmppBuddies = new XmppBuddies(context);
-        _xmppFileMgr = new XmppFileManager(context, this);
-        _xmppMuc = new XmppMuc(context, this);
+        _xmppBuddies = XmppBuddies.getInstance(context);
+        _xmppFileMgr = XmppFileManager.getInstance(context);
+        _xmppMuc = XmppMuc.getInstance(context);
+        _xmppBuddies.registerListener(this);
+        _xmppFileMgr.registerListener(this);
+        _xmppMuc.registerListener(this);
         reusedConnectionCount = 0;
         newConnectionCount = 0;
         ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
         ServiceDiscoveryManager.setIdentityType("bot"); // http://xmpp.org/registrar/disco-categories.html
         if (DEBUG)
             Connection.DEBUG_ENABLED = true;
+    }
+    
+    public static XmppManager getInstance(Context ctx) {
+        if (xmppManager == null) {
+            xmppManager = new XmppManager(ctx);            
+        }
+        return xmppManager;
     }
     
     private void start(int initialState) {
@@ -474,9 +491,7 @@ public class XmppManager {
         _connection.addConnectionListener(_connectionListener);            
 
         try {
-            _xmppMuc.initialize(_connection);
-            _xmppBuddies.initialize(_connection);
-            _xmppFileMgr.initialize(_connection);
+            informListeners(_connection);
 
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
             _packetListener = new ChatPacketListener(_connection, _context);            
@@ -516,7 +531,12 @@ public class XmppManager {
         _currentRetryCount = 0;  
         
         updateStatus(CONNECTED);
-
+    }
+    
+    private static void informListeners(XMPPConnection connection) {
+        for (XmppConnectionChangeListener listener : connectionChangeListeners) {
+            listener.newConnection(connection);
+        }
     }
     
     /**
@@ -682,16 +702,8 @@ public class XmppManager {
         }
     }
     
-    public XmppFileManager getXmppFileMgr() {
-        return _xmppFileMgr;        
-    }
-    
-    public XmppMuc getXmppMuc() {
-        return _xmppMuc;
-    }
-    
-    public XmppBuddies getXmppBuddies() {
-        return _xmppBuddies;
+    public void registerConnectionChangeListener(XmppConnectionChangeListener listener) {
+        connectionChangeListeners.add(listener);
     }
     
     public int getNewConnectionCount() {

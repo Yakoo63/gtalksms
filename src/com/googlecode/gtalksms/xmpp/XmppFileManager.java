@@ -19,19 +19,21 @@ import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppFileManager implements FileTransferListener {
-    private SettingsManager _settings;
-    private XMPPConnection _connection;
-    private FileTransferManager _fileTransferManager = null;
-    private XmppManager _xmppMgr;
-    private String answerTo;
+    private static SettingsManager _settings;
+    private static XMPPConnection _connection;
+    private static FileTransferManager _fileTransferManager = null;
+    private static String answerTo;
     private static File externalFilesDir;
     private static File landingDir;
+    private static Context ctx;
+    
+    private static XmppFileManager xmppFileManager;
     
     private static final String gtalksmsDir = "GTalkSMS";
     
-    public XmppFileManager(Context context, XmppManager xmppMgr) {
+    private XmppFileManager(Context context) {
         _settings = SettingsManager.getSettingsManager(context);
-        _xmppMgr = xmppMgr;
+        ctx = context;
         if (_settings.backupAgentAvailable) {  // API Level >= 8 check
             externalFilesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         } else {
@@ -41,13 +43,26 @@ public class XmppFileManager implements FileTransferListener {
         if (!landingDir.exists()) {
             landingDir.mkdirs();
         }
+
     }
     
-    public void initialize(XMPPConnection connection) {
-        _connection = connection;      
-        _fileTransferManager = new FileTransferManager(_connection);
-        _fileTransferManager.addFileTransferListener(this);
-   }
+    public void registerListener(XmppManager xmppMgr) {
+        XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
+            public void newConnection(XMPPConnection connection) {
+                _connection = connection;
+                _fileTransferManager = new FileTransferManager(_connection);
+                _fileTransferManager.addFileTransferListener(XmppFileManager.this);
+            }            
+        };
+        xmppMgr.registerConnectionChangeListener(listener);
+    }
+    
+    public static XmppFileManager getInstance(Context ctx) {
+        if (xmppFileManager == null) {
+            xmppFileManager = new XmppFileManager(ctx);
+        }
+        return xmppFileManager;
+    }
    
    /**
     * returns the FileTransferManager for the current connection
@@ -119,15 +134,15 @@ public class XmppFileManager implements FileTransferListener {
         return new XmppMsg(message);
     }
     
-    public File getLandingDir() {
+    public static File getLandingDir() {
         return landingDir;
-    }
+    }   
     
     private void send(String msg) {
-        _xmppMgr.send(new XmppMsg(msg), answerTo);
+        Tools.send(msg, answerTo, ctx);
     }
     
     private void send(XmppMsg msg) {
-        _xmppMgr.send(msg, answerTo);
+        Tools.send(msg, answerTo, ctx);
     }
 }

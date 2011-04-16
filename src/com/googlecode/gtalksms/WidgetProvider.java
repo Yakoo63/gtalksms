@@ -16,8 +16,7 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // The widget needs to be updated - just ask the service to broadcast it's current
         // status - the actual update happens when we receive that...
-        Intent intent = MainService.newSvcIntent(context, MainService.ACTION_BROADCAST_STATUS);
-        context.startService(intent);
+        Tools.startSvcIntent(context, MainService.ACTION_BROADCAST_STATUS);
     }
 
     public void doUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, int state) {
@@ -62,8 +61,7 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         if (action.equals(MainService.ACTION_WIDGET_ACTION)) {
-            Intent svcintent = MainService.newSvcIntent(context, MainService.ACTION_TOGGLE);
-            context.startService(svcintent);
+            Tools.startSvcIntent(context, MainService.ACTION_TOGGLE);
         } else if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
             int state = intent.getIntExtra("new_state", 0);
             // Update all AppWidget with current status

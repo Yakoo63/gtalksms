@@ -272,7 +272,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         Button startStopButton = (Button) findViewById(R.id.StartStop);
         startStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                startService(MainService.newSvcIntent(MainScreen.this, MainService.ACTION_TOGGLE));
+                Tools.startSvcIntent(MainScreen.this, MainService.ACTION_TOGGLE);
             }
         });
 

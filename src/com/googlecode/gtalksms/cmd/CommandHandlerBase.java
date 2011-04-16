@@ -84,7 +84,7 @@ public abstract class CommandHandlerBase {
     	 * As the XmppUserCommand class is verified to be good, the XmppUserCommand
     	 * initialization should be moved out to the caller of this method.
     	 */
-    	execute(new XmppUserCommand(_mainService.getXmppmanager(), cmd, args, answerTo));
+    	execute(new XmppUserCommand(XmppManager.getInstance(_context), cmd, args, answerTo));
     }
     
     private static class XmppUserCommand extends Command {

@@ -18,7 +18,7 @@ public class BatteryCmd extends CommandHandlerBase {
     
     public BatteryCmd(MainService mainService) {
         super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
-        _xmppMgr = mainService.getXmppmanager();
+        _xmppMgr = XmppManager.getInstance(_context);
         _powerSource = "Unknown";
         
         _batInfoReceiver = new BroadcastReceiver() {

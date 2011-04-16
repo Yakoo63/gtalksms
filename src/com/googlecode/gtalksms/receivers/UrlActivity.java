@@ -8,8 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 
-import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.tools.Tools;
 
 public class UrlActivity extends Activity {
     Handler _handler = new Handler();
@@ -31,9 +31,9 @@ public class UrlActivity extends Activity {
         try {
             url = new URL(data.getScheme(), data.getHost(), data.getPath());
 
-            MainService.send(this, url.toString());
+            Tools.send(url.toString(), null, this);
         } catch (Exception e) {
-            MainService.send(this, getString(R.string.chat_error, e.toString()));
+            Tools.send(getString(R.string.chat_error, e.toString()), null, this);
         }
         finish();
     }

@@ -7,7 +7,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
+//import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.util.StringUtils;
@@ -16,38 +16,53 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 public class XmppBuddies implements RosterListener {
     
-    private Context _context;
-    private XMPPConnection _connection;
+    private static Context _context;
+    private static XMPPConnection _connection;
+    private static XmppBuddies xmppBuddies;
     
-    public XmppBuddies(Context context) {
+    private XmppBuddies(Context context) {
         _context = context;
-    }
-    
-    public void initialize(XMPPConnection connection) {
-        _connection = connection;
-    }
-    
-    public void addFriend(String userID) {
-        Roster roster = null;
-        String nickname = null;
 
-        nickname = StringUtils.parseBareAddress(userID);
+    }
 
-        roster = _connection.getRoster();
-        if (!roster.contains(userID)) {
-            try {
-                roster.createEntry(userID, nickname, null);
-            } catch (XMPPException e) {
-                System.err.println("Error in adding friend");
+    public void registerListener(XmppManager xmppMgr) {
+        XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
+            public void newConnection(XMPPConnection connection) {
+                _connection = connection;
             }
-        }
-
-        return;
+        };
+        xmppMgr.registerConnectionChangeListener(listener);
     }
+    
+    public static XmppBuddies getInstance(Context ctx) {
+        if (xmppBuddies == null) {
+            xmppBuddies = new XmppBuddies(ctx);
+        }
+        return xmppBuddies;
+    }
+
+//    public void addFriend(String userID) {
+//        Roster roster = null;
+//        String nickname = null;
+//
+//        nickname = StringUtils.parseBareAddress(userID);
+//
+//        roster = _connection.getRoster();
+//        if (!roster.contains(userID)) {
+//            try {
+//                roster.createEntry(userID, nickname, null);
+//            } catch (XMPPException e) {
+//                System.err.println("Error in adding friend");
+//            }
+//        }
+//
+//        return;
+//    }
     
     /**
      * retrieves the current xmpp rooster

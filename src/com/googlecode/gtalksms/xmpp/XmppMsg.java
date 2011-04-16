@@ -4,10 +4,13 @@ import java.util.ArrayList;
 
 import org.jivesoftware.smackx.XHTMLText;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
-public class XmppMsg {
+public class XmppMsg implements Parcelable {
     public final static String BoldBegin = "##BOLD_BEGIN##";
     public final static String BoldEnd = "##BOLD_END##";
     public final static String ItalicBegin = "##ITALIC_BEGIN##";
@@ -218,4 +221,24 @@ public class XmppMsg {
             return str;
         }
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(toString());
+    }
+    
+    public static final Parcelable.Creator<XmppMsg> CREATOR = new Parcelable.Creator<XmppMsg>() {
+        public XmppMsg createFromParcel(Parcel in) {
+            return new XmppMsg(in.readString());
+        }
+
+        public XmppMsg[] newArray(int size) {
+            return new XmppMsg[size];
+        }
+    };
 }

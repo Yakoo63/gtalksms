@@ -12,11 +12,14 @@ import java.util.List;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 
+import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class Tools {
     public final static String LOG_TAG = "gtalksms";
@@ -186,4 +189,63 @@ public class Tools {
         }
         return shortendMessage;
     }    
+    
+    /**
+     * Sends an String via an service intent
+     * 
+     * @param msg
+     * @param to destination jid, can be null
+     * @param ctx
+     */
+    public static void send(String msg, String to, Context ctx) {
+        send(new XmppMsg(msg), to, ctx);
+    }
+    
+    /**
+     * Sends a XMPP Message via an service intent
+     * 
+     * @param msg
+     * @param to destination jid, can be null
+     * @param ctx
+     */
+    public static void send(XmppMsg msg, String to, Context ctx) {
+        Intent intent = new Intent(MainService.ACTION_SEND);
+        intent.setClass(ctx, MainService.class);
+        if (to != null) {
+            intent.putExtra("to", to);
+        }
+        intent.putExtra("xmppMsg", msg);
+        ctx.startService(intent);
+    }
+    
+    /**
+     * Starts the GTalkSMS service with the given action
+     * 
+     * @param ctx
+     * @param action
+     */
+    public static void startSvcIntent(final Context ctx, final String action) {
+        final Intent i = newSvcIntent(ctx, action, null, null);
+        ctx.startService(i);
+    }
+    
+    /**
+     * Composes a new intent for the GTalkSMS MainService
+     * 
+     * @param ctx
+     * @param action
+     * @param message the String extra "message", can be null
+     * @param to the String extra "to", can be null for default notification address
+     * @return
+     */
+    public static Intent newSvcIntent(final Context ctx, final String action, final String message, final String to) {
+        final Intent i = new Intent(action, null, ctx, MainService.class);
+        if (message != null) {
+            i.putExtra("message", message);
+        }
+        if (to != null) {
+            i.putExtra("to", to);
+        }
+        return i;
+    }
 }
