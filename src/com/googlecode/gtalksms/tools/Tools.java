@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
@@ -159,6 +160,19 @@ public class Tools {
             }
         }
         return true;
+    }
+    
+    public final static void writeFile(byte[] data, String filename) {
+        File file = new File(filename);
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(data);
+            fos.close();
+            Log.i(LOG_TAG, "Writing file '" + filename + "'");
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Failed to save file '" + filename + "'", e);
+        }
     }
     
     public final static String getAppBaseDir(Context ctx) {

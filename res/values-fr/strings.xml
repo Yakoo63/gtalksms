@@ -35,6 +35,8 @@
     <string name="pref_app_geo_link_app_openstreetmap_help">Utiliser Open Street Map pour localiser le téléphone</string>
     <string name="pref_app_enable_debug">Log de Debug</string>
     <string name="pref_app_enable_debug_help">Activer les log en mode Debug</string>    
+    <string name="pref_app_connect_mainscreen">Connexion de GTalkSMS au démarrage</string>
+    <string name="pref_app_connect_mainscreen_help">Connexion de GTalkSMS quand l\'écran d\'accueil est affiché</string>    
     <string name="pref_con">Connexion</string>
     <string name="pref_con_notified_address_cat">Adresse de notification</string>
     <string name="pref_con_notified_address">Adresse de notification</string>
@@ -61,6 +63,8 @@
     <string name="pref_con_muc_password_help">Mot de passe des salons de discussion pour les notifications SMS</string>
     <string name="pref_con_muc_server">Serveur de salons de discussion</string>
     <string name="pref_con_muc_server_help">Serveur XMPP Groupchat (A modifier en connaissance de cause !)</string>
+    <string name="pref_con_manually_specify_server_settings">Paramètres serveur manuels</string>
+    <string name="pref_con_manually_specify_server_settings_help">Permet de configurer manuellement les paramètres de connexion XMPP</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_application_connection">Connexion de l\'application</string>
     <string name="pref_notif_application_connection_help">Notification pour les connexions au service de messagerie</string>
@@ -116,6 +120,7 @@
     <string name="chat_error">Erreur : %s</string>
     <string name="chat_error_root">Impossible d\'avoir l\'accès super administrateur !</string>
     <string name="chat_error_unkown_name">Nom du contact inconnu</string>
+    <string name="chat_error_more_arguments">La commande \"%1$s\" nécessite plus d\'arguments</string>
     <string name="chat_reply_contact">Le destinataire par défaut est %s</string>
     <string name="chat_start_locating">Démarrage de la localisation du téléphone</string>
     <string name="chat_start_ringing">Le téléphone sonne</string>
@@ -141,6 +146,7 @@
     <string name="chat_help_title">Commandes disponibles :</string>
     <string name="chat_help_help">- %1$s ou %2$s: afficher cette aide.</string>
     <string name="chat_help_help_all">- %s: affiche toute l\'aide.</string>
+    <string name="chat_help_help_categories">- %1$s or %2$s: afficher les catégories d\'aide.</string>
     <string name="chat_help_stop">- %s: stopper l\'application sur le téléphone.</string>
     <string name="chat_help_dial">- %s: composer le numéro du contact spécifié.</string>
     <string name="chat_help_sms_reply">- %s: envoyer un SMS au dernier destinataire entrant ou sortant.</string>
@@ -218,5 +224,6 @@
     <string name="chat_alias_del_suc">Alias \'%1$s\' supprimé</string>
     <string name="chat_alias_del_fail">Impossible de supprimer l\'alias \'%1$s\'</string>
     <string name="chat_alias_show_non_existent">L\'alias \'%1$s\' n\'existe pas</string>
-    <string name="chat_alias_empty">No aliases set</string>
+    <string name="chat_alias_empty">Aucun alias</string>
+    <string name="chat_alias_invalid_char">Les alias ne peuvent pas contenir d\'apostrophe ("'").</string>    
 </resources>

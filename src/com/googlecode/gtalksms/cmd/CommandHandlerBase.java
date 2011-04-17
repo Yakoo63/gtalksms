@@ -90,7 +90,7 @@ public abstract class CommandHandlerBase {
     private static class XmppUserCommand extends Command {
     	private final XmppManager xmppManager;
 		public XmppUserCommand(XmppManager xmppManager, String cmd, String args, String replyTo) {
-			super(cmd, args, replyTo);
+			super(cmd + ":" + args, replyTo);
 			this.xmppManager = xmppManager;
 		}
 

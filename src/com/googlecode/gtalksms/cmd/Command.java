@@ -18,10 +18,11 @@ public abstract class Command {
 
 	@Deprecated
 	public Command(String cmd, String args, String replyTo) {
-		if(args == null || "".equals(args))
+		if(args == null || args.equals("")) {
 			this.originalCommand = cmd;
-		else
-			this.originalCommand = cmd+":"+args;
+		} else {
+			this.originalCommand = cmd + ":" + args;
+		}
 		this.replyTo = replyTo;
 	}
 
