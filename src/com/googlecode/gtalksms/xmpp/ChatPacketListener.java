@@ -5,7 +5,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
@@ -35,11 +34,7 @@ public class ChatPacketListener implements PacketListener {
                 if (settings.debugLog)
                     Log.i(Tools.LOG_TAG, "XMPP packet received - sending Intent: " + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
                 
-                Intent intent = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED);
-                intent.putExtra("from", from); // usually a full JID with resource
-                intent.putExtra("message", message.getBody());
-                intent.setClass(ctx, MainService.class);
-                ctx.startService(intent);
+                Tools.startSvcXMPPMsg(ctx, message.getBody(), from);
             } else if (settings.debugLog) {
                 if (!from.toLowerCase().startsWith(settings.notifiedAddress.toLowerCase() + "/")) {
                     Log.i(Tools.LOG_TAG, "XMPP packet received - but from address \"" + from.toLowerCase() + "\" does not match notification address \"" 

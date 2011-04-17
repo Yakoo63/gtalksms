@@ -248,4 +248,18 @@ public class Tools {
         }
         return i;
     }
+    
+    /**
+     * Starts the GTalkSMS Service with an XMPP Message Received intent
+     * 
+     * @param ctx
+     * @param message
+     * @param from
+     */
+    public static void startSvcXMPPMsg(final Context ctx, final String message, final String from) {
+        final Intent i = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED, null, ctx, MainService.class);
+        i.putExtra("message", message);
+        i.putExtra("from", from);
+        ctx.startService(i);
+    }
 }

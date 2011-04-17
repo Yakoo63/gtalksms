@@ -42,6 +42,7 @@ public class KeyValueDatabase extends Database {
             c.close();
             return res;
         } else { 
+            c.close();
             return null;
         }
     }

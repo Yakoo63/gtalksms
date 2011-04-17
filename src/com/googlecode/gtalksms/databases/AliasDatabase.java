@@ -57,6 +57,7 @@ public class AliasDatabase extends Database {
             c.close();
             return res;
         } else { 
+            c.close();
             return null;
         }
     }

@@ -1,5 +1,6 @@
 upcoming
 * Rejoin MUC rooms on XMPP reconnect or service restart
+* handle offline messages on servers that support XEP-13
 
 2.1
 * Alias command added

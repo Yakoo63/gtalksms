@@ -61,6 +61,7 @@ import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
+import com.googlecode.gtalksms.xmpp.XmppOfflineMessages;
 
 public class XmppManager {
     
@@ -524,6 +525,8 @@ public class XmppManager {
             Log.i(Tools.LOG_TAG, "conn parameters: con=" + con + " auth=" + auth + " enc=" + enc + " comp=" + comp);
         }                
         
+        XmppOfflineMessages.handleOfflineMessages(_connection, _settings.notifiedAddress, _context);
+        
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
             send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);
@@ -662,7 +665,6 @@ public class XmppManager {
             }
             if ((to == null) || XHTMLManager.isServiceEnabled(_connection, to)) { 
                 String xhtmlBody = message.generateXHTMLText().toString();
-                xhtmlBody = xhtmlBody.replace("<br>", "<br/>");  //fix for smack problem
                 XHTMLManager.addBody(msg, xhtmlBody);
             }
             if(muc == null) {
