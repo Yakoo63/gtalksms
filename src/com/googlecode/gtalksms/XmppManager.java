@@ -436,6 +436,7 @@ public class XmppManager {
             // disable the built-in ReconnectionManager
             // since we handle this
             conf.setReconnectionAllowed(false);
+            conf.setSendPresence(false);
             
             connection = new XMPPConnection(conf);            
             SettingsManager.connectionSettingsObsolete = false;
@@ -497,7 +498,6 @@ public class XmppManager {
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
             _packetListener = new ChatPacketListener(_connection, _context);            
             _connection.addPacketListener(_packetListener, filter);
-            setStatus(_presenceMessage);
 
             try {
                 _connection.getRoster().addRosterListener(_xmppBuddies);
@@ -526,6 +526,7 @@ public class XmppManager {
         }                
         
         XmppOfflineMessages.handleOfflineMessages(_connection, _settings.notifiedAddress, _context);
+        setStatus(_presenceMessage);
         
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
