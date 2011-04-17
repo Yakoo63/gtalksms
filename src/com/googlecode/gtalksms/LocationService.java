@@ -16,6 +16,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -103,6 +104,13 @@ public class LocationService extends Service {
 
     public void onStart(final Intent intent, int startId) {
         super.onStart(intent, startId);
+        if (_settingsManager.debugLog) {
+            if (intent != null) {
+                Log.i(Tools.LOG_TAG, "LocationService onStart with intent action=" + intent.getAction());
+            } else {
+                Log.i(Tools.LOG_TAG, "Location Service onStart with null intent");
+            }
+        }
 
         if (intent.getAction().equals(STOP_SERVICE)) {
             destroy();

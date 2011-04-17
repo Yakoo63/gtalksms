@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Debug.MemoryInfo;
 import android.os.Process;
 import android.os.SystemClock;
+import android.telephony.TelephonyManager;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
@@ -24,8 +25,9 @@ public class SystemCmd extends CommandHandlerBase {
     private final static int myPidArray[] = { myPid };
     private static ActivityManager activityManager; 
     private static ConnectivityManager connectivityManager;
-    private static XmppManager xmppMgr;
+    private static XmppManager xmppMgr;    
     private static MainService mainService;
+    private static TelephonyManager telephonyManager;
     
     public SystemCmd(MainService mainService) {
         super(mainService, new String[] {"system"}, CommandHandlerBase.TYPE_SYSTEM);
@@ -33,6 +35,7 @@ public class SystemCmd extends CommandHandlerBase {
             Context ctx = mainService.getBaseContext();
             activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
             connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+            telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
             SystemCmd.mainService = mainService;
             xmppMgr = XmppManager.getInstance(_context);
         }
@@ -60,6 +63,8 @@ public class SystemCmd extends CommandHandlerBase {
         appendMonkeyTest(res);
         res.newLine();
         appendPreferences(res);
+        res.newLine();
+        appendTelephonStatus(res);
         
         send(res);
     }
@@ -216,5 +221,16 @@ public class SystemCmd extends CommandHandlerBase {
     private static void appendDataConnectionStatus(XmppMsg msg) {
         msg.appendBoldLine("Data connection status");
         msg.appendLine(getDataConnectionStatus());
+    }
+    
+    private static void appendTelephonStatus(XmppMsg msg) {
+        msg.appendBold("TelephonyManager");
+        msg.append("DeviceID: " + telephonyManager.getDeviceId());
+        msg.append("Device Software Version: " + telephonyManager.getDeviceSoftwareVersion());
+        msg.append("Line1Number: " + telephonyManager.getLine1Number());
+        msg.append("SIM Serial # " + telephonyManager.getSimSerialNumber());
+        msg.append("Subscriber ID: " + telephonyManager.getSubscriberId());
+        msg.append("Voice Mail Alpha Tag: " + telephonyManager.getVoiceMailAlphaTag());
+        msg.append("Voice Mail Number: " + telephonyManager.getVoiceMailNumber());
     }
 }
