@@ -25,7 +25,6 @@ public class SystemCmd extends CommandHandlerBase {
     private final static int myPidArray[] = { myPid };
     private static ActivityManager activityManager; 
     private static ConnectivityManager connectivityManager;
-    private static XmppManager xmppMgr;    
     private static MainService mainService;
     private static TelephonyManager telephonyManager;
     
@@ -37,7 +36,6 @@ public class SystemCmd extends CommandHandlerBase {
             connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
             telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
             SystemCmd.mainService = mainService;
-            xmppMgr = XmppManager.getInstance(_context);
         }
     }
 
@@ -122,8 +120,8 @@ public class SystemCmd extends CommandHandlerBase {
     }
     
     private static void appendXMPPConnectionData(XmppMsg msg) {
-        int reused = xmppMgr.getReusedConnectionCount();
-        int newcons = xmppMgr.getNewConnectionCount();
+        int reused = XmppManager.getReusedConnectionCount();
+        int newcons = XmppManager.getNewConnectionCount();
         int total = reused + newcons;
         msg.appendBoldLine("XMPP Connection Data");
         msg.appendLine("Total connections: " + total + " thereof " + reused + " reused and " + newcons + " new");

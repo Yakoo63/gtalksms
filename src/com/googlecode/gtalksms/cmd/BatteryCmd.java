@@ -14,11 +14,9 @@ public class BatteryCmd extends CommandHandlerBase {
     private BroadcastReceiver _batInfoReceiver = null;
     private int _lastPercentageNotified = -1;
     private String _powerSource;
-    private XmppManager _xmppMgr;
     
     public BatteryCmd(MainService mainService) {
         super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
-        _xmppMgr = XmppManager.getInstance(_context);
         _powerSource = "Unknown";
         
         _batInfoReceiver = new BroadcastReceiver() {
@@ -67,7 +65,7 @@ public class BatteryCmd extends CommandHandlerBase {
             send(R.string.chat_battery_level, level);
         }
         if (_settingsMgr.notifyBatteryInStatus) {
-            _xmppMgr.setStatus("GTalkSMS - " + level + "%" + " - " + _powerSource);
+            XmppManager.setStatus("GTalkSMS - " + level + "%" + " - " + _powerSource);
         }
     }
     

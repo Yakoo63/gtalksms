@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
 
 import android.app.Notification;
@@ -267,7 +266,7 @@ public class MainService extends Service {
     }
 
     public int getConnectionStatus() {
-        return _xmppMgr == null ? XmppManager.DISCONNECTED : _xmppMgr.getConnectionStatus();
+        return _xmppMgr == null ? XmppManager.DISCONNECTED : XmppManager.getConnectionStatus();
     }
     
     public Map<String, CommandHandlerBase> getCommands() {
@@ -279,12 +278,14 @@ public class MainService extends Service {
     }
     
     public boolean getTLSStatus() {
-        return _xmppMgr == null ? false : _xmppMgr.getTLSStatus();
-    }           // null check necessary
+        // null check necessary
+        return _xmppMgr == null ? false : XmppManager.getTLSStatus();
+    }
     
     public boolean getCompressionStatus() {
-    	return _xmppMgr == null ? false : _xmppMgr.getCompressionStatus();   	    
-    }          // null check necessary
+        // null check necessary
+    	return _xmppMgr == null ? false : XmppManager.getCompressionStatus();   	    
+    }         
     
     public static GoogleAnalyticsHelper getAnalyticsHelper() {
     	return _gAnalytics;
@@ -334,8 +335,6 @@ public class MainService extends Service {
         _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
         
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onCreate(): service thread created");
-        SmackConfiguration.setKeepAliveInterval(60000 * 15);  // 15 mins
-        SmackConfiguration.setPacketReplyTimeout(10000);      // 10 secs
         IsRunning = true; 
     }
 

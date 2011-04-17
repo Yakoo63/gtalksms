@@ -8,6 +8,7 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -85,35 +86,35 @@ public class XmppManager {
     public static final int WAITING_FOR_NETWORK = 5;
     
     // Indicates the current state of the service (disconnected/connecting/connected)
-    private int _status = DISCONNECTED;
-    private String _presenceMessage = "GTalkSMS";
+    private static int _status = DISCONNECTED;
+    private static String _presenceMessage = "GTalkSMS";
     
     private static Set<XmppConnectionChangeListener> connectionChangeListeners;
     private static XMPPConnection _connection = null;
     private static XmppManager xmppManager;
-    private PacketListener _packetListener = null;
-    private ConnectionListener _connectionListener = null;    
-    private XmppMuc _xmppMuc;
-    private XmppBuddies _xmppBuddies;
-    private XmppFileManager _xmppFileMgr;
+    private static PacketListener _packetListener = null;
+    private static ConnectionListener _connectionListener = null;    
+    private static XmppMuc _xmppMuc;
+    private static XmppBuddies _xmppBuddies;
+    private static XmppFileManager _xmppFileMgr;
 //    private ServiceDiscoveryManager serviceDiscoMgr;
     
     private static int reusedConnectionCount = 0;
     private static int newConnectionCount = 0;
         
     // Our current retry attempt, plus a runnable and handler to implement retry
-    private int _currentRetryCount = 0;
-    Runnable _reconnectRunnable = new Runnable() {
+    private static int _currentRetryCount = 0;
+    private static Runnable _reconnectRunnable = new Runnable() {
         public void run() {
             if (_settings.debugLog) Log.i(Tools.LOG_TAG, "attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
             Tools.startSvcIntent(_context, MainService.ACTION_CONNECT);
         }
     };
 
-    Handler _reconnectHandler = new Handler();
+    private static Handler _reconnectHandler = new Handler();
 
-    private SettingsManager _settings;
-    private Context _context;
+    private static  SettingsManager _settings;
+    private static Context _context;
     
     private XmppManager(Context context) {
         connectionChangeListeners = new HashSet<XmppConnectionChangeListener>();
@@ -132,6 +133,8 @@ public class XmppManager {
         ServiceDiscoveryManager.setIdentityType("bot"); // http://xmpp.org/registrar/disco-categories.html
         if (DEBUG)
             Connection.DEBUG_ENABLED = true;
+        SmackConfiguration.setKeepAliveInterval(60000 * 5);  // 5 mins
+        SmackConfiguration.setPacketReplyTimeout(10000);      // 10 secs
     }
     
     public static XmppManager getInstance(Context ctx) {
@@ -141,7 +144,7 @@ public class XmppManager {
         return xmppManager;
     }
     
-    private void start(int initialState) {
+    private static void start(int initialState) {
         switch (initialState) {
             case CONNECTED:
                 initConnection();
@@ -159,7 +162,7 @@ public class XmppManager {
      * calls cleanupConnection and 
      * sets _status to DISCONNECTED
      */
-    private void stop() {
+    private static void stop() {
         updateStatus(DISCONNECTING);
         cleanupConnection();
         updateStatus(DISCONNECTED);
@@ -172,7 +175,7 @@ public class XmppManager {
      * is still connected and removes packetListeners and 
      * Callbacks for the reconnectHandler
      */
-    private void cleanupConnection() {
+    private static void cleanupConnection() {
         _reconnectHandler.removeCallbacks(_reconnectRunnable);
 
         if (_connection != null) {
@@ -262,7 +265,7 @@ public class XmppManager {
         // the state actually changes and update everything accordingly.
     }
 
-    private void xmppDisconnect(XMPPConnection connection) {
+    private static void xmppDisconnect(XMPPConnection connection) {
         // In some cases the 'disconnect' may hang - see
         // http://code.google.com/p/gtalksms/issues/detail?id=12 for an
         // example.  We worm around this by leveraging the fact that we 
@@ -351,7 +354,7 @@ public class XmppManager {
      * 
      * @param status
      */
-    private void updateStatus(int status) {
+    private static void updateStatus(int status) {
         if (status != _status) {
             // ensure _status is set before broadcast, just in-case
             // a receiver happens to wind up querying the state on
@@ -364,7 +367,7 @@ public class XmppManager {
         }
     }
 
-    private void maybeStartReconnect() {
+    private static void maybeStartReconnect() {
             int timeout;
             updateStatus(WAITING_TO_CONNECT);
             cleanupConnection();
@@ -382,7 +385,7 @@ public class XmppManager {
     
 
     /** init the XMPP connection */
-    private void initConnection() {
+    private static void initConnection() {
         XMPPConnection connection;
 
         // assert we are only ever called from one thread
@@ -525,15 +528,16 @@ public class XmppManager {
             Log.i(Tools.LOG_TAG, "conn parameters: con=" + con + " auth=" + auth + " enc=" + enc + " comp=" + comp);
         }                
         
+        // It is important that we query the server for offline messages BEFORE we send the first presence stanza
         XmppOfflineMessages.handleOfflineMessages(_connection, _settings.notifiedAddress, _context);
         setStatus(_presenceMessage);
         
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
-            send(new XmppMsg(_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null);
+            Tools.send((_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null, _context);
         }
-        _currentRetryCount = 0;  
         
+        _currentRetryCount = 0;        
         updateStatus(CONNECTED);
     }
     
@@ -550,7 +554,7 @@ public class XmppManager {
      * @param connection
      * @return true if we are connected and authenticated, false otherwise
      */
-    private boolean connectAndAuth(XMPPConnection connection) {
+    private static boolean connectAndAuth(XMPPConnection connection) {
         try {
             connection.connect();
         } catch (Exception e) {
@@ -615,22 +619,22 @@ public class XmppManager {
      * returns true if the service is correctly connected
      * and authenticated
      */
-    private boolean isConnected() {
+    private static boolean isConnected() {
         return    (_connection != null
                 && _connection.isConnected()
                 && _connection.isAuthenticated());
     }
 
     /** returns the current connection state */
-    public int getConnectionStatus() {
+    public static int getConnectionStatus() {
         return _status;
     }
     
-    public boolean getTLSStatus() {
+    public static boolean getTLSStatus() {
         return _connection == null ? false : _connection.isUsingTLS();
     }
     
-    public boolean getCompressionStatus() {
+    public static boolean getCompressionStatus() {
     	return _connection == null ? false : _connection.isUsingCompression();
     }
     
@@ -692,7 +696,7 @@ public class XmppManager {
      * @param status
      * @return true if the presence could be set
      */
-    public boolean setStatus(String status) {
+    public static boolean setStatus(String status) {
         _presenceMessage = status;
         Presence presence = new Presence(Presence.Type.available);
         presence.setStatus(_presenceMessage);
@@ -709,15 +713,15 @@ public class XmppManager {
         connectionChangeListeners.add(listener);
     }
     
-    public int getNewConnectionCount() {
+    public static int getNewConnectionCount() {
         return newConnectionCount;
     }
     
-    public int getReusedConnectionCount() {
+    public static int getReusedConnectionCount() {
         return reusedConnectionCount;
     }    
 
-    private void configure(ProviderManager pm) {
+    private static void configure(ProviderManager pm) {
         //  Private Data Storage
         pm.addIQProvider("query","jabber:iq:private", new PrivateDataManager.PrivateDataIQProvider());
  
