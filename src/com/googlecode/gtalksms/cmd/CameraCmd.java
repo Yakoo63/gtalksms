@@ -1,28 +1,37 @@
 package com.googlecode.gtalksms.cmd;
 
 import java.io.File;
-import java.util.Date;
 
-import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
-import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceView;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.cmd.cameraCmd.EmailCallback;
+import com.googlecode.gtalksms.cmd.cameraCmd.XMPPTransferCallback;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class CameraCmd extends CommandHandlerBase {
     
-    Camera _camera = null;
-    private final String _path = "/sdcard/DCIM/GTalkSMS";
+    private Camera _camera = null;
+    private static File _path;
+    private String emailReceiving;
     
     public CameraCmd(MainService mainService) {
         super(mainService, new String[] {"camera"}, CommandHandlerBase.TYPE_SYSTEM);
         
+        SettingsManager settings = SettingsManager.getSettingsManager(_context);
+        if (settings.backupAgentAvailable) {  // API Level >= 8 check
+            _path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        } else {
+            _path = Environment.getExternalStorageDirectory();
+        }
+        emailReceiving = settings.notifiedAddress;
         try {
-            File repository = new File(_path);
+            File repository = new File(_path, Tools.APP_NAME);
             if(!repository.exists()) {
                 repository.mkdirs();
             }
@@ -35,46 +44,29 @@ public class CameraCmd extends CommandHandlerBase {
     protected void execute(String cmd, String args) {
         if (cmd.equals("camera")) {
             cleanUp();
+            PictureCallback pictureCallback;
             
             try {
                 _camera = Camera.open();
                 SurfaceView view = new SurfaceView(_context);
                 _camera.setPreviewDisplay(view.getHolder());
                 _camera.startPreview();
-
-                _camera.takePicture(null, null, jpegCallback);
+                
+                if (args.equals("xmpp")) {
+                    pictureCallback = new XMPPTransferCallback(this, _path, _context, _answerTo);
+                } else {
+                    pictureCallback = new EmailCallback(this, _path, _context, emailReceiving);
+                }
+                _camera.takePicture(null, null, pictureCallback);
             } catch (Exception e) {
                 send("error while getting picture: " + e);
             }
         } 
     }
-    
-    PictureCallback jpegCallback = new PictureCallback() {
-        
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
-            
-            String filename = _path + "/photo-" + new Date().getTime() + ".jpg";
-            Tools.writeFile(data, filename);
-            cleanUp();
-             
-            try {
-                Intent emailIntent = new Intent(Intent.ACTION_SEND);
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "GTalkSMS Picture");
-                emailIntent.putExtra(Intent.EXTRA_TEXT, "GTalkSMS Picture");
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {_settingsMgr.notifiedAddress});
-                emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(filename)));  
-                emailIntent.setType("image/jpeg");  
-                emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                _context.startActivity(emailIntent);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        }
-    };
+       
     
     @Override
-    public void cleanUp() {
+    public synchronized void cleanUp() {
         if (_camera != null) {
             try {
                 _camera.release();
