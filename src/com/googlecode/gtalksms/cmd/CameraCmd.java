@@ -16,22 +16,28 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class CameraCmd extends CommandHandlerBase {
     
-    private Camera _camera = null;
-    private static File _path;
-    private String emailReceiving;
+    private static final int XMPP_CALLBACK = 1;
+    private static final int EMAIL_CALLBACK = 2;
+    
+    private static Camera camera = null;
+    private static File repository;
+    private static String emailReceiving;
+    private static boolean api9orGreater;
     
     public CameraCmd(MainService mainService) {
-        super(mainService, new String[] {"camera"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, new String[] {"camera", "photo"}, CommandHandlerBase.TYPE_SYSTEM);
+        File path;
         
         SettingsManager settings = SettingsManager.getSettingsManager(_context);
-        if (settings.backupAgentAvailable) {  // API Level >= 8 check
-            _path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        if (settings.api8orGreater) {  // API Level >= 8 check
+            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         } else {
-            _path = Environment.getExternalStorageDirectory();
+            path = new File(Environment.getExternalStorageDirectory(), "DCIM");
         }
         emailReceiving = settings.notifiedAddress;
+        api9orGreater = settings.api9orGreater;
         try {
-            File repository = new File(_path, Tools.APP_NAME);
+            repository = new File(path, Tools.APP_NAME);
             if(!repository.exists()) {
                 repository.mkdirs();
             }
@@ -42,38 +48,74 @@ public class CameraCmd extends CommandHandlerBase {
     
     @Override
     protected void execute(String cmd, String args) {
-        if (cmd.equals("camera")) {
-            cleanUp();
-            PictureCallback pictureCallback;
-            
-            try {
-                _camera = Camera.open();
-                SurfaceView view = new SurfaceView(_context);
-                _camera.setPreviewDisplay(view.getHolder());
-                _camera.startPreview();
-                
-                if (args.equals("xmpp")) {
-                    pictureCallback = new XMPPTransferCallback(this, _path, _context, _answerTo);
-                } else {
-                    pictureCallback = new EmailCallback(this, _path, _context, emailReceiving);
-                }
-                _camera.takePicture(null, null, pictureCallback);
-            } catch (Exception e) {
-                send("error while getting picture: " + e);
-            }
+        String[] splitedArgs = splitArgs(args);
+        if (cmd.equals("camera") || cmd.equals("photo")) {
+            if (splitedArgs[0].equals("") || splitedArgs[0].equals("email")) {
+                takePicture(EMAIL_CALLBACK);
+            } else if (splitedArgs[0].equals("xmpp")) {
+                takePicture(XMPP_CALLBACK);
+            } else if (splitedArgs[0].equals("list")) {
+                listCameras();
+            } else if (splitedArgs[0].equals("set")) {
+                setCamera(splitedArgs);
+            }           
         } 
+    }
+    
+    private void setCamera(String[] splitedArgs) {
+        // TODO does nothing atm, we need API >= 9 for this feature
+        if (api9orGreater) {
+            // TODO set the camera
+        } else {
+            // TODO print error message
+        }
+    }
+
+    private void listCameras() {
+        // TODO does nothing atm, we need API >= 9 for this feature
+        if (api9orGreater) {
+            // TODO list the available cameras
+        } else {
+            // TODO print error message
+        }
+    }
+
+    private void takePicture(int pCallbackMethod) {
+        cleanUp();
+        PictureCallback pictureCallback;
+        
+        try {
+            camera = Camera.open();
+            SurfaceView view = new SurfaceView(_context);
+            camera.setPreviewDisplay(view.getHolder());
+            camera.startPreview();
+            
+            switch (pCallbackMethod) {
+            case XMPP_CALLBACK:
+                pictureCallback = new XMPPTransferCallback(repository, _context, _answerTo);
+                break;
+            case EMAIL_CALLBACK:
+            default:
+                pictureCallback = new EmailCallback(repository, _context, emailReceiving);
+                break;
+            }
+            
+            camera.takePicture(null, null, pictureCallback);
+        } catch (Exception e) {
+            send("error while getting picture: " + e);
+        }
     }
        
     
     @Override
     public synchronized void cleanUp() {
-        if (_camera != null) {
+        if (camera != null) {
             try {
-                _camera.release();
+                camera.release();
             } catch (Exception e) {
                 Log.e(Tools.LOG_TAG, "Failed to release Camera", e);
             }
-            _camera = null;
+            camera = null;
         }
     }
 

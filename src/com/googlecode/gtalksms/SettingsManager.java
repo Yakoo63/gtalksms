@@ -88,7 +88,8 @@ public class SettingsManager {
     public Locale locale;
     
     // app settings
-    public boolean backupAgentAvailable;
+    public boolean api8orGreater;
+    public boolean api9orGreater;
     public boolean debugLog;
     public boolean connectOnMainscreenShow;
     
@@ -139,7 +140,7 @@ public class SettingsManager {
     }
 
     public void OnPreferencesUpdated(String key) {
-    	if(backupAgentAvailable) {
+    	if(api8orGreater) {
     		BackupManager.dataChanged(_context.getPackageName());
     	}
     	for (String s : xmppConnectionSettings)
@@ -229,10 +230,12 @@ public class SettingsManager {
         
         try {
         	Class.forName("android.app.backup.BackupAgent");
-        	backupAgentAvailable = true;
+        	api8orGreater = true;
         } catch (Exception e) {
-        	backupAgentAvailable = false;
+        	api8orGreater = false;
         }
+        
+        api9orGreater = false;
                 
         notifyInMuc = _sharedPreferences.getBoolean("notifyInMuc", false); 
         smsReplySeparate = _sharedPreferences.getBoolean("smsReplySeparate", false);

@@ -34,7 +34,7 @@ public class XmppFileManager implements FileTransferListener {
     private XmppFileManager(Context context) {
         _settings = SettingsManager.getSettingsManager(context);
         ctx = context;
-        if (_settings.backupAgentAvailable) {  // API Level >= 8 check
+        if (_settings.api8orGreater) {  // API Level >= 8 check
             externalFilesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         } else {
             externalFilesDir = Environment.getExternalStorageDirectory();
