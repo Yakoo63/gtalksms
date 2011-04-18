@@ -59,7 +59,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
     private ServiceConnection _mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             _mainService = ((MainService.LocalBinder) service).getService();
-            MainScreen.this.updateStatus(_mainService.getConnectionStatus(), _mainService.getTLSStatus(), _mainService.getCompressionStatus());
+            updateStatus(_mainService.getConnectionStatus(), _mainService.getTLSStatus(), _mainService.getCompressionStatus());
             _mainService.updateBuddies();
         }
 

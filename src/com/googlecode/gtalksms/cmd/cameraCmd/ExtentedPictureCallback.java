@@ -14,7 +14,13 @@ public abstract class ExtentedPictureCallback implements PictureCallback {
     private File path;
     protected Context ctx;
     protected String recipient;
-
+    
+    /**
+     * 
+     * @param path the path were the picture will be saved in
+     * @param ctx
+     * @param recipient
+     */
     public ExtentedPictureCallback(File path, Context ctx, String recipient) {
         this.path = path;
         this.ctx = ctx;

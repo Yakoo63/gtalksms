@@ -161,7 +161,7 @@ public class SettingsManager {
         useDifferentAccount = _sharedPreferences.getBoolean("useDifferentAccount", false);
         if (useDifferentAccount) {
             login = _sharedPreferences.getString("login", "");
-        } else{
+        } else {
             login = notifiedAddress;
         }
         

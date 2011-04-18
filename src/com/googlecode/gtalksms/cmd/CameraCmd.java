@@ -111,6 +111,7 @@ public class CameraCmd extends CommandHandlerBase {
     public synchronized void cleanUp() {
         if (camera != null) {
             try {
+                camera.unlock();
                 camera.release();
             } catch (Exception e) {
                 Log.e(Tools.LOG_TAG, "Failed to release Camera", e);
