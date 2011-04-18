@@ -25,34 +25,34 @@ public class SentIntentReceiver extends SmsPendingIntentReceiver {
         Sms s = getSms(smsID);
 
         if (s != null) {  // we could find the sms in the smsMap
-            answerTo = s.answerTo;
-            s.sentIntents[partNum] = true;
+            answerTo = s.getAnswerTo();
+            s.setSentIntentTrue(partNum);
             boolean sentIntComplete = s.sentIntentsComplete();
             String to;
-            if (s.to != null) { // prefer a name over a number in the to field
-                to = s.to;
+            if (s.getTo() != null) { // prefer a name over a number in the to field
+                to = s.getTo();
             } else {
-                to = s.number;
+                to = s.getNumber();
             }
 
             if (res == Activity.RESULT_OK && sentIntComplete) {
-                send(context.getString(R.string.chat_sms_sent_to, s.shortendMessage, to));
-            } else if (s.resSentIntent == -1) {
+                send(context.getString(R.string.chat_sms_sent_to, s.getShortendMessage(), to));
+            } else if (s.getResSentIntent() == -1) {
                 switch (res) {
                 case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                    send(context.getString(R.string.chat_sms_failure_to, s.shortendMessage, to));
+                    send(context.getString(R.string.chat_sms_failure_to, s.getShortendMessage(), to));
                     break;
                 case SmsManager.RESULT_ERROR_NO_SERVICE:
-                    send(context.getString(R.string.chat_sms_no_service_to, s.shortendMessage, to));
+                    send(context.getString(R.string.chat_sms_no_service_to, s.getShortendMessage(), to));
                     break;
                 case SmsManager.RESULT_ERROR_NULL_PDU:
-                    send(context.getString(R.string.chat_sms_null_pdu_to, s.shortendMessage, to));
+                    send(context.getString(R.string.chat_sms_null_pdu_to, s.getShortendMessage(), to));
                     break;
                 case SmsManager.RESULT_ERROR_RADIO_OFF:
-                    send(context.getString(R.string.chat_sms_radio_off_to, s.shortendMessage, to));
+                    send(context.getString(R.string.chat_sms_radio_off_to, s.getShortendMessage(), to));
                     break;
                 }
-                s.resSentIntent = res;
+                s.setResSentIntent(res);
             }
             if (settings.notifySmsDelivered == false && sentIntComplete) {
                 removeSms(smsID);  

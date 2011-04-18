@@ -84,9 +84,9 @@ public class SmsMmsManager {
             for (boolean hasData = c.moveToFirst(); hasData && (getMax || nbSms < maxSms); hasData = c.moveToNext(), ++nbSms) {
                 Sms sms = new Sms(Tools.getString(c, "address"), Tools.getString(c, "body"),  Tools.getDateMilliSeconds(c, "date"));
                 if (sender == null) {
-                    sms.sender = ContactsManager.getContactName(_context, Tools.getLong(c, "person"));
+                    sms.setSender(ContactsManager.getContactName(_context, Tools.getLong(c, "person")));
                 } else {
-                    sms.sender = sender;
+                    sms.setSender(sender);
                 }
                 res.add(sms);
     
@@ -109,7 +109,7 @@ public class SmsMmsManager {
             Boolean phoneMatch = false;
 
             for (Phone phone : phones) {
-                if (phone.phoneMatch(aSms.number)) {
+                if (phone.phoneMatch(aSms.getNumber())) {
                     phoneMatch = true;
                     break;
                 }

@@ -15,6 +15,9 @@ public class DeliveredIntentReceiver extends SmsPendingIntentReceiver {
     public DeliveredIntentReceiver(MainService mainService, Map<Integer, Sms> smsMap) {
         super(mainService, smsMap);
     }
+    
+    // TODO this class needs some refactoring, more code could be shared in superclass
+    // e.g. implement an abstract method smsIntentReceived(null or sms)
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -24,23 +27,26 @@ public class DeliveredIntentReceiver extends SmsPendingIntentReceiver {
         Sms s = getSms(smsID);
 
         if (s != null) { // we could find the sms in the smsMap
-            this.answerTo = s.answerTo;
-            s.delIntents[partNum] = true;
+            this.answerTo = s.getAnswerTo();
+            s.setDelIntentTrue(partNum);
             boolean delIntComplete = s.delIntentsComplete();
             String to;
-            if (s.to != null) { // prefer a name over a number in the to field
-                to = s.to;
+            if (s.getTo() != null) { // prefer a name over a number in the to field
+                // TODO to contains a full jid (incl. resource), but this resource could became offline
+                // we should check here that the resource is still connected and provide an adequate fallback
+                // implement this check in SmsPendingIntentReceiver
+                to = s.getTo();
             } else {
-                to = s.number;
+                to = s.getNumber();
             }
 
             if (res == Activity.RESULT_OK && delIntComplete) {
-                send(context.getString(R.string.chat_sms_delivered_to, s.shortendMessage, to));
-            } else if (s.resSentIntent == -1) {
+                send(context.getString(R.string.chat_sms_delivered_to, s.getShortendMessage(), to));
+            } else if (s.getResSentIntent() == -1) {
                 if(res == Activity.RESULT_CANCELED) {
-                    send(context.getString(R.string.chat_sms_not_delivered_to, s.shortendMessage, to));
+                    send(context.getString(R.string.chat_sms_not_delivered_to, s.getShortendMessage(), to));
                 }
-                s.resSentIntent = res;
+                s.setResSentIntent(res);
             }
             if (delIntComplete) {
                 removeSms(smsID);

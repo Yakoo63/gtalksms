@@ -4,17 +4,17 @@ import java.util.Date;
 
 
 public class Sms implements Comparable<Sms> {
-    public String message;          
-    public String shortendMessage;
-    public String number;
-    public String sender;
-    public String to;
-    public String answerTo;
-    public Date date;
-    public int resSentIntent;
-    public int resDelIntent;
-    public boolean[] sentIntents;
-    public boolean[] delIntents;
+    private String message;          
+    private String shortendMessage;
+    private String number;
+    private String sender;
+    private String to;
+    private String answerTo;
+    private Date date;
+    private int resSentIntent;
+    private int resDelIntent;
+    private boolean[] sentIntents;
+    private boolean[] delIntents;
     
     /**
      * 
@@ -23,12 +23,13 @@ public class Sms implements Comparable<Sms> {
      * @param date
      */
     public Sms(String phoneNumber, String message, Date date) {
-    	this.number = phoneNumber;
-    	this.message = message;
+    	this.setNumber(phoneNumber);
+    	this.setMessage(message);
     	this.date = date;
     }
     
     /**
+     * this constructor gets called when sending an sms to put the sms in the sms map
      * 
      * @param phoneNumber
      * @param toName
@@ -37,15 +38,15 @@ public class Sms implements Comparable<Sms> {
      * @param answerTo - which jid should be informed about the status (sent/delivered) of the sms
      */
     public Sms(String phoneNumber, String toName, String shortendMessage, int numParts, String answerTo) {
-        this.resSentIntent = -1;
-        this.resDelIntent = -1;
+        this.setResSentIntent(-1);
+        this.setResDelIntent(-1);
         
-        sentIntents = new boolean[numParts];
-        delIntents = new boolean[numParts];
-        this.number = phoneNumber;
-        this.to = toName;
-        this.shortendMessage = shortendMessage;
-        this.answerTo = answerTo;
+        this.sentIntents = new boolean[numParts];
+        this.delIntents = new boolean[numParts];
+        this.setNumber(phoneNumber);
+        this.setTo(toName);
+        this.setShortendMessage(shortendMessage);
+        this.setAnswerTo(answerTo);
     }
     
     public boolean sentIntentsComplete() {
@@ -65,5 +66,81 @@ public class Sms implements Comparable<Sms> {
     @Override
     public int compareTo(Sms another) {
         return date.compareTo(another.date);
+    }
+    
+    public void setDelIntentTrue(int partNumber) {
+        delIntents[partNumber] = true;
+    }
+    
+    public void setSentIntentTrue(int partNumber) {
+        sentIntents[partNumber] = true;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setShortendMessage(String shortendMessage) {
+        this.shortendMessage = shortendMessage;
+    }
+
+    public String getShortendMessage() {
+        return shortendMessage;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public void setAnswerTo(String answerTo) {
+        this.answerTo = answerTo;
+    }
+
+    public String getAnswerTo() {
+        return answerTo;
+    }
+
+    public void setResSentIntent(int resSentIntent) {
+        this.resSentIntent = resSentIntent;
+    }
+
+    public int getResSentIntent() {
+        return resSentIntent;
+    }
+
+    public void setResDelIntent(int resDelIntent) {
+        this.resDelIntent = resDelIntent;
+    }
+
+    public int getResDelIntent() {
+        return resDelIntent;
+    }
+    
+    public Date getDate() {
+        return date;
     }
 }

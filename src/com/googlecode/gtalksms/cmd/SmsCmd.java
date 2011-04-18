@@ -379,8 +379,8 @@ public class SmsCmd extends CommandHandlerBase {
      * @param sms
      */
     private static void appendSMS(XmppMsg msg, Sms sms) {
-        msg.appendItalicLine(sms.date.toLocaleString() + " - " + sms.sender);
-        msg.appendLine(sms.message);
+        msg.appendItalicLine(sms.getDate().toLocaleString() + " - " + sms.getSender());
+        msg.appendLine(sms.getMessage());
     }
 
     /**
