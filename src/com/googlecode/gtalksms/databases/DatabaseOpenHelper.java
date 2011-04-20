@@ -61,6 +61,5 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     	if (oldVersion < 3) {
     		db.execSQL(MUC_TABLE_CREATE);
     	}
-    }
-
+    }    
 }

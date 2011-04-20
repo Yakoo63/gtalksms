@@ -471,7 +471,7 @@ public class MainService extends Service {
             try {
                 _commands.get(cmd).execute(cmd, args, answerTo);
             } catch (Exception e) {
-                String error = cmd + " (" + args + ") " + e.getLocalizedMessage();
+                String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
                 Log.e(Tools.LOG_TAG, "executeCommand: " + error, e); 
                 GoogleAnalyticsHelper.trackAndLogError("executeCommnad: exception ", e);
                 send(getString(R.string.chat_error, error), answerTo);

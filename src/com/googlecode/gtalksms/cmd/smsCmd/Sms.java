@@ -17,6 +17,7 @@ public class Sms implements Comparable<Sms> {
     private boolean[] delIntents;
     
     /**
+     * This constructor is called when querying sms
      * 
      * @param phoneNumber
      * @param message
@@ -29,7 +30,7 @@ public class Sms implements Comparable<Sms> {
     }
     
     /**
-     * this constructor gets called when sending an sms to put the sms in the sms map
+     * This constructor gets called when sending an sms to put the sms in the sms map
      * 
      * @param phoneNumber
      * @param toName
