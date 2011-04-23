@@ -14,6 +14,9 @@ import android.content.Context;
 public class KeyValueHelper {
 	public static final String KEY_LAST_RECIPIENT = "lastRecipient";
 	public static final String KEY_SEND_DIR = "sendDir";
+	public static final String KEY_SMS_ID = "smsID";
+	public static final String KEY_SINTENT = "sIntent";
+	public static final String KEY_DINTENT = "dIntent";
 	
     private static KeyValueHelper keyValueHelper = null;
     
@@ -63,6 +66,17 @@ public class KeyValueHelper {
 		} else {
 			return null;
 		}
+	}
+	
+	public Integer getIntegerValue(String key) {
+	    String value = getValue(key);
+	    Integer res;
+	    try {
+	    res = Integer.parseInt(value);
+	    } catch (Exception e) {
+	        res = null;
+	    }
+	    return res;
 	}
     
     public String[][] getAllKeyValue() {

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.databases.SMSHelper;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 import android.app.Activity;
@@ -13,8 +14,8 @@ import android.telephony.SmsManager;
 
 public class SentIntentReceiver extends SmsPendingIntentReceiver {
 
-    public SentIntentReceiver(MainService mainService, Map<Integer, Sms> smsMap) {
-        super(mainService, smsMap);
+    public SentIntentReceiver(MainService mainService, Map<Integer, Sms> smsMap, SMSHelper smsHelper) {
+        super(mainService, smsMap, smsHelper);
     }
 
     @Override
@@ -27,10 +28,11 @@ public class SentIntentReceiver extends SmsPendingIntentReceiver {
         if (s != null) {  // we could find the sms in the smsMap
             answerTo = s.getAnswerTo();
             s.setSentIntentTrue(partNum);
+            smsHelper.setSentIntentTrue(smsID, partNum);
             boolean sentIntComplete = s.sentIntentsComplete();
             String to;
             if (s.getTo() != null) { // prefer a name over a number in the to field
-                to = s.getTo();
+                to = checkResource(s.getTo());
             } else {
                 to = s.getNumber();
             }
