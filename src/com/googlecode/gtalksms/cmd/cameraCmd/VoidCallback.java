@@ -5,19 +5,19 @@ import java.io.File;
 import android.content.Context;
 
 import com.googlecode.gtalksms.cmd.CommandHandlerBase;
+import com.googlecode.gtalksms.tools.Tools;
 
 public class VoidCallback extends ExtentedPictureCallback {
 
     CommandHandlerBase _command;
     
-    public VoidCallback(CommandHandlerBase cmd, File path, Context ctx, String recipient) {
+    public VoidCallback(File path, Context ctx, String recipient) {
         super(path, ctx, recipient);
-        _command = cmd;
     }
 
     @Override
     protected boolean onPictureSaved(File picture) {
-        _command.send("Photo saved in " + picture.getAbsolutePath());
+        Tools.send("Photo saved as " + picture.getAbsolutePath(), recipient, ctx);
         return true;
     }
 }

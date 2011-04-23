@@ -38,5 +38,6 @@ public abstract class ExtentedPictureCallback implements PictureCallback {
         camera.release();
     }
     
-    protected abstract boolean onPictureSaved(File picture);    
+    protected abstract boolean onPictureSaved(File picture);
+       
 }

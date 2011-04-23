@@ -45,23 +45,23 @@ public abstract class CommandHandlerBase {
      * @param id
      * @param args
      */
-    public void send(int id, Object... args) {
+    protected void send(int id, Object... args) {
         send(getString(id, args));
     }    
     
-    public void send(String message) {
+    protected void send(String message) {
         send(message, _answerTo);
     }
     
-    public void send(XmppMsg message) {
+    protected void send(XmppMsg message) {
         send(message, _answerTo);
     }
     
-    public void send(String message, String to) {
+    protected void send(String message, String to) {
         _mainService.send(message, to);
     }
 
-    public void send(XmppMsg message, String to) {
+    protected void send(XmppMsg message, String to) {
         _mainService.send(message, to);
     }
     

@@ -6,11 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.googlecode.gtalksms.cmd.CommandHandlerBase;
-
 public class EmailCallback extends ExtentedPictureCallback {
 
-    public EmailCallback(CommandHandlerBase cmd, File path, Context ctx, String recipient) {
+    public EmailCallback(File path, Context ctx, String recipient) {
         super(path, ctx, recipient);
     }
 

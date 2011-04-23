@@ -6,11 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.cmd.CommandHandlerBase;
 
 public class XMPPTransferCallback extends ExtentedPictureCallback {
 
-    public XMPPTransferCallback(CommandHandlerBase cmd, File path, Context ctx, String recipient) {
+    public XMPPTransferCallback(File path, Context ctx, String recipient) {
         super(path, ctx, recipient);
     }
 

@@ -96,14 +96,14 @@ public class CameraCmd extends CommandHandlerBase {
             
             switch (pCallbackMethod) {
             case XMPP_CALLBACK:
-                pictureCallback = new XMPPTransferCallback(this, repository, _context, _answerTo);
+                pictureCallback = new XMPPTransferCallback(repository, _context, _answerTo);
                 break;
             case EMAIL_CALLBACK:
-                pictureCallback = new EmailCallback(this, repository, _context, emailReceiving);
+                pictureCallback = new EmailCallback(repository, _context, emailReceiving);
                 break;
             case VOID_CALLBACK:
             default:
-                pictureCallback = new VoidCallback(this, repository, _context, emailReceiving);
+                pictureCallback = new VoidCallback(repository, _context, emailReceiving);
             }
             
             camera.takePicture(null, null, pictureCallback);
