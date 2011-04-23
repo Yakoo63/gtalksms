@@ -11,11 +11,13 @@ import android.view.SurfaceView;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.cmd.cameraCmd.EmailCallback;
+import com.googlecode.gtalksms.cmd.cameraCmd.VoidCallback;
 import com.googlecode.gtalksms.cmd.cameraCmd.XMPPTransferCallback;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class CameraCmd extends CommandHandlerBase {
     
+    private static final int VOID_CALLBACK = 0;
     private static final int XMPP_CALLBACK = 1;
     private static final int EMAIL_CALLBACK = 2;
     
@@ -50,7 +52,9 @@ public class CameraCmd extends CommandHandlerBase {
     protected void execute(String cmd, String args) {
         String[] splitedArgs = splitArgs(args);
         if (cmd.equals("camera") || cmd.equals("photo")) {
-            if (splitedArgs[0].equals("") || splitedArgs[0].equals("email")) {
+            if (args.equals("") || splitedArgs[0].equals("")) {
+                takePicture(VOID_CALLBACK);
+            } else if (splitedArgs[0].equals("email")) {
                 takePicture(EMAIL_CALLBACK);
             } else if (splitedArgs[0].equals("xmpp")) {
                 takePicture(XMPP_CALLBACK);
@@ -92,12 +96,14 @@ public class CameraCmd extends CommandHandlerBase {
             
             switch (pCallbackMethod) {
             case XMPP_CALLBACK:
-                pictureCallback = new XMPPTransferCallback(repository, _context, _answerTo);
+                pictureCallback = new XMPPTransferCallback(this, repository, _context, _answerTo);
                 break;
             case EMAIL_CALLBACK:
-            default:
-                pictureCallback = new EmailCallback(repository, _context, emailReceiving);
+                pictureCallback = new EmailCallback(this, repository, _context, emailReceiving);
                 break;
+            case VOID_CALLBACK:
+            default:
+                pictureCallback = new VoidCallback(this, repository, _context, emailReceiving);
             }
             
             camera.takePicture(null, null, pictureCallback);
