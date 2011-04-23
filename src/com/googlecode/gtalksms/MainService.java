@@ -75,6 +75,10 @@ public class MainService extends Service {
     // 
     public static final String SERVICE_THREAD_NAME = Tools.APP_NAME + ".Service";
     
+    public static final int STATUS_ICON_GREEN = 0;
+    public static final int STATUS_ICON_ORANGE = 1;
+    public static final int STATUS_ICON_RED = 2;
+
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
     // about some events
@@ -481,6 +485,27 @@ public class MainService extends Service {
         }
     }
     
+    private int getImageStatus(int color) {
+        int index = 2;
+        int res = 0;
+        try {
+            switch(color) {
+                case STATUS_ICON_GREEN:
+                    res = R.drawable.class.getField("status_green_" + index).getInt(null);
+                    break;
+                case STATUS_ICON_ORANGE:
+                    res = R.drawable.class.getField("status_orange_" + index).getInt(null);
+                    break;
+                case STATUS_ICON_RED:
+                    res = R.drawable.class.getField("status_red_" + index).getInt(null);
+                    break;
+            }
+        } catch (Exception e) {
+        }
+        
+        return res;
+    }
+    
     /** Updates the status about the service state (and the status bar) */
     private void onConnectionStatusChanged(int oldStatus, int status) {
         if (_settingsMgr.showStatusIcon) {
@@ -489,25 +514,25 @@ public class MainService extends Service {
             switch (status) {
             case XmppManager.CONNECTED:
                 msg = getString(R.string.main_service_connected);
-                notification = new Notification(R.drawable.status_green, msg, System.currentTimeMillis());
+                notification = new Notification(getImageStatus(STATUS_ICON_GREEN), msg, System.currentTimeMillis());
                 break;
             case XmppManager.CONNECTING:
                 msg = getString(R.string.main_service_connecting);
-                notification = new Notification(R.drawable.status_orange, msg, System.currentTimeMillis());
+                notification = new Notification(getImageStatus(STATUS_ICON_ORANGE), msg, System.currentTimeMillis());
                 break;
             case XmppManager.DISCONNECTED:
                 msg = getString(R.string.main_service_disconnected);
-                notification = new Notification(R.drawable.status_red, msg, System.currentTimeMillis());
+                notification = new Notification(getImageStatus(STATUS_ICON_RED), msg, System.currentTimeMillis());
                 break;
             case XmppManager.DISCONNECTING:
                 msg = getString(R.string.main_service_disconnecting);
-                notification = new Notification(R.drawable.status_orange, msg, System.currentTimeMillis());
+                notification = new Notification(getImageStatus(STATUS_ICON_ORANGE), msg, System.currentTimeMillis());
                 break;
             case XmppManager.WAITING_TO_CONNECT:
             case XmppManager.WAITING_FOR_NETWORK:
                 String msgNotif = getString(R.string.main_service_waiting);
                 msg = getString(R.string.main_service_waiting_to_connect);
-                notification = new Notification(R.drawable.status_orange, msgNotif, System.currentTimeMillis());
+                notification = new Notification(getImageStatus(STATUS_ICON_ORANGE), msgNotif, System.currentTimeMillis());
                 break;
             default:
             	throw new IllegalStateException("onConnectionSTatusChanged: Unkown status int");
