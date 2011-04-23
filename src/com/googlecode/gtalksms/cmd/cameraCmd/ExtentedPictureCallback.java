@@ -1,14 +1,14 @@
 package com.googlecode.gtalksms.cmd.cameraCmd;
 
 import java.io.File;
-import java.util.Date;
-
-import com.googlecode.gtalksms.tools.Tools;
+import java.util.GregorianCalendar;
 
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.util.Log;
+
+import com.googlecode.gtalksms.tools.Tools;
 
 public abstract class ExtentedPictureCallback implements PictureCallback {
     private File path;
@@ -28,7 +28,7 @@ public abstract class ExtentedPictureCallback implements PictureCallback {
     }
     
     public void onPictureTaken(byte[] data, Camera camera) {
-        File filename = new File(path, "photo-" + new Date().getDate() + ".jpg");
+        File filename = new File(path, Tools.getFileFormat(GregorianCalendar.getInstance()) + ".jpg");
 
         if (Tools.writeFile(data, filename)) {
             onPictureSaved(filename);

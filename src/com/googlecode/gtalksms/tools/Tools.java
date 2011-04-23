@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +27,23 @@ public class Tools {
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
     public final static int shortenTo = 35;
-        
+    
+    public final static String getFileFormat(Calendar c) {
+        return 
+            c.get(Calendar.YEAR) + 
+            "-" + 
+            String.format("%02d", (c.get(Calendar.MONTH)+ 1)) + 
+            "-" + 
+            String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + 
+            " " + 
+            String.format("%02d", c.get(Calendar.HOUR_OF_DAY)) + 
+            "h" + 
+            String.format("%02d", c.get(Calendar.MINUTE)) + 
+            "m" + 
+            String.format("%02d", c.get(Calendar.SECOND)) + 
+            "s";
+    }
+    
     public final static String getVersionName(Context context) {
 
         try {
