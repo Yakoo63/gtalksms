@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseOpenHelper extends SQLiteOpenHelper {
     
     /* general database version gtalksms uses */
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     
     /* information for the alias database */
     public static final String ALIAS_TABLE_NAME = "alias";
@@ -36,12 +36,26 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
             "number TEXT NOT NULL, " +
             "PRIMARY KEY(muc)" +
          ")";
-
-//    public AliasOpenHelper(Context context, String name, CursorFactory factory, int version) {
-//        super(context, name, factory, version);
-//    }
+    
+    public static final String SMS_TABLE_NAME = "sms";
+    public static final String SMS_TABLE_CREATE =
+        "Create TABLE " + SMS_TABLE_NAME + " (" +
+            "smsID INTEGER NOT NULL, " +
+            "phoneNumber TEXT NOT NULL, " +
+            "name TEXT NOT NULL, " +
+            "shortendMessage TEXT NOT NULL, " +
+            "answerTo TEXT NOT NULL, " +
+            "dIntents TEXT NOT NULL, " +
+            "sIntents TEXT NOT NULL, " +
+            "numParts INTEGER NOT NULL, " +
+            "resSIntent INTEGER NOT NULL, " +
+            "resDIntent INTEGER NOT NULL, " +
+            "date INTEGER NOT NULL, " +
+            "PRIMARY KEY(smsID)" +
+        ")";
     
     DatabaseOpenHelper(Context context) {
+        // I made a small mistake here, the database is now called "alias"
         super(context, ALIAS_TABLE_NAME, null, DATABASE_VERSION);
     }
 
@@ -60,6 +74,9 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     	}
     	if (oldVersion < 3) {
     		db.execSQL(MUC_TABLE_CREATE);
+    	}
+    	if (oldVersion < 4) {
+    	    db.execSQL(SMS_TABLE_CREATE);
     	}
     }    
 }

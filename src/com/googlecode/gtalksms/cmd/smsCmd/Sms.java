@@ -15,6 +15,7 @@ public class Sms implements Comparable<Sms> {
     private int resDelIntent;
     private boolean[] sentIntents;
     private boolean[] delIntents;
+    private Integer id;
     
     /**
      * This constructor is called when querying sms
@@ -38,7 +39,8 @@ public class Sms implements Comparable<Sms> {
      * @param numParts
      * @param answerTo - which jid should be informed about the status (sent/delivered) of the sms
      */
-    public Sms(String phoneNumber, String toName, String shortendMessage, int numParts, String answerTo) {
+    public Sms(String phoneNumber, String toName, String shortendMessage, int numParts, String answerTo, Integer id) {
+        this.id = id;
         this.setResSentIntent(-1);
         this.setResDelIntent(-1);
         
@@ -48,8 +50,35 @@ public class Sms implements Comparable<Sms> {
         this.setTo(toName);
         this.setShortendMessage(shortendMessage);
         this.setAnswerTo(answerTo);
+        this.date = new Date();
     }
     
+    public Sms(int smsID, String phoneNumber, String name, String shortendMessage, String answerTo, String dIntents, String sIntents, int resSIntent, int resDIntent, long date) {
+        this.id = new Integer(smsID);
+        this.number = phoneNumber;
+        this.to = name;
+        this.shortendMessage = shortendMessage;
+        this.answerTo = answerTo;
+        this.delIntents = toBoolArray(dIntents);
+        this.sentIntents = toBoolArray(sIntents);
+        this.resDelIntent = resDIntent;
+        this.resSentIntent = resSIntent;
+        this.date = new Date(date);
+    }
+
+    private boolean[] toBoolArray(String string) {
+        boolean[] res = new boolean[string.length()];
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if (c == 'X') {
+                res[i] = true;
+            } else {
+                res[i] = false;
+            }
+        }
+        return res;
+    }
+
     public boolean sentIntentsComplete() {
     	for (int i = 0; i < sentIntents.length; i++) {
     		if (sentIntents[i] == false) return false;
@@ -142,6 +171,42 @@ public class Sms implements Comparable<Sms> {
     }
     
     public Date getDate() {
+        return date;
+    }
+    
+    public int getNumParts() {
+        return sentIntents.length;
+    }
+    
+    public int getID() {
+        return id;
+    }
+    
+    public String getDelIntents() {
+        StringBuilder res = new StringBuilder(delIntents.length);
+        for (boolean b : delIntents) {
+            if (b == true) {
+                res.append('X');
+            } else {
+                res.append('O');
+            }
+        }
+        return new String(res);
+    }
+    
+    public String getSentIntents() {
+        StringBuilder res = new StringBuilder(sentIntents.length);
+        for (boolean b : sentIntents) {
+            if (b == true) {
+                res.append('X');
+            } else {
+                res.append('O');
+            }
+        }
+        return new String(res);
+    }
+    
+    public Date getCreatedDate() {
         return date;
     }
 }

@@ -26,6 +26,7 @@ import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.databases.AliasHelper;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
+import com.googlecode.gtalksms.databases.SMSHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
@@ -44,28 +45,31 @@ public class SmsCmd extends CommandHandlerBase {
     // synchronizedMap because the worker thread and the intent receivers work with this map
     // TODO move smsMap to a Database Backend, as currently if there is a xmpp reconnect in the time between a
     // send sms and a sent/delivery notification the smsMap will be newly created, because we re-created the SmsCmd object
-    private static Map<Integer, Sms> _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>()); 
+    private static Map<Integer, Sms> _smsMap; 
     
     private AliasHelper _aliasHelper;
     private KeyValueHelper _keyValueHelper;
+    private SMSHelper _smsHelper;
           
     public SmsCmd(MainService mainService) {
         super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"}, CommandHandlerBase.TYPE_MESSAGE);
         _smsMgr = new SmsMmsManager(_settingsMgr, _context);
+        _smsHelper = SMSHelper.getSMSHelper(_context);
+        _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
+        _keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());     
+        
+        restoreSmsInformation();
 
         if (_settingsMgr.notifySmsSent) {
-            _sentSmsReceiver = new SentIntentReceiver(_mainService, _smsMap);
+            _sentSmsReceiver = new SentIntentReceiver(_mainService, _smsMap, _smsHelper);
             _mainService.registerReceiver(_sentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
         }
 
         if (_settingsMgr.notifySmsDelivered) {
-            _deliveredSmsReceiver = new DeliveredIntentReceiver(_mainService, _smsMap);
+            _deliveredSmsReceiver = new DeliveredIntentReceiver(_mainService, _smsMap, _smsHelper);
             _mainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
         }
-        _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
-        _keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());     
         restoreLastRecipient();
-        restoreSmsInformation();
     }
 
     @Override
@@ -555,9 +559,10 @@ public class SmsCmd extends CommandHandlerBase {
 
         if(_settingsMgr.notifySmsSentDelivered) {
             String shortendMessage = Tools.shortenMessage(message);
-            int smsID = getSmsID();
-            Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size(), _answerTo);
-            _smsMap.put(new Integer(smsID), s);
+            Integer smsID = getSmsID();
+            Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size(), _answerTo, smsID);          
+            _smsMap.put(smsID, s);
+            _smsHelper.addSMS(s);
             if(_settingsMgr.notifySmsSent) {
                 SentPenIntents = createSPendingIntents(messages.size(), smsID);
             }
@@ -588,11 +593,11 @@ public class SmsCmd extends CommandHandlerBase {
         int startSIntentNumber = getSIntentStart(size);
         for (int i = 0; i < size; i++) {
             int p = startSIntentNumber++;
-                Intent sentIntent = new Intent(MainService.ACTION_SMS_SENT);
-                sentIntent.putExtra("partNum", i);
-                sentIntent.putExtra("smsID", smsID);
-                PendingIntent sentPenIntent = PendingIntent.getBroadcast(_context, p, sentIntent, PendingIntent.FLAG_ONE_SHOT);
-                SentPenIntents.add(sentPenIntent);
+            Intent sentIntent = new Intent(MainService.ACTION_SMS_SENT);
+            sentIntent.putExtra("partNum", i);
+            sentIntent.putExtra("smsID", smsID);
+            PendingIntent sentPenIntent = PendingIntent.getBroadcast(_context, p, sentIntent, PendingIntent.FLAG_ONE_SHOT);
+            SentPenIntents.add(sentPenIntent);
         }
         return SentPenIntents;
     }
@@ -631,14 +636,20 @@ public class SmsCmd extends CommandHandlerBase {
                 _keyValueHelper.addKey(KeyValueHelper.KEY_DINTENT, "0");
                 smsID = 0;
             }
+            _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
+            _smsHelper.deleteOldSMS();
+            Sms[] toAdd = _smsHelper.getFullDatabase();
+            for (Sms s : toAdd) {
+                _smsMap.put(s.getID(), s);
+            }
         }
     }
     
-    private int getSmsID() {
+    private Integer getSmsID() {
         int res = smsID;
         smsID++;
         _keyValueHelper.addKey(KeyValueHelper.KEY_SMS_ID, smsID.toString());        
-        return res;
+        return new Integer(res);
     }
     
     private int getSIntentStart(int size) {

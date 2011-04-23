@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.databases.SMSHelper;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 import android.app.Activity;
@@ -12,8 +13,8 @@ import android.content.Intent;
 
 public class DeliveredIntentReceiver extends SmsPendingIntentReceiver {
 
-    public DeliveredIntentReceiver(MainService mainService, Map<Integer, Sms> smsMap) {
-        super(mainService, smsMap);
+    public DeliveredIntentReceiver(MainService mainService, Map<Integer, Sms> smsMap, SMSHelper smsHelper) {
+        super(mainService, smsMap, smsHelper);
     }
     
     // TODO this class needs some refactoring, more code could be shared in superclass
@@ -29,13 +30,11 @@ public class DeliveredIntentReceiver extends SmsPendingIntentReceiver {
         if (s != null) { // we could find the sms in the smsMap
             this.answerTo = s.getAnswerTo();
             s.setDelIntentTrue(partNum);
+            smsHelper.setDelIntentTrue(smsID, partNum);
             boolean delIntComplete = s.delIntentsComplete();
             String to;
             if (s.getTo() != null) { // prefer a name over a number in the to field
-                // TODO to contains a full jid (incl. resource), but this resource could became offline
-                // we should check here that the resource is still connected and provide an adequate fallback
-                // implement this check in SmsPendingIntentReceiver
-                to = s.getTo();
+                to = checkResource(s.getTo());
             } else {
                 to = s.getNumber();
             }
