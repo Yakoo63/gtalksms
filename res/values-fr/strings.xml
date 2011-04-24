@@ -16,6 +16,8 @@
     <string name="pref_app_stop_on_power_disconnected_help">Arrête GTalkSMS au débranchement du chargeur</string>
     <string name="pref_app_show_status_icon">Icône de notification de l\'état de connexion</string>
     <string name="pref_app_show_status_icon_help">Cocher pour afficher GTalkSMS dans la barre de notifications</string>
+    <string name="pref_app_select_status_icon">Icônes de la barre de notifications</string>
+    <string name="pref_app_select_status_icon_help">Choisir les icônes à afficher dans la barre de notifications</string>
     <string name="pref_app_format_responses">Formater les résultats</string>
     <string name="pref_app_format_responses_help">Cocher pour formater les résultats (Gras/Italique…), ne fonctionne pas avec tous les clients XMPP</string>
     <string name="pref_app_sms_number">Nombre de SMS</string>

@@ -38,9 +38,9 @@
             android:summary="@string/pref_app_show_status_icon_help"/>
         <com.googlecode.gtalksms.tools.CustomListPreference
             android:key="displayIconIndex"
-            android:title="Status Bar Icons"
-            android:dialogTitle="Choose icons"
-            android:summary="Icons that will appears in notification bar"
+            android:title="@string/pref_app_select_status_icon"
+            android:dialogTitle="@string/pref_app_select_status_icon"
+            android:summary="@string/pref_app_select_status_icon_help"
             android:entries="@array/icons_prefix"/>
             
         <PreferenceScreen android:title="@string/pref_app_geo_link_app">
