@@ -486,7 +486,7 @@ public class MainService extends Service {
     }
     
     private int getImageStatus(int color) {
-        int index = 2;
+        String index = _settingsMgr.displayIconIndex;
         int res = 0;
         try {
             switch(color) {

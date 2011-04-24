@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="list_bat_notif_interval">
-		<item>1</item>
-		<item>5</item>
-		<item>10</item>
-		<item>20</item>
-	</string-array>
-	<string-array name="list_locale_entries">
+	<string-array name="icons_prefix">
+        <item>status_green_</item>
+        <item>status_orange_</item>
+        <item>status_red_</item>
+    </string-array>
+    <string-array name="list_bat_notif_interval">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="list_locale_entries">
 		<item>System Default</item>
 		<item>French</item>
 		<item>German</item>

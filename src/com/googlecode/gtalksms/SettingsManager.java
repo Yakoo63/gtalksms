@@ -92,6 +92,7 @@ public class SettingsManager {
     public boolean api9orGreater;
     public boolean debugLog;
     public boolean connectOnMainscreenShow;
+    public String displayIconIndex;
     
     private static SettingsManager settingsManager = null;
     
@@ -202,7 +203,8 @@ public class SettingsManager {
         callLogsNumber = _sharedPreferences.getInt("callLogsNumber", 10);
         formatResponses = _sharedPreferences.getBoolean("formatResponses", false);
         notifyIncomingCalls = _sharedPreferences.getBoolean("notifyIncomingCalls", false);
-
+        displayIconIndex = _sharedPreferences.getString("displayIconIndex", "0");
+        
         String localeStr = _sharedPreferences.getString("locale", "default");
         if (localeStr.equals("default")) {
             locale = Locale.getDefault();
