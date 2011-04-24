@@ -2,8 +2,10 @@ package com.googlecode.gtalksms.cmd;
 
 import java.io.File;
 
+import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.media.AudioManager;
 import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -20,15 +22,19 @@ public class CameraCmd extends CommandHandlerBase {
     private static final int VOID_CALLBACK = 0;
     private static final int XMPP_CALLBACK = 1;
     private static final int EMAIL_CALLBACK = 2;
-    
+
+    private static AudioManager audioManager;
     private static Camera camera = null;
     private static File repository;
     private static String emailReceiving;
     private static boolean api9orGreater;
+    private static int streamVolume;
     
     public CameraCmd(MainService mainService) {
         super(mainService, new String[] {"camera", "photo"}, CommandHandlerBase.TYPE_SYSTEM);
         File path;
+        
+        audioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         
         SettingsManager settings = SettingsManager.getSettingsManager(_context);
         if (settings.api8orGreater) {  // API Level >= 8 check
@@ -106,7 +112,18 @@ public class CameraCmd extends CommandHandlerBase {
                 pictureCallback = new VoidCallback(repository, _context, emailReceiving);
             }
             
-            camera.takePicture(null, null, pictureCallback);
+            streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM); 
+            audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, 0, 0); 
+            
+            Camera.ShutterCallback cb = new Camera.ShutterCallback() {
+                
+                @Override
+                public void onShutter() {
+                    audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, streamVolume, 0); 
+                }
+            };
+
+            camera.takePicture(cb, null, pictureCallback);
         } catch (Exception e) {
             send("error while getting picture: " + e);
         }
