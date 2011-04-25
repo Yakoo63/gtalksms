@@ -1,13 +1,13 @@
 Upcoming
 * File transfer
 * Take photo and receive them via XMPP 
-* Status bar icons picker
 
 2.2
 * Rejoin MUC rooms on XMPP reconnect or service restart
 * Handle offline messages on servers that support XEP-13
 * Bug fixes
 * New status bar icons (You can propose new icons on site)
+* Status bar icons picker
 
 2.1
 * Alias command added
