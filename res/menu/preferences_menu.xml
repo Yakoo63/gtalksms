@@ -5,7 +5,7 @@
           android:icon="@drawable/ic_menu_preferences"
           android:title="@string/pref_con" />
     <item android:id="@+id/application_settings"
-          android:icon="@drawable/icon_green"
+          android:icon="@drawable/ic_menu_icon_blue"
           android:title="@string/pref_app" />
     <item android:id="@+id/notification_settings"
           android:icon="@drawable/ic_menu_info_details"
