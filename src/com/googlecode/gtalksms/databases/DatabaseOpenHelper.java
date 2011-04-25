@@ -64,6 +64,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
         db.execSQL(ALIAS_TABLE_CREATE);
         db.execSQL(KV_TABLE_CREATE);
         db.execSQL(MUC_TABLE_CREATE);
+        db.execSQL(SMS_TABLE_CREATE);
     }
 
     @Override
