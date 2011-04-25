@@ -68,6 +68,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    // NOTICE: when adding a new table, don't forget to add the create command also into the onCreate() method    
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     	// add table that came with version 2 of our database
     	if (oldVersion < 2) {
