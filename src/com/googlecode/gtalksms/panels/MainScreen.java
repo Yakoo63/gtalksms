@@ -204,9 +204,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
 
     private void createView() {
     	if (_settingsMgr.connectOnMainscreenShow) {
-    		Intent intent = new Intent(MainService.ACTION_CONNECT);
-    		intent.setClass(this, MainService.class);
-    		startService(intent);
+    	    Tools.startSvcIntent(this, MainService.ACTION_CONNECT);
     	}
     	
         Tools.setLocale(_settingsMgr, this);
