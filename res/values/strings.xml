@@ -16,6 +16,8 @@
     <string name="pref_app_stop_on_power_disconnected_help">Automatically stops GTalkSMS when a charger is disconnected</string>
     <string name="pref_app_show_status_icon">Status notification icon</string>
     <string name="pref_app_show_status_icon_help">Check if you want to see GTalkSMS status icon in notification bar</string>
+    <string name="pref_app_select_status_icon">Status Bar Icons</string>
+    <string name="pref_app_select_status_icon_help">Select icons that will appear in notification bar</string>
     <string name="pref_app_format_responses">Format chat responses</string>
     <string name="pref_app_format_responses_help">Check if you want to format responses with bold and italic, doesn\'t work with all XMPP clients</string>
     <string name="pref_app_sms_number">Number of SMS</string>

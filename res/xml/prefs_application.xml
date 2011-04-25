@@ -36,14 +36,20 @@
             android:key="showStatusIcon"
             android:title="@string/pref_app_show_status_icon"
             android:summary="@string/pref_app_show_status_icon_help"/>
-        
+        <com.googlecode.gtalksms.tools.CustomListPreference
+            android:key="displayIconIndex"
+            android:title="@string/pref_app_select_status_icon"
+            android:dialogTitle="@string/pref_app_select_status_icon"
+            android:summary="@string/pref_app_select_status_icon_help"
+            android:entries="@array/icons_prefix"/>
+            
         <PreferenceScreen android:title="@string/pref_app_geo_link_app">
-              <CheckBoxPreference
+            <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="useGoogleMapUrl"
                 android:title="@string/pref_app_geo_link_app_gmap"
                 android:summary="@string/pref_app_geo_link_app_gmap_help"/>
-              <CheckBoxPreference
+            <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="useOpenStreetMapUrl"
                 android:title="@string/pref_app_geo_link_app_openstreetmap"

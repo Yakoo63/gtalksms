@@ -16,6 +16,8 @@
     <string name="pref_app_stop_on_power_disconnected_help">Beendet GTalkSMS wenn das Ladegerät entfernt wird</string>
     <string name="pref_app_show_status_icon">Zeige Icon</string>
     <string name="pref_app_show_status_icon_help">Zeigt das GTalkSMS Status Icon im Benachrichtigungsbalken an</string>
+    <string name="pref_app_select_status_icon">TO_TRANSLATE_Status Bar Icons</string>
+    <string name="pref_app_select_status_icon_help">TO_TRANSLATE_Select icons that will appear in notification bar</string>
     <string name="pref_app_format_responses">Formatiere Chat Nachrichten</string>
     <string name="pref_app_format_responses_help">Formatiere Antworten mit Fett- und Kursivschrift, funktioniert nicht mit allen XMPP Clients</string>
     <string name="pref_app_sms_number">Anzahl der SMS</string>
