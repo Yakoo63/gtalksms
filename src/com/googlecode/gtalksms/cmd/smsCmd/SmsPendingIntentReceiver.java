@@ -25,7 +25,21 @@ public abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
         this.smsHelper = smsHelper;
     }
     
-    public abstract void onReceive(Context context, Intent intent);
+    public void onReceive(Context context, Intent intent) {
+        int smsID = intent.getIntExtra("smsID", -1);
+        int partNum = intent.getIntExtra("partNum", -1);
+        int res = getResultCode();
+        Sms s = getSms(smsID);
+        if (s != null) {
+            onReceiveWithSms(context, s, partNum, res, smsID);
+        } else {
+            onReceiveWithoutSms(context, partNum, res);
+        }
+    }
+    
+    public abstract void onReceiveWithSms(Context context, Sms s, int partNum, int res, int smsID);
+    
+    public abstract void onReceiveWithoutSms(Context context, int partNum, int res);
     
     protected void send(String s) {
         mainService.send(s, answerTo);
@@ -42,7 +56,7 @@ public abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
         smsHelper.deleteSMS(smsId);
     }
     
-    // TODO to contains a full jid (incl. resource), but this resource could became offline
+    // TODO "to" contains a full JID (incl. resource), but this resource could became offline
     // we should check here that the resource is still connected and provide an adequate fallback
     // implement this check in SmsPendingIntentReceiver
     protected String checkResource(String resource) {

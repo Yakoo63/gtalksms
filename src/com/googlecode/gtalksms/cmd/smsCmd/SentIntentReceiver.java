@@ -9,7 +9,6 @@ import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.telephony.SmsManager;
 
 public class SentIntentReceiver extends SmsPendingIntentReceiver {
@@ -19,67 +18,62 @@ public class SentIntentReceiver extends SmsPendingIntentReceiver {
     }
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        int smsID = intent.getIntExtra("smsID", -1);
-        int partNum = intent.getIntExtra("partNum", -1);
-        int res = getResultCode();
-        Sms s = getSms(smsID);
+    public void onReceiveWithSms(Context context, Sms s, int partNum, int res, int smsID) {
+        answerTo = s.getAnswerTo();
+        s.setSentIntentTrue(partNum);
+        smsHelper.setSentIntentTrue(smsID, partNum);
+        boolean sentIntComplete = s.sentIntentsComplete();
+        String to;
+        if (s.getTo() != null) { // prefer a name over a number in the to field
+            to = checkResource(s.getTo());
+        } else {
+            to = s.getNumber();
+        }
 
-        if (s != null) {  // we could find the sms in the smsMap
-            answerTo = s.getAnswerTo();
-            s.setSentIntentTrue(partNum);
-            smsHelper.setSentIntentTrue(smsID, partNum);
-            boolean sentIntComplete = s.sentIntentsComplete();
-            String to;
-            if (s.getTo() != null) { // prefer a name over a number in the to field
-                to = checkResource(s.getTo());
-            } else {
-                to = s.getNumber();
-            }
-
-            if (res == Activity.RESULT_OK && sentIntComplete) {
-                send(context.getString(R.string.chat_sms_sent_to, s.getShortendMessage(), to));
-            } else if (s.getResSentIntent() == -1) {
-                switch (res) {
-                case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                    send(context.getString(R.string.chat_sms_failure_to, s.getShortendMessage(), to));
-                    break;
-                case SmsManager.RESULT_ERROR_NO_SERVICE:
-                    send(context.getString(R.string.chat_sms_no_service_to, s.getShortendMessage(), to));
-                    break;
-                case SmsManager.RESULT_ERROR_NULL_PDU:
-                    send(context.getString(R.string.chat_sms_null_pdu_to, s.getShortendMessage(), to));
-                    break;
-                case SmsManager.RESULT_ERROR_RADIO_OFF:
-                    send(context.getString(R.string.chat_sms_radio_off_to, s.getShortendMessage(), to));
-                    break;
-                }
-                s.setResSentIntent(res);
-            }
-            if (settings.notifySmsDelivered == false && sentIntComplete) {
-                removeSms(smsID);  
-            }
-            
-        } else { // we could NOT find the sms in the smsMap - fall back to old behavior
-            answerTo = null;
-            GoogleAnalyticsHelper.trackAndLogWarning("sms in smsMap missing");
+        if (res == Activity.RESULT_OK && sentIntComplete) {
+            send(context.getString(R.string.chat_sms_sent_to, s.getShortendMessage(), to));
+        } else if (s.getResSentIntent() == -1) {
             switch (res) {
-            case Activity.RESULT_OK:
-                send(context.getString(R.string.chat_sms_sent));
-                break;
             case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                send(context.getString(R.string.chat_sms_failure));
+                send(context.getString(R.string.chat_sms_failure_to, s.getShortendMessage(), to));
                 break;
             case SmsManager.RESULT_ERROR_NO_SERVICE:
-                send(context.getString(R.string.chat_sms_no_service));
+                send(context.getString(R.string.chat_sms_no_service_to, s.getShortendMessage(), to));
                 break;
             case SmsManager.RESULT_ERROR_NULL_PDU:
-                send(context.getString(R.string.chat_sms_null_pdu));
+                send(context.getString(R.string.chat_sms_null_pdu_to, s.getShortendMessage(), to));
                 break;
             case SmsManager.RESULT_ERROR_RADIO_OFF:
-                send(context.getString(R.string.chat_sms_radio_off));
+                send(context.getString(R.string.chat_sms_radio_off_to, s.getShortendMessage(), to));
                 break;
             }
+            s.setResSentIntent(res);
+        }
+        if (settings.notifySmsDelivered == false && sentIntComplete) {
+            removeSms(smsID);  
+        }        
+    }
+
+    @Override
+    public void onReceiveWithoutSms(Context context, int partNum, int res) {
+        answerTo = null;
+        GoogleAnalyticsHelper.trackAndLogWarning("sms in smsMap missing");
+        switch (res) {
+        case Activity.RESULT_OK:
+            send(context.getString(R.string.chat_sms_sent));
+            break;
+        case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+            send(context.getString(R.string.chat_sms_failure));
+            break;
+        case SmsManager.RESULT_ERROR_NO_SERVICE:
+            send(context.getString(R.string.chat_sms_no_service));
+            break;
+        case SmsManager.RESULT_ERROR_NULL_PDU:
+            send(context.getString(R.string.chat_sms_null_pdu));
+            break;
+        case SmsManager.RESULT_ERROR_RADIO_OFF:
+            send(context.getString(R.string.chat_sms_radio_off));
+            break;
         }
     }
 
