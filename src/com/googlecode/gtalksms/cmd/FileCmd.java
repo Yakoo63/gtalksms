@@ -2,6 +2,7 @@ package com.googlecode.gtalksms.cmd;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Date;
 
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
@@ -76,16 +77,22 @@ public class FileCmd extends CommandHandlerBase {
             transfer.sendFile(file, "Sending you: " + file.getAbsolutePath() + " to: " + _answerTo);
             send("File transfer starting: " + file.getAbsolutePath() + " - " + transfer.getFileSize() / 1024 + " KB");
             
+            // We allow 30s before that status go to in progress
+            long maxDate = new Date().getTime() + 30000;
             while (!transfer.isDone()) {
                 if (transfer.getStatus() == FileTransfer.Status.refused) {
                     send("Could not send the file. Refused by peer.");
                     return;
-                }
-                if (transfer.getStatus() == FileTransfer.Status.error) {
+                } else if (transfer.getStatus() == FileTransfer.Status.error) {
                     send(XmppFileManager.returnAndLogError(transfer));
                     return;
-               }
-               Thread.sleep(1000);
+                } else if (transfer.getStatus() == FileTransfer.Status.negotiating_transfer) {
+                    maxDate = new Date().getTime() + 30000;
+                } else if (transfer.getStatus() == FileTransfer.Status.negotiating_stream && new Date().getTime() > maxDate) {
+                    send(XmppFileManager.returnAndLogError(transfer));
+                    return;
+                }
+                Thread.sleep(1000);
             }
         } catch (Exception ex) {
             String message = "Cannot send the file because an error occured during the process." 

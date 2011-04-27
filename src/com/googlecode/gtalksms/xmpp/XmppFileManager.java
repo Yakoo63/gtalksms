@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms.xmpp;
 
 import java.io.File;
+import java.util.Date;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
@@ -99,6 +100,9 @@ public class XmppFileManager implements FileTransferListener {
             transfer.recieveFile(saveTo);
             send("File transfer: " + saveTo.getName() + " - " + transfer.getStatus());
             double percents = 0.0;
+            
+            // We allow 30s before that status go to in progress
+            long maxDate = new Date().getTime() + 30000;
             while (!transfer.isDone()) {
                 if (transfer.getStatus().equals(Status.in_progress)) {
                     percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
@@ -106,6 +110,8 @@ public class XmppFileManager implements FileTransferListener {
                 } else if (transfer.getStatus().equals(Status.error)) {
                     send(returnAndLogError(transfer));
                     return;
+                } else if (new Date().getTime() > maxDate) {
+                    break;
                 }
                 Thread.sleep(1000);
             }
@@ -129,6 +135,9 @@ public class XmppFileManager implements FileTransferListener {
         }
         if (transfer.getException() != null) {
             message += transfer.getException() + Tools.LineSep;
+        }
+        if (transfer.getStatus() == Status.negotiating_stream) {
+            message += "Negotiating stream failed" + Tools.LineSep;
         }
         Log.w(Tools.LOG_TAG, message);
         return new XmppMsg(message);
