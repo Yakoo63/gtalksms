@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.GregorianCalendar;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,7 +31,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
 
         SettingsManager settings = SettingsManager.getSettingsManager(_context);
         if (settings.api8orGreater) { // API Level >= 8 check
-            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         } else {
             path = new File(Environment.getExternalStorageDirectory(), "DCIM");
         }
@@ -71,8 +72,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
             int height = 480;// dm.heightPixels;
 
             int screenshotSize = width * height;
-            // String raw = "/sdcard/screenshots/frame" + new Date().getTime() +
-            // ".raw";
+            // String raw = "/sdcard/screenshots/frame" + new Date().getTime() + ".raw";
             String raw = "/sdcard/screenshots/frame.raw";
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
@@ -112,45 +112,24 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 }
             }
             
-            // TODO : real file management with date in filename
-            String SCREENSHOT_DIR = "/screenshots";
-            String filename = saveBitmap(bitmap, SCREENSHOT_DIR, "capturedImage");
-
+            File picture = new File(repository, "screenshot_" + Tools.getFileFormat(GregorianCalendar.getInstance()) + ".png");
+            String name = picture.getAbsolutePath();
+            FileOutputStream fos = new FileOutputStream(name);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            fos.close();
+            Tools.send("Screenshot saved as " + picture.getAbsolutePath(), _answerTo, _context);
+            
+            // TODO manage subcommand
             Intent i = new Intent(MainService.ACTION_COMMAND);
             i.setClass(_context, MainService.class);
             i.putExtra("from", _answerTo);
             i.putExtra("cmd", "send");
-            i.putExtra("args", filename);
+            i.putExtra("args", picture.getAbsolutePath());
             _context.startService(i);
         } catch (Exception e) {
             send("error while getting picture: " + e);
         }
-    }
-
-    String saveBitmap(Bitmap bitmap, String dir, String baseName) {
-        try {
-            File sdcard = Environment.getExternalStorageDirectory();
-            File pictureDir = new File(sdcard, dir);
-            pictureDir.mkdirs();
-            File f = null;
-            for (int i = 1; i < 2000; ++i) {
-                String name = baseName + i + ".png";
-                f = new File(pictureDir, name);
-                if (!f.exists()) {
-                    break;
-                }
-            }
-            if (!f.exists()) {
-                String name = f.getAbsolutePath();
-                FileOutputStream fos = new FileOutputStream(name);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                fos.flush();
-                fos.close();
-                return name;
-            }
-        } catch (Exception e) {
-        }
-        return null;
     }
 
     @Override
