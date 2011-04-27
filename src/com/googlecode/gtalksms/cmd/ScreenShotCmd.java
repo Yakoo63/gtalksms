@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.nio.ShortBuffer;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
 
@@ -17,19 +17,19 @@ import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class ScreenShotCmd extends CommandHandlerBase {
-    
+
     private static final int VOID_CALLBACK = 0;
     private static final int XMPP_CALLBACK = 1;
     private static final int EMAIL_CALLBACK = 2;
 
     private static File repository;
-    
+
     public ScreenShotCmd(MainService mainService) {
-        super(mainService, new String[] {"screenshot", "sc"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, new String[] { "screenshot", "sc" }, CommandHandlerBase.TYPE_SYSTEM);
         File path;
-        
+
         SettingsManager settings = SettingsManager.getSettingsManager(_context);
-        if (settings.api8orGreater) {  // API Level >= 8 check
+        if (settings.api8orGreater) { // API Level >= 8 check
             path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         } else {
             path = new File(Environment.getExternalStorageDirectory(), "DCIM");
@@ -37,14 +37,14 @@ public class ScreenShotCmd extends CommandHandlerBase {
 
         try {
             repository = new File(path, Tools.APP_NAME);
-            if(!repository.exists()) {
+            if (!repository.exists()) {
                 repository.mkdirs();
             }
         } catch (Exception e) {
             Log.e(Tools.LOG_TAG, "Failed to create repository.", e);
         }
     }
-    
+
     @Override
     protected void execute(String cmd, String args) {
         String[] splitedArgs = splitArgs(args);
@@ -55,62 +55,67 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 takePicture(EMAIL_CALLBACK);
             } else if (splitedArgs[0].equals("xmpp")) {
                 takePicture(XMPP_CALLBACK);
-            }           
-        } 
+            }
+        }
     }
-    
+
     private void takePicture(int pCallbackMethod) {
         cleanUp();
-        
+
         try {
-            //DisplayMetrics dm = new DisplayMetrics();
-            //_mainService.getWindowManager().getDefaultDisplay().getMetrics(dm);
-            int width = 320;//dm.widthPixels;
-            int height = 480;//dm.heightPixels;
             
+            // TODO Use phone specifications
+            // DisplayMetrics dm = new DisplayMetrics();
+            // _mainService.getWindowManager().getDefaultDisplay().getMetrics(dm);
+            int width = 320;// dm.widthPixels;
+            int height = 480;// dm.heightPixels;
+
             int screenshotSize = width * height;
-            
+            // String raw = "/sdcard/screenshots/frame" + new Date().getTime() +
+            // ".raw";
+            String raw = "/sdcard/screenshots/frame.raw";
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes("cat /dev/graphics/fb0 > /sdcard/frame.raw\n");
+            os.writeBytes("cat /dev/graphics/fb0 > " + raw + "\n");
             os.flush();
             os.close();
-      
+
             process.waitFor();
-            
-            // /sdcard/frame.raw
-            //Bitmap bitmap = BitmapFactory.decodeFile("/dev/graphics/fb0");
-            File file = new File("/sdcard/frame.raw");
-            if(!file.exists()) throw new Exception("File doesn't exist");
-            
+
+            File file = new File(raw);
+            if (!file.exists())
+                throw new Exception("File doesn't exist");
+
             InputStream in = null;
             in = new FileInputStream(file);
-            
-            byte sBuffer[] = new byte[screenshotSize*2];
-            short sBuffer2[] = new short[screenshotSize];
+
+            byte sBuffer[] = new byte[screenshotSize * 2];
             in.read(sBuffer);
-            
-            //Bitmap bitmap = BitmapFactory.decodeFile("/dev/graphics/fb0");
-            //if (null == bitmap) throw new Exception("Faild to decode bitmap");
-            ShortBuffer sb = ShortBuffer.wrap(sBuffer2);
-            //bitmap.copyPixelsToBuffer(sb);
-            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-            
-            //Making created bitmap (from OpenGL points) compatible with Android bitmap
-            for (int i = 0; i < screenshotSize*2; i+=2) {                  
-                sBuffer2[i/2] = (short)(((short) sBuffer[i]) << 8);
-                sBuffer2[i/2] |= sBuffer[i+1];
-                
-                short s = sBuffer2[i/2];
-                sBuffer2[i/2] = (short) (((s&0x1f) << 11) | (s&0x7e0) | ((s&0xf800) >> 11));
-                
+
+            short sBuffer2[] = new short[screenshotSize];
+
+            for (int i = 0; i < screenshotSize * 2; i += 2) {
+                sBuffer2[i / 2] = (short) (((0xFF00 & ((short) sBuffer[i + 1]) << 8)) | (0x00FF & sBuffer[i]));
             }
-            sb.rewind();
+
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+
+            for (int i = 0; i < width; ++i) {
+                for (int j = 0; j < height; ++j) {
+                    short pixel = sBuffer2[width * j + i];
+
+                    int red = (255 * ((pixel & 0xF800) >> 11)) / 32;
+                    int green = (255 * ((pixel & 0x07E0) >> 5)) / 64;
+                    int blue = (255 * (pixel & 0x001F)) / 32;
+
+                    bitmap.setPixel(i, j, Color.rgb(red, green, blue));
+                }
+            }
             
-            bitmap.copyPixelsFromBuffer(sb);
+            // TODO : real file management with date in filename
             String SCREENSHOT_DIR = "/screenshots";
             String filename = saveBitmap(bitmap, SCREENSHOT_DIR, "capturedImage");
-            
+
             Intent i = new Intent(MainService.ACTION_COMMAND);
             i.setClass(_context, MainService.class);
             i.putExtra("from", _answerTo);
@@ -121,7 +126,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
             send("error while getting picture: " + e);
         }
     }
-       
+
     String saveBitmap(Bitmap bitmap, String dir, String baseName) {
         try {
             File sdcard = Environment.getExternalStorageDirectory();
@@ -147,7 +152,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
         }
         return null;
     }
-    
+
     @Override
     public synchronized void cleanUp() {
     }
