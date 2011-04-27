@@ -35,6 +35,7 @@ import com.googlecode.gtalksms.cmd.GeoCmd;
 import com.googlecode.gtalksms.cmd.HelpCmd;
 import com.googlecode.gtalksms.cmd.KeyboardCmd;
 import com.googlecode.gtalksms.cmd.RingCmd;
+import com.googlecode.gtalksms.cmd.ScreenShotCmd;
 import com.googlecode.gtalksms.cmd.SettingsCmd;
 import com.googlecode.gtalksms.cmd.ShellCmd;
 import com.googlecode.gtalksms.cmd.SmsCmd;
@@ -579,6 +580,7 @@ public class MainService extends Service {
     
     private void setupCommands() {
         registerCommand(new CameraCmd(this));
+        registerCommand(new ScreenShotCmd(this));
         registerCommand(new KeyboardCmd(this));
         registerCommand(new BatteryCmd(this));
         registerCommand(new GeoCmd(this));
