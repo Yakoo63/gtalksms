@@ -1,7 +1,6 @@
 package com.googlecode.gtalksms.xmpp;
 
 import java.io.File;
-import java.util.Date;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;

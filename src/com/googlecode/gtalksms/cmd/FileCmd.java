@@ -2,7 +2,6 @@ package com.googlecode.gtalksms.cmd;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Date;
 
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;

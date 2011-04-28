@@ -24,6 +24,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
     private static final int EMAIL_CALLBACK = 2;
 
     private static File repository;
+    private static File tmpDir;
 
     public ScreenShotCmd(MainService mainService) {
         super(mainService, new String[] { "screenshot", "sc" }, CommandHandlerBase.TYPE_SYSTEM);
@@ -35,14 +36,18 @@ public class ScreenShotCmd extends CommandHandlerBase {
         } else {
             path = new File(Environment.getExternalStorageDirectory(), "DCIM");
         }
-
-        try {
+        
+        if (repository == null) {
             repository = new File(path, Tools.APP_NAME);
-            if (!repository.exists()) {
-                repository.mkdirs();
+            tmpDir = _context.getCacheDir();
+            try {
+                if (!repository.exists()) {
+                    repository.mkdirs();
+                }
+            } catch (Exception e) {
+                // TODO we should fail here
+                Log.e(Tools.LOG_TAG, "Failed to create direcotry.", e);
             }
-        } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "Failed to create repository.", e);
         }
     }
 
@@ -73,7 +78,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
 
             int screenshotSize = width * height;
             // String raw = "/sdcard/screenshots/frame" + new Date().getTime() + ".raw";
-            String raw = "/sdcard/screenshots/frame.raw";
+            String raw = tmpDir.getAbsolutePath() + "/frame.raw";
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
             os.writeBytes("cat /dev/graphics/fb0 > " + raw + "\n");
