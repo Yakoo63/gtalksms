@@ -17,6 +17,8 @@ import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class FileCmd extends CommandHandlerBase {
+    private static final int MAX_CYCLES = 30;
+    
     private File landingDir;
     private File sendDir;  // where the files come from if send:filename is given
     private KeyValueHelper keyValueHelper;
@@ -78,7 +80,7 @@ public class FileCmd extends CommandHandlerBase {
             send("File transfer starting: " + file.getAbsolutePath() + " - " + transfer.getFileSize() / 1024 + " KB");
             
             // We allow 30s before that status go to in progress
-            long maxDate = new Date().getTime() + 30000;
+           int currentCycle = 0;
             while (!transfer.isDone()) {
                 if (transfer.getStatus() == FileTransfer.Status.refused) {
                     send("Could not send the file. Refused by peer.");
@@ -87,10 +89,16 @@ public class FileCmd extends CommandHandlerBase {
                     send(XmppFileManager.returnAndLogError(transfer));
                     return;
                 } else if (transfer.getStatus() == FileTransfer.Status.negotiating_transfer) {
-                    maxDate = new Date().getTime() + 30000;
-                } else if (transfer.getStatus() == FileTransfer.Status.negotiating_stream && new Date().getTime() > maxDate) {
+                    // user has not accepted the transfer yet
+                    // reset the cycle count
+                    currentCycle = 0; 
+                } else if (transfer.getStatus() != FileTransfer.Status.in_progress) {
+                    // there is still not transfer going on
+                    currentCycle++;
+                }
+                if (currentCycle > MAX_CYCLES) {
                     send(XmppFileManager.returnAndLogError(transfer));
-                    return;
+                    break;
                 }
                 Thread.sleep(1000);
             }

@@ -20,6 +20,8 @@ import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppFileManager implements FileTransferListener {
+   private static final int MAX_CYCLES = 30; 
+    
     private static SettingsManager _settings;
     private static XMPPConnection _connection;
     private static FileTransferManager _fileTransferManager = null;
@@ -102,7 +104,7 @@ public class XmppFileManager implements FileTransferListener {
             double percents = 0.0;
             
             // We allow 30s before that status go to in progress
-            long maxDate = new Date().getTime() + 30000;
+            int currentCycle = 0; 
             while (!transfer.isDone()) {
                 if (transfer.getStatus().equals(Status.in_progress)) {
                     percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
@@ -110,7 +112,11 @@ public class XmppFileManager implements FileTransferListener {
                 } else if (transfer.getStatus().equals(Status.error)) {
                     send(returnAndLogError(transfer));
                     return;
-                } else if (new Date().getTime() > maxDate) {
+                // If we are not in progress state, increase the cycles count;
+                } else {
+                    currentCycle++;
+                }
+                if (currentCycle > MAX_CYCLES) {
                     break;
                 }
                 Thread.sleep(1000);
@@ -129,18 +135,19 @@ public class XmppFileManager implements FileTransferListener {
     }
 
     public static XmppMsg returnAndLogError(FileTransfer transfer) {
-        String message = "Cannot process the file because an error occured during the process." + Tools.LineSep;
+        XmppMsg message = new XmppMsg();
+        message.appendBold("Incoming File Transfer Error");
         if (transfer.getError() != null) {
-            message += transfer.getError() + Tools.LineSep;
+            message.appendLine(transfer.getError().getMessage());
         }
         if (transfer.getException() != null) {
-            message += transfer.getException() + Tools.LineSep;
+            message.appendLine(transfer.getException().getMessage());
         }
         if (transfer.getStatus() == Status.negotiating_stream) {
-            message += "Negotiating stream failed" + Tools.LineSep;
+            message.appendLine("Negotiating stream failed");
         }
-        Log.w(Tools.LOG_TAG, message);
-        return new XmppMsg(message);
+        Log.w(Tools.LOG_TAG, message.toString());
+        return message;
     }
     
     public static File getLandingDir() {
