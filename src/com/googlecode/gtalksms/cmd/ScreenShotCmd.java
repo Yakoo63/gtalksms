@@ -13,11 +13,11 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Environment;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.tools.RootTools;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class ScreenShotCmd extends CommandHandlerBase {
@@ -45,14 +45,6 @@ public class ScreenShotCmd extends CommandHandlerBase {
             }
             repository = new File(path, Tools.APP_NAME);
             tmpDir = _context.getCacheDir();
-            try {
-                if (!repository.exists()) {
-                    repository.mkdirs();
-                }
-            } catch (Exception e) {
-                // TODO we should fail here
-                Log.e(Tools.LOG_TAG, "Failed to create direcotry.", e);
-            }
             DisplayMetrics dm = new DisplayMetrics();
             WindowManager wm = (WindowManager)_context.getSystemService(Context.WINDOW_SERVICE);
             wm.getDefaultDisplay().getMetrics(dm);
@@ -64,6 +56,9 @@ public class ScreenShotCmd extends CommandHandlerBase {
 
     @Override
     protected void execute(String cmd, String args) {
+        if (!repository.exists()) {
+            repository.mkdirs();
+        }
         String[] splitedArgs = splitArgs(args);
         if (cmd.equals("sc") || cmd.equals("screenshot")) {
             if (args.equals("") || splitedArgs[0].equals("")) {
@@ -79,7 +74,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
     private void takePicture(int pCallbackMethod) {
         cleanUp();
         
-        if (!ShellCmd.askRootAccess()) {
+        if (!RootTools.askRootAccess()) {
             send("Root not given!");
             return;
         }

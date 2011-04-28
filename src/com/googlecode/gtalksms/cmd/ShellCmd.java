@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.tools.RootTools;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFont;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -25,25 +26,7 @@ public class ShellCmd extends CommandHandlerBase {
     
     public ShellCmd(MainService mainService) {
         super(mainService, new String[] {"cmd"}, CommandHandlerBase.TYPE_SYSTEM);
-    }
-    
-    public static boolean askRootAccess() {
-        try {
-            Process p = Runtime.getRuntime().exec("su");
-
-            DataOutputStream os = new DataOutputStream(p.getOutputStream());
-            // TODO issue "id" command an check if result contains "uid=0"
-            os.writeBytes("exit\n");
-            os.flush();
-            p.waitFor();
-            if (p.exitValue() != 255) {
-                return true;
-            }
-            return false;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+    }   
         
     private Runnable _cmdRunnable = new Runnable() {
         
@@ -55,7 +38,7 @@ public class ShellCmd extends CommandHandlerBase {
             Process myproc = null;
             
             try { 
-                if (!askRootAccess()) {
+                if (!RootTools.askRootAccess()) {
                     _cmdResults.append(_context.getString(R.string.chat_error_root) + Tools.LineSep);
                     myproc = Runtime.getRuntime().exec(new String[] {"/system/bin/sh", "-c", _currentCommand});
                 } else {
