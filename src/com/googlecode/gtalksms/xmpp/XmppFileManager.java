@@ -80,18 +80,22 @@ public class XmppFileManager implements FileTransferListener {
         answerTo = request.getRequestor();  // set answerTo for replies and send()        
         if (!answerTo.startsWith(_settings.notifiedAddress)) { 
             send("File transfer from " + answerTo + " rejected.");
+            request.reject();
             return;                
         } else if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             send("External Media not mounted read/write");
+            request.reject();
             return;
         } else if (!landingDir.isDirectory()) {
             send("The directory " + landingDir.getAbsolutePath() + " is not a directory");
+            request.reject();
             return;
         }
         
         saveTo = new File(landingDir, request.getFileName());
         if (saveTo.exists()) {
             send("The file " + saveTo.getAbsolutePath() + " already exists");
+            request.reject();
             return;
         }
         
@@ -105,11 +109,14 @@ public class XmppFileManager implements FileTransferListener {
             // We allow 30s before that status go to in progress
             int currentCycle = 0; 
             while (!transfer.isDone()) {
-                if (transfer.getStatus().equals(Status.in_progress)) {
+                if (transfer.getStatus() != Status.in_progress) {
                     percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
                     send("File transfer: " + saveTo.getName() + " - " + percents + "%");
-                } else if (transfer.getStatus().equals(Status.error)) {
+                } else if (transfer.getStatus() == Status.error) {
                     send(returnAndLogError(transfer));
+                    if (saveTo.exists()) {
+                        saveTo.delete();
+                    }
                     return;
                 // If we are not in progress state, increase the cycles count;
                 } else {
@@ -135,17 +142,19 @@ public class XmppFileManager implements FileTransferListener {
 
     public static XmppMsg returnAndLogError(FileTransfer transfer) {
         XmppMsg message = new XmppMsg();
-        message.appendBold("Incoming File Transfer Error");
+        message.appendBoldLine("File Transfer Error");
         if (transfer.getError() != null) {
             message.appendLine(transfer.getError().getMessage());
+            Log.w(Tools.LOG_TAG, transfer.getError().getMessage());
         }
         if (transfer.getException() != null) {
             message.appendLine(transfer.getException().getMessage());
+            Log.w(Tools.LOG_TAG, transfer.getException().getMessage(), transfer.getException());
         }
         if (transfer.getStatus() == Status.negotiating_stream) {
             message.appendLine("Negotiating stream failed");
+            Log.w(Tools.LOG_TAG, "Negotiating stream failed");
         }
-        Log.w(Tools.LOG_TAG, message.toString());
         return message;
     }
     
