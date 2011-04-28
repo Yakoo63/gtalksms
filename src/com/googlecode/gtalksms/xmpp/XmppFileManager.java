@@ -109,7 +109,7 @@ public class XmppFileManager implements FileTransferListener {
             // We allow 30s before that status go to in progress
             int currentCycle = 0; 
             while (!transfer.isDone()) {
-                if (transfer.getStatus() != Status.in_progress) {
+                if (transfer.getStatus() == Status.in_progress) {
                     percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
                     send("File transfer: " + saveTo.getName() + " - " + percents + "%");
                 } else if (transfer.getStatus() == Status.error) {
