@@ -27,12 +27,12 @@ public class ShellCmd extends CommandHandlerBase {
         super(mainService, new String[] {"cmd"}, CommandHandlerBase.TYPE_SYSTEM);
     }
     
-    private boolean askRootAccess() {
+    public static boolean askRootAccess() {
         try {
             Process p = Runtime.getRuntime().exec("su");
 
-            // Attempt to write a file to a root-only
             DataOutputStream os = new DataOutputStream(p.getOutputStream());
+            // TODO issue "id" command an check if result contains "uid=0"
             os.writeBytes("exit\n");
             os.flush();
             p.waitFor();
@@ -63,6 +63,7 @@ public class ShellCmd extends CommandHandlerBase {
 
                     DataOutputStream os = new DataOutputStream(myproc.getOutputStream());
                     os.writeBytes(_currentCommand + "\n");
+                    os.writeBytes("exit\n");
                     os.flush();
                     os.close();
                 }

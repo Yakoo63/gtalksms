@@ -78,15 +78,17 @@ public class ScreenShotCmd extends CommandHandlerBase {
 
     private void takePicture(int pCallbackMethod) {
         cleanUp();
-
+        
+        if (!ShellCmd.askRootAccess()) {
+            send("Root not given!");
+            return;
+        }
         try {
-            // TODO check here first for su rights, if not abort
-            // maybe a good start to integrate the roottools lib
-            // http://code.google.com/p/roottools/
             String raw = tmpDir.getAbsolutePath() + "/frame.raw";
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
             os.writeBytes("cat /dev/graphics/fb0 > " + raw + "\n");
+            os.writeBytes("exit\n");
             os.flush();
             os.close();
 
@@ -121,16 +123,15 @@ public class ScreenShotCmd extends CommandHandlerBase {
                     bitmap.setPixel(i, j, Color.rgb(red, green, blue));
                 }
             }
-            
-            rawTmpFile.delete();
-            
+                        
             File picture = new File(repository, "screenshot_" + Tools.getFileFormat(GregorianCalendar.getInstance()) + ".png");
-            String name = picture.getAbsolutePath();
-            FileOutputStream fos = new FileOutputStream(name);
+            FileOutputStream fos = new FileOutputStream(picture);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             fos.close();
             Tools.send("Screenshot saved as " + picture.getAbsolutePath(), _answerTo, _context);
+            
+            rawTmpFile.delete();
             
             // TODO manage subcommand
             Intent i = new Intent(MainService.ACTION_COMMAND);
