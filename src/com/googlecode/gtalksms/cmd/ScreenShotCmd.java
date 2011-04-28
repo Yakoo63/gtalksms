@@ -7,11 +7,14 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.GregorianCalendar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
@@ -25,19 +28,21 @@ public class ScreenShotCmd extends CommandHandlerBase {
 
     private static File repository;
     private static File tmpDir;
+    private static int displayHeight;
+    private static int displayWidth;
+    private static int screenshotSize;
 
     public ScreenShotCmd(MainService mainService) {
-        super(mainService, new String[] { "screenshot", "sc" }, CommandHandlerBase.TYPE_SYSTEM);
-        File path;
-
-        SettingsManager settings = SettingsManager.getSettingsManager(_context);
-        if (settings.api8orGreater) { // API Level >= 8 check
-            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        } else {
-            path = new File(Environment.getExternalStorageDirectory(), "DCIM");
-        }
-        
+        super(mainService, new String[] { "screenshot", "sc" }, CommandHandlerBase.TYPE_SYSTEM);        
         if (repository == null) {
+            File path;
+
+            SettingsManager settings = SettingsManager.getSettingsManager(_context);
+            if (settings.api8orGreater) { // API Level >= 8 check
+                path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            } else {
+                path = new File(Environment.getExternalStorageDirectory(), "DCIM");
+            }
             repository = new File(path, Tools.APP_NAME);
             tmpDir = _context.getCacheDir();
             try {
@@ -48,6 +53,12 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 // TODO we should fail here
                 Log.e(Tools.LOG_TAG, "Failed to create direcotry.", e);
             }
+            DisplayMetrics dm = new DisplayMetrics();
+            WindowManager wm = (WindowManager)_context.getSystemService(Context.WINDOW_SERVICE);
+            wm.getDefaultDisplay().getMetrics(dm);
+            displayHeight = dm.heightPixels;
+            displayWidth = dm.widthPixels;
+            screenshotSize = displayWidth * displayHeight;
         }
     }
 
@@ -69,15 +80,9 @@ public class ScreenShotCmd extends CommandHandlerBase {
         cleanUp();
 
         try {
-            
-            // TODO Use phone specifications
-            // DisplayMetrics dm = new DisplayMetrics();
-            // _mainService.getWindowManager().getDefaultDisplay().getMetrics(dm);
-            int width = 320;// dm.widthPixels;
-            int height = 480;// dm.heightPixels;
-
-            int screenshotSize = width * height;
-            // String raw = "/sdcard/screenshots/frame" + new Date().getTime() + ".raw";
+            // TODO check here first for su rights, if not abort
+            // maybe a good start to integrate the roottools lib
+            // http://code.google.com/p/roottools/
             String raw = tmpDir.getAbsolutePath() + "/frame.raw";
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
@@ -87,12 +92,12 @@ public class ScreenShotCmd extends CommandHandlerBase {
 
             process.waitFor();
 
-            File file = new File(raw);
-            if (!file.exists())
+            File rawTmpFile = new File(raw);
+            if (!rawTmpFile.exists())
                 throw new Exception("File doesn't exist");
 
             InputStream in = null;
-            in = new FileInputStream(file);
+            in = new FileInputStream(rawTmpFile);
 
             byte sBuffer[] = new byte[screenshotSize * 2];
             in.read(sBuffer);
@@ -103,11 +108,11 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 sBuffer2[i / 2] = (short) (((0xFF00 & ((short) sBuffer[i + 1]) << 8)) | (0x00FF & sBuffer[i]));
             }
 
-            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            Bitmap bitmap = Bitmap.createBitmap(displayWidth, displayHeight, Bitmap.Config.RGB_565);
 
-            for (int i = 0; i < width; ++i) {
-                for (int j = 0; j < height; ++j) {
-                    short pixel = sBuffer2[width * j + i];
+            for (int i = 0; i < displayWidth; ++i) {
+                for (int j = 0; j < displayHeight; ++j) {
+                    short pixel = sBuffer2[displayWidth * j + i];
 
                     int red = (255 * ((pixel & 0xF800) >> 11)) / 32;
                     int green = (255 * ((pixel & 0x07E0) >> 5)) / 64;
@@ -116,6 +121,8 @@ public class ScreenShotCmd extends CommandHandlerBase {
                     bitmap.setPixel(i, j, Color.rgb(red, green, blue));
                 }
             }
+            
+            rawTmpFile.delete();
             
             File picture = new File(repository, "screenshot_" + Tools.getFileFormat(GregorianCalendar.getInstance()) + ".png");
             String name = picture.getAbsolutePath();
