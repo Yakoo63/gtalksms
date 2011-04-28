@@ -6,6 +6,7 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -27,7 +28,6 @@ public class CameraCmd extends CommandHandlerBase {
     private static Camera camera = null;
     private static File repository;
     private static String emailReceiving;
-    private static boolean api9orGreater;
     private static int streamVolume;
     
     public CameraCmd(MainService mainService) {
@@ -37,13 +37,12 @@ public class CameraCmd extends CommandHandlerBase {
         audioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         
         SettingsManager settings = SettingsManager.getSettingsManager(_context);
-        if (settings.api8orGreater) {  // API Level >= 8 check
+        if (Build.VERSION.SDK_INT >= 8) {  // API Level >= 8 check
             path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         } else {
             path = new File(Environment.getExternalStorageDirectory(), "DCIM");
         }
         emailReceiving = settings.notifiedAddress;
-        api9orGreater = settings.api9orGreater;
         try {
             repository = new File(path, Tools.APP_NAME);
             if(!repository.exists()) {
@@ -74,7 +73,7 @@ public class CameraCmd extends CommandHandlerBase {
     
     private void setCamera(String[] splitedArgs) {
         // TODO does nothing atm, we need API >= 9 for this feature
-        if (api9orGreater) {
+        if (Build.VERSION.SDK_INT >= 9) {
             // TODO set the camera
         } else {
             // TODO print error message
@@ -83,7 +82,7 @@ public class CameraCmd extends CommandHandlerBase {
 
     private void listCameras() {
         // TODO does nothing atm, we need API >= 9 for this feature
-        if (api9orGreater) {
+        if (Build.VERSION.SDK_INT >= 9) {
             // TODO list the available cameras
         } else {
             // TODO print error message

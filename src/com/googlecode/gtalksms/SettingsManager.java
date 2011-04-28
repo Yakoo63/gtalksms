@@ -9,6 +9,7 @@ import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -88,8 +89,6 @@ public class SettingsManager {
     public Locale locale;
     
     // app settings
-    public boolean api8orGreater;
-    public boolean api9orGreater;
     public boolean debugLog;
     public boolean connectOnMainscreenShow;
     public String displayIconIndex;
@@ -141,7 +140,7 @@ public class SettingsManager {
     }
 
     public void OnPreferencesUpdated(String key) {
-    	if(api8orGreater) {
+    	if (Build.VERSION.SDK_INT >= 8) {
     		BackupManager.dataChanged(_context.getPackageName());
     	}
     	for (String s : xmppConnectionSettings)
@@ -229,15 +228,6 @@ public class SettingsManager {
             notifySmsInSameConversation = true;
             notifySmsInChatRooms = false;
         }
-        
-        try {
-        	Class.forName("android.app.backup.BackupAgent");
-        	api8orGreater = true;
-        } catch (Exception e) {
-        	api8orGreater = false;
-        }
-        
-        api9orGreater = false;
                 
         notifyInMuc = _sharedPreferences.getBoolean("notifyInMuc", false); 
         smsReplySeparate = _sharedPreferences.getBoolean("smsReplySeparate", false);

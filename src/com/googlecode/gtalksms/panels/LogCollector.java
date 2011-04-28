@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -142,7 +143,9 @@ public class LogCollector extends Activity {
                 log.insert(0, LINE_SEPARATOR);
                 log.insert(0, "Kernel info: " + getFormattedKernelVersion());
                 log.insert(0, LINE_SEPARATOR);
-                log.insert(0, "Version: " + getVersionNumber(LogCollector.this));
+                log.insert(0, "Android API: " + Build.VERSION.SDK_INT); 
+                log.insert(0, LINE_SEPARATOR);
+                log.insert(0, Tools.APP_NAME + " Version: " + getVersionNumber(LogCollector.this));
                 log.insert(0, LINE_SEPARATOR);
                 log.insert(0, getPreferences());
 

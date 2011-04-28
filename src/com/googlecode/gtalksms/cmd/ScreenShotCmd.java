@@ -11,12 +11,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.RootTools;
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -37,14 +37,14 @@ public class ScreenShotCmd extends CommandHandlerBase {
         if (repository == null) {
             File path;
 
-            SettingsManager settings = SettingsManager.getSettingsManager(_context);
-            if (settings.api8orGreater) { // API Level >= 8 check
+            if (Build.VERSION.SDK_INT >= 8) { // API Level >= 8 check
                 path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
             } else {
                 path = new File(Environment.getExternalStorageDirectory(), "DCIM");
             }
             repository = new File(path, Tools.APP_NAME);
             tmpDir = _context.getCacheDir();
+            
             DisplayMetrics dm = new DisplayMetrics();
             WindowManager wm = (WindowManager)_context.getSystemService(Context.WINDOW_SERVICE);
             wm.getDefaultDisplay().getMetrics(dm);

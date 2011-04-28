@@ -11,6 +11,7 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -36,7 +37,7 @@ public class XmppFileManager implements FileTransferListener {
     private XmppFileManager(Context context) {
         _settings = SettingsManager.getSettingsManager(context);
         ctx = context;
-        if (_settings.api8orGreater) {  // API Level >= 8 check
+        if (Build.VERSION.SDK_INT >= 8) {  // API Level >= 8 check
             externalFilesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         } else {
             externalFilesDir = Environment.getExternalStorageDirectory();
@@ -45,7 +46,6 @@ public class XmppFileManager implements FileTransferListener {
         if (!landingDir.exists()) {
             landingDir.mkdirs();
         }
-
     }
     
     public void registerListener(XmppManager xmppMgr) {
