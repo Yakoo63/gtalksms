@@ -22,18 +22,18 @@ public class DeliveredIntentReceiver extends SmsPendingIntentReceiver {
         s.setDelIntentTrue(partNum);
         smsHelper.setDelIntentTrue(smsID, partNum);
         boolean delIntComplete = s.delIntentsComplete();
-        String to;
+        String smsSendTo;
         if (s.getTo() != null) { // prefer a name over a number in the to field
-            to = checkResource(s.getTo());
+            smsSendTo = s.getTo();
         } else {
-            to = s.getNumber();
+            smsSendTo = s.getNumber();
         }
 
         if (res == Activity.RESULT_OK && delIntComplete) {
-            send(context.getString(R.string.chat_sms_delivered_to, s.getShortendMessage(), to));
+            send(context.getString(R.string.chat_sms_delivered_to, s.getShortendMessage(), smsSendTo));
         } else if (s.getResSentIntent() == -1) {
             if(res == Activity.RESULT_CANCELED) {
-                send(context.getString(R.string.chat_sms_not_delivered_to, s.getShortendMessage(), to));
+                send(context.getString(R.string.chat_sms_not_delivered_to, s.getShortendMessage(), smsSendTo));
             }
             s.setResSentIntent(res);
         }

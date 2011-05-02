@@ -9,14 +9,17 @@ import android.os.BatteryManager;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.xmpp.XmppBuddies;
 
 public class BatteryCmd extends CommandHandlerBase {
     private BroadcastReceiver _batInfoReceiver = null;
     private int _lastPercentageNotified = -1;
     private String _powerSource;
+    private static XmppBuddies xmppBuddies;
     
     public BatteryCmd(MainService mainService) {
         super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
+        xmppBuddies = XmppBuddies.getInstance(_context);
         _powerSource = "Unknown";
         
         _batInfoReceiver = new BroadcastReceiver() {
@@ -65,7 +68,10 @@ public class BatteryCmd extends CommandHandlerBase {
             send(R.string.chat_battery_level, level);
         }
         if (_settingsMgr.notifyBatteryInStatus) {
-            XmppManager.setStatus("GTalkSMS - " + level + "%" + " - " + _powerSource);
+            // only send an notification to the user if he is available
+            if (xmppBuddies.isNotificationAddressAvailable() || force) {
+                XmppManager.setStatus("GTalkSMS - " + level + "%" + " - " + _powerSource);
+            }
         }
     }
     

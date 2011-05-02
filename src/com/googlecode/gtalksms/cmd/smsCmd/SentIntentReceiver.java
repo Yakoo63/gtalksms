@@ -23,28 +23,28 @@ public class SentIntentReceiver extends SmsPendingIntentReceiver {
         s.setSentIntentTrue(partNum);
         smsHelper.setSentIntentTrue(smsID, partNum);
         boolean sentIntComplete = s.sentIntentsComplete();
-        String to;
+        String smsSendTo;
         if (s.getTo() != null) { // prefer a name over a number in the to field
-            to = checkResource(s.getTo());
+            smsSendTo = s.getTo();
         } else {
-            to = s.getNumber();
+            smsSendTo = s.getNumber();
         }
 
         if (res == Activity.RESULT_OK && sentIntComplete) {
-            send(context.getString(R.string.chat_sms_sent_to, s.getShortendMessage(), to));
+            send(context.getString(R.string.chat_sms_sent_to, s.getShortendMessage(), smsSendTo));
         } else if (s.getResSentIntent() == -1) {
             switch (res) {
             case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                send(context.getString(R.string.chat_sms_failure_to, s.getShortendMessage(), to));
+                send(context.getString(R.string.chat_sms_failure_to, s.getShortendMessage(), smsSendTo));
                 break;
             case SmsManager.RESULT_ERROR_NO_SERVICE:
-                send(context.getString(R.string.chat_sms_no_service_to, s.getShortendMessage(), to));
+                send(context.getString(R.string.chat_sms_no_service_to, s.getShortendMessage(), smsSendTo));
                 break;
             case SmsManager.RESULT_ERROR_NULL_PDU:
-                send(context.getString(R.string.chat_sms_null_pdu_to, s.getShortendMessage(), to));
+                send(context.getString(R.string.chat_sms_null_pdu_to, s.getShortendMessage(), smsSendTo));
                 break;
             case SmsManager.RESULT_ERROR_RADIO_OFF:
-                send(context.getString(R.string.chat_sms_radio_off_to, s.getShortendMessage(), to));
+                send(context.getString(R.string.chat_sms_radio_off_to, s.getShortendMessage(), smsSendTo));
                 break;
             }
             s.setResSentIntent(res);

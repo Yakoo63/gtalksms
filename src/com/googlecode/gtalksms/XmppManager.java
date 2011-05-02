@@ -13,6 +13,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
@@ -57,6 +58,7 @@ import android.util.Log;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
+import com.googlecode.gtalksms.xmpp.PresencePacketListener;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
@@ -93,6 +95,9 @@ public class XmppManager {
     private static XMPPConnection _connection = null;
     private static XmppManager xmppManager;
     private static PacketListener _packetListener = null;
+    
+    private static PacketListener sPresencePacketListener = null;
+    
     private static ConnectionListener _connectionListener = null;    
     private static XmppMuc _xmppMuc;
     private static XmppBuddies _xmppBuddies;
@@ -136,6 +141,7 @@ public class XmppManager {
         SmackConfiguration.setKeepAliveInterval(60000 * 5);  // 5 mins
         SmackConfiguration.setPacketReplyTimeout(10000);      // 10 secs
         SmackConfiguration.setLocalSocks5ProxyEnabled(false);
+        Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
     }
     
     public static XmppManager getInstance(Context ctx) {
@@ -191,10 +197,15 @@ public class XmppManager {
                 if (_connectionListener != null) {
                     _connection.removeConnectionListener(_connectionListener);
                 }
+                if (sPresencePacketListener != null) {
+                    _connection.removePacketListener(sPresencePacketListener);
+                }
+                
             }
         }
         _packetListener = null; 
         _connectionListener = null;
+        sPresencePacketListener = null;
     }
     
     /** 
@@ -502,6 +513,10 @@ public class XmppManager {
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
             _packetListener = new ChatPacketListener(_connection, _context);            
             _connection.addPacketListener(_packetListener, filter);
+            
+            filter = new PacketTypeFilter(Presence.class);
+            sPresencePacketListener = new PresencePacketListener(_connection, _settings);
+            _connection.addPacketListener(sPresencePacketListener, filter);
 
             try {
                 _connection.getRoster().addRosterListener(_xmppBuddies);
@@ -673,7 +688,7 @@ public class XmppManager {
                 String xhtmlBody = message.generateXHTMLText().toString();
                 XHTMLManager.addBody(msg, xhtmlBody);
             }
-            if(muc == null) {
+            if (muc == null) {
                 msg.setType(Message.Type.chat);
                 _connection.sendPacket(msg);
             } else {

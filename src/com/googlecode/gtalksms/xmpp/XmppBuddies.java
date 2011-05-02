@@ -7,8 +7,10 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 //import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.util.StringUtils;
 
@@ -16,34 +18,40 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 public class XmppBuddies implements RosterListener {
     
-    private static Context _context;
-    private static XMPPConnection _connection;
-    private static XmppBuddies xmppBuddies;
+    private static Context sContext;
+    private static XMPPConnection sConnection;
+    private static XmppBuddies sXmppBuddies;
+    private static SettingsManager sSettings;
+    private static Roster sRoster;
     
     private XmppBuddies(Context context) {
-        _context = context;
+        sContext = context;
+        sSettings = SettingsManager.getSettingsManager(context);
 
     }
 
     public void registerListener(XmppManager xmppMgr) {
         XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
             public void newConnection(XMPPConnection connection) {
-                _connection = connection;
+                sConnection = connection;
+                sRoster = connection.getRoster();
+                checkNotificationAddressRoster();
             }
         };
         xmppMgr.registerConnectionChangeListener(listener);
     }
     
     public static XmppBuddies getInstance(Context ctx) {
-        if (xmppBuddies == null) {
-            xmppBuddies = new XmppBuddies(ctx);
+        if (sXmppBuddies == null) {
+            sXmppBuddies = new XmppBuddies(ctx);
         }
-        return xmppBuddies;
+        return sXmppBuddies;
     }
 
 //    public void addFriend(String userID) {
@@ -75,14 +83,14 @@ public class XmppBuddies implements RosterListener {
         
         ArrayList<XmppFriend> friends = new ArrayList<XmppFriend>();
 
-        if (_connection == null) {
+        if (sConnection == null) {
             return friends;
         }
         
         try {
             String userID = null;
             String status = null;
-            Roster roster = _connection.getRoster();
+            Roster roster = sConnection.getRoster();
     
             for (RosterEntry r : roster.getEntries()) {
                 userID = r.getUser();
@@ -98,6 +106,12 @@ public class XmppBuddies implements RosterListener {
         return friends;
     }
     
+    /**
+     * sends an XMPP_PRESENCE_CHANGED intent for every known xmpp rooster item (friend)
+     * with the actual status information
+     * 
+     * @param list
+     */
     public void sendFriendList(ArrayList<XmppFriend> list) {
         
         for (XmppFriend xmppFriend : list) {
@@ -106,7 +120,7 @@ public class XmppBuddies implements RosterListener {
             intent.putExtra("name", xmppFriend.name == null ? xmppFriend.id : xmppFriend.name);
             intent.putExtra("status", xmppFriend.status);
             intent.putExtra("state", xmppFriend.state);
-            _context.sendBroadcast(intent);
+            sContext.sendBroadcast(intent);
         }
     }
 
@@ -114,12 +128,11 @@ public class XmppBuddies implements RosterListener {
         String userStatus = ""; // default return value
 
         try {
-            userStatus = _connection.getRoster().getPresence(userID).getStatus();
+            userStatus = sConnection.getRoster().getPresence(userID).getStatus();
         } catch (NullPointerException e) {
-            System.err.println("Invalid connection or user in retrieveStatus()");
+            GoogleAnalyticsHelper.trackAndLogError("Invalid connection or user in retrieveStatus() - NPE");
             userStatus = "";
         }
-
         // Server may set their status to null; we want empty string
         if (userStatus == null) {
             userStatus = "";
@@ -133,10 +146,10 @@ public class XmppBuddies implements RosterListener {
         Presence userFromServer = null;
 
         try {
-            userFromServer = _connection.getRoster().getPresence(userID);
+            userFromServer = sConnection.getRoster().getPresence(userID);
             userState = retrieveState(userFromServer.getMode(), userFromServer.isAvailable());
         } catch (NullPointerException e) {
-            GoogleAnalyticsHelper.trackAndLogError("retrieveState(): Invalid connection or user");
+            GoogleAnalyticsHelper.trackAndLogError("retrieveState(): Invalid connection or user - NPE");
         }
 
         return userState;
@@ -180,6 +193,74 @@ public class XmppBuddies implements RosterListener {
         intent.putExtra("fullid", presence.getFrom());
         intent.putExtra("state", retrieveState(presence.getMode(), presence.isAvailable()));
         intent.putExtra("status", presence.getStatus());
-        _context.sendBroadcast(intent);
+        sContext.sendBroadcast(intent);
+    }
+    
+    public boolean isNotificationAddressAvailable() {
+        if (sRoster != null) {
+            // getPresence retrieves eventually the status of the notified Address in an internal data structure cache
+            // thus avoiding an extra data packet
+            Presence presence = sRoster.getPresence(sSettings.notifiedAddress);
+            return presence.isAvailable();
+        }
+        return true;
+    }
+    
+    private void checkNotificationAddressRoster() {
+        if (sRoster != null && sSettings.useDifferentAccount) {
+            if (!sRoster.contains(sSettings.notifiedAddress)) {
+                try {
+                    // this sends a new subscription request to the other side
+                    sRoster.createEntry(sSettings.notifiedAddress, sSettings.notifiedAddress, null);
+                } catch (XMPPException e) { /* Ignore */  }
+            } else {
+                RosterEntry rosterEntry = sRoster.getEntry(sSettings.notifiedAddress);
+                RosterPacket.ItemType type = rosterEntry.getType();
+                switch (type) {
+                case both:
+                    break;
+                case from:
+                    requestSubscription(sSettings.notifiedAddress, sConnection);
+                    break;
+                case to:
+                    grantSubscription(sSettings.notifiedAddress, sConnection);
+                    break;
+                case none:
+                    grantSubscription(sSettings.notifiedAddress, sConnection);
+                    requestSubscription(sSettings.notifiedAddress, sConnection);
+                    break;
+                default:
+                    break;
+                }
+                
+            }
+        }
+    }
+    
+    /**
+     * grants the given JID the subscription (e.g. viewing your online state)
+     * 
+     * @param jid
+     * @param connection
+     */
+    public static void grantSubscription(String jid, XMPPConnection connection) {
+        Presence presence = new Presence(Presence.Type.subscribed);
+        sendPresenceTo(jid, presence, connection);
+    }
+    
+    /**
+     * request the subscription from a given JID
+     * 
+     * @param jid
+     * @param connection
+     */
+    public static void requestSubscription(String jid, XMPPConnection connection) {
+        Presence presence = new Presence(Presence.Type.subscribe);
+        sendPresenceTo(jid, presence, connection);
+    }
+    
+    private static void sendPresenceTo(String to, Presence presence, XMPPConnection connection) {
+        presence.setTo(to);
+        connection.sendPacket(presence); 
     }
 }

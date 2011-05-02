@@ -54,12 +54,5 @@ public abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
         Integer i = new Integer(smsId);
         smsMap.remove(i);
         smsHelper.deleteSMS(smsId);
-    }
-    
-    // TODO "to" contains a full JID (incl. resource), but this resource could became offline
-    // we should check here that the resource is still connected and provide an adequate fallback
-    // implement this check in SmsPendingIntentReceiver
-    protected String checkResource(String resource) {
-        return resource;
-    }
+    }    
 }
