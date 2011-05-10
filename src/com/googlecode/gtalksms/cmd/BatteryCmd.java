@@ -12,20 +12,25 @@ import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 
 public class BatteryCmd extends CommandHandlerBase {
-    private BroadcastReceiver _batInfoReceiver = null;
-    private int _lastPercentageNotified = -1;
-    private String _powerSource;
-    private static XmppBuddies xmppBuddies;
+    private static BroadcastReceiver sBatInfoReceiver = null;
+    private static int sLastKnownPercentage = -1; // flag so the BroadcastReceiver can set the percentage
+    private static String sPowerSource;
+    private static int sLastStatusPercentage = -1;
+    private static String sLastStatusPowersource;
+    private static XmppBuddies sXmppBuddies;
     
     public BatteryCmd(MainService mainService) {
         super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
-        xmppBuddies = XmppBuddies.getInstance(_context);
-        _powerSource = "Unknown";
+        sXmppBuddies = XmppBuddies.getInstance(_context);
+        sPowerSource = "Unknown";
         
-        _batInfoReceiver = new BroadcastReceiver() {
+        sBatInfoReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent intent) {
-                int level = intent.getIntExtra("level", 0);
+                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
+                float levelFloat = ((float)level / (float)scale)*100;
+                level = (int) levelFloat;
                 int pSource = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
                 String pSourceStr = null;
                 switch (pSource) {
@@ -42,50 +47,56 @@ public class BatteryCmd extends CommandHandlerBase {
                         pSourceStr = "Unknown";
                         break;
                 }                                       
-                if (_lastPercentageNotified == -1) {
+                if (sLastKnownPercentage == -1) {
                     notifyAndSave(level, pSourceStr);
-                } else if (level != _lastPercentageNotified || _powerSource.compareTo(pSourceStr) != 0) {
+                } else if (level != sLastKnownPercentage || sPowerSource.compareTo(pSourceStr) != 0) {
                     notifyAndSave(level, pSourceStr);
                 }
             }
-
-            private void notifyAndSave(int level, String powerSource) {
-                _powerSource = powerSource;
-                _lastPercentageNotified = level;                
-                sendBatteryInfos(level, false);
-            }
         };
-        _context.registerReceiver(_batInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        _context.registerReceiver(sBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
     
     /**
      * 
-     * @param level
      * @param force
      */
-    private void sendBatteryInfos(int level, boolean force) {
-        if (force || (_settingsMgr.notifyBattery && level % _settingsMgr.batteryNotificationIntervalInt == 0)) {
-            send(R.string.chat_battery_level, level);
+    private void sendBatteryInfos(boolean force) {
+        if (force || (_settingsMgr.notifyBattery && sLastKnownPercentage % _settingsMgr.batteryNotificationIntervalInt == 0)) {
+            send(R.string.chat_battery_level, sLastKnownPercentage);
         }
         if (_settingsMgr.notifyBatteryInStatus) {
             // only send an notification to the user if he is available
-            if (xmppBuddies.isNotificationAddressAvailable() || force) {
-                XmppManager.setStatus("GTalkSMS - " + level + "%" + " - " + _powerSource);
+            // and if something has changed
+            if (sXmppBuddies.isNotificationAddressAvailable() && (sLastKnownPercentage != sLastStatusPercentage || !sPowerSource.equals(sLastStatusPowersource))) {
+                XmppManager.setStatus("GTalkSMS - " + sLastKnownPercentage + "%" + " - " + sPowerSource);
+                sLastStatusPercentage = sLastKnownPercentage;
+                sLastStatusPowersource = sPowerSource;
             }
         }
     }
     
+    private void notifyAndSave(int level, String powerSource) {
+        sPowerSource = powerSource;
+        sLastKnownPercentage = level;                
+        sendBatteryInfos(false);
+    }
+    
     @Override
     protected void execute(String cmd, String args) {
-        sendBatteryInfos(_lastPercentageNotified, true);
+        if (args.equals("silent")) {
+            sendBatteryInfos(false);
+        } else {
+            sendBatteryInfos(true);
+        }
     }
 
     @Override
     public void cleanUp() {
-        if (_batInfoReceiver != null) {
-            _context.unregisterReceiver(_batInfoReceiver);
+        if (sBatInfoReceiver != null) {
+            _context.unregisterReceiver(sBatInfoReceiver);
         }
-        _batInfoReceiver = null;
+        sBatInfoReceiver = null;
     }
 
     @Override

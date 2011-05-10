@@ -129,7 +129,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
                 if (action.equals(MainService.ACTION_XMPP_PRESENCE_CHANGED)) {
                     int stateInt = intent.getIntExtra("state", XmppFriend.OFFLINE);
                     String userId = intent.getStringExtra("userid");
-                    String userFullId = intent.getStringExtra("fullid");
+                    String userFullId = intent.getStringExtra("fullid");  // TODO check if fullid contains only the bare resource
                     String name = intent.getStringExtra("name");
                     String status = intent.getStringExtra("status");
                     String stateImg = getStateImg(stateInt);
