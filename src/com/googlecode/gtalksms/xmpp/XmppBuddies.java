@@ -76,6 +76,7 @@ public class XmppBuddies implements RosterListener {
      * retrieves the current xmpp rooster
      * and sends a broadcast ACTION_XMPP_PRESENCE_CHANGED
      * for every friend
+     * does nothing if we are offline
      * 
      * @return
      */
@@ -83,24 +84,22 @@ public class XmppBuddies implements RosterListener {
         
         ArrayList<XmppFriend> friends = new ArrayList<XmppFriend>();
 
-        if (sConnection == null) {
-            return friends;
-        }
-        
-        try {
-            String userID = null;
-            String status = null;
-            Roster roster = sConnection.getRoster();
-    
-            for (RosterEntry r : roster.getEntries()) {
-                userID = r.getUser();
-                status = retrieveStatus(userID);
-                friends.add(new XmppFriend(userID, r.getName(), status, retrieveState(userID)));
+        if (sConnection != null && sConnection.isAuthenticated()) {
+            try {
+                String userID = null;
+                String status = null;
+                Roster roster = sConnection.getRoster();
+
+                for (RosterEntry r : roster.getEntries()) {
+                    userID = r.getUser();
+                    status = retrieveStatusMessage(userID);
+                    friends.add(new XmppFriend(userID, r.getName(), status, retrieveState(userID)));
+                }
+
+                sendFriendList(friends);
+            } catch (Exception ex) {
+                GoogleAnalyticsHelper.trackAndLogWarning("Failed to retrieve Xmpp Friend list", ex);
             }
-    
-            sendFriendList(friends);
-        } catch (Exception ex) {
-            GoogleAnalyticsHelper.trackAndLogWarning("Failed to retrieve Xmpp Friend list", ex);
         }
         
         return friends;
@@ -123,8 +122,14 @@ public class XmppBuddies implements RosterListener {
             sContext.sendBroadcast(intent);
         }
     }
-
-    public String retrieveStatus(String userID) {
+    
+    /**
+     * returns the status message for a given bare or full JID
+     * 
+     * @param userID
+     * @return
+     */
+    public String retrieveStatusMessage(String userID) {
         String userStatus = ""; // default return value
 
         try {
@@ -155,7 +160,15 @@ public class XmppBuddies implements RosterListener {
         return userState;
     }
     
-
+    /**
+     * Maps the smack internal userMode enums into our int status mode flags
+     * 
+     * @param userMode
+     * @param isOnline
+     * @return
+     */
+    // TODO do we need the isOnline boolean?
+    // Mode.available should be an equivalent
     public int retrieveState(Mode userMode, boolean isOnline) {
         int userState = XmppFriend.OFFLINE; // default return value
         
@@ -186,14 +199,27 @@ public class XmppBuddies implements RosterListener {
         // TODO Auto-generated method stub
     }
 
-    @Override
+    // carefull, this method does also get called by the SmackListener Thread
+    @Override    
     public void presenceChanged(Presence presence) {
+        String bareUserId = StringUtils.parseBareAddress(presence.getFrom());
+        
         Intent intent = new Intent(MainService.ACTION_XMPP_PRESENCE_CHANGED);
-        intent.putExtra("userid", StringUtils.parseBareAddress(presence.getFrom()));
+        intent.putExtra("userid", bareUserId);
         intent.putExtra("fullid", presence.getFrom());
         intent.putExtra("state", retrieveState(presence.getMode(), presence.isAvailable()));
         intent.putExtra("status", presence.getStatus());
         sContext.sendBroadcast(intent);
+        
+        // if the notification address is/has become available, update the resource status string
+        if (bareUserId.equals(sSettings.notifiedAddress) && presence.isAvailable()) {
+            intent = new Intent(MainService.ACTION_COMMAND);
+            intent.setClass(sContext, MainService.class);
+            intent.putExtra("command", "batt");
+            intent.putExtra("args", "silent");
+            sContext.sendBroadcast(intent);
+        }
+        
     }
     
     public boolean isNotificationAddressAvailable() {
