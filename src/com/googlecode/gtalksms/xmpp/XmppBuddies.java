@@ -215,11 +215,10 @@ public class XmppBuddies implements RosterListener {
         if (bareUserId.equals(sSettings.notifiedAddress) && presence.isAvailable()) {
             intent = new Intent(MainService.ACTION_COMMAND);
             intent.setClass(sContext, MainService.class);
-            intent.putExtra("command", "batt");
+            intent.putExtra("cmd", "batt");
             intent.putExtra("args", "silent");
-            sContext.sendBroadcast(intent);
-        }
-        
+            sContext.startService(intent);
+        }       
     }
     
     public boolean isNotificationAddressAvailable() {
