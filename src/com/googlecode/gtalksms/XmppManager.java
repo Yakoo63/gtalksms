@@ -511,9 +511,9 @@ public class XmppManager {
             informListeners(_connection);
 
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-            _packetListener = new ChatPacketListener(_connection, _context);            
+            _packetListener = new ChatPacketListener(_connection, _context);
             _connection.addPacketListener(_packetListener, filter);
-            
+
             filter = new PacketTypeFilter(Presence.class);
             sPresencePacketListener = new PresencePacketListener(_connection, _settings);
             _connection.addPacketListener(sPresencePacketListener, filter);
@@ -525,16 +525,26 @@ public class XmppManager {
             } catch (Exception ex) {
                 GoogleAnalyticsHelper.trackAndLogError("Failed to setup XMPP friend list roster.", ex);
             }
+
+            // It is important that we query the server for offline messages
+            // BEFORE we send the first presence stanza
+            XmppOfflineMessages.handleOfflineMessages(_connection, _settings.notifiedAddress, _context);
         } catch (Exception e) {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
             GoogleAnalyticsHelper.trackAndLogError("xmppMgr exception caught", e);
             if (!_connection.isConnected()) {
+                // TODO maybe this is handled by the connectinListener
+                // connectionClosedOnError()
                 maybeStartReconnect();
+                return;
             } else {
                 throw new IllegalStateException(e);
             }
-        }
+        }    
+        
+        setStatus(_presenceMessage);
+        
         Log.i(Tools.LOG_TAG, "connection established");
         if (_settings.debugLog) {
             boolean con = _connection.isConnected();
@@ -542,11 +552,7 @@ public class XmppManager {
             boolean enc = _connection.isUsingTLS();
             boolean comp = _connection.isUsingCompression();
             Log.i(Tools.LOG_TAG, "conn parameters: con=" + con + " auth=" + auth + " enc=" + enc + " comp=" + comp);
-        }                
-        
-        // It is important that we query the server for offline messages BEFORE we send the first presence stanza
-        XmppOfflineMessages.handleOfflineMessages(_connection, _settings.notifiedAddress, _context);
-        setStatus(_presenceMessage);
+        }    
         
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
