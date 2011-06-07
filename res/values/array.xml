@@ -5,6 +5,14 @@
         <item>status_orange_</item>
         <item>status_red_</item>
     </string-array>
+    <string-array name="list_framebufferMode_entryValues">
+        <item>ARGB_8888</item>
+        <item>RGB_565</item>
+    </string-array>
+    <string-array name="list_framebufferMode_entries">
+        <item>ARGB_8888 (Galaxy S II)</item>
+        <item>RGB_565 (Magic)</item>
+    </string-array>
     <string-array name="list_bat_notif_interval">
         <item>1</item>
         <item>5</item>

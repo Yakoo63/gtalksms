@@ -38,7 +38,9 @@
     <string name="pref_app_enable_debug">Debug Log</string>
     <string name="pref_app_enable_debug_help">Enabled debug log messages, increases log verbosity</string>
     <string name="pref_app_connect_mainscreen">Connect on GTalkSMS start</string>
-    <string name="pref_app_connect_mainscreen_help">Connects GTalkSMS when the Mainscreen is shown</string>    
+    <string name="pref_app_connect_mainscreen_help">Connects GTalkSMS when the Mainscreen is shown</string>  
+    <string name="pref_app_framebufferMode">Screenshot decoder</string>
+    <string name="pref_app_framebufferMode_help">FrameBuffer decoder type to take a screenshot on your phone</string>
     <string name="pref_con">Connection settings</string>
     <string name="pref_con_notified_address_cat">Address to notify</string>
     <string name="pref_con_notified_address">Address to notify</string>

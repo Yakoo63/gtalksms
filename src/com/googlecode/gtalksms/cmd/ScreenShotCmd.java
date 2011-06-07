@@ -17,6 +17,7 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.RootTools;
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -96,35 +97,56 @@ public class ScreenShotCmd extends CommandHandlerBase {
             InputStream in = null;
             in = new FileInputStream(rawTmpFile);
 
-            byte sBuffer[] = new byte[screenshotSize * 2];
-            in.read(sBuffer);
-
-            short sBuffer2[] = new short[screenshotSize];
-
-            for (int i = 0; i < screenshotSize * 2; i += 2) {
-                sBuffer2[i / 2] = (short) (((0xFF00 & ((short) sBuffer[i + 1]) << 8)) | (0x00FF & sBuffer[i]));
-            }
-
-            Bitmap bitmap = Bitmap.createBitmap(displayWidth, displayHeight, Bitmap.Config.RGB_565);
-
-            for (int i = 0; i < displayWidth; ++i) {
-                for (int j = 0; j < displayHeight; ++j) {
-                    short pixel = sBuffer2[displayWidth * j + i];
-
-                    int red = (255 * ((pixel & 0xF800) >> 11)) / 32;
-                    int green = (255 * ((pixel & 0x07E0) >> 5)) / 64;
-                    int blue = (255 * (pixel & 0x001F)) / 32;
-
-                    bitmap.setPixel(i, j, Color.rgb(red, green, blue));
+            Bitmap bitmap;
+            if (_settingsMgr.framebufferMode.equals(SettingsManager.FRAMEBUFFER_RGB_565)) {
+                byte sBuffer[] = new byte[screenshotSize * 2];
+                in.read(sBuffer);
+    
+                short sBuffer2[] = new short[screenshotSize];
+    
+                for (int i = 0; i < screenshotSize * 2; i += 2) {
+                    sBuffer2[i / 2] = (short) (((0xFF00 & ((short) sBuffer[i + 1]) << 8)) | (0x00FF & sBuffer[i]));
                 }
+    
+                bitmap = Bitmap.createBitmap(displayWidth, displayHeight, Bitmap.Config.RGB_565);
+    
+                for (int i = 0; i < displayWidth; ++i) {
+                    for (int j = 0; j < displayHeight; ++j) {
+                        short pixel = sBuffer2[displayWidth * j + i];
+    
+                        int red = (255 * ((pixel & 0xF800) >> 11)) / 32;
+                        int green = (255 * ((pixel & 0x07E0) >> 5)) / 64;
+                        int blue = (255 * (pixel & 0x001F)) / 32;
+    
+                        bitmap.setPixel(i, j, Color.rgb(red, green, blue));
+                    }
+                }
+            } else if (_settingsMgr.framebufferMode.equals(SettingsManager.FRAMEBUFFER_ARGB_8888)) {
+                byte sBuffer[] = new byte[screenshotSize * 4];
+                in.read(sBuffer);
+                
+                int sBuffer2[] = new int[screenshotSize];
+                for (int i = 0; i < screenshotSize * 4; i += 4) {
+                    sBuffer2[i / 4] = (int) (
+                            ((0xFF000000 & ((int) sBuffer[i + 3]) << 24)) | 
+                            ((0x00FF0000 & ((int) sBuffer[i + 2]) << 16)) | 
+                            ((0x0000FF00 & ((int) sBuffer[i + 1]) << 8)) | 
+                            (0x000000FF & sBuffer[i]));
+                }
+                
+                bitmap = Bitmap.createBitmap(sBuffer2, displayWidth, displayHeight, Bitmap.Config.ARGB_8888);
+            } else {
+                Tools.send("Framebuffer decoder not set", _answerTo, _context);
+                rawTmpFile.delete();
+                return;
             }
-                        
+            
             File picture = new File(repository, "screenshot_" + Tools.getFileFormat(GregorianCalendar.getInstance()) + ".png");
             FileOutputStream fos = new FileOutputStream(picture);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             fos.close();
-            Tools.send("Screenshot saved as " + picture.getAbsolutePath(), _answerTo, _context);
+            Tools.send(_settingsMgr.framebufferMode + " screenshot saved as " + picture.getAbsolutePath(), _answerTo, _context);
             
             rawTmpFile.delete();
             
