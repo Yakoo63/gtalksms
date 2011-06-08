@@ -2,7 +2,7 @@
 <manifest 
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms" 
-    android:versionName="2.2.3.1" 
+    android:versionName="2.2.3.2" 
     android:versionCode="36">
     <uses-sdk 
         android:minSdkVersion="5" 
@@ -113,7 +113,8 @@
         <meta-data 
             android:value="a14d73bb1e4a729" 
             android:name="ADMOB_INTERSTITIAL_PUBLISHER_ID" />
-    <uses-library android:name="android.test.runner" />
+        
+        <uses-library android:name="android.test.runner" />
     </application>
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
