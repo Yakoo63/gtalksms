@@ -581,7 +581,9 @@ public class XmppManager {
             connection.connect();
         } catch (Exception e) {
             Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e.getMessage());
-            MainService.displayToast(R.string.xmpp_manager_connection_failed, e.getLocalizedMessage());
+            // This notification is annoying when data network blinks
+            // MainService.displayToast(R.string.xmpp_manager_connection_failed, e.getLocalizedMessage());
+            
             // "No response from server" usually means that the connection is somehow in an undefined state
             // so we throw away the XMPPConnection by null ing it
             // see also issue 133 - http://code.google.com/p/gtalksms/issues/detail?id=133
