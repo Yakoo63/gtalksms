@@ -35,6 +35,7 @@ public abstract class ExtentedPictureCallback implements PictureCallback {
         } else {
             Log.e(Tools.LOG_TAG, "Error writing file");
         }
+        camera.stopPreview();
         camera.release();
     }
     
