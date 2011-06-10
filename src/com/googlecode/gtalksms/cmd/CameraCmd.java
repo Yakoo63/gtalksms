@@ -4,12 +4,15 @@ import java.io.File;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
@@ -25,15 +28,18 @@ public class CameraCmd extends CommandHandlerBase {
     private static final int EMAIL_CALLBACK = 2;
 
     private static AudioManager audioManager;
+    private static WindowManager windowManager;
     private static Camera camera = null;
     private static File repository;
     private static String emailReceiving;
     private static int streamVolume;
+    private static int cameraId = 0;
     
     public CameraCmd(MainService mainService) {
         super(mainService, new String[] {"camera", "photo"}, CommandHandlerBase.TYPE_SYSTEM);
         File path;
         
+        windowManager = (WindowManager) _mainService.getSystemService(Context.WINDOW_SERVICE);
         audioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         
         SettingsManager settings = SettingsManager.getSettingsManager(_context);
@@ -65,36 +71,92 @@ public class CameraCmd extends CommandHandlerBase {
                 takePicture(XMPP_CALLBACK);
             } else if (splitedArgs[0].equals("list")) {
                 listCameras();
-            } else if (splitedArgs[0].equals("set")) {
-                setCamera(splitedArgs);
+            } else if (splitedArgs[0].equals("set") && splitedArgs.length > 1) {
+                setCamera(splitedArgs[1]);
             }           
         } 
     }
     
-    private void setCamera(String[] splitedArgs) {
-        // TODO does nothing atm, we need API >= 9 for this feature
+    private void setCamera(String arg) {
         if (Build.VERSION.SDK_INT >= 9) {
-            // TODO set the camera
+            Integer id = Tools.parseInt(arg);
+            if (id == null || id < 0 || id >= Camera.getNumberOfCameras()) {
+                listCameras();
+            } else {
+                cameraId = id.intValue(); 
+                CameraInfo info = new CameraInfo(); 
+                Camera.getCameraInfo(cameraId, info);
+                
+                if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
+                    send("Back camera activated");
+                } else if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
+                    send("Front camera activated");
+                }    
+            }                
         } else {
-            // TODO print error message
+            // TODO internationalization
+            String msg = "Your Android version doesn't allow this command.";
+            Log.w(Tools.LOG_TAG, msg);
+            send(msg);
         }
     }
 
     private void listCameras() {
-        // TODO does nothing atm, we need API >= 9 for this feature
         if (Build.VERSION.SDK_INT >= 9) {
-            // TODO list the available cameras
+            StringBuilder res = new StringBuilder();
+            for(int i = 0; i < Camera.getNumberOfCameras(); ++i) {
+                CameraInfo info = new CameraInfo(); 
+                Camera.getCameraInfo(i, info);
+                
+                res.append(i + " - ");
+                if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
+                    res.append(" Back camera\n");
+                } else if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
+                    res.append(" Front camera\n");
+                }    
+            }
+            send(res.toString());
         } else {
-            // TODO print error message
+            // TODO internationalization
+            String msg = "Your Android version doesn't allow this command.";
+            Log.w(Tools.LOG_TAG, msg);
+            send(msg);
         }
     }
+    
+    private int getCameraOrientation() {
+        CameraInfo info = new CameraInfo();
+        Camera.getCameraInfo(cameraId, info);
+        int rotation = windowManager.getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
 
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        return result;
+    }
+    
     private void takePicture(int pCallbackMethod) {
         cleanUp();
         PictureCallback pictureCallback;
         
         try {
-            camera = Camera.open();
+            if (Build.VERSION.SDK_INT >= 9) {
+                camera = Camera.open(cameraId);
+                camera.setDisplayOrientation(getCameraOrientation());
+            } else {
+                camera = Camera.open();
+            }
             SurfaceView view = new SurfaceView(_context);
             camera.setPreviewDisplay(view.getHolder());
             camera.startPreview();
@@ -128,7 +190,6 @@ public class CameraCmd extends CommandHandlerBase {
         }
     }
        
-    
     @Override
     public synchronized void cleanUp() {
         if (camera != null) {
