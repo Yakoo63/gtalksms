@@ -561,10 +561,10 @@ public class MainService extends Service {
         String command;
         String args;
         if (commandLine.indexOf(":") != -1) {
-            command = commandLine.substring(0, commandLine.indexOf(":"));
+            command = commandLine.substring(0, commandLine.indexOf(":")).trim();
             args = commandLine.substring(commandLine.indexOf(":") + 1);
         } else {
-            command = commandLine;
+            command = commandLine.trim();
             args = "";
         }
 
