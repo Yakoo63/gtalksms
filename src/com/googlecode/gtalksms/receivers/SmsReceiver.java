@@ -20,7 +20,7 @@ public class SmsReceiver extends BroadcastReceiver {
         // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
         // However, send long SMS of same sender in one message
         Map<String, String> msg = RetrieveMessages(intent);
-        
+           
         // Finally, send all SMS via XMPP by sender
         for(String sender : msg.keySet()) {
             Intent svcintent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
@@ -34,7 +34,7 @@ public class SmsReceiver extends BroadcastReceiver {
         Bundle bundle = intent.getExtras();
         SmsMessage[] msgs = null;
         
-        if (bundle != null && MainService.IsRunning && bundle.containsKey("pdus")) {
+        if (bundle != null && bundle.containsKey("pdus")) {
             Object[] pdus = (Object[]) bundle.get("pdus");
 
             if (pdus != null) {

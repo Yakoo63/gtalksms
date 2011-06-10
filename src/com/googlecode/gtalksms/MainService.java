@@ -194,10 +194,11 @@ public class MainService extends Service {
                 onCommandReceived(message, intent.getStringExtra("from"));
             }
         } else if (action.equals(ACTION_SMS_RECEIVED)) {
+            String number = intent.getStringExtra("sender");
+            String name = ContactsManager.getContactName(this, number);
+            String message = intent.getStringExtra("message");
+    
             if (initialState == XmppManager.CONNECTED) {
-                String number = intent.getStringExtra("sender");
-                String name = ContactsManager.getContactName(this, number);
-                String message = intent.getStringExtra("message");
                 boolean roomExists = XmppMuc.getInstance(this).roomExists(number);
                 
                 if (_settingsMgr.debugLog) {
@@ -226,6 +227,9 @@ public class MainService extends Service {
                         _xmppMgr.send(msg, null);
                     }
                 }                
+            } else if (message.trim().toLowerCase().compareTo("gtalksms") == 0){
+                Log.i(Tools.LOG_TAG, "Connection command received by SMS from " + name);
+                _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             }
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);

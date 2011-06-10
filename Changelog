@@ -1,7 +1,8 @@
 Upcoming
 * File transfer
-* Take photo and receive them via XMPP 
+* Take photo and receive them via XMPP with front and back camera
 * Screen shot feature (Rooted phones only)
+* Application starts when a SMS containing "GTalkSMS" is received
 
 2.2
 * Rejoin MUC rooms on XMPP reconnect or service restart
