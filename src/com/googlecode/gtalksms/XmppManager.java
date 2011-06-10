@@ -628,7 +628,7 @@ public class XmppManager {
             // hard-coded string.
             if (e.getMessage().indexOf("SASL authentication") == -1) {
                 // doesn't look like a bad username/password, so retry
-                MainService.displayToast(R.string.xmpp_manager_login_failed, e.getLocalizedMessage());
+                // MainService.displayToast(R.string.xmpp_manager_login_failed, e.getLocalizedMessage());
                 maybeStartReconnect();
             } else {
                 MainService.displayToast(R.string.xmpp_manager_invalid_credentials, null);
