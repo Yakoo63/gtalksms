@@ -554,7 +554,6 @@ public class XmppManager {
             connection.connect();
         } catch (Exception e) {
             Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e.getMessage());
-            MainService.displayToast(R.string.xmpp_manager_connection_failed, e.getLocalizedMessage());
             // "No response from server" usually means that the connection is somehow in an undefined state
             // so we throw away the XMPPConnection by null ing it
             // see also issue 133 - http://code.google.com/p/gtalksms/issues/detail?id=133
@@ -575,8 +574,9 @@ public class XmppManager {
         }          
         
         // we reuse the connection and the auth was done with the connect()
-        if (connection.isAuthenticated())
+        if (connection.isAuthenticated()) {
             return true;
+        }
         
         ServiceDiscoveryManager serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
         XHTMLManager.setServiceEnabled(connection, false);   
@@ -599,7 +599,6 @@ public class XmppManager {
             // hard-coded string.
             if (e.getMessage().indexOf("SASL authentication") == -1) {
                 // doesn't look like a bad username/password, so retry
-                MainService.displayToast(R.string.xmpp_manager_login_failed, e.getLocalizedMessage());
                 maybeStartReconnect();
             } else {
                 MainService.displayToast(R.string.xmpp_manager_invalid_credentials, null);

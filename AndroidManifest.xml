@@ -6,7 +6,7 @@
     android:versionCode="36">
     <uses-sdk 
         android:minSdkVersion="5" 
-        android:targetSdkVersion="8"/>
+        android:targetSdkVersion="9"/>
     <application 
         android:icon="@drawable/icon_green" 
         android:label="GTalkSMS" 

@@ -2,6 +2,7 @@ package com.googlecode.gtalksms.data.contacts;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.provider.ContactsContract.PhoneLookup;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
+import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.tools.StringFmt;
@@ -224,13 +226,13 @@ public class ContactsManager {
      */
     public static ArrayList<Phone> getPhones(Context ctx, Long contactId) {
         ArrayList<Phone> res = new ArrayList<Phone>();
+        HashSet<String> phones = new HashSet<String>();
         
         if(null != contactId) {
             String where =  ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId;
             Cursor c = ctx.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, where, null, null);
             
             while (c.moveToNext()) {
-
                 String number = Tools.getString(c, CommonDataKinds.Phone.NUMBER);
                 String label = Tools.getString(c,CommonDataKinds.Phone.LABEL);
                 int type = Tools.getLong(c, CommonDataKinds.Phone.TYPE).intValue();
@@ -246,7 +248,11 @@ public class ContactsManager {
                 phone.label = label;
                 phone.type = type;
     
-                res.add(phone);
+                if (phones.add(phone.cleanNumber)) {
+                    res.add(phone);
+                } else if (MainService._settingsMgr.debugLog) {
+                    Log.i(Tools.LOG_TAG, "Duplicated phone number: " + number);
+                }
             }
             c.close();
         }

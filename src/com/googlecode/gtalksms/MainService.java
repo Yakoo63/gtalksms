@@ -86,7 +86,7 @@ public class MainService extends Service {
     // about some events
     public static boolean IsRunning = false;
 
-    private static SettingsManager _settingsMgr;
+    public static SettingsManager _settingsMgr;
     private static XmppManager _xmppMgr;
     private static BroadcastReceiver _xmppConChangedReceiver;
     private static KeyboardInputMethod _keyboard;
@@ -204,30 +204,37 @@ public class MainService extends Service {
             if (_settingsMgr.debugLog) {
                 Log.i(Tools.LOG_TAG, MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
             }
-
-            if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
-                XmppMsg msg = new XmppMsg();
-                msg.appendBold(getString(R.string.chat_sms_from, name));
-                msg.append(message);
-                _xmppMgr.send(msg, null);
-                if (_commands.containsKey("sms")) {
-                    ((SmsCmd) _commands.get("sms")).setLastRecipient(number);
+            if (message.trim().toLowerCase().compareTo("gtalksms") == 0) {
+                if (_settingsMgr.debugLog) {
+                    Log.i(Tools.LOG_TAG, "Connection command received by SMS from " + name);
                 }
-            }
-            if (_settingsMgr.notifySmsInChatRooms || roomExists) {
-                try {
-                    XmppMuc.getInstance(this).writeRoom(number, name, message);
-                } catch (XMPPException e) {
-                    // room creation and/or writing failed - notify about this
-                    // error
-                    // and send the message to the notification address
+                _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+            } else {
+                if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
                     XmppMsg msg = new XmppMsg();
-                    msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
                     _xmppMgr.send(msg, null);
+                    if (_commands.containsKey("sms")) {
+                        ((SmsCmd) _commands.get("sms")).setLastRecipient(number);
+                    }
                 }
-            }               
+                if (_settingsMgr.notifySmsInChatRooms || roomExists) {
+                    try {
+                        XmppMuc.getInstance(this).writeRoom(number, name, message);
+                    } catch (XMPPException e) {
+                        // room creation and/or writing failed - notify about
+                        // this
+                        // error
+                        // and send the message to the notification address
+                        XmppMsg msg = new XmppMsg();
+                        msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
+                        msg.appendBold(getString(R.string.chat_sms_from, name));
+                        msg.append(message);
+                        _xmppMgr.send(msg, null);
+                    }
+                }
+            }
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
             if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
@@ -563,10 +570,10 @@ public class MainService extends Service {
         String command;
         String args;
         if (commandLine.indexOf(":") != -1) {
-            command = commandLine.substring(0, commandLine.indexOf(":"));
+            command = commandLine.substring(0, commandLine.indexOf(":")).trim();
             args = commandLine.substring(commandLine.indexOf(":") + 1);
         } else {
-            command = commandLine;
+            command = commandLine.trim();
             args = "";
         }
 

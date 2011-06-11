@@ -31,7 +31,7 @@ public class SystemCmd extends CommandHandlerBase {
     private static NullIntentStartCounter sNullIntentStartCounter;
     
     public SystemCmd(MainService mainService) {
-        super(mainService, new String[] {"system"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, new String[] {"sysinfo"}, CommandHandlerBase.TYPE_SYSTEM);
         if (SystemCmd.mainService == null) {
             Context ctx = mainService.getBaseContext();
             activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
@@ -228,13 +228,13 @@ public class SystemCmd extends CommandHandlerBase {
     
     private static void appendTelephonStatus(XmppMsg msg) {
         msg.appendBold("TelephonyManager");
-        msg.append("DeviceID: " + telephonyManager.getDeviceId());
-        msg.append("Device Software Version: " + telephonyManager.getDeviceSoftwareVersion());
-        msg.append("Line1Number: " + telephonyManager.getLine1Number());
-        msg.append("SIM Serial # " + telephonyManager.getSimSerialNumber());
-        msg.append("Subscriber ID: " + telephonyManager.getSubscriberId());
-        msg.append("Voice Mail Alpha Tag: " + telephonyManager.getVoiceMailAlphaTag());
-        msg.append("Voice Mail Number: " + telephonyManager.getVoiceMailNumber());
+        msg.appendLine("DeviceID: " + telephonyManager.getDeviceId());
+        msg.appendLine("Device Software Version: " + telephonyManager.getDeviceSoftwareVersion());
+        msg.appendLine("Line1Number: " + telephonyManager.getLine1Number());
+        msg.appendLine("SIM Serial # " + telephonyManager.getSimSerialNumber());
+        msg.appendLine("Subscriber ID: " + telephonyManager.getSubscriberId());
+        msg.appendLine("Voice Mail Alpha Tag: " + telephonyManager.getVoiceMailAlphaTag());
+        msg.appendLine("Voice Mail Number: " + telephonyManager.getVoiceMailNumber());
     }
     
     private static void appendNullIntentStartCounter(XmppMsg msg) {
