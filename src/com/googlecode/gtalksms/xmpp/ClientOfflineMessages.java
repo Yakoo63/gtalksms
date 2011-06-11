@@ -26,13 +26,12 @@ public class ClientOfflineMessages {
     private static XMPPConnection sXMPPConnection;
 
     private static ClientOfflineMessages sClientOfflineMessages;
-    private static Context sContext;
     
     private ClientOfflineMessages(Context ctx) {
-        sContext = ctx;
         sDirFile = new File(ctx.getFilesDir(), DIRECTORY);
-        if (!sDirFile.exists())
+        if (!sDirFile.exists()) {
             sDirFile.mkdir();
+        }
         sXmppMuc = XmppMuc.getInstance(ctx);
         cleanUp();
     }

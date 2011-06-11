@@ -17,10 +17,8 @@ public class NullIntentStartCounter {
     private static File sDirFile;
     
     private static NullIntentStartCounter sNullIntentStartCounter;
-    private static Context sContext;
-    
+
     private NullIntentStartCounter(Context ctx) {
-        sContext = ctx;
         sDirFile = new File(ctx.getFilesDir(), DIRECTORY);
         if (!sDirFile.exists())
             sDirFile.mkdir();

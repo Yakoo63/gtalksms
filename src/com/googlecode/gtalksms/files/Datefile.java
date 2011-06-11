@@ -39,7 +39,7 @@ public abstract class Datefile extends File {
         return dos;
     }
     
-    public static void deleteDatefilesOlderThan(List files, Date date) {
+    public static void deleteDatefilesOlderThan(List<?> files, Date date) {
         for (int i = 0; i < files.size(); i++) {
             Datefile f = (Datefile) files.get(i);
             if (f.getTime() < date.getTime())
