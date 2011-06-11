@@ -15,6 +15,7 @@ import android.provider.ContactsContract.PhoneLookup;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
+import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.tools.StringFmt;
@@ -249,7 +250,7 @@ public class ContactsManager {
     
                 if (phones.add(phone.cleanNumber)) {
                     res.add(phone);
-                } else {
+                } else if (MainService._settingsMgr.debugLog) {
                     Log.i(Tools.LOG_TAG, "Duplicated phone number: " + number);
                 }
             }

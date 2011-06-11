@@ -85,7 +85,7 @@ public class MainService extends Service {
     // about some events
     public static boolean IsRunning = false;
 
-    private static SettingsManager _settingsMgr;
+    public static SettingsManager _settingsMgr;
     private static XmppManager _xmppMgr;
     private static BroadcastReceiver _xmppConChangedReceiver;
     private static KeyboardInputMethod _keyboard;
@@ -228,12 +228,16 @@ public class MainService extends Service {
                     }
                 }                
             } else if (message.trim().toLowerCase().compareTo("gtalksms") == 0){
-                Log.i(Tools.LOG_TAG, "Connection command received by SMS from " + name);
+                if(_settingsMgr.debugLog) {
+                    Log.i(Tools.LOG_TAG, "Connection command received by SMS from " + name);
+                }
                 _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             }
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
-            if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
+            if(_settingsMgr.debugLog) {
+                Log.i(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
+            }
             if(available) {
                 GoogleAnalyticsHelper.dispatch();
             }
