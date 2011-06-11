@@ -1,7 +1,7 @@
 package com.googlecode.gtalksms;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -58,6 +58,7 @@ import android.util.Log;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
+import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;
 import com.googlecode.gtalksms.xmpp.PresencePacketListener;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
@@ -91,7 +92,7 @@ public class XmppManager {
     private static int _status = DISCONNECTED;
     private static String _presenceMessage = "GTalkSMS";
     
-    private static Set<XmppConnectionChangeListener> connectionChangeListeners;
+    private static List<XmppConnectionChangeListener> connectionChangeListeners;
     private static XMPPConnection _connection = null;
     private static XmppManager xmppManager;
     private static PacketListener _packetListener = null;
@@ -102,6 +103,7 @@ public class XmppManager {
     private static XmppMuc _xmppMuc;
     private static XmppBuddies _xmppBuddies;
     private static XmppFileManager _xmppFileMgr;
+    private static ClientOfflineMessages sClientOfflineMessages;
 //    private ServiceDiscoveryManager serviceDiscoMgr;
     
     private static int reusedConnectionCount = 0;
@@ -122,16 +124,18 @@ public class XmppManager {
     private static Context _context;
     
     private XmppManager(Context context) {
-        connectionChangeListeners = new HashSet<XmppConnectionChangeListener>();
+        connectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
         _settings = SettingsManager.getSettingsManager(context);
         _context = context;
         configure(ProviderManager.getInstance());
         _xmppBuddies = XmppBuddies.getInstance(context);
         _xmppFileMgr = XmppFileManager.getInstance(context);
         _xmppMuc = XmppMuc.getInstance(context);
+        sClientOfflineMessages = ClientOfflineMessages.getInstance(context);
         _xmppBuddies.registerListener(this);
         _xmppFileMgr.registerListener(this);
         _xmppMuc.registerListener(this);
+        sClientOfflineMessages.registerListener(this);
         reusedConnectionCount = 0;
         newConnectionCount = 0;
         ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
@@ -142,6 +146,7 @@ public class XmppManager {
         SmackConfiguration.setPacketReplyTimeout(10000);      // 10 secs
         SmackConfiguration.setLocalSocks5ProxyEnabled(false);
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
+        _connection = createNewConnection();
     }
     
     public static XmppManager getInstance(Context ctx) {
@@ -412,58 +417,26 @@ public class XmppManager {
             updateStatus(WAITING_FOR_NETWORK);
             return;
         }
-        
+
         if (SettingsManager.connectionSettingsObsolete 
                 || _connection == null 
                 || _connection.isConnected() ) {
             
-            ConnectionConfiguration conf;
-            if (_settings.manuallySpecifyServerSettings) {
-                // trim the serverHost here because of Issue 122
-                conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
-            } else {
-                // DNS SRV lookup, yeah! :)
-                // Note: The Emulator will throw here an BadAddressFamily Exception
-                // but on a real device it just works fine
-                // see: http://stackoverflow.com/questions/2879455/android-2-2-and-bad-address-family-on-socket-connect
-                // and http://code.google.com/p/android/issues/detail?id=9431
-                conf = new ConnectionConfiguration(_settings.serviceName);
-            }
-            
-            conf.setTruststorePath("/system/etc/security/cacerts.bks");
-            conf.setTruststorePassword("changeit");
-            conf.setTruststoreType("bks");
-            switch (_settings.xmppSecurityModeInt) {
-            case SettingsManager.XMPPSecurityOptional:
-                conf.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
-                break;
-            case SettingsManager.XMPPSecurityRequired:
-                conf.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
-                break;
-            case SettingsManager.XMPPSecurityDisabled:
-            default:
-                conf.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-                break;
-            }
-            if (_settings.useCompression)
-                conf.setCompressionEnabled(true);
-            
-            // disable the built-in ReconnectionManager
-            // since we handle this
-            conf.setReconnectionAllowed(false);
-            conf.setSendPresence(false);
-            
-            connection = new XMPPConnection(conf);            
+            connection = createNewConnection();
             SettingsManager.connectionSettingsObsolete = false;
-            if (!connectAndAuth(connection))
-                return;  // connection failure
+            if (!connectAndAuth(connection)) {
+                // connection failure
+                return;
+            }                  
             newConnectionCount++;
         } else {
             // reuse the old connection settings
             connection = _connection;
             // we reuse the xmpp connection so only connect() is needed
-            if (!connectAndAuth(connection))
-                return; // connection failure
+            if (!connectAndAuth(connection)) {
+                // connection failure
+                return;
+            }
             reusedConnectionCount++;
         }                
         // this code is only executed if we have an connection established
@@ -646,6 +619,46 @@ public class XmppManager {
                 && _connection.isConnected()
                 && _connection.isAuthenticated());
     }
+    
+    private static XMPPConnection createNewConnection() {
+        ConnectionConfiguration conf;
+        if (_settings.manuallySpecifyServerSettings) {
+            // trim the serverHost here because of Issue 122
+            conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
+        } else {
+            // DNS SRV lookup, yeah! :)
+            // Note: The Emulator will throw here an BadAddressFamily Exception
+            // but on a real device it just works fine
+            // see: http://stackoverflow.com/questions/2879455/android-2-2-and-bad-address-family-on-socket-connect
+            // and http://code.google.com/p/android/issues/detail?id=9431
+            conf = new ConnectionConfiguration(_settings.serviceName);
+        }
+        
+        conf.setTruststorePath("/system/etc/security/cacerts.bks");
+        conf.setTruststorePassword("changeit");
+        conf.setTruststoreType("bks");
+        switch (_settings.xmppSecurityModeInt) {
+        case SettingsManager.XMPPSecurityOptional:
+            conf.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
+            break;
+        case SettingsManager.XMPPSecurityRequired:
+            conf.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
+            break;
+        case SettingsManager.XMPPSecurityDisabled:
+        default:
+            conf.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+            break;
+        }
+        if (_settings.useCompression)
+            conf.setCompressionEnabled(true);
+        
+        // disable the built-in ReconnectionManager
+        // since we handle this
+        conf.setReconnectionAllowed(false);
+        conf.setSendPresence(false);
+        
+        return new XMPPConnection(conf);     
+    }
 
     /** returns the current connection state */
     public static int getConnectionStatus() {
@@ -668,48 +681,59 @@ public class XmppManager {
      * @return true, if we were connected and the message was handeld over to the connection - otherwise false
      */
     public boolean send(XmppMsg message, String to) {
-        if (isConnected()) {
-            if (_settings.debugLog) {
-                if (to == null) {
-                    Log.i(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\"");
-                } else {
-                    Log.i(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\" to " + to);
-                }
-            }
-            Message msg;
-            MultiUserChat muc = null;
+        if (_settings.debugLog) {
             if (to == null) {
-                msg = new Message(_settings.notifiedAddress, Message.Type.chat);
+                Log.i(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\"");
             } else {
-                msg = new Message(to);
-                muc = _xmppMuc.getRoomViaRoomname(to);
+                Log.i(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\" to " + to);
             }
-            
-            if (_settings.formatResponses) {
-                msg.setBody(message.generateFmtTxt());
-            } else {
-                msg.setBody(message.generateTxt());
-            }
-            if ((to == null) || XHTMLManager.isServiceEnabled(_connection, to)) { 
-                String xhtmlBody = message.generateXHTMLText().toString();
-                XHTMLManager.addBody(msg, xhtmlBody);
-            }
+        }
+        Message msg;
+        MultiUserChat muc = null;
+
+        // to is null, so send to the default, which is the notifiedAddress
+        if (to == null) {
+            msg = new Message(_settings.notifiedAddress, Message.Type.chat);
+        } else {
+            msg = new Message(to);
+            muc = _xmppMuc.getRoomViaRoomname(to);
+        }
+
+        if (_settings.formatResponses) {
+            msg.setBody(message.generateFmtTxt());
+        } else {
+            msg.setBody(message.generateTxt());
+        }
+
+        // add an XTHML Body
+        if ((to == null) || XHTMLManager.isServiceEnabled(_connection, to)) {
+            String xhtmlBody = message.generateXHTMLText().toString();
+            XHTMLManager.addBody(msg, xhtmlBody);
+        }
+
+        // determine the type of the message, groupchat or chat
+        if (muc == null) {
+            msg.setType(Message.Type.chat);
+        } else {
+            msg.setType(Message.Type.groupchat);
+
+        }
+
+        if (_connection.isConnected()) {
             if (muc == null) {
-                msg.setType(Message.Type.chat);
                 _connection.sendPacket(msg);
             } else {
-                msg.setType(Message.Type.groupchat);
                 try {
                     muc.sendMessage(msg);
                 } catch (XMPPException e) {
                     return false;
                 }
-            }            
+            }
             return true;
         } else {
             if (_settings.debugLog)
-                Log.d(Tools.LOG_TAG, "Not sending message \"" + message.toShortString() + "\" because we are not connected");
-            return false;
+                Log.d(Tools.LOG_TAG, "Offline client message \"" + message.toShortString() + "\" because we are not connected");
+            return sClientOfflineMessages.addOfflineMessage(msg);
         }
     }
     

@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -290,5 +292,16 @@ public class Tools {
         i.putExtra("message", message);
         i.putExtra("from", from);
         ctx.startService(i);
+    }
+    
+    /**
+     * Returns a String in the simple date format
+     * 
+     * @return the current date in dd/MM/yyyy format
+     */
+    public static String currentDate() {
+        DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+        Calendar cal = Calendar.getInstance();
+        return DATE_FORMAT.format(cal.getTime());
     }
 }

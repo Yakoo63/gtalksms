@@ -5,9 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import android.content.Context;
 import android.util.Log;
@@ -141,7 +138,6 @@ public class GoogleAnalyticsHelper {
     /**
      * checks the contents of the datefile
      * and updates the datefile if its outdated
-     * used by trackServiceStartsPerDay
      * 
      * @return false if datefile is outdated, true otherwise
      */
@@ -154,7 +150,7 @@ public class GoogleAnalyticsHelper {
         } catch (Exception e) {
 //            trackAndLogError("Reading datefile", e);  //commented out - just spams the event on fresh installs
         }
-        if ((new String(inputBuffer)).equals(currentDate())) {
+        if ((new String(inputBuffer)).equals(Tools.currentDate())) {
             return true;
         }
         createDatefile();
@@ -163,12 +159,13 @@ public class GoogleAnalyticsHelper {
     
     /**
      * checks if the method trackServiceStartsPerDay()
-     * to avoid filesystem lookups when possible
+     * was run today before to avoid filesystem lookups 
+     * when possible
      * 
      * @return
      */
     private boolean hasBeenRunToday() {
-        final String currentDate = currentDate();
+        final String currentDate = Tools.currentDate();
         if (lastRun == null) {
             lastRun = currentDate;
             return false;
@@ -182,21 +179,16 @@ public class GoogleAnalyticsHelper {
     
     private boolean createDatefile() {
         try {
-            FileOutputStream fOut = ctx.openFileOutput(datefile, Context.MODE_PRIVATE); //MODE_APPEND not set, should be ok
+            // MODE_APPEND not set, should be ok
+            FileOutputStream fOut = ctx.openFileOutput(datefile, Context.MODE_PRIVATE);
             OutputStreamWriter osw = new OutputStreamWriter(fOut);
-            osw.write(currentDate());
+            osw.write(Tools.currentDate());
             osw.close();
         } catch (Exception e) {
             return false;
         }
         return true;
-    }
-    
-    private String currentDate() {
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Calendar cal = Calendar.getInstance();
-        return dateFormat.format(cal.getTime());
-    }
+    }   
     
 //    private boolean datefileExists() {
 //        for (String s : ctx.fileList()) {

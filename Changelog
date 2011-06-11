@@ -2,6 +2,7 @@ Upcoming
 * File transfer
 * Take photo and receive them via XMPP 
 * Screen shot feature (Rooted phones only)
+* Client Offline Messages - GTalkSMS will try to send a message later when disconnected
 
 2.2
 * Rejoin MUC rooms on XMPP reconnect or service restart

@@ -16,6 +16,7 @@ import android.telephony.TelephonyManager;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.tools.NullIntentStartCounter;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -27,6 +28,7 @@ public class SystemCmd extends CommandHandlerBase {
     private static ConnectivityManager connectivityManager;
     private static MainService mainService;
     private static TelephonyManager telephonyManager;
+    private static NullIntentStartCounter sNullIntentStartCounter;
     
     public SystemCmd(MainService mainService) {
         super(mainService, new String[] {"system"}, CommandHandlerBase.TYPE_SYSTEM);
@@ -36,6 +38,7 @@ public class SystemCmd extends CommandHandlerBase {
             connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
             telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
             SystemCmd.mainService = mainService;
+            sNullIntentStartCounter = NullIntentStartCounter.getInstance(ctx);
         }
     }
 
@@ -63,6 +66,8 @@ public class SystemCmd extends CommandHandlerBase {
         appendPreferences(res);
         res.newLine();
         appendTelephonStatus(res);
+        res.newLine();
+        appendNullIntentStartCounter(res);
         
         send(res);
     }
@@ -230,5 +235,16 @@ public class SystemCmd extends CommandHandlerBase {
         msg.append("Subscriber ID: " + telephonyManager.getSubscriberId());
         msg.append("Voice Mail Alpha Tag: " + telephonyManager.getVoiceMailAlphaTag());
         msg.append("Voice Mail Number: " + telephonyManager.getVoiceMailNumber());
+    }
+    
+    private static void appendNullIntentStartCounter(XmppMsg msg) {
+        msg.appendBoldLine("Null Intents Starts");
+        msg.appendLine("Hot often was " + Tools.APP_NAME + " restarted by Android");
+        long[] values = sNullIntentStartCounter.getLastValues(7);
+        String line = "";        
+        for (int i = 0; i < values.length; i++) {
+            line += values[i] + " ";
+        }
+        msg.appendLine(line);
     }
 }

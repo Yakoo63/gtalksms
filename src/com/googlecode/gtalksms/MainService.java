@@ -46,6 +46,7 @@ import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.tools.DisplayToast;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
+import com.googlecode.gtalksms.tools.NullIntentStartCounter;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -138,7 +139,8 @@ public class MainService extends Service {
      * @param id
      */
     protected void onHandleIntent(final Intent intent, int id) {
-        if (intent == null) {  // TODO remove this if block
+        // TODO remove this if block
+        if (intent == null) {  
             GoogleAnalyticsHelper.trackAndLogError("onHandleIntent: Intent null");  
             return;
         }
@@ -194,39 +196,38 @@ public class MainService extends Service {
                 onCommandReceived(message, intent.getStringExtra("from"));
             }
         } else if (action.equals(ACTION_SMS_RECEIVED)) {
-            if (initialState == XmppManager.CONNECTED) {
-                String number = intent.getStringExtra("sender");
-                String name = ContactsManager.getContactName(this, number);
-                String message = intent.getStringExtra("message");
-                boolean roomExists = XmppMuc.getInstance(this).roomExists(number);
-                
-                if (_settingsMgr.debugLog) {
-                	Log.i(Tools.LOG_TAG, MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
+            String number = intent.getStringExtra("sender");
+            String name = ContactsManager.getContactName(this, number);
+            String message = intent.getStringExtra("message");
+            boolean roomExists = XmppMuc.getInstance(this).roomExists(number);
+
+            if (_settingsMgr.debugLog) {
+                Log.i(Tools.LOG_TAG, MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
+            }
+
+            if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
+                XmppMsg msg = new XmppMsg();
+                msg.appendBold(getString(R.string.chat_sms_from, name));
+                msg.append(message);
+                _xmppMgr.send(msg, null);
+                if (_commands.containsKey("sms")) {
+                    ((SmsCmd) _commands.get("sms")).setLastRecipient(number);
                 }
-                
-                if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
+            }
+            if (_settingsMgr.notifySmsInChatRooms || roomExists) {
+                try {
+                    XmppMuc.getInstance(this).writeRoom(number, name, message);
+                } catch (XMPPException e) {
+                    // room creation and/or writing failed - notify about this
+                    // error
+                    // and send the message to the notification address
                     XmppMsg msg = new XmppMsg();
+                    msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
                     _xmppMgr.send(msg, null);
-                    if (_commands.containsKey("sms")) {
-                        ((SmsCmd)_commands.get("sms")).setLastRecipient(number);
-                    }
                 }
-                if (_settingsMgr.notifySmsInChatRooms || roomExists) {
-                    try {
-                        XmppMuc.getInstance(this).writeRoom(number, name, message);
-                    } catch (XMPPException e) {
-                        // room creation and/or writing failed - notify about this error
-                        // and send the message to the notification address
-                        XmppMsg msg = new XmppMsg();
-                        msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
-                        msg.appendBold(getString(R.string.chat_sms_from, name));
-                        msg.append(message);
-                        _xmppMgr.send(msg, null);
-                    }
-                }                
-            }
+            }               
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
             if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
@@ -349,6 +350,7 @@ public class MainService extends Service {
         if (intent == null) { 
             // The application has been killed by Android and
             // we try to restart the connection
+            NullIntentStartCounter.getInstance(getApplicationContext()).count();
             startService(new Intent(MainService.ACTION_CONNECT));
             return START_STICKY;
         }
