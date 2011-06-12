@@ -227,7 +227,7 @@ public class SystemCmd extends CommandHandlerBase {
     }
     
     private static void appendTelephonStatus(XmppMsg msg) {
-        msg.appendBold("TelephonyManager");
+        msg.appendBoldLine("TelephonyManager");
         msg.appendLine("DeviceID: " + telephonyManager.getDeviceId());
         msg.appendLine("Device Software Version: " + telephonyManager.getDeviceSoftwareVersion());
         msg.appendLine("Line1Number: " + telephonyManager.getLine1Number());
