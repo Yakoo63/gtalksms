@@ -66,6 +66,7 @@ import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
 import com.googlecode.gtalksms.xmpp.XmppOfflineMessages;
+import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class XmppManager {
     
@@ -104,6 +105,7 @@ public class XmppManager {
     private static XmppBuddies _xmppBuddies;
     private static XmppFileManager _xmppFileMgr;
     private static ClientOfflineMessages sClientOfflineMessages;
+    private static XmppStatus sXmppStatus;
 //    private ServiceDiscoveryManager serviceDiscoMgr;
     
     private static int reusedConnectionCount = 0;
@@ -132,6 +134,7 @@ public class XmppManager {
         _xmppFileMgr = XmppFileManager.getInstance(context);
         _xmppMuc = XmppMuc.getInstance(context);
         sClientOfflineMessages = ClientOfflineMessages.getInstance(context);
+        sXmppStatus = XmppStatus.getInstance(context);
         _xmppBuddies.registerListener(this);
         _xmppFileMgr.registerListener(this);
         _xmppMuc.registerListener(this);
@@ -377,7 +380,8 @@ public class XmppManager {
             // a receiver happens to wind up querying the state on
             // delivery.
             int old = _status;
-            _status = status;
+            _status = status;     
+            sXmppStatus.setStatus(status);
             if(_settings.debugLog)
                 Log.i(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
             broadcastStatus(_context, old, status);

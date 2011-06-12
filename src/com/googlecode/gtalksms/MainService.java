@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -51,6 +52,7 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
+import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class MainService extends Service {
     public final static int ID = 1;
@@ -349,6 +351,18 @@ public class MainService extends Service {
         
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onCreate(): service thread created");
         IsRunning = true; 
+        
+        // it seems that with gingerbread android does not more issue null intents when restarting a service
+        // but only calls the service's onCreate()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            int lastStatus = XmppStatus.getInstance(this).getStatusFromStatefile();
+            if (lastStatus != XmppManager.getConnectionStatus() && lastStatus != XmppManager.DISCONNECTING) {
+                if (_settingsMgr.debugLog)
+                    Log.i(Tools.LOG_TAG, "onCreate(): issuing connect intent because we are on gingerbread or higher");
+                startService(new Intent(MainService.ACTION_CONNECT));
+                NullIntentStartCounter.getInstance(getApplicationContext()).count();
+            }
+        }
     }
 
     @Override
@@ -357,8 +371,13 @@ public class MainService extends Service {
         if (intent == null) { 
             // The application has been killed by Android and
             // we try to restart the connection
-            NullIntentStartCounter.getInstance(getApplicationContext()).count();
-            startService(new Intent(MainService.ACTION_CONNECT));
+            // this null intent behavoir is only for SDK < 9
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
+                NullIntentStartCounter.getInstance(getApplicationContext()).count();
+                startService(new Intent(MainService.ACTION_CONNECT));
+            } else {
+                GoogleAnalyticsHelper.trackAndLogWarning("onStartCommand() null intent with Gingerbread or higher");
+            }
             return START_STICKY;
         }
         if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onStartCommand(): Intent " + intent.getAction());

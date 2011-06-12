@@ -30,8 +30,8 @@
     <string name="pref_app_ringtone_help">Klingelton der durch den \"ring\" Befehl abgespielt wird</string>
     <string name="pref_app_locale">Sprache</string>
     <string name="pref_app_locale_help">Sprachumgebung der Anwendung festlegen</string>
-    <string name="pref_app_framebufferMode">TODO Screenshot decoder</string>
-    <string name="pref_app_framebufferMode_help">TODO FrameBuffer decoder type to take a screenshot on your phone</string>
+    <string name="pref_app_framebufferMode">Screenshot Dekoder</string>
+    <string name="pref_app_framebufferMode_help">Verwendeter Framebuffer Dekoder für Screenshots</string>
     <string name="pref_con">Verbindungsoptionen</string>
     <string name="pref_app_geo_link_app">Kartenlink für folgende Karten</string>
     <string name="pref_app_geo_link_app_gmap">Google Maps</string>

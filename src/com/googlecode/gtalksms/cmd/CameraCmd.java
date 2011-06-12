@@ -78,7 +78,7 @@ public class CameraCmd extends CommandHandlerBase {
     }
     
     private void setCamera(String arg) {
-        if (Build.VERSION.SDK_INT >= 9) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             Integer id = Tools.parseInt(arg);
             if (id == null || id < 0 || id >= Camera.getNumberOfCameras()) {
                 listCameras();
@@ -102,7 +102,7 @@ public class CameraCmd extends CommandHandlerBase {
     }
 
     private void listCameras() {
-        if (Build.VERSION.SDK_INT >= 9) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             StringBuilder res = new StringBuilder();
             for(int i = 0; i < Camera.getNumberOfCameras(); ++i) {
                 CameraInfo info = new CameraInfo(); 
@@ -151,7 +151,7 @@ public class CameraCmd extends CommandHandlerBase {
         PictureCallback pictureCallback;
         
         try {
-            if (Build.VERSION.SDK_INT >= 9) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
                 camera = Camera.open(cameraId);
                 camera.setDisplayOrientation(getCameraOrientation());
             } else {
