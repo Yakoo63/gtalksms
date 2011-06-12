@@ -2,14 +2,19 @@ Upcoming
 * File transfer
 * Take photo and receive them via XMPP with front and back camera
 * Screen shot feature (Rooted phones only)
+
+2.4
 * Application starts when a SMS containing "GTalkSMS" is received
 * Client Offline Messages - GTalkSMS will try to send a message later when disconnected
+* Bug fixes
+* New Xmpp library
+* New blank icons for status bar
 
 2.2
 * Rejoin MUC rooms on XMPP reconnect or service restart
 * Handle offline messages on servers that support XEP-13
 * Bug fixes
-* New status bar icons (You can propose new icons on site)
+* New status bar icons
 * Status bar icons picker
 
 2.1
