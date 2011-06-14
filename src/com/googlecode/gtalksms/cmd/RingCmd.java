@@ -82,7 +82,7 @@ public class RingCmd extends CommandHandlerBase {
             clearMediaPlayer();
             initMediaPlayer();
             
-            final AudioManager audioManager = (AudioManager) _context.getSystemService(Context.AUDIO_SERVICE);
+            final AudioManager audioManager = (AudioManager) sContext.getSystemService(Context.AUDIO_SERVICE);
             if (_canRing && audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
                 
                 try {
@@ -107,18 +107,18 @@ public class RingCmd extends CommandHandlerBase {
     /** init the media player */
     public void initMediaPlayer() {
         _canRing = true;
-        Uri alert = Uri.parse(_settingsMgr.ringtone);
+        Uri alert = Uri.parse(sSettingsMgr.ringtone);
         if(alert.toString().equals("")) { //if URI is empty string user has set ringtone to "no sound"/"silent"
             _canRing = false;
             return;
         }
         _mediaPlayer = new MediaPlayer();
         try {
-            _mediaPlayer.setDataSource(_context, alert);
+            _mediaPlayer.setDataSource(sContext, alert);
         } catch (IOException ioe) {
             try {
                 Log.w(Tools.LOG_TAG, "Could not set choosen ringtone, falling back to system default ringtone");
-                _mediaPlayer.setDataSource(_context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)); //the emulator wont find the default ringtone as he has none
+                _mediaPlayer.setDataSource(sContext, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)); //the emulator wont find the default ringtone as he has none
             } catch (Exception e) {
                 _canRing = false;
             }

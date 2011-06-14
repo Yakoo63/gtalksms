@@ -18,7 +18,7 @@ public class ContactCmd extends CommandHandlerBase {
     @Override
     protected void execute(String cmd, String searchedText) {
     
-        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(_context, searchedText);
+        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, searchedText);
 
         if (contacts.size() > 0) {
 
@@ -34,7 +34,7 @@ public class ContactCmd extends CommandHandlerBase {
                 // strContact.append(Tools.LineSep + "Raw Ids : " + TextUtils.join(" ",
                 // contact.rawIds));
 
-                ArrayList<Phone> mobilePhones = ContactsManager.getPhones(_context, contact.id);
+                ArrayList<Phone> mobilePhones = ContactsManager.getPhones(sContext, contact.id);
                 if (mobilePhones.size() > 0) {
                     strContact.appendItalicLine(getString(R.string.chat_phones));
                     for (Phone phone : mobilePhones) {
@@ -42,7 +42,7 @@ public class ContactCmd extends CommandHandlerBase {
                     }
                 }
 
-                ArrayList<ContactAddress> emails = ContactsManager.getEmailAddresses(_context, contact.id);
+                ArrayList<ContactAddress> emails = ContactsManager.getEmailAddresses(sContext, contact.id);
                 if (emails.size() > 0) {
                     strContact.appendItalicLine(getString(R.string.chat_emails));
                     for (ContactAddress email : emails) {
@@ -50,7 +50,7 @@ public class ContactCmd extends CommandHandlerBase {
                     }
                 }
 
-                ArrayList<ContactAddress> addresses = ContactsManager.getPostalAddresses(_context, contact.id);
+                ArrayList<ContactAddress> addresses = ContactsManager.getPostalAddresses(sContext, contact.id);
                 if (addresses.size() > 0) {
                     strContact.appendItalicLine(getString(R.string.chat_addresses));
                     for (ContactAddress address : addresses) {

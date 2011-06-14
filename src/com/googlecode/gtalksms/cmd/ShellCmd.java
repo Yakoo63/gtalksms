@@ -39,7 +39,7 @@ public class ShellCmd extends CommandHandlerBase {
             
             try { 
                 if (!RootTools.askRootAccess()) {
-                    _cmdResults.append(_context.getString(R.string.chat_error_root) + Tools.LineSep);
+                    _cmdResults.append(sContext.getString(R.string.chat_error_root) + Tools.LineSep);
                     myproc = Runtime.getRuntime().exec(new String[] {"/system/bin/sh", "-c", _currentCommand});
                 } else {
                     myproc = Runtime.getRuntime().exec("su");

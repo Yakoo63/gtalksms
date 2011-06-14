@@ -27,10 +27,10 @@ public class CallCmd extends CommandHandlerBase {
     
     public CallCmd(MainService mainService) {
         super(mainService, new String[] {"calls", "dial"}, CommandHandlerBase.TYPE_CONTACTS);
-        _phoneMgr = new PhoneManager(_context);
+        _phoneMgr = new PhoneManager(sContext);
         _telephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
         
-        if (_settingsMgr.notifyIncomingCalls) {
+        if (sSettingsMgr.notifyIncomingCalls) {
             _phoneListener = new PhoneCallListener(mainService);
             _telephonyMgr.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
         }
@@ -53,12 +53,12 @@ public class CallCmd extends CommandHandlerBase {
         XmppMsg all = new XmppMsg();
         int callLogsNumber;
         if (args.equals("")) {
-            callLogsNumber = _settingsMgr.callLogsNumber;
+            callLogsNumber = sSettingsMgr.callLogsNumber;
         } else {
             try {
             callLogsNumber = Integer.parseInt(args);
             } catch (Exception e) {
-                callLogsNumber = _settingsMgr.callLogsNumber;
+                callLogsNumber = sSettingsMgr.callLogsNumber;
             }
         }
         
@@ -67,8 +67,8 @@ public class CallCmd extends CommandHandlerBase {
             for (Call call : callList) {
                 all.appendItalic(call.date.toLocaleString());
                 all.append(" - ");
-                all.appendBold(ContactsManager.getContactName(_context, call.phoneNumber));
-                all.appendLine(" - " + call.type(_context) + getString(R.string.chat_call_duration) + call.duration());
+                all.appendBold(ContactsManager.getContactName(sContext, call.phoneNumber));
+                all.appendLine(" - " + call.type(sContext) + getString(R.string.chat_call_duration) + call.duration());
             }
         } else {
             all.appendLine(getString(R.string.chat_no_call));
@@ -84,9 +84,9 @@ public class CallCmd extends CommandHandlerBase {
         
         if (Phone.isCellPhoneNumber(contactInfo)) {
             number = contactInfo;
-            contact = ContactsManager.getContactName(_context, number);
+            contact = ContactsManager.getContactName(sContext, number);
         } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contactInfo);
+            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contactInfo);
             if (mobilePhones.size() > 1) {
                 XmppMsg phones = new XmppMsg(getString(R.string.chat_specify_details));
                 phones.newLine();

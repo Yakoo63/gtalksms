@@ -21,7 +21,7 @@ public class BatteryCmd extends CommandHandlerBase {
     
     public BatteryCmd(MainService mainService) {
         super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
-        sXmppBuddies = XmppBuddies.getInstance(_context);
+        sXmppBuddies = XmppBuddies.getInstance(sContext);
         sPowerSource = "Unknown";
         
         sBatInfoReceiver = new BroadcastReceiver() {
@@ -54,7 +54,7 @@ public class BatteryCmd extends CommandHandlerBase {
                 }
             }
         };
-        _context.registerReceiver(sBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        sContext.registerReceiver(sBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
     
     /**
@@ -62,10 +62,10 @@ public class BatteryCmd extends CommandHandlerBase {
      * @param force
      */
     private void sendBatteryInfos(boolean force) {
-        if (force || (_settingsMgr.notifyBattery && sLastKnownPercentage % _settingsMgr.batteryNotificationIntervalInt == 0)) {
+        if (force || (sSettingsMgr.notifyBattery && sLastKnownPercentage % sSettingsMgr.batteryNotificationIntervalInt == 0)) {
             send(R.string.chat_battery_level, sLastKnownPercentage);
         }
-        if (_settingsMgr.notifyBatteryInStatus) {
+        if (sSettingsMgr.notifyBatteryInStatus) {
             // only send an notification to the user if he is available
             // and if something has changed
             if (sXmppBuddies.isNotificationAddressAvailable() && (sLastKnownPercentage != sLastStatusPercentage || !sPowerSource.equals(sLastStatusPowersource))) {
@@ -94,7 +94,7 @@ public class BatteryCmd extends CommandHandlerBase {
     @Override
     public void cleanUp() {
         if (sBatInfoReceiver != null) {
-            _context.unregisterReceiver(sBatInfoReceiver);
+            sContext.unregisterReceiver(sBatInfoReceiver);
         }
         sBatInfoReceiver = null;
     }

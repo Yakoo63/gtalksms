@@ -16,26 +16,26 @@ public abstract class CommandHandlerBase {
     protected static final int TYPE_SYSTEM = 4;
     protected static final int TYPE_COPY = 5;
     
-    protected static SettingsManager _settingsMgr;
-    protected static Context _context;
-    protected static MainService _mainService = null;
-    protected final String[] _commands;
-    protected final int _cmdType;
-    protected String _answerTo;
+    protected static SettingsManager sSettingsMgr;
+    protected static Context sContext;
+    protected static MainService sMainService = null;
+    protected final String[] mCommands;
+    protected final int mCmdType;
+    protected String mAnswerTo;
         
     CommandHandlerBase(MainService mainService, String[] commands, int cmdType) {
-        if (_mainService == null) {
-            _mainService = mainService;
-            _settingsMgr = mainService.getSettingsManager();
-            _context = mainService.getBaseContext();
+        if (sMainService == null) {
+            sMainService = mainService;
+            sSettingsMgr = mainService.getSettingsManager();
+            sContext = mainService.getBaseContext();
         }
-        this._commands = commands;
-        this._cmdType = cmdType;
-        this._answerTo = null;
+        this.mCommands = commands;
+        this.mCmdType = cmdType;
+        this.mAnswerTo = null;
     }
 
     protected String getString(int id, Object... args) {
-        return _context.getString(id, args);
+        return sContext.getString(id, args);
     }   
     
     /**
@@ -50,23 +50,23 @@ public abstract class CommandHandlerBase {
     }    
     
     protected void send(String message) {
-        send(message, _answerTo);
+        send(message, mAnswerTo);
     }
     
     protected void send(XmppMsg message) {
-        send(message, _answerTo);
+        send(message, mAnswerTo);
     }
     
     protected void send(String message, String to) {
-        _mainService.send(message, to);
+        sMainService.send(message, to);
     }
 
     protected void send(XmppMsg message, String to) {
-        _mainService.send(message, to);
+        sMainService.send(message, to);
     }
     
     public String[] getCommands() {
-        return _commands;
+        return mCommands;
     }   
     
     /**
@@ -84,7 +84,7 @@ public abstract class CommandHandlerBase {
     	 * As the XmppUserCommand class is verified to be good, the XmppUserCommand
     	 * initialization should be moved out to the caller of this method.
     	 */
-    	execute(new XmppUserCommand(XmppManager.getInstance(_context), cmd, args, answerTo));
+    	execute(new XmppUserCommand(XmppManager.getInstance(sContext), cmd, args, answerTo));
     }
     
     private static class XmppUserCommand extends Command {
@@ -114,7 +114,7 @@ public abstract class CommandHandlerBase {
     	 * Make abstract when execute(String, String) is gone, but for now default to it for
     	 * backwards compatibility.
     	 */
-    	this._answerTo = userCommand.getReplyTo();
+    	this.mAnswerTo = userCommand.getReplyTo();
     	execute(userCommand.getCommand(), userCommand.getAllArguments());
     }
     
@@ -179,7 +179,7 @@ public abstract class CommandHandlerBase {
      */
     protected final String getCommandsAsString() {
         String res = "";
-        for(String c : _commands) {
+        for(String c : mCommands) {
             res  = res + c + ", ";
         }
         res = res.substring(0, res.length() - 1);
@@ -216,8 +216,8 @@ public abstract class CommandHandlerBase {
     }
     
     protected SettingsManager getSettingsManager() {
-    	if (_mainService == null)
+    	if (sMainService == null)
     		throw new IllegalStateException("Command._mainService is not set.");
-    	return _mainService.getSettingsManager();
+    	return sMainService.getSettingsManager();
     }
 }

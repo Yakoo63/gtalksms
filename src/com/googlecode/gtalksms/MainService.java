@@ -25,6 +25,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.cmd.AliasCmd;
 import com.googlecode.gtalksms.cmd.BatteryCmd;
+import com.googlecode.gtalksms.cmd.BluetoothCmd;
 import com.googlecode.gtalksms.cmd.CallCmd;
 import com.googlecode.gtalksms.cmd.CameraCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
@@ -623,6 +624,7 @@ public class MainService extends Service {
         registerCommand(new ExitCmd(this));
         registerCommand(new AliasCmd(this));
         registerCommand(new SettingsCmd(this));
+        registerCommand(new BluetoothCmd(this));
         
         registerCommand(new SystemCmd(this)); // used for debugging
         

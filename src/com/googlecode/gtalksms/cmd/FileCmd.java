@@ -71,11 +71,11 @@ public class FileCmd extends CommandHandlerBase {
     }
     
     private void sendFile(File file) {
-        FileTransferManager fileTransferManager = XmppFileManager.getInstance(_context).getFileTransferManager();
-        OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(_answerTo);
+        FileTransferManager fileTransferManager = XmppFileManager.getInstance(sContext).getFileTransferManager();
+        OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(mAnswerTo);
 
         try {
-            transfer.sendFile(file, "Sending you: " + file.getAbsolutePath() + " to: " + _answerTo);
+            transfer.sendFile(file, "Sending you: " + file.getAbsolutePath() + " to: " + mAnswerTo);
             send("File transfer starting: " + file.getAbsolutePath() + " - " + transfer.getFileSize() / 1024 + " KB");
             
             // We allow 30s before that status go to in progress

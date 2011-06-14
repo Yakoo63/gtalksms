@@ -39,10 +39,10 @@ public class CameraCmd extends CommandHandlerBase {
         super(mainService, new String[] {"camera", "photo"}, CommandHandlerBase.TYPE_SYSTEM);
         File path;
         
-        windowManager = (WindowManager) _mainService.getSystemService(Context.WINDOW_SERVICE);
+        windowManager = (WindowManager) sMainService.getSystemService(Context.WINDOW_SERVICE);
         audioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         
-        SettingsManager settings = SettingsManager.getSettingsManager(_context);
+        SettingsManager settings = SettingsManager.getSettingsManager(sContext);
         if (Build.VERSION.SDK_INT >= 8) {  // API Level >= 8 check
             path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         } else {
@@ -157,20 +157,20 @@ public class CameraCmd extends CommandHandlerBase {
             } else {
                 camera = Camera.open();
             }
-            SurfaceView view = new SurfaceView(_context);
+            SurfaceView view = new SurfaceView(sContext);
             camera.setPreviewDisplay(view.getHolder());
             camera.startPreview();
             
             switch (pCallbackMethod) {
             case XMPP_CALLBACK:
-                pictureCallback = new XMPPTransferCallback(repository, _context, _answerTo);
+                pictureCallback = new XMPPTransferCallback(repository, sContext, mAnswerTo);
                 break;
             case EMAIL_CALLBACK:
-                pictureCallback = new EmailCallback(repository, _context, emailReceiving);
+                pictureCallback = new EmailCallback(repository, sContext, emailReceiving);
                 break;
             case VOID_CALLBACK:
             default:
-                pictureCallback = new VoidCallback(repository, _context, emailReceiving);
+                pictureCallback = new VoidCallback(repository, sContext, emailReceiving);
             }
             
             streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM); 

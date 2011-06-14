@@ -12,7 +12,7 @@ public class ExitCmd extends CommandHandlerBase {
 
     @Override
     protected void execute(String cmd, String args) {
-       _mainService.stopSelf();
+       sMainService.stopSelf();
     }
     
     @Override

@@ -16,7 +16,7 @@ public class UrlsCmd extends CommandHandlerBase {
         Intent target = new Intent(Intent.ACTION_VIEW, Uri.parse(c.getOriginalCommand()));
         Intent intent = Intent.createChooser(target, getString(R.string.chat_choose_activity));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        _context.startActivity(intent);
+        sContext.startActivity(intent);
     }
     
     @Override

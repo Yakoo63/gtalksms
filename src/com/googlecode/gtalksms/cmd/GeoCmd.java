@@ -53,23 +53,23 @@ public class GeoCmd extends CommandHandlerBase {
     
     /** Starts the geolocation service */
     public void startLocatingPhone() {
-        Intent intent = new Intent(_context, LocationService.class);
+        Intent intent = new Intent(sContext, LocationService.class);
         intent.setAction(LocationService.START_SERVICE);
-        intent.putExtra("to", this._answerTo);
-        _context.startService(intent);
+        intent.putExtra("to", this.mAnswerTo);
+        sContext.startService(intent);
     }
 
     /** Stops the geolocation service */
     public void stopLocatingPhone() {
-        Intent intent = new Intent(_context, LocationService.class);
+        Intent intent = new Intent(sContext, LocationService.class);
         intent.setAction(LocationService.STOP_SERVICE);
-        _context.startService(intent);
+        sContext.startService(intent);
     }
 
     /** Return List of <Address> from searched location */
     public List<Address> geoDecode(String searchedLocation) {
         try {
-            Geocoder geo = new Geocoder(_context, Locale.getDefault());
+            Geocoder geo = new Geocoder(sContext, Locale.getDefault());
             List<Address> addresses = geo.getFromLocationName(searchedLocation, 10);
             if (addresses != null && addresses.size() > 0) {
                return addresses;
@@ -83,11 +83,11 @@ public class GeoCmd extends CommandHandlerBase {
 
     /** launches an activity on the url */
     public void launchExternal(String url) {
-        Intent popup = new Intent(_context, GeoPopup.class);
+        Intent popup = new Intent(sContext, GeoPopup.class);
         popup.putExtra("url", url);
         popup.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        _context.startActivity(popup);
+        sContext.startActivity(popup);
     }
 
     @Override

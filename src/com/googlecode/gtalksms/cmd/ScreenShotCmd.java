@@ -44,10 +44,10 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 path = new File(Environment.getExternalStorageDirectory(), "DCIM");
             }
             repository = new File(path, Tools.APP_NAME);
-            tmpDir = _context.getCacheDir();
+            tmpDir = sContext.getCacheDir();
             
             DisplayMetrics dm = new DisplayMetrics();
-            WindowManager wm = (WindowManager)_context.getSystemService(Context.WINDOW_SERVICE);
+            WindowManager wm = (WindowManager)sContext.getSystemService(Context.WINDOW_SERVICE);
             wm.getDefaultDisplay().getMetrics(dm);
             displayHeight = dm.heightPixels;
             displayWidth = dm.widthPixels;
@@ -98,7 +98,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
             in = new FileInputStream(rawTmpFile);
 
             Bitmap bitmap;
-            if (_settingsMgr.framebufferMode.equals(SettingsManager.FRAMEBUFFER_RGB_565)) {
+            if (sSettingsMgr.framebufferMode.equals(SettingsManager.FRAMEBUFFER_RGB_565)) {
                 byte sBuffer[] = new byte[screenshotSize * 2];
                 in.read(sBuffer);
     
@@ -121,7 +121,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
                         bitmap.setPixel(i, j, Color.rgb(red, green, blue));
                     }
                 }
-            } else if (_settingsMgr.framebufferMode.equals(SettingsManager.FRAMEBUFFER_ARGB_8888)) {
+            } else if (sSettingsMgr.framebufferMode.equals(SettingsManager.FRAMEBUFFER_ARGB_8888)) {
                 byte sBuffer[] = new byte[screenshotSize * 4];
                 in.read(sBuffer);
                 
@@ -136,7 +136,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 
                 bitmap = Bitmap.createBitmap(sBuffer2, displayWidth, displayHeight, Bitmap.Config.ARGB_8888);
             } else {
-                Tools.send("Framebuffer decoder not set", _answerTo, _context);
+                Tools.send("Framebuffer decoder not set", mAnswerTo, sContext);
                 rawTmpFile.delete();
                 return;
             }
@@ -146,17 +146,17 @@ public class ScreenShotCmd extends CommandHandlerBase {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             fos.close();
-            Tools.send(_settingsMgr.framebufferMode + " screenshot saved as " + picture.getAbsolutePath(), _answerTo, _context);
+            Tools.send(sSettingsMgr.framebufferMode + " screenshot saved as " + picture.getAbsolutePath(), mAnswerTo, sContext);
             
             rawTmpFile.delete();
             
             // TODO manage subcommand
             Intent i = new Intent(MainService.ACTION_COMMAND);
-            i.setClass(_context, MainService.class);
-            i.putExtra("from", _answerTo);
+            i.setClass(sContext, MainService.class);
+            i.putExtra("from", mAnswerTo);
             i.putExtra("cmd", "send");
             i.putExtra("args", picture.getAbsolutePath());
-            _context.startService(i);
+            sContext.startService(i);
         } catch (Exception e) {
             send("error while getting picture: " + e);
         }

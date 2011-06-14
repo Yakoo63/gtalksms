@@ -53,21 +53,21 @@ public class SmsCmd extends CommandHandlerBase {
           
     public SmsCmd(MainService mainService) {
         super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"}, CommandHandlerBase.TYPE_MESSAGE);
-        _smsMgr = new SmsMmsManager(_settingsMgr, _context);
-        _smsHelper = SMSHelper.getSMSHelper(_context);
+        _smsMgr = new SmsMmsManager(sSettingsMgr, sContext);
+        _smsHelper = SMSHelper.getSMSHelper(sContext);
         _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
         _keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());     
         
         restoreSmsInformation();
 
-        if (_settingsMgr.notifySmsSent) {
-            _sentSmsReceiver = new SentIntentReceiver(_mainService, _smsMap, _smsHelper);
-            _mainService.registerReceiver(_sentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
+        if (sSettingsMgr.notifySmsSent) {
+            _sentSmsReceiver = new SentIntentReceiver(sMainService, _smsMap, _smsHelper);
+            sMainService.registerReceiver(_sentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
         }
 
-        if (_settingsMgr.notifySmsDelivered) {
-            _deliveredSmsReceiver = new DeliveredIntentReceiver(_mainService, _smsMap, _smsHelper);
-            _mainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
+        if (sSettingsMgr.notifySmsDelivered) {
+            _deliveredSmsReceiver = new DeliveredIntentReceiver(sMainService, _smsMap, _smsHelper);
+            sMainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
         }
         restoreLastRecipient();
     }
@@ -131,7 +131,7 @@ public class SmsCmd extends CommandHandlerBase {
                 inviteRoom(_aliasHelper.convertAliasToNumber(args));
         	} else if (_lastRecipient != null) {
         	    try {
-					XmppMuc.getInstance(_context).inviteRoom(_lastRecipient, _lastRecipientName);
+					XmppMuc.getInstance(sContext).inviteRoom(_lastRecipient, _lastRecipientName);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}
@@ -196,7 +196,7 @@ public class SmsCmd extends CommandHandlerBase {
     public synchronized void setLastRecipientNow(String phoneNumber, boolean silentAndUpdate) {
         if (_lastRecipient == null || !phoneNumber.equals(_lastRecipient)) {
             _lastRecipient = phoneNumber;
-            _lastRecipientName = ContactsManager.getContactName(_context, phoneNumber);
+            _lastRecipientName = ContactsManager.getContactName(sContext, phoneNumber);
             if (!silentAndUpdate) { 
             	displayLastRecipient();
             	_keyValueHelper.addKey(KeyValueHelper.KEY_LAST_RECIPIENT, phoneNumber);
@@ -235,7 +235,7 @@ public class SmsCmd extends CommandHandlerBase {
                 send(R.string.chat_del_sms_error);
             }
         } else if (cmd.equals("contact") && search != null) {
-            ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(_context, search);
+            ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, search);
             if (contacts.size() > 1) {
                 StringBuilder sb = new StringBuilder(getString(R.string.chat_specify_details));
                 sb.append(Tools.LineSep);
@@ -274,14 +274,14 @@ public class SmsCmd extends CommandHandlerBase {
         String name, number;
         if (Phone.isCellPhoneNumber(contact)) {
                 number = contact;
-                name = ContactsManager.getContactName(_context, contact);                
+                name = ContactsManager.getContactName(sContext, contact);                
                 try {
-					XmppMuc.getInstance(_context).inviteRoom(number, name);
+					XmppMuc.getInstance(sContext).inviteRoom(number, name);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}
         } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
+            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contact);
             if (mobilePhones.size() > 1) {
                 send(R.string.chat_specify_details);
                 for (Phone phone : mobilePhones) {
@@ -290,7 +290,7 @@ public class SmsCmd extends CommandHandlerBase {
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 try {
-                    XmppMuc.getInstance(_context).inviteRoom(phone.cleanNumber, phone.contactName);
+                    XmppMuc.getInstance(sContext).inviteRoom(phone.cleanNumber, phone.contactName);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}
@@ -314,9 +314,9 @@ public class SmsCmd extends CommandHandlerBase {
         
         send(R.string.chat_sms_search_start);
         
-        contacts = ContactsManager.getMatchingContacts(_context, contactName != null ? contactName : "*");
+        contacts = ContactsManager.getMatchingContacts(sContext, contactName != null ? contactName : "*");
         
-        if (_settingsMgr.showSentSms) {
+        if (sSettingsMgr.showSentSms) {
             sentSms = _smsMgr.getAllSentSms(message);
         }
         
@@ -326,7 +326,7 @@ public class SmsCmd extends CommandHandlerBase {
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name, message);
                 if (sentSms != null) {
-                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(_context, contact.id), sentSms));
+                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(sContext, contact.id), sentSms));
                 }
                 Collections.sort(smsArrayList);
 
@@ -335,7 +335,7 @@ public class SmsCmd extends CommandHandlerBase {
                     smsContact.appendBold(contact.name);
                     smsContact.append(" - ");
                     smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, smsArrayList.size()));
-                    if (_settingsMgr.smsReplySeparate) {
+                    if (sSettingsMgr.smsReplySeparate) {
                         send(smsContact);
                         for (Sms sms : smsArrayList) {
                             smsContact = new XmppMsg();
@@ -355,7 +355,7 @@ public class SmsCmd extends CommandHandlerBase {
             smsContact.appendBold(getString(R.string.chat_me));
             smsContact.append(" - ");
             smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, sentSms.size()));
-            if (_settingsMgr.smsReplySeparate) {
+            if (sSettingsMgr.smsReplySeparate) {
                 send(smsContact);
                 for (Sms sms : sentSms) {
                     smsContact = new XmppMsg();
@@ -394,13 +394,13 @@ public class SmsCmd extends CommandHandlerBase {
      */
     private void sendSMS(String message, String contact) {
         if (Phone.isCellPhoneNumber(contact)) {
-            String resolvedName = ContactsManager.getContactName(_context, contact);
-            if (_settingsMgr.notifySmsSent) {
+            String resolvedName = ContactsManager.getContactName(sContext, contact);
+            if (sSettingsMgr.notifySmsSent) {
                 send(R.string.chat_send_sms,  resolvedName + ": \"" + Tools.shortenMessage(message) + "\"");
             }
             sendSMSByPhoneNumber(message, contact, resolvedName);           
         } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
+            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contact);
             if (mobilePhones.size() > 1) {
                 send(R.string.chat_specify_details);
 
@@ -409,7 +409,7 @@ public class SmsCmd extends CommandHandlerBase {
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
-                if (_settingsMgr.notifySmsSent) {
+                if (sSettingsMgr.notifySmsSent) {
                     send(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")"  + ": \"" + Tools.shortenMessage(message) + "\"");
                 }
                 sendSMSByPhoneNumber(message, phone.cleanNumber, phone.contactName);
@@ -422,10 +422,10 @@ public class SmsCmd extends CommandHandlerBase {
     private void markSmsAsRead(String contact) {
 
         if (Phone.isCellPhoneNumber(contact)) {
-            send(R.string.chat_mark_as_read, ContactsManager.getContactName(_context, contact));
+            send(R.string.chat_mark_as_read, ContactsManager.getContactName(sContext, contact));
             _smsMgr.markAsRead(contact);
         } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(_context, contact);
+            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contact);
             if (mobilePhones.size() > 0) {
                 send(R.string.chat_mark_as_read, mobilePhones.get(0).contactName);
 
@@ -445,9 +445,9 @@ public class SmsCmd extends CommandHandlerBase {
      */
     private void readSMS(String searchedText) {
 
-        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(_context, searchedText);
+        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, searchedText);
         ArrayList<Sms> sentSms = new ArrayList<Sms>();
-        if (_settingsMgr.showSentSms) {
+        if (sSettingsMgr.showSentSms) {
             sentSms = _smsMgr.getAllSentSms();
         }
 
@@ -457,12 +457,12 @@ public class SmsCmd extends CommandHandlerBase {
             boolean hasMatch = false;
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name);
-                if (_settingsMgr.showSentSms) {
-                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(_context, contact.id), sentSms));
+                if (sSettingsMgr.showSentSms) {
+                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(sContext, contact.id), sentSms));
                 }
                 Collections.sort(smsArrayList);
 
-                List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
+                List<Sms> smsList = Tools.getLastElements(smsArrayList, sSettingsMgr.smsNumber);
                 if (smsList.size() > 0) {
                     hasMatch = true;
                     XmppMsg smsContact = new XmppMsg();
@@ -473,7 +473,7 @@ public class SmsCmd extends CommandHandlerBase {
                     for (Sms sms : smsList) {
                         appendSMS(smsContact, sms);
                     }
-                    if (smsList.size() < _settingsMgr.smsNumber) {
+                    if (smsList.size() < sSettingsMgr.smsNumber) {
                         smsContact.appendItalicLine(getString(R.string.chat_only_got_n_sms, smsList.size()));
                     }
                     send(smsContact);
@@ -497,7 +497,7 @@ public class SmsCmd extends CommandHandlerBase {
         ArrayList<Sms> smsArrayList = _smsMgr.getAllUnreadSms();
         XmppMsg allSms = new XmppMsg();
 
-        List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
+        List<Sms> smsList = Tools.getLastElements(smsArrayList, sSettingsMgr.smsNumber);
         if (smsList.size() > 0) {
             for (Sms sms : smsList) {
                 appendSMS(allSms, sms);
@@ -513,15 +513,15 @@ public class SmsCmd extends CommandHandlerBase {
 
         ArrayList<Sms> smsArrayList = _smsMgr.getAllReceivedSms();
 
-        if (_settingsMgr.showSentSms) {
+        if (sSettingsMgr.showSentSms) {
             smsArrayList.addAll(_smsMgr.getAllSentSms());
         }
         Collections.sort(smsArrayList);
 
-        List<Sms> smsList = Tools.getLastElements(smsArrayList, _settingsMgr.smsNumber);
+        List<Sms> smsList = Tools.getLastElements(smsArrayList, sSettingsMgr.smsNumber);
         if (smsList.size() > 0) {
             XmppMsg message = new XmppMsg();
-            if (_settingsMgr.smsReplySeparate) {
+            if (sSettingsMgr.smsReplySeparate) {
                 for (Sms sms : smsList) {
                     appendSMS(message, sms);
                     send(message);
@@ -542,7 +542,7 @@ public class SmsCmd extends CommandHandlerBase {
         if (_lastRecipient == null) {
             send(R.string.chat_error_no_recipient);
         } else {
-            String contact = ContactsManager.getContactName(_context, _lastRecipient);
+            String contact = ContactsManager.getContactName(sContext, _lastRecipient);
             if (Phone.isCellPhoneNumber(_lastRecipient) && contact.compareTo(_lastRecipient) != 0) {
                 contact += " (" + _lastRecipient + ")";
             }
@@ -557,16 +557,16 @@ public class SmsCmd extends CommandHandlerBase {
         SmsManager sms = SmsManager.getDefault();
         ArrayList<String> messages = sms.divideMessage(message);
 
-        if(_settingsMgr.notifySmsSentDelivered) {
+        if(sSettingsMgr.notifySmsSentDelivered) {
             String shortendMessage = Tools.shortenMessage(message);
             Integer smsID = getSmsID();
-            Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size(), _answerTo, smsID);          
+            Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size(), mAnswerTo, smsID);          
             _smsMap.put(smsID, s);
             _smsHelper.addSMS(s);
-            if(_settingsMgr.notifySmsSent) {
+            if(sSettingsMgr.notifySmsSent) {
                 SentPenIntents = createSPendingIntents(messages.size(), smsID);
             }
-            if(_settingsMgr.notifySmsDelivered) {
+            if(sSettingsMgr.notifySmsDelivered) {
                 DelPenIntents = createDPendingIntents(messages.size(), smsID);
             }
         }
@@ -579,10 +579,10 @@ public class SmsCmd extends CommandHandlerBase {
     /** clear the sms monitoring related stuff */
     private void clearSmsMonitor() {
         if (_sentSmsReceiver != null) {
-            _context.unregisterReceiver(_sentSmsReceiver);
+            sContext.unregisterReceiver(_sentSmsReceiver);
         }
         if (_deliveredSmsReceiver != null) {
-            _context.unregisterReceiver(_deliveredSmsReceiver);
+            sContext.unregisterReceiver(_deliveredSmsReceiver);
         }
         _sentSmsReceiver = null;
         _deliveredSmsReceiver = null;
@@ -596,7 +596,7 @@ public class SmsCmd extends CommandHandlerBase {
             Intent sentIntent = new Intent(MainService.ACTION_SMS_SENT);
             sentIntent.putExtra("partNum", i);
             sentIntent.putExtra("smsID", smsID);
-            PendingIntent sentPenIntent = PendingIntent.getBroadcast(_context, p, sentIntent, PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent sentPenIntent = PendingIntent.getBroadcast(sContext, p, sentIntent, PendingIntent.FLAG_ONE_SHOT);
             SentPenIntents.add(sentPenIntent);
         }
         return SentPenIntents;
@@ -610,7 +610,7 @@ public class SmsCmd extends CommandHandlerBase {
             Intent deliveredIntent = new Intent(MainService.ACTION_SMS_DELIVERED);
             deliveredIntent.putExtra("partNum", i);
             deliveredIntent.putExtra("smsID", smsID);
-            PendingIntent deliveredPenIntent = PendingIntent.getBroadcast(_context, p, deliveredIntent, PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent deliveredPenIntent = PendingIntent.getBroadcast(sContext, p, deliveredIntent, PendingIntent.FLAG_ONE_SHOT);
             DelPenIntents.add(deliveredPenIntent);
         }
         return DelPenIntents;

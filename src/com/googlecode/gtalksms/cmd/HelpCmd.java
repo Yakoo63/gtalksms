@@ -61,7 +61,7 @@ public class HelpCmd extends CommandHandlerBase {
             
             addLinesToMsg(_msgAll, helpLines);
             
-            switch (c._cmdType) {
+            switch (c.mCmdType) {
             case (CommandHandlerBase.TYPE_CONTACTS):
                 contactCmds = contactCmds + c.getCommandsAsString() + " ";
                 addLinesToMsg(_msgContact, helpLines);

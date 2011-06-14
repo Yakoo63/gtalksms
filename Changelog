@@ -5,7 +5,7 @@ Upcoming
 
 2.4
 * Application starts when a SMS containing "GTalkSMS" is received
-* Client Offline Messages - GTalkSMS will try to send a message later when disconnected
+* Client Offline Messages - GTalkSMS will try to send cached messages on reconnect
 * Bug fixes
 * New Xmpp library
 * New blank icons for status bar

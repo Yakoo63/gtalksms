@@ -11,7 +11,7 @@ public class KeyboardCmd extends CommandHandlerBase {
     
     @Override
     protected void execute(String cmd, String args) {
-        KeyboardInputMethod keyboard = _mainService.getKeyboard();
+        KeyboardInputMethod keyboard = sMainService.getKeyboard();
         
         if (keyboard != null) {
             keyboard.setText(args);
