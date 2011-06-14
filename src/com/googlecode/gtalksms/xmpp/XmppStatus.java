@@ -1,15 +1,10 @@
 package com.googlecode.gtalksms.xmpp;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.databases.KeyValueHelper;
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 import android.content.Context;
 
@@ -19,11 +14,18 @@ public class XmppStatus {
     
     private static XmppStatus sXmppStatus;
     private static File sStatefile;
+    private static KeyValueHelper sKeyValueHelper;
     
     
     private XmppStatus(Context ctx) {
         File filesDir = ctx.getFilesDir();
         sStatefile = new File(filesDir, STATEFILE_NAME);
+        sKeyValueHelper = KeyValueHelper.getKeyValueHelper(ctx);
+        // Delete the old statefile
+        // TODO remove this check with a future release
+        if (sStatefile.isFile()) {
+            sStatefile.delete();
+        }
     }
     
     public static XmppStatus getInstance(Context ctx) {
@@ -39,19 +41,17 @@ public class XmppStatus {
      * 
      * @return integer representing the XMPP status as defined in XmppManager
      */
-    public int getStatusFromStatefile() {
-        int res = XmppManager.DISCONNECTED;        
-        FileInputStream fis;
-        try {
-            fis = new FileInputStream(sStatefile);
-            DataInputStream dis = new DataInputStream(fis);
-            res = dis.readInt();
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {            
+    public int getLastKnowState() {
+        int res = XmppManager.DISCONNECTED;
+        String value = sKeyValueHelper.getValue(KeyValueHelper.KEY_XMPP_STATUS);
+        if (value != null) {
+            try {
+                res = Integer.parseInt(value);
+            } catch(NumberFormatException e) { 
+                GoogleAnalyticsHelper.trackAndLogError("XmppStatus unable to parse integer", e);
+            }
         }
-
-        return res;
-        
+        return res;        
     }
     
     /**
@@ -59,27 +59,8 @@ public class XmppStatus {
      * 
      * @param status
      */
-    public void setStatus(int status) {
-        try {
-            if (sStatefile.isFile()) {
-
-                RandomAccessFile raf = new RandomAccessFile(sStatefile, "rw");
-                raf.setLength(0);
-
-            } else {
-                sStatefile.createNewFile();
-            }
-        } catch (FileNotFoundException e) {
-            return;
-        } catch (IOException e) {
-            return;
-        }
-        try {
-            FileOutputStream fos = new FileOutputStream(sStatefile);
-            DataOutputStream dos = new DataOutputStream(fos);
-            dos.writeInt(status);
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
-        }
+    public void setState(int status) {
+        String value = Integer.toString(status);
+        sKeyValueHelper.addKey(KeyValueHelper.KEY_XMPP_STATUS, value);
     }
 }

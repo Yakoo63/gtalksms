@@ -381,7 +381,7 @@ public class XmppManager {
             // delivery.
             int old = _status;
             _status = status;     
-            sXmppStatus.setStatus(status);
+            sXmppStatus.setState(status);
             if(_settings.debugLog)
                 Log.i(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
             broadcastStatus(_context, old, status);

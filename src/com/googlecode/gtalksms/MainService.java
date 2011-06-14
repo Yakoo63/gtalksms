@@ -356,7 +356,7 @@ public class MainService extends Service {
         // it seems that with gingerbread android does not more issue null intents when restarting a service
         // but only calls the service's onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            int lastStatus = XmppStatus.getInstance(this).getStatusFromStatefile();
+            int lastStatus = XmppStatus.getInstance(this).getLastKnowState();
             if (lastStatus != XmppManager.getConnectionStatus() && lastStatus != XmppManager.DISCONNECTING) {
                 if (_settingsMgr.debugLog)
                     Log.i(Tools.LOG_TAG, "onCreate(): issuing connect intent because we are on gingerbread or higher");

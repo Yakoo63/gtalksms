@@ -17,6 +17,7 @@ public class KeyValueHelper {
 	public static final String KEY_SMS_ID = "smsID";
 	public static final String KEY_SINTENT = "sIntent";
 	public static final String KEY_DINTENT = "dIntent";
+	public static final String KEY_XMPP_STATUS = "xmppStatus";
 	
     private static KeyValueHelper keyValueHelper = null;
     
