@@ -150,8 +150,9 @@ public class SettingsManager {
     		BackupManager.dataChanged(_context.getPackageName());
     	}
     	for (String s : xmppConnectionSettings)
-    	    if (s.equals(key))
+    	    if (s.equals(key)) {
     	        connectionSettingsObsolete = true;
+    	    }
     	if (key.equals("locale")) {
             Tools.setLocale(this, _context);
     	}

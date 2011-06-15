@@ -26,7 +26,7 @@ public abstract class CommandHandlerBase {
     CommandHandlerBase(MainService mainService, String[] commands, int cmdType) {
         if (sMainService == null) {
             sMainService = mainService;
-            sSettingsMgr = mainService.getSettingsManager();
+            sSettingsMgr = MainService.getSettingsManager();
             sContext = mainService.getBaseContext();
         }
         this.mCommands = commands;
@@ -216,8 +216,9 @@ public abstract class CommandHandlerBase {
     }
     
     protected SettingsManager getSettingsManager() {
-    	if (sMainService == null)
-    		throw new IllegalStateException("Command._mainService is not set.");
-    	return sMainService.getSettingsManager();
+    	if (sSettingsMgr == null) {
+    		throw new IllegalStateException("Command.sSettingsMgr is not set.");
+    	}
+    	return sSettingsMgr;
     }
 }

@@ -250,7 +250,7 @@ public class ContactsManager {
     
                 if (phones.add(phone.cleanNumber)) {
                     res.add(phone);
-                } else if (MainService._settingsMgr.debugLog) {
+                } else if (MainService.getSettingsManager().debugLog) {
                     Log.i(Tools.LOG_TAG, "Duplicated phone number: " + number);
                 }
             }

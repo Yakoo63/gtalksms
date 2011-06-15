@@ -8,13 +8,12 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Debug.MemoryInfo;
 import android.os.Process;
 import android.os.SystemClock;
+import android.os.Debug.MemoryInfo;
 import android.telephony.TelephonyManager;
 
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.NullIntentStartCounter;
 import com.googlecode.gtalksms.tools.Tools;
@@ -205,8 +204,7 @@ public class SystemCmd extends CommandHandlerBase {
     
     private static void appendPreferences(XmppMsg msg) {
         msg.appendBoldLine(Tools.APP_NAME + " Preferences");
-        SettingsManager settings = mainService.getSettingsManager();
-        Map<String, ?> allSharedPrefs = settings.getAllSharedPreferences();
+        Map<String, ?> allSharedPrefs = sSettingsMgr.getAllSharedPreferences();
         for(Map.Entry<String, ?> pairs : allSharedPrefs.entrySet()) {
             String key = pairs.getKey();
             String value = pairs.getValue().toString();
