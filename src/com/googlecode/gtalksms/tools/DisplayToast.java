@@ -23,8 +23,7 @@ public final class DisplayToast implements Runnable {
             toastMsg = Tools.APP_NAME + ": " + text;
             duration = Toast.LENGTH_SHORT;
         } else {
-            toastMsg = Tools.APP_NAME + ": " + text + "\n"
-                            + extraInfo;
+            toastMsg = Tools.APP_NAME + ": " + text + "\n" + extraInfo;
             duration = Toast.LENGTH_LONG;
         }
         

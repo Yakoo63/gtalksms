@@ -14,7 +14,7 @@ public class PhoneCallListener extends PhoneStateListener {
     public PhoneCallListener(MainService svc) {
         super();
         this.svc = svc;
-        settingsMgr = svc.getSettingsManager();
+        settingsMgr = MainService.getSettingsManager();
     }
 
     private MainService svc;

@@ -21,7 +21,6 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import com.googlecode.gtalksms.cmd.AliasCmd;
 import com.googlecode.gtalksms.cmd.BatteryCmd;
@@ -89,7 +88,7 @@ public class MainService extends Service {
     // about some events
     public static boolean IsRunning = false;
 
-    public static SettingsManager _settingsMgr;
+    private static SettingsManager _settingsMgr;
     private static XmppManager _xmppMgr;
     private static BroadcastReceiver _xmppConChangedReceiver;
     private static KeyboardInputMethod _keyboard;
@@ -163,7 +162,7 @@ public class MainService extends Service {
         updateListenersToCurrentState(initialState);
         
         String action = intent.getAction();
-        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "handling action '" + action + "' while in state " + initialState);
+        Log.i("handling action '" + action + "' while in state " + initialState);
         
         if (action.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
@@ -204,13 +203,9 @@ public class MainService extends Service {
             String message = intent.getStringExtra("message");
             boolean roomExists = XmppMuc.getInstance(this).roomExists(number);
 
-            if (_settingsMgr.debugLog) {
-                Log.i(Tools.LOG_TAG, MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
-            }
+            Log.i(MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
             if (message.trim().toLowerCase().compareTo("gtalksms") == 0) {
-                if (_settingsMgr.debugLog) {
-                    Log.i(Tools.LOG_TAG, "Connection command received by SMS from " + name);
-                }
+                Log.i("Connection command received by SMS from " + name);
                 _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             } else {
                 if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
@@ -240,7 +235,7 @@ public class MainService extends Service {
             }
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
-            if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "network_changed with available=" + available + " and with state=" + initialState);
+            Log.i("network_changed with available=" + available + " and with state=" + initialState);
             if(available) {
                 GoogleAnalyticsHelper.dispatch();
             }
@@ -264,19 +259,19 @@ public class MainService extends Service {
                     from = null;
                 executeCommand(cmd, args, from);
             } else {
-                Log.w(Tools.LOG_TAG, "Intent " + MainService.ACTION_COMMAND + " without extra cmd");
+                Log.w("Intent " + MainService.ACTION_COMMAND + " without extra cmd");
             }
         } else if(!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {            
             GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
-        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "handled action '" + action + "' - state now " + getConnectionStatus());
+        Log.i("handled action '" + action + "' - state now " + getConnectionStatus());
         // stop the service if we are disconnected (but stopping the service
         // doesn't mean the process is terminated - onStart can still happen.)
         if (getConnectionStatus() == XmppManager.DISCONNECTED) {
             if (stopSelfResult(id) == true) {
-                if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "service is stopping (we are disconnected and no pending intents exist.)");
+                Log.i("service is stopping (we are disconnected and no pending intents exist.)");
             } else {
-                if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "we are disconnected, but more pending intents to be delivered - service will not stop");
+                Log.i("we are disconnected, but more pending intents to be delivered - service will not stop");
             }
         }
     }
@@ -337,6 +332,7 @@ public class MainService extends Service {
         
         _settingsMgr = SettingsManager.getSettingsManager(this);
         
+        Log.initialize(_settingsMgr);
         Tools.setLocale(_settingsMgr, this);
         
         HandlerThread thread = new HandlerThread(SERVICE_THREAD_NAME);
@@ -350,7 +346,7 @@ public class MainService extends Service {
         
         _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
         
-        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onCreate(): service thread created");
+        Log.i("onCreate(): service thread created");
         IsRunning = true; 
         
         // it seems that with gingerbread android does not more issue null intents when restarting a service
@@ -359,11 +355,9 @@ public class MainService extends Service {
             int lastStatus = XmppStatus.getInstance(this).getLastKnowState();
             int currentStatus = XmppManager.getConnectionStatus();
             if (lastStatus !=  currentStatus && lastStatus != XmppManager.DISCONNECTING) {
-                if (_settingsMgr.debugLog)
-                    Log.i(Tools.LOG_TAG, "onCreate(): issuing connect intent " +
-                    		"because we are on gingerbread (or higher) " +
-                    		"and lastStatus is " + lastStatus + 
-                    		" and currentStatus is " + currentStatus);
+                Log.i("onCreate(): issuing connect intent because we are on gingerbread (or higher). " 
+                        + "lastStatus is " + lastStatus
+                        + " and currentStatus is " + currentStatus);
                 startService(new Intent(MainService.ACTION_CONNECT));
                 NullIntentStartCounter.getInstance(getApplicationContext()).count();
             }
@@ -385,7 +379,7 @@ public class MainService extends Service {
             }
             return START_STICKY;
         }
-        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onStartCommand(): Intent " + intent.getAction());
+        Log.i("onStartCommand(): Intent " + intent.getAction());
         // A special case for the 'broadcast status' intent - we avoid setting
         // up the _xmppMgr etc
         if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
@@ -398,7 +392,7 @@ public class MainService extends Service {
             if (_xmppMgr == null) {
                 if (_settingsMgr.notifiedAddress == null || _settingsMgr.notifiedAddress.equals("")
                         || _settingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
-                    Log.i(Tools.LOG_TAG, "Preferences not set! Opens preferences page.");
+                    Log.w("Preferences not set! Opens preferences page.");
                     Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
                     settingsActivity.putExtra("panel", R.xml.prefs_connection);
                     settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -429,7 +423,7 @@ public class MainService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.i(Tools.LOG_TAG, "service destroyed");
+        Log.i("service destroyed");
         IsRunning = false;
         // If the _xmppManager is non-null, then our service was "started" (as
         // opposed to simply "created" - so tell the user it has stopped.
@@ -470,7 +464,7 @@ public class MainService extends Service {
         }
     }
     
-    public SettingsManager getSettingsManager() {
+    public static SettingsManager getSettingsManager() {
         return _settingsMgr;
     }
     
@@ -510,7 +504,7 @@ public class MainService extends Service {
                 _commands.get(cmd).execute(cmd, args, answerTo);
             } catch (Exception e) {
                 String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
-                Log.e(Tools.LOG_TAG, "executeCommand: " + error, e); 
+                Log.e("executeCommand: " + error, e); 
                 GoogleAnalyticsHelper.trackAndLogError("executeCommnad: exception ", e);
                 send(getString(R.string.chat_error, error), answerTo);
             }
@@ -588,9 +582,7 @@ public class MainService extends Service {
      * @param commandLine
      */
     private void onCommandReceived(String commandLine, String from) {
-        if (_settingsMgr.debugLog) {
-            Log.i(Tools.LOG_TAG, "onCommandReceived(): \"" + Tools.shortenMessage(commandLine) + "\"");
-        }
+        Log.d("onCommandReceived(): \"" + Tools.shortenMessage(commandLine) + "\"");
         String command;
         String args;
         if (commandLine.indexOf(":") != -1) {
@@ -695,7 +687,7 @@ public class MainService extends Service {
      *  
      */
     private void setupListenersForConnection() {
-        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "setupListenersForConnection()");  
+        Log.i("setupListenersForConnection()");  
         
         try {
             setupCommands();
@@ -706,7 +698,7 @@ public class MainService extends Service {
     }
     
     private void teardownListenersForConnection() {
-        if(_settingsMgr.debugLog) Log.i(Tools.LOG_TAG, "teardownListenersForConnection()");      
+        Log.i("teardownListenersForConnection()");      
         stopForeground(true);
         stopCommands();
         cleanupCommands();

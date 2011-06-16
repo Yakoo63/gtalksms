@@ -53,7 +53,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
-import android.util.Log;
 
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
@@ -115,7 +114,7 @@ public class XmppManager {
     private static int _currentRetryCount = 0;
     private static Runnable _reconnectRunnable = new Runnable() {
         public void run() {
-            if (_settings.debugLog) Log.i(Tools.LOG_TAG, "attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
+            Log.i("attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
             Tools.startSvcIntent(_context, MainService.ACTION_CONNECT);
         }
     };
@@ -128,6 +127,7 @@ public class XmppManager {
     private XmppManager(Context context) {
         connectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
         _settings = SettingsManager.getSettingsManager(context);
+        Log.initialize(_settings);
         _context = context;
         configure(ProviderManager.getInstance());
         _xmppBuddies = XmppBuddies.getInstance(context);
@@ -143,8 +143,9 @@ public class XmppManager {
         newConnectionCount = 0;
         ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
         ServiceDiscoveryManager.setIdentityType("bot"); // http://xmpp.org/registrar/disco-categories.html
-        if (DEBUG)
+        if (DEBUG) {
             Connection.DEBUG_ENABLED = true;
+        }
         SmackConfiguration.setKeepAliveInterval(60000 * 5);  // 5 mins
         SmackConfiguration.setPacketReplyTimeout(10000);      // 10 secs
         SmackConfiguration.setLocalSocks5ProxyEnabled(false);
@@ -208,7 +209,6 @@ public class XmppManager {
                 if (sPresencePacketListener != null) {
                     _connection.removePacketListener(sPresencePacketListener);
                 }
-                
             }
         }
         _packetListener = null; 
@@ -304,9 +304,7 @@ public class XmppManager {
             
             public void run() {
                 if (con.isConnected()) {
-                    if (_settings.debugLog) {
-                        Log.i(Tools.LOG_TAG, "disconnectING xmpp connection");
-                    }
+                    Log.i("disconnectING xmpp connection");
                     float start = System.currentTimeMillis();
                     try {
                         con.disconnect();
@@ -314,36 +312,31 @@ public class XmppManager {
                         // Even if we double check that the connection is still connected
                         // sometimes the connection timeout occurs when the disconnect method
                         // is running, so we just log that here
-                        if (_settings.debugLog)
-                            Log.w(Tools.LOG_TAG, "xmpp disconnect failed: " + e2);
+                        Log.i("xmpp disconnect failed: " + e2);
                     }
                     float stop = System.currentTimeMillis();
                     float diff = stop - start;
                     diff = diff / 1000;
-                    if (_settings.debugLog) {
-                        Log.i(Tools.LOG_TAG, "disconnectED xmpp connection. Took: " + diff + " s");
-                    }
+                    Log.i("disconnectED xmpp connection. Took: " + diff + " s");
                     GoogleAnalyticsHelper.trackDisconTime(diff);
                 }
             }
         }
-            Thread t = new Thread(new DisconnectRunnable(connection), "xmpp-disconnector");
-            // we don't want this thread to hold up process shutdown so mark as
-            // daemonic.
-            t.setDaemon(true);
-            t.start();
-            
-            try {
-                t.join(DISCON_TIMEOUT);
-            } catch (InterruptedException e) {}
-            // the thread is still alive, this means that the disconnect is still running
-            // we don't have the time, so prepare for a new connection
-            if (t.isAlive()) {
-                if (_settings.debugLog) {
-                    Log.i(Tools.LOG_TAG, t.getName() + " was still alive: connection will be set to null");
-                }
-                _connection = null;
-            }
+        
+        Thread t = new Thread(new DisconnectRunnable(connection), "xmpp-disconnector");
+        // we don't want this thread to hold up process shutdown so mark as daemon.
+        t.setDaemon(true);
+        t.start();
+        
+        try {
+            t.join(DISCON_TIMEOUT);
+        } catch (InterruptedException e) {}
+        // the thread is still alive, this means that the disconnect is still running
+        // we don't have the time, so prepare for a new connection
+        if (t.isAlive()) {
+            Log.i(t.getName() + " was still alive: connection will be set to null");
+            _connection = null;
+        }
     }
 
     /**
@@ -382,8 +375,7 @@ public class XmppManager {
             int old = _status;
             _status = status;     
             sXmppStatus.setState(status);
-            if(_settings.debugLog)
-                Log.i(Tools.LOG_TAG, "broadcasting state transition from " + old + " to " + status + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
+            Log.i("broadcasting state transition from " + old + " to " + status + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
             broadcastStatus(_context, old, status);
         }
     }
@@ -400,7 +392,7 @@ public class XmppManager {
                 // every 5 min
                 timeout = 1000 * 60 * 5;
             }
-            if (_settings.debugLog) Log.i(Tools.LOG_TAG, "maybeStartReconnect scheduling retry in " + timeout);
+            Log.i("maybeStartReconnect scheduling retry in " + timeout);
             _reconnectHandler.postDelayed(_reconnectRunnable, timeout);
     }
     
@@ -415,7 +407,7 @@ public class XmppManager {
         updateStatus(CONNECTING);
         NetworkInfo active = ((ConnectivityManager)_context.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (active == null || !active.isAvailable()) {
-            Log.e(Tools.LOG_TAG, "initConnection: connection request, but no network available");
+            Log.e("initConnection: connection request, but no network available");
             // we don't destroy the service here - our network receiver will notify us when
             // the network comes up and we try again then.
             updateStatus(WAITING_FOR_NETWORK);
@@ -451,16 +443,16 @@ public class XmppManager {
                 // connection was closed by the foreign host
                 // or we have closed the connection
                 // maybeStartReconnect();
-                if (_settings.debugLog) Log.i(Tools.LOG_TAG, "ConnectionListener: connectionClosed() called");
+                Log.i("ConnectionListener: connectionClosed() called");
             }
 
             @Override
             public void connectionClosedOnError(Exception e) {
                 // this happens mainly because of on IOException
                 // eg. connection timeouts because of lost connectivity
-                Log.w(Tools.LOG_TAG, "xmpp disconnected due to error: ", e);
+                Log.w("xmpp disconnected due to error: ", e);
                 if (e.getMessage().startsWith("Attr.value missing")) {
-                    Log.w(Tools.LOG_TAG, (Log.getStackTraceString(e)));
+                    Log.w((android.util.Log.getStackTraceString(e)));
                 }
                 // We update the state to disconnected (mainly to cleanup listeners etc)
                 // then schedule an automatic reconnect.
@@ -522,14 +514,11 @@ public class XmppManager {
         
         setStatus(_presenceMessage);
         
-        Log.i(Tools.LOG_TAG, "connection established");
-        if (_settings.debugLog) {
-            boolean con = _connection.isConnected();
-            boolean auth = _connection.isAuthenticated();
-            boolean enc = _connection.isUsingTLS();
-            boolean comp = _connection.isUsingCompression();
-            Log.i(Tools.LOG_TAG, "conn parameters: con=" + con + " auth=" + auth + " enc=" + enc + " comp=" + comp);
-        }    
+        Log.i("connection established");
+        Log.i("connection parameters: con=" + _connection.isConnected() + 
+                " auth=" + _connection.isAuthenticated() + 
+                " enc=" + _connection.isUsingTLS() + 
+                " comp=" + _connection.isUsingCompression());
         
         // Send welcome message
         if (_settings.notifyApplicationConnection) {
@@ -557,12 +546,12 @@ public class XmppManager {
         try {
             connection.connect();
         } catch (Exception e) {
-            Log.w(Tools.LOG_TAG, "xmpp connection failed: " + e.getMessage());
+            Log.w("xmpp connection failed: " + e.getMessage());
             // "No response from server" usually means that the connection is somehow in an undefined state
             // so we throw away the XMPPConnection by null ing it
             // see also issue 133 - http://code.google.com/p/gtalksms/issues/detail?id=133
             if (e.getMessage().startsWith("Connection failed. No response from server")) {
-                Log.w(Tools.LOG_TAG, "xmpp connection in an unusable state, marking it as obsolete", e);
+                Log.w("xmpp connection in an unusable state, marking it as obsolete", e);
                 _connection = null;
             }
             if (e instanceof XMPPException) {
@@ -570,7 +559,7 @@ public class XmppManager {
                 StreamError error = xmppEx.getStreamError();
                 // Make sure the error is not null
                 if (error != null) {
-                    Log.w(Tools.LOG_TAG, error.toString());
+                    Log.w(error.toString());
                 }
             }
             maybeStartReconnect();
@@ -587,15 +576,12 @@ public class XmppManager {
         serviceDiscoMgr.addFeature("http://jabber.org/protocol/disco#info");
         serviceDiscoMgr.addFeature("http://jabber.org/protocol/muc");
         serviceDiscoMgr.addFeature("bug-fix-gtalksms");
-//        try {
-//            Thread.sleep(300);
-//        } catch (InterruptedException e1) {}
         
         try {
             connection.login(_settings.login, _settings.password, Tools.APP_NAME);
         } catch (Exception e) {
             xmppDisconnect(connection);
-            Log.e(Tools.LOG_TAG, "xmpp login failed: " + e.getMessage());
+            Log.e("xmpp login failed: " + e.getMessage());
             // sadly, smack throws the same generic XMPPException for network
             // related messages (eg "no response from the server") as for
             // authoritative login errors (ie, bad password).  The only
@@ -684,12 +670,10 @@ public class XmppManager {
      * @return true, if we were connected and the message was handeld over to the connection - otherwise false
      */
     public boolean send(XmppMsg message, String to) {
-        if (_settings.debugLog) {
-            if (to == null) {
-                Log.i(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\"");
-            } else {
-                Log.i(Tools.LOG_TAG, "Sending message \"" + message.toShortString() + "\" to " + to);
-            }
+        if (to == null) {
+            Log.i("Sending message \"" + message.toShortString() + "\"");
+        } else {
+            Log.i("Sending message \"" + message.toShortString() + "\" to " + to);
         }
         Message msg;
         MultiUserChat muc = null;
@@ -734,8 +718,7 @@ public class XmppManager {
             }
             return true;
         } else {
-            if (_settings.debugLog)
-                Log.d(Tools.LOG_TAG, "Offline client message \"" + message.toShortString() + "\" because we are not connected");
+            Log.d("Offline client message \"" + message.toShortString() + "\" because we are not connected");
             return sClientOfflineMessages.addOfflineMessage(msg);
         }
     }
@@ -778,7 +761,7 @@ public class XmppManager {
         try {
             pm.addIQProvider("query","jabber:iq:time", Class.forName("org.jivesoftware.smackx.packet.Time"));
         } catch (ClassNotFoundException e) {
-            Log.w(Tools.LOG_TAG, "Can't load class for org.jivesoftware.smackx.packet.Time");
+            Log.w("Can't load class for org.jivesoftware.smackx.packet.Time");
         }
  
         //  XHTML
@@ -822,7 +805,7 @@ public class XmppManager {
         try {
             pm.addIQProvider("query","jabber:iq:version", Class.forName("org.jivesoftware.smackx.packet.Version"));
         } catch (ClassNotFoundException e) {
-            Log.w(Tools.LOG_TAG, "Can't load class for org.jivesoftware.smackx.packet.Version");
+            Log.w("Can't load class for org.jivesoftware.smackx.packet.Version");
         }
         //  VCard
         pm.addIQProvider("vCard","vcard-temp", new VCardProvider());

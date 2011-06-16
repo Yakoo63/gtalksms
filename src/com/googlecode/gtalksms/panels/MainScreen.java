@@ -92,7 +92,6 @@ public class MainScreen extends Activity implements InterstitialAdListener{
 
         tlsStatus.setVisibility(tls ? View.VISIBLE : View.INVISIBLE);
         compressionStatus.setVisibility(compression ? View.VISIBLE : View.INVISIBLE);
-        
     }
 
     @Override
