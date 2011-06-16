@@ -357,9 +357,13 @@ public class MainService extends Service {
         // but only calls the service's onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             int lastStatus = XmppStatus.getInstance(this).getLastKnowState();
-            if (lastStatus != XmppManager.getConnectionStatus() && lastStatus != XmppManager.DISCONNECTING) {
+            int currentStatus = XmppManager.getConnectionStatus();
+            if (lastStatus !=  currentStatus && lastStatus != XmppManager.DISCONNECTING) {
                 if (_settingsMgr.debugLog)
-                    Log.i(Tools.LOG_TAG, "onCreate(): issuing connect intent because we are on gingerbread or higher");
+                    Log.i(Tools.LOG_TAG, "onCreate(): issuing connect intent " +
+                    		"because we are on gingerbread (or higher) " +
+                    		"and lastStatus is " + lastStatus + 
+                    		" and currentStatus is " + currentStatus);
                 startService(new Intent(MainService.ACTION_CONNECT));
                 NullIntentStartCounter.getInstance(getApplicationContext()).count();
             }
