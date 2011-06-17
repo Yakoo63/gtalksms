@@ -120,7 +120,7 @@
     <string name="chat_sms_from">SMS from %s:&#xA0;</string>
     <string name="chat_battery_level">Battery level %d%%</string>
     <string name="chat_error_no_recipient">Reply contact is not set.</string>
-    <string name="chat_error_unknown_cmd">\'%s\': unknown command. Send \"?\" for get help.</string>
+    <string name="chat_error_unknown_cmd">\'%s\': unknown command. Send \"?\" for help.</string>
     <string name="chat_error">Error: %s</string>
     <string name="chat_error_root">Can\'t have root access!</string>
     <string name="chat_error_unkown_name">Contact name is not known or not distinct</string>
