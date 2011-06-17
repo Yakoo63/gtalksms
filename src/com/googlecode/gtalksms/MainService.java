@@ -255,8 +255,9 @@ public class MainService extends Service {
             if (cmd != null) {
                 String args = intent.getStringExtra("args");
                 String from = intent.getStringExtra("from");
-                if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc)
+                if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc) {
                     from = null;
+                }
                 executeCommand(cmd, args, from);
             } else {
                 Log.w("Intent " + MainService.ACTION_COMMAND + " without extra cmd");
@@ -501,7 +502,7 @@ public class MainService extends Service {
         assert(cmd != null);
         if (_commands.containsKey(cmd)) {
             try {
-                _commands.get(cmd).execute(cmd, args, answerTo);
+                _commands.get(cmd).execute(cmd, args == null ? "" : args, answerTo);
             } catch (Exception e) {
                 String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
                 Log.e("executeCommand: " + error, e); 

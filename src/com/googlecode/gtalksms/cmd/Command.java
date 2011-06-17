@@ -43,8 +43,9 @@ public abstract class Command {
 	 */
 	public String getAllArguments() {
 		int x = originalCommand.indexOf(separator);
-		if(x > -1)
-			return originalCommand.substring(x+1).trim();
+		if (x > -1) {
+		    return originalCommand.substring(x+1).trim();
+		}
 		return "";
 	}
 	
@@ -54,8 +55,9 @@ public abstract class Command {
 
 	public String getCommand() {
 		int x = originalCommand.indexOf(separator);
-		if(x > -1)
-			return originalCommand.substring(0, x).trim();
+		if (x > -1) {
+		    return originalCommand.substring(0, x).trim();
+		}
 		return originalCommand;
 	}
 
@@ -66,11 +68,13 @@ public abstract class Command {
 	 */
 	public String get1() {
 		int x = originalCommand.indexOf(separator);
-		if(x < 0 || x == originalCommand.length())
-			return "";
+		if (x < 0 || x == originalCommand.length()) {
+		    return "";
+		}
 		int y = originalCommand.indexOf(separator, x+1);
-		if(y<0)
-			y = originalCommand.length();
+		if (y<0) { 
+		    y = originalCommand.length();
+		}
 		return originalCommand.substring(x+1,y).trim();
 	}
 	
@@ -81,11 +85,13 @@ public abstract class Command {
 	 */
 	public String get2() {
 		int x = originalCommand.indexOf(separator);
-		if(x < 0)
-			return "";
+		if (x < 0) {
+		    return "";
+		}
 		int y = originalCommand.indexOf(separator, x+1);
-		if(y<0)
-			return "";
+		if (y<0) {
+		    return "";
+		}
 		return originalCommand.substring(y+1);
 	}
 }

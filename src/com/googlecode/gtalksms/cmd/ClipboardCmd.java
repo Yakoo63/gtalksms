@@ -35,7 +35,7 @@ public class ClipboardCmd extends CommandHandlerBase {
     public String[] help() {
         String[] s = { 
                 getString(R.string.chat_help_copy, makeBold("\"copy:#text#\""))
-                };
+            };
         return s;
     }
 
