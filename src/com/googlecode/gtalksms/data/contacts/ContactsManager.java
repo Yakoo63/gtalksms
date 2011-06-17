@@ -266,6 +266,8 @@ public class ContactsManager {
      */
     public static ArrayList<Phone> getPhones(Context ctx, String searchedText) {
         ArrayList<Phone> res = new ArrayList<Phone>();
+        HashSet<String> resPhones = new HashSet<String>();
+        
         if (Phone.isCellPhoneNumber(searchedText)) {
             Phone phone = new Phone();
             phone.number = searchedText;
@@ -283,7 +285,11 @@ public class ContactsManager {
                     ArrayList<Phone> phones = getPhones(ctx, contact.id);
                     for (Phone phone : phones) {
                         phone.contactName = contact.name;
-                        res.add(phone);
+                        if (resPhones.add(phone.cleanNumber)) {
+                            res.add(phone);
+                        } else if (MainService.getSettingsManager().debugLog) {
+                            Log.i(Tools.LOG_TAG, "Duplicated phone number: " + phone.contactName + " " + phone.cleanNumber);
+                        }
                     }
                 }
             }
