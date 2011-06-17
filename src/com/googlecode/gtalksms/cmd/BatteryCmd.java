@@ -68,7 +68,8 @@ public class BatteryCmd extends CommandHandlerBase {
         if (sSettingsMgr.notifyBatteryInStatus) {
             // only send an notification to the user if he is available
             // and if something has changed
-            if (sXmppBuddies.isNotificationAddressAvailable() && (sLastKnownPercentage != sLastStatusPercentage || !sPowerSource.equals(sLastStatusPowersource))) {
+            if (sXmppBuddies.isNotificationAddressAvailable() 
+                    && (sLastKnownPercentage != sLastStatusPercentage || !sPowerSource.equals(sLastStatusPowersource))) {
                 XmppManager.setStatus("GTalkSMS - " + sLastKnownPercentage + "%" + " - " + sPowerSource);
                 sLastStatusPercentage = sLastKnownPercentage;
                 sLastStatusPowersource = sPowerSource;

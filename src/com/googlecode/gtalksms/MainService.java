@@ -153,8 +153,9 @@ public class MainService extends Service {
             _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
         }
 
-        if (Thread.currentThread().getId() != _handlerThreadId)
+        if (Thread.currentThread().getId() != _handlerThreadId) {
             throw new IllegalThreadStateException();
+        }
         // We need to handle xmpp state changes which happened "externally" - eg,
         // due to a connection error, or running out of retries, or a retry
         // handler actually succeeding etc.
@@ -645,8 +646,9 @@ public class MainService extends Service {
      * used to stop ongoing actions, like gps updates, ringing, ... 
      */
     private static void stopCommands() {
-        for(CommandHandlerBase c : _commandSet)
+        for(CommandHandlerBase c : _commandSet) {
             c.stop();
+        }
     }
     
     private static void registerCommand(CommandHandlerBase cmd) {
