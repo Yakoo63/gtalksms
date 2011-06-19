@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.googlecode.gtalksms"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    
+    <TextView 
+        android:text="@string/wizard_welcome_text" 
+        android:layout_height="wrap_content" 
+        android:layout_width="fill_parent" 
+        android:gravity="top|left" 
+        android:layout_weight="10"
+        />
+    
+    <LinearLayout 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" 
+        android:layout_weight="1"
+        >
+        
+        <Button 
+            android:text="@string/wizard_welcome_login_button" 
+            android:id="@+id/loginBut"
+            android:layout_height="40dp" 
+            android:layout_width="fill_parent" 
+            android:layout_weight=".5"
+            android:fitsSystemWindows="true" 
+            android:gravity="center" 
+            android:layout_gravity="center"
+            /> 
+        
+        <Button 
+            android:text="@string/wizard_welcome_create_button" 
+            android:id="@+id/createBut"
+            android:layout_height="40dp" 
+            android:layout_width="fill_parent" 
+            android:layout_weight=".5"
+            android:fitsSystemWindows="true" 
+            android:gravity="center" 
+            android:layout_gravity="center"
+            /> 
+            
+    </LinearLayout>
+    
+    <TextView 
+        android:text="Version X.X.X @Yakooo" 
+        android:id="@+id/VersionLabel"
+        android:layout_height="wrap_content" 
+        android:layout_width="fill_parent" 
+        android:gravity="bottom|right" android:layout_weight="0"/>
+
+</LinearLayout>

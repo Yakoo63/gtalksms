@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="wizard">Setup wizard</string>
+    <string name="wizard_welcome_text">Welcome to the GTalkSMS setup wizard.\nDo you want to create a new account for your phone or login to an existing one?</string>
+    <string name="wizard_welcome_login_button">Login</string>
+    <string name="wizard_welcome_create_button">Create</string>
+    <string name="wizard_create_text">Choose your login and your password</string>
+    <string name="wizard_create_back_button">Back</string>
+    <string name="wizard_create_create_button">Create</string>
+    <string name="wizard_create_login">Enter your login</string>
+    <string name="wizard_create_password1">Enter your password</string>
+    <string name="wizard_create_password2">Retype your password</string>
+    <string name="wizard_login_text">Enter your login and your password</string>
+    <string name="wizard_login_back_button">Back</string>
+    <string name="wizard_login_login_button">Login</string>
+    <string name="wizard_login_login">Enter your login</string>
+    <string name="wizard_login_password">Enter your password</string>
+    
+
     <string name="pref_app">Application settings</string>
     <string name="pref_app_advanced">Advanced settings</string>
     <string name="pref_app_auto_start_options">Auto-start options</string>

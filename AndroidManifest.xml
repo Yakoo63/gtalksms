@@ -23,6 +23,9 @@
         <activity android:name="com.googlecode.gtalksms.panels.GeoPopup"
                   android:label="@string/main_panel">
         </activity>
+        <activity android:name="com.googlecode.gtalksms.panels.wizard.Wizard"
+                  android:label="@string/wizard">
+        </activity>
         <activity android:name="com.googlecode.gtalksms.panels.Preferences"
                   android:label="@string/preference_panel">
         </activity>

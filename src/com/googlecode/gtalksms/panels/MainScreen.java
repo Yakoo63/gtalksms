@@ -41,6 +41,7 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.panels.wizard.Wizard;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFriend;
@@ -355,6 +356,10 @@ public class MainScreen extends Activity implements InterstitialAdListener{
             case R.id.application_settings:
                 prefs_id = R.xml.prefs_application;
                 break;
+            case R.id.wizard:
+                Intent intent = new Intent(MainScreen.this, Wizard.class);
+                startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
