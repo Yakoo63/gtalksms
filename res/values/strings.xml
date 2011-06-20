@@ -15,8 +15,6 @@
     <string name="wizard_login_login_button">Login</string>
     <string name="wizard_login_login">Enter your login</string>
     <string name="wizard_login_password">Enter your password</string>
-    
-
     <string name="pref_app">Application settings</string>
     <string name="pref_app_advanced">Advanced settings</string>
     <string name="pref_app_auto_start_options">Auto-start options</string>
@@ -137,7 +135,7 @@
     <string name="chat_sms_from">SMS from %s:&#xA0;</string>
     <string name="chat_battery_level">Battery level %d%%</string>
     <string name="chat_error_no_recipient">Reply contact is not set.</string>
-    <string name="chat_error_unknown_cmd">\'%s\': unknown command. Send \"?\" for get help.</string>
+    <string name="chat_error_unknown_cmd">\'%s\': unknown command. Send \"?\" for help.</string>
     <string name="chat_error">Error: %s</string>
     <string name="chat_error_root">Can\'t have root access!</string>
     <string name="chat_error_unkown_name">Contact name is not known or not distinct</string>
