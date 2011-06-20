@@ -692,8 +692,11 @@ public class XmppManager {
             msg.setBody(message.generateTxt());
         }
 
-        // add an XTHML Body
-        if ((to == null) || XHTMLManager.isServiceEnabled(_connection, to)) {
+        // add an XTHML Body when
+        // we don't know the recipient
+        // we know that the recipient is able to read XHTML-IM
+        // we are disconnected and therefore send the message later
+        if ((to == null) || XHTMLManager.isServiceEnabled(_connection, to) || !_connection.isAuthenticated()) {
             String xhtmlBody = message.generateXHTMLText().toString();
             XHTMLManager.addBody(msg, xhtmlBody);
         }
