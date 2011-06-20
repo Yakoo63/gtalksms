@@ -638,8 +638,9 @@ public class XmppManager {
             conf.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             break;
         }
-        if (_settings.useCompression)
+        if (_settings.useCompression) {
             conf.setCompressionEnabled(true);
+        }
         
         // disable the built-in ReconnectionManager
         // since we handle this

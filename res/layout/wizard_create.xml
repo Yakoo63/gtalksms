@@ -22,10 +22,22 @@
             android:layout_height="100dip"
             />
         <TextView 
+            android:text="@string/wizard_create_server" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            />
+        <EditText 
+            android:text="draugr.de" 
+            android:id="@+id/server" 
+            android:layout_width="match_parent" 
+            android:layout_height="wrap_content"
+            />
+        <TextView 
             android:text="@string/wizard_create_login" 
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content"
             />
+            <!--  android:text="AndroidTest" --> 
         <EditText 
             android:id="@+id/login" 
             android:layout_width="match_parent" 
@@ -36,13 +48,14 @@
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content"
             />
+            <!-- android:text="azertyuiop" --> 
         <EditText 
             android:id="@+id/password1" 
             android:inputType="textPassword" 
             android:layout_width="match_parent" 
             android:layout_height="wrap_content"
             />
-        <TextView 
+        <!--<TextView 
             android:text="@string/wizard_create_password2" 
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content"
@@ -52,6 +65,12 @@
             android:inputType="textPassword" 
             android:layout_width="match_parent" 
             android:layout_height="wrap_content"
+            />-->
+        <TextView 
+            android:id="@+id/result" 
+            android:textAppearance="?android:attr/textAppearanceMedium" 
+            android:layout_width="match_parent" 
+            android:layout_height="match_parent"
             />
     </LinearLayout>
     
@@ -75,6 +94,17 @@
             /> 
         
         <Button 
+            android:text="@string/wizard_create_delete_button" 
+            android:id="@+id/deleteBut"
+            android:layout_height="40dp" 
+            android:layout_width="fill_parent" 
+            android:layout_weight=".5"
+            android:fitsSystemWindows="true" 
+            android:gravity="center" 
+            android:layout_gravity="center"
+            /> 
+ 
+         <Button 
             android:text="@string/wizard_create_create_button" 
             android:id="@+id/createBut"
             android:layout_height="40dp" 

@@ -6,7 +6,9 @@
     <string name="wizard_welcome_create_button">Create</string>
     <string name="wizard_create_text">Choose your login and your password</string>
     <string name="wizard_create_back_button">Back</string>
+    <string name="wizard_create_delete_button">Delete</string>
     <string name="wizard_create_create_button">Create</string>
+    <string name="wizard_create_server">Choose your XMPP server</string>
     <string name="wizard_create_login">Enter your login</string>
     <string name="wizard_create_password1">Enter your password</string>
     <string name="wizard_create_password2">Retype your password</string>
