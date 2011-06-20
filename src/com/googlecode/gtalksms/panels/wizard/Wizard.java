@@ -1,17 +1,22 @@
 package com.googlecode.gtalksms.panels.wizard;
 
+import org.jivesoftware.smack.XMPPException;
+
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.xmpp.XmppAccountManager;
 
 public class Wizard extends Activity {
     private final static int VIEW_WELCOME = 0;
@@ -67,6 +72,33 @@ public class Wizard extends Activity {
                 setContentView(R.layout.wizard_create);
                 mapWizardButton(R.id.backBut, VIEW_WELCOME);
                 // TODO real account creation
+                Button mCreate = (Button) findViewById(R.id.createBut);
+                mCreate.setOnClickListener(
+                        new View.OnClickListener() {
+                            
+                            @Override
+                            public void onClick(View v) {
+                                EditText login = (EditText)findViewById(R.id.login);
+                                EditText pass1 = (EditText)findViewById(R.id.password1);
+                                EditText pass2 = (EditText)findViewById(R.id.password2);
+                                String jid = login.getText().toString().trim();
+                                String psw1 = pass1.getText().toString().trim();
+                                String psw2 = pass2.getText().toString().trim();
+                                if (psw1.equals(psw2)) {
+                                    String res = null;
+                                    try {
+                                        res = XmppAccountManager.tryToCreateAccount(jid, psw2, mSettingsMgr);
+                                    } catch (XMPPException e) {
+                                        res = e.getLocalizedMessage();
+                                    }
+                                    if (res == null) {
+                                        res = "Account succesfull created";
+                                    }
+                                    MainService.displayToast(res, null);
+                                }
+                                
+                            }
+                        });
                 // mapWizardButton(R.id.createBut, VIEW_CREATE);
                 break;
 
@@ -82,7 +114,7 @@ public class Wizard extends Activity {
         }
         
         TextView label = (TextView) findViewById(R.id.VersionLabel);
-        label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
+        label.setText(StringFmt.Style(Tools.APP_NAME + " " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
 
         mCurrentView = viewId;
     }
@@ -91,5 +123,5 @@ public class Wizard extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-    }
+    }    
 }

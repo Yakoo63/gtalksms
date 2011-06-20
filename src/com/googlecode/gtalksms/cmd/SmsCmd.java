@@ -45,8 +45,6 @@ public class SmsCmd extends CommandHandlerBase {
     private SetLastRecipientRunnable _setLastrecipientRunnable;
     
     // synchronizedMap because the worker thread and the intent receivers work with this map
-    // TODO move smsMap to a Database Backend, as currently if there is a xmpp reconnect in the time between a
-    // send sms and a sent/delivery notification the smsMap will be newly created, because we re-created the SmsCmd object
     private static Map<Integer, Sms> _smsMap; 
     
     private AliasHelper _aliasHelper;
@@ -583,18 +581,6 @@ public class SmsCmd extends CommandHandlerBase {
         setLastRecipient(phoneNumber);
         _smsMgr.addSmsToSentBox(message, phoneNumber);
     }
-
-    /** clear the sms monitoring related stuff */
-    private void clearSmsMonitor() {
-        if (_sentSmsReceiver != null) {
-            sContext.unregisterReceiver(_sentSmsReceiver);
-            sSentIntentReceiverRegistered = false;
-        }
-        if (_deliveredSmsReceiver != null) {
-            sContext.unregisterReceiver(_deliveredSmsReceiver);
-            sDelIntentReceiverRegistered = false;
-        }
-    }
     
     private ArrayList<PendingIntent> createSPendingIntents(int size, int smsID) {
         ArrayList<PendingIntent> SentPenIntents = new ArrayList<PendingIntent>();
@@ -676,7 +662,11 @@ public class SmsCmd extends CommandHandlerBase {
     
     @Override
     public void cleanUp() {
-        clearSmsMonitor();
-    }
-    
+        if (_sentSmsReceiver != null && sSentIntentReceiverRegistered) {
+            sContext.unregisterReceiver(_sentSmsReceiver);
+        }
+        if (_deliveredSmsReceiver != null && sDelIntentReceiverRegistered) {
+            sContext.unregisterReceiver(_deliveredSmsReceiver);
+        }
+    }    
 }
