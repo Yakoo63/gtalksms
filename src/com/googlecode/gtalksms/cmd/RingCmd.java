@@ -76,7 +76,7 @@ public class RingCmd extends CommandHandlerBase {
      * @param volume from [0-100] where 0 means vibration mode
      * @return true is phone is able to ring, otherwise false
      */
-    public boolean ring(float volume) {
+    private boolean ring(float volume) {
         boolean res = false;
         if (volume > 0) {
             clearMediaPlayer();
@@ -105,7 +105,7 @@ public class RingCmd extends CommandHandlerBase {
     }
 
     /** init the media player */
-    public void initMediaPlayer() {
+    private void initMediaPlayer() {
         _canRing = true;
         Uri alert = Uri.parse(sSettingsMgr.ringtone);
         if(alert.toString().equals("")) { //if URI is empty string user has set ringtone to "no sound"/"silent"

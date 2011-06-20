@@ -72,9 +72,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
         }
     }
 
-    private void takePicture(int pCallbackMethod) {
-        cleanUp();
-        
+    private void takePicture(int pCallbackMethod) {      
         if (!RootTools.askRootAccess()) {
             send("Root not given!");
             return;
@@ -160,10 +158,6 @@ public class ScreenShotCmd extends CommandHandlerBase {
         } catch (Exception e) {
             send("error while getting picture: " + e);
         }
-    }
-
-    @Override
-    public synchronized void cleanUp() {
     }
 
     @Override

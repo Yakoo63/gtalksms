@@ -222,9 +222,8 @@ public class MainService extends Service {
                     try {
                         XmppMuc.getInstance(this).writeRoom(number, name, message);
                     } catch (XMPPException e) {
-                        // room creation and/or writing failed - notify about
-                        // this
-                        // error
+                        // room creation and/or writing failed - 
+                        // notify about this error
                         // and send the message to the notification address
                         XmppMsg msg = new XmppMsg();
                         msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
@@ -392,6 +391,7 @@ public class MainService extends Service {
             // OK - a real action request - ensure xmpp is setup (but not yet connected)
             // in preparation for the worker thread performing the request.
             if (_xmppMgr == null) {
+                // check if the user has done his part
                 if (_settingsMgr.notifiedAddress == null || _settingsMgr.notifiedAddress.equals("")
                         || _settingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
                     Log.w("Preferences not set! Opens preferences page.");
@@ -411,7 +411,7 @@ public class MainService extends Service {
                 };
                 IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_CONNECTION_CHANGED);
                 registerReceiver(_xmppConChangedReceiver, intentFilter);
-                
+                setupCommands();
                 _xmppMgr = XmppManager.getInstance(getBaseContext());
             }
             
@@ -605,41 +605,50 @@ public class MainService extends Service {
         }
     }
     
+    /**
+     * Creates the instances from the CommandHanlderBase classes
+     */
     private void setupCommands() {
-        registerCommand(new CameraCmd(this));
-        registerCommand(new ScreenShotCmd(this));
-        registerCommand(new KeyboardCmd(this));
-        registerCommand(new BatteryCmd(this));
-        registerCommand(new GeoCmd(this));
-        registerCommand(new CallCmd(this));
-        registerCommand(new ContactCmd(this));
-        registerCommand(new ClipboardCmd(this));
-        registerCommand(new ShellCmd(this));
-        registerCommand(new UrlsCmd(this));
-        registerCommand(new RingCmd(this));
-        registerCommand(new FileCmd(this));
-        registerCommand(new SmsCmd(this));
-        registerCommand(new ExitCmd(this));
-        registerCommand(new AliasCmd(this));
-        registerCommand(new SettingsCmd(this));
-        registerCommand(new BluetoothCmd(this));
-        
-        registerCommand(new SystemCmd(this)); // used for debugging
-        
-        registerCommand(new HelpCmd(this));  //help command needs to be registered as last
+        try {
+            // TODO: Ideally we would surround every registerCommand() with an
+            // try catch block and inform the user about the exception.
+            // Maybe there is a elegant way to do this with an
+            // for iteration with help from java reflection
+            registerCommand(new CameraCmd(this));
+            registerCommand(new ScreenShotCmd(this));
+            registerCommand(new KeyboardCmd(this));
+            registerCommand(new BatteryCmd(this));
+            registerCommand(new GeoCmd(this));
+            registerCommand(new CallCmd(this));
+            registerCommand(new ContactCmd(this));
+            registerCommand(new ClipboardCmd(this));
+            registerCommand(new ShellCmd(this));
+            registerCommand(new UrlsCmd(this));
+            registerCommand(new RingCmd(this));
+            registerCommand(new FileCmd(this));
+            registerCommand(new SmsCmd(this));
+            registerCommand(new ExitCmd(this));
+            registerCommand(new AliasCmd(this));
+            registerCommand(new SettingsCmd(this));
+            registerCommand(new BluetoothCmd(this));
+            // used for debugging
+            registerCommand(new SystemCmd(this));
+            // help command needs to be registered as last
+            registerCommand(new HelpCmd(this));
+
+        } catch (Exception e) {
+            // Should not happen.
+            GoogleAnalyticsHelper.trackAndLogError("MainService.setupListenersForConnection: Setup commands error", e);
+        }
     }
     
     /**
      * Calls cleanUp() for every registered command
-     * and removes the references for every registered command
-     * by calling clear() 
      */
     private static void cleanupCommands() {
         for (CommandHandlerBase cmd : _commandSet) {
             cmd.cleanUp();
         }
-        _commands.clear();
-        _commandSet.clear();
     }
     
     /**
@@ -662,23 +671,23 @@ public class MainService extends Service {
     private int updateListenersToCurrentState(int currentState) {
         boolean wantListeners;
         switch (currentState) {
-        case XmppManager.CONNECTED:
-            wantListeners = true;
-            break;
-        case XmppManager.CONNECTING:
-        case XmppManager.DISCONNECTED:
-        case XmppManager.DISCONNECTING:
-        case XmppManager.WAITING_TO_CONNECT:
-        case XmppManager.WAITING_FOR_NETWORK:
-            wantListeners = false;
-            break;
-        default:
-            throw new IllegalStateException("updateListeners found invalid state: " + currentState);
+            case XmppManager.CONNECTED:
+            case XmppManager.CONNECTING:
+            case XmppManager.DISCONNECTING:
+            case XmppManager.WAITING_TO_CONNECT:
+            case XmppManager.WAITING_FOR_NETWORK:
+                wantListeners = true;
+                break;
+            case XmppManager.DISCONNECTED:
+                wantListeners = false;
+                break;
+            default:
+                throw new IllegalStateException("updateListeners found invalid state: " + currentState);
         }
         
-        if (wantListeners && _commands.isEmpty()) {
+        if (wantListeners) {
             setupListenersForConnection();
-        } else if (!wantListeners && !_commands.isEmpty()) {
+        } else {
             teardownListenersForConnection();
         }
         
@@ -690,14 +699,10 @@ public class MainService extends Service {
      *  
      */
     private void setupListenersForConnection() {
-        Log.i("setupListenersForConnection()");  
-        
-        try {
-            setupCommands();
-        } catch (Exception e) {
-            // Should not happen.
-            GoogleAnalyticsHelper.trackAndLogError("MainService.setupListenersForConnection: Setup commands error", e);
-        } 
+        Log.i("setupListeners()");          
+        for(CommandHandlerBase c : _commandSet) {
+            c.setup();
+        }
     }
     
     private void teardownListenersForConnection() {

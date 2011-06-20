@@ -19,6 +19,7 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class CallCmd extends CommandHandlerBase {
+    private static boolean sListenerActive = false;
     private PhoneManager _phoneMgr;
     private PhoneCallListener _phoneListener = null;
     private TelephonyManager _telephonyMgr = null;
@@ -30,11 +31,18 @@ public class CallCmd extends CommandHandlerBase {
         _phoneMgr = new PhoneManager(sContext);
         _telephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
         
-        if (sSettingsMgr.notifyIncomingCalls) {
-            _phoneListener = new PhoneCallListener(mainService);
-            _telephonyMgr.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
-        }
+        setup();
         _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
+    }
+    
+    public void setup() {
+        if (sSettingsMgr.notifyIncomingCalls && !sListenerActive) {
+            if (_phoneListener == null) {
+                _phoneListener = new PhoneCallListener(sMainService);
+            }
+            _telephonyMgr.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
+            sListenerActive = true;
+        }
     }
     
     @Override
@@ -115,7 +123,7 @@ public class CallCmd extends CommandHandlerBase {
     public void cleanUp() {
         if (_phoneListener != null) {
             _telephonyMgr.listen(_phoneListener, 0);
-            _phoneListener = null;
+            sListenerActive = false;
         }
     }
 

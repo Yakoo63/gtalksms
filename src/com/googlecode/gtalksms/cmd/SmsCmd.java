@@ -32,6 +32,8 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class SmsCmd extends CommandHandlerBase {
+    private static boolean sSentIntentReceiverRegistered = false;
+    private static boolean sDelIntentReceiverRegistered = false;
     private SmsMmsManager _smsMgr;
     private String _lastRecipient = null;
     private String _lastRecipientName = null;    
@@ -56,20 +58,26 @@ public class SmsCmd extends CommandHandlerBase {
         _smsMgr = new SmsMmsManager(sSettingsMgr, sContext);
         _smsHelper = SMSHelper.getSMSHelper(sContext);
         _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
-        _keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());     
+        _keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());
         
         restoreSmsInformation();
-
-        if (sSettingsMgr.notifySmsSent) {
-            _sentSmsReceiver = new SentIntentReceiver(sMainService, _smsMap, _smsHelper);
+        setup();
+        restoreLastRecipient();
+    }
+    
+    public void setup() {
+        if (sSettingsMgr.notifySmsSent && !sSentIntentReceiverRegistered) {
+            if (_sentSmsReceiver == null) {
+                _sentSmsReceiver = new SentIntentReceiver(sMainService, _smsMap, _smsHelper);
+            }
             sMainService.registerReceiver(_sentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
         }
-
-        if (sSettingsMgr.notifySmsDelivered) {
-            _deliveredSmsReceiver = new DeliveredIntentReceiver(sMainService, _smsMap, _smsHelper);
+        if (sSettingsMgr.notifySmsDelivered && !sDelIntentReceiverRegistered) {
+            if (_deliveredSmsReceiver == null) {
+                _deliveredSmsReceiver = new DeliveredIntentReceiver(sMainService, _smsMap, _smsHelper);
+            }
             sMainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
         }
-        restoreLastRecipient();
     }
 
     @Override
@@ -580,12 +588,12 @@ public class SmsCmd extends CommandHandlerBase {
     private void clearSmsMonitor() {
         if (_sentSmsReceiver != null) {
             sContext.unregisterReceiver(_sentSmsReceiver);
+            sSentIntentReceiverRegistered = false;
         }
         if (_deliveredSmsReceiver != null) {
             sContext.unregisterReceiver(_deliveredSmsReceiver);
+            sDelIntentReceiverRegistered = false;
         }
-        _sentSmsReceiver = null;
-        _deliveredSmsReceiver = null;
     }
     
     private ArrayList<PendingIntent> createSPendingIntents(int size, int smsID) {

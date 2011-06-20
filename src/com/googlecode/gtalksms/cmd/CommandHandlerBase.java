@@ -139,10 +139,18 @@ public abstract class CommandHandlerBase {
     public void stop() {}
     
     /**
-     * Cleans up the structures holden by the Command Class
-     * Usually issued on exit of GtalkSMS
+     * Setups the command to get working. Usually called when the user want's 
+     * GTalkSMS to be active (meaning connected)
+     * setup() the contrary to cleanUp()
      */
-    public void cleanUp() {};
+    public void setup() {};
+    
+    /**
+     * Cleans up the structures holden by the CommandHanlderBase Class.
+     * Common actions are: unregister broadcast receivers etc.
+     * Usually issued on the stop of the MainService
+     */
+    public void cleanUp() {};   
     
     /**
      * Request a help String array from the command
