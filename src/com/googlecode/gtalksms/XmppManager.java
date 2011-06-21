@@ -684,7 +684,7 @@ public class XmppManager {
             msg = new Message(_settings.notifiedAddress, Message.Type.chat);
         } else {
             msg = new Message(to);
-            muc = _xmppMuc.getRoomViaRoomname(to);
+            muc = _xmppMuc.getRoomViaRoomName(to);
         }
 
         if (_settings.formatResponses) {

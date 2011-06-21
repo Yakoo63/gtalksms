@@ -84,10 +84,25 @@ public class XmppMuc {
      * @throws XMPPException
      */
     public void writeRoom(String number, String contact, String message) throws XMPPException {
+        writeRoom(number, contact, new XmppMsg(message));
+    }
+    
+    /**
+     * Writes a formated message to a room and creates the room if necessary,
+     * followed by an invite to the default notification address 
+     * to join the room
+     * 
+     * @param number
+     * @param contact
+     * @param message
+     * @throws XMPPException
+     */
+    public void writeRoom(String number, String contact, XmppMsg message) throws XMPPException {
         MultiUserChat muc;
         muc = inviteRoom(number, contact);
-        if (muc != null)
-        	muc.sendMessage(message);
+        if (muc != null) {
+            muc.sendMessage(message.generateFmtTxt());
+        }
     }
     
     /**
@@ -111,8 +126,7 @@ public class XmppMuc {
 			// TODO: test if occupants contains also the sender (in case we
 			// invite other people)
 			if (muc != null && muc.getOccupantsCount() < 2) {
-				muc.invite(_settings.notifiedAddress, "SMS conversation with "
-						+ contact);
+				muc.invite(_settings.notifiedAddress, "SMS conversation with " + contact);
 			}
 		}
 		return muc;
@@ -139,11 +153,12 @@ public class XmppMuc {
      * @param roomname - the full roomname as JID
      * @return the room or null
      */
-    public MultiUserChat getRoomViaRoomname(String roomname) {
+    public MultiUserChat getRoomViaRoomName(String roomname) {
         Collection<MultiUserChat> mucSet = _rooms.values();
         for(MultiUserChat muc : mucSet) {
-            if(muc.getRoom().equals(roomname))
+            if(muc.getRoom().equals(roomname)) {
                 return muc;
+            }
         }
         return null;
     }

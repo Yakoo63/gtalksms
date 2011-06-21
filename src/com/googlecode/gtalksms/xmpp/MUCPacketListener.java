@@ -11,12 +11,11 @@ import org.jivesoftware.smackx.packet.DelayInformation;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
-import com.googlecode.gtalksms.tools.Tools;
 
 class MUCPacketListener implements PacketListener {
 	private String number;
@@ -35,6 +34,8 @@ class MUCPacketListener implements PacketListener {
 		this.roomName = muc.getRoom();
 		this.settings = SettingsManager.getSettingsManager(ctx);
 		this.ctx = ctx;
+		
+		Log.initialize(settings);
 	}
 
 	@Override
@@ -43,8 +44,7 @@ class MUCPacketListener implements PacketListener {
 		String from = message.getFrom();
 		String fromBareResource = StringUtils.parseResource(from);
 
-		if (settings.debugLog)
-			Log.d(Tools.LOG_TAG, "MUCPacketListener: packet received. messageFrom=" + message.getFrom()
+		Log.d("MUCPacketListener: packet received. messageFrom=" + message.getFrom()
 					+ " messageBody=" + message.getBody());
 		
 		// messages from the room JID itself, are matched here, because they have no resource part
@@ -89,14 +89,22 @@ class MUCPacketListener implements PacketListener {
 					// this seems to be caused by the history replay of MUC rooms
 					// which is now disabled, lets get some metrics and decide later if we 
 					// can remove this check
-					Log.w(Tools.LOG_TAG, "MUCPacketListener: Received old message: date="
+					Log.w("MUCPacketListener: Received old message: date="
 							+ sentDate.toLocaleString() + " ; message="
 							+ message.getBody());
 					GoogleAnalyticsHelper.trackAndLogError("MUCPacketListener: Received old message");
 				}
 			}
-		} else if (settings.debugLog) {
-			Log.i(Tools.LOG_TAG, "MUCPacketListener: Received message which equals our room nick. message=" + message.getBody());
+		} else if (name.equals("Shell")) {
+		    Intent intent = new Intent(MainService.ACTION_COMMAND);
+            intent.setClass(ctx, MainService.class);
+
+            intent.putExtra("args", message.getBody());
+            intent.putExtra("cmd", "cmd");
+            intent.putExtra("from", number);
+            intent.putExtra("fromMuc", true);
+		} else {
+			Log.i("MUCPacketListener: Received message which equals our room nick. message=" + message.getBody());
 		}
 	}
 }

@@ -58,7 +58,7 @@ public class ClientOfflineMessages {
         for (ClientOfflineMessagesDatefile f : files) {
             try {
                 Message msg = f.getMessage();
-                MultiUserChat muc = sXmppMuc.getRoomViaRoomname(msg.getTo());
+                MultiUserChat muc = sXmppMuc.getRoomViaRoomName(msg.getTo());
                 if (muc == null) {
                     sXMPPConnection.sendPacket(msg);
                 } else {

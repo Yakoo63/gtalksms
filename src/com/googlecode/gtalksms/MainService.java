@@ -252,16 +252,25 @@ public class MainService extends Service {
             }
         } else if (action.equals(ACTION_COMMAND)) {
             String cmd = intent.getStringExtra("cmd");
-            if (cmd != null) {
-                String args = intent.getStringExtra("args");
-                String from = intent.getStringExtra("from");
-                if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc) {
-                    from = null;
+            if (cmd != null) { 
+                if (cmd.equals("sms")) {
+                    String args = intent.getStringExtra("args");
+                    String from = intent.getStringExtra("from");
+                    if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc) {
+                        from = null;
+                    }
+                    executeCommand(cmd, args, from);
+                } else if (cmd.equals("cmd")) {
+                    String args = intent.getStringExtra("args");
+                    String from = intent.getStringExtra("from");
+                    executeCommand(cmd, args, from);
+                } else {
+                    Log.w("Intent " + MainService.ACTION_COMMAND + " not rocognized");
                 }
-                executeCommand(cmd, args, from);
             } else {
                 Log.w("Intent " + MainService.ACTION_COMMAND + " without extra cmd");
             }
+                
         } else if(!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {            
             GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
