@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.googlecode.gtalksms.Log;
@@ -13,16 +17,38 @@ import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
+/**
+ * Wizard control flow:
+ * 
+ * Welcome --> Choose Method -->  Choose Server --> Create --> Create Success
+ *                            \
+ *                             --> Same Account
+ *                             |
+ *                             --> Existing Account
+ *                             
+ * Not that "Same Account" and "Existing Account" share the same layout, the
+ * only difference is that with "Same Account" the notification address is 
+ * set as login and the editText field is made unchangeable
+ * 
+ * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
+ *
+ */
 public class Wizard extends Activity {
-    private final static int VIEW_WELCOME = 0;
-    private final static int VIEW_LOGIN = 1;
-    private final static int VIEW_CREATE = 2;
-    private final static int VIEW_NOTIFICATIONS = 3;
+    
+    protected final static int VIEW_WELCOME = 0;
+    protected final static int VIEW_CHOOSE_METHOD = 1;    
+    protected final static int VIEW_CREATE_CHOOSE_SERVER = 2;
+    protected final static int VIEW_CREATE = 3;
+    protected final static int VIEW_CREATE_SUCCESS = 4;
+    protected final static int VIEW_EXISTING_ACCOUNT = 5;
+    protected final static int VIEW_SAME_ACCOUNT = 6;
  
     private int mCurrentView = 0;
     private SettingsManager mSettingsMgr;
     
-    /** Called when the activity is first created. */
+    /** 
+     * Called when the activity is first created. 
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,40 +80,52 @@ public class Wizard extends Activity {
         }
     }
     
-    private void initView(int viewId) {
+    protected void initView(int viewId) {
         
+        Button next;
+        RadioGroup rg;
         switch (viewId) {
             case VIEW_WELCOME:
                 setContentView(R.layout.wizard_welcome);
-                mapWizardButton(R.id.loginBut, VIEW_LOGIN);
-                mapWizardButton(R.id.createBut, VIEW_CREATE);
+                next = (Button) findViewById(R.id.nextBut);
+                EditText textNotiAddress = (EditText) findViewById(R.id.notificationAddress);
+                next.setOnClickListener(new WelcomeNextButtonClickListener(this, textNotiAddress));
                 break;
-
+            case VIEW_CHOOSE_METHOD:
+                setContentView(R.layout.wizard_choose_method);
+                mapWizardButton(R.id.backBut, VIEW_WELCOME);
+                next = (Button) findViewById(R.id.nextBut);
+                rg = (RadioGroup) findViewById(R.id.radioGroupMethod);
+                next.setOnClickListener(new ChooseMethodNextButtonClickListener(this, rg));
+                break;
+            case VIEW_CREATE_CHOOSE_SERVER:
+                setContentView(R.layout.wizard_create_choose_server);
+                Spinner spinner = (Spinner) findViewById(R.id.serverChooser);
+                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.predefined_xmpp_servers, android.R.layout.simple_spinner_item);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
+                EditText textServer = (EditText) findViewById(R.id.textServer);
+                rg = (RadioGroup) findViewById(R.id.radioGroupServer);
+                rg.setOnCheckedChangeListener(new ChooseServerRadioGroupChangeListener(spinner, textServer));
+                mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
+                mapWizardButton(R.id.nextBut, VIEW_CREATE);
+                break;
             case VIEW_CREATE:
                 setContentView(R.layout.wizard_create);
-                mapWizardButton(R.id.backBut, VIEW_WELCOME);
-                Button mCreate = (Button) findViewById(R.id.createBut);
-                mCreate.setOnClickListener(new CreateButtonClickListener(mSettingsMgr));
-//                    Button deleteButton = (Button) findViewById(R.id.deleteBut);
-//                    deleteButton.setOnClickListener(
-//                            new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View arg0) {
-//                                    XmppManager.deleteAccount();
-//                                }
-//                            }
-//                    );
+                mapWizardButton(R.id.backBut, VIEW_CREATE_CHOOSE_SERVER);
+                Button create = (Button) findViewById(R.id.createBut);
+                create.setOnClickListener(new CreateButtonClickListener(this, mSettingsMgr));
                 break;
-
-            case VIEW_LOGIN:
-                setContentView(R.layout.wizard_login);
-                mapWizardButton(R.id.backBut, VIEW_WELCOME);
-                // TODO real login (test?)
-                // mapWizardButton(R.id.loginBut, VIEW_LOGIN);
-                break;
-
+            case VIEW_SAME_ACCOUNT:
+                setContentView(R.layout.wizard_existing_account);
+                String login = ((EditText)findViewById(R.id.notificationAddress)).getText().toString();
+                EditText loginText = (EditText) findViewById(R.id.login);
+                loginText.setEnabled(false);
+                loginText.setText(login);
+                mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
+                // TODO map next button
             default:
-                break;
+                throw new IllegalStateException();
         }
         
         TextView label = (TextView) findViewById(R.id.VersionLabel);

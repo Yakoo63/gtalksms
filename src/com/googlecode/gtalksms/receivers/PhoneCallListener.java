@@ -39,7 +39,7 @@ public class PhoneCallListener extends PhoneStateListener {
             if (manageIncoming) {
                 manageIncoming = false;
                 String contact = ContactsManager.getContactName(svc, incomingNumber);
-                contact = contact + " (" + incomingNumber + " )";
+                contact = contact + " ( " + incomingNumber + " )";
                 svc.send(svc.getString(R.string.chat_is_calling, contact), null);
             }
             break;

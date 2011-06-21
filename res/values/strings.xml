@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="wizard">Setup wizard</string>
-    <string name="wizard_welcome_text">Welcome to the GTalkSMS setup wizard.\nDo you want to create a new account for your phone or login to an existing one?</string>
+    <string name="wizard_welcome_text">Welcome to the GTalkSMS setup wizard.\nPlease enter your XMPP (Jabber) or GTalk Address (username@googlemail.com) below. This Address will be able to control your android phone via Jabber/GTalk and will be notified about new events on your phone.</string>
     <string name="wizard_welcome_login_button">Login</string>
     <string name="wizard_welcome_create_button">Create</string>
     <string name="wizard_create_text">Choose your login and your password</string>
@@ -19,10 +19,11 @@
     <string name="wizard_create_success">Account successfully created, you can now exit the App or return to the main screen</string>
     <string name="wizard_back_to_mainscreen">Back to Main Screen</string>
     <string name="wizard_next">Next</string>
-    <string name="wizard_new_account">Create a new account</string>
-    <string name="wizard_existing_account">Use an existing account</string>
     <string name="wizard_choose_server">I want to choose a server from the predefined list</string>
     <string name="wizard_manual_server">I know the server on which I want to create the account</string>
+    <string name="wizard_different_account">Create an extra account for GTalkSMS</string>
+    <string name="wizard_existing_account">Use an existing account exclusively for GTalkSMS</string>    
+    <string name="wizard_same_account">Use the same account (not recommended)</string>
     <string name="wizard_enter_login">Enter your login and password</string>
     <string name="pref_app">Application settings</string>
     <string name="pref_app_advanced">Advanced settings</string>

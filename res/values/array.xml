@@ -53,4 +53,8 @@
 	   <item>req</item>
 	   <item>opt</item>
     </string-array>
+    <string-array name="predefined_xmpp_servers">
+        <item>jabber.ccc.de</item>
+        <item>draugr.de</item>
+    </string-array>
 </resources>
