@@ -12,8 +12,10 @@
         android:gravity="top|left" 
         android:layout_weight="10" android:layout_height="wrap_content"/>
     <RadioGroup android:id="@+id/radioGroup1" android:layout_width="wrap_content" android:layout_height="wrap_content">
-        <RadioButton android:layout_height="wrap_content" android:checked="true" android:layout_width="wrap_content" android:id="@+id/radioNewAccount" android:text="@string/wizard_new_account"></RadioButton>
-        <RadioButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/radioExsistingAccount" android:text="@string/wizard_existing_account"></RadioButton>
+        <RadioButton android:layout_height="wrap_content" android:checked="true" android:layout_width="wrap_content" android:id="@+id/radioChooseServer" android:text="@string/wizard_choose_server"></RadioButton>
+        <Spinner android:id="@+id/spinner1" android:layout_width="wrap_content" android:layout_height="wrap_content"></Spinner>
+        <RadioButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/radioManualServer" android:text="@string/wizard_manual_server"></RadioButton>
+        <EditText android:id="@+id/editText1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="jabber.ccc.de"></EditText>
     </RadioGroup>
     
     <LinearLayout 
@@ -22,7 +24,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" 
         android:layout_weight="1"
-        > 
+        >
+        <Button android:gravity="center" android:layout_gravity="center" android:layout_weight=".5" android:layout_width="fill_parent" android:fitsSystemWindows="true" android:id="@+id/backBut" android:layout_height="40dp" android:text="@string/wizard_back_button"></Button> 
         
         <Button 
             android:layout_height="40dp" 

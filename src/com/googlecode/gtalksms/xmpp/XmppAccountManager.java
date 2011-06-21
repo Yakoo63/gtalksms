@@ -15,8 +15,7 @@ public class XmppAccountManager {
     /**
      * Tries to create a new account and if successful 
      * will write the account data to the SharedPreferences.
-     * Will return null on success, otherwise a string with the
-     * error message or a XMPPException
+     * Will return the XMPPConnection on success, otherwise a XMPPException
      * 
      * @param jid
      * @param password
@@ -24,14 +23,14 @@ public class XmppAccountManager {
      * @return
      * @throws XMPPException
      */
-    public static String tryToCreateAccount(String jid, String password, SettingsManager settings) throws XMPPException {
+    public static XMPPConnection tryToCreateAccount(String jid, String password, SettingsManager settings) throws XMPPException {
         String host = StringUtils.parseServer(jid);
         String username = StringUtils.parseName(jid);
         if (host.equals("")) {
-            return "JID without server part";
+            throw new XMPPException("JID without server part");
         }
         if (username.equals("")) {
-            return "JID without user part";
+            throw new XMPPException("JID without user part");
         }
         
         ConnectionConfiguration conf = new ConnectionConfiguration(host);
@@ -39,7 +38,7 @@ public class XmppAccountManager {
         connection.connect();
         AccountManager accManager = new AccountManager(connection);
         if(!accManager.supportsAccountCreation()) {
-            return "Server does not support account creation";
+            throw new XMPPException("Server does not support account creation");
         }
         accManager.createAccount(username, password);
         
@@ -53,6 +52,6 @@ public class XmppAccountManager {
         
         editor.commit();
         
-        return null;
+        return connection;
     }
 }

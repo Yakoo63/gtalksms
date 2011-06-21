@@ -15,10 +15,9 @@
         >
         
         <TextView 
-            android:text="@string/wizard_create_text" 
             android:gravity="top|left" 
             android:layout_width="fill_parent" 
-            android:layout_weight="0" android:layout_height="wrap_content"/>
+            android:layout_weight="0" android:layout_height="wrap_content" android:text="@string/wizard_enter_login"/>
         <TextView 
             android:text="@string/wizard_create_login" 
             android:layout_width="wrap_content" 
@@ -29,7 +28,7 @@
             android:id="@+id/login" 
             android:layout_width="match_parent" 
             android:layout_height="wrap_content"
-            />
+            android:text="username@jabber.server"/>
         <TextView 
             android:text="@string/wizard_create_password1" 
             android:layout_width="wrap_content" 
@@ -38,17 +37,6 @@
             <!-- android:text="azertyuiop" --> 
         <EditText 
             android:id="@+id/password1" 
-            android:inputType="textPassword" 
-            android:layout_width="match_parent" 
-            android:layout_height="wrap_content"
-            />
-        <TextView 
-            android:text="@string/wizard_create_password2" 
-            android:layout_width="wrap_content" 
-            android:layout_height="wrap_content"
-            />
-        <EditText 
-            android:id="@+id/password2" 
             android:inputType="textPassword" 
             android:layout_width="match_parent" 
             android:layout_height="wrap_content"

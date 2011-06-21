@@ -7,14 +7,12 @@
     android:layout_height="fill_parent" >
     
     <TextView 
-        android:text="@string/wizard_welcome_text" 
+        android:text="@string/wizard_create_success" 
+        android:layout_height="wrap_content" 
         android:layout_width="fill_parent" 
         android:gravity="top|left" 
-        android:layout_weight="10" android:layout_height="wrap_content"/>
-    <RadioGroup android:id="@+id/radioGroup1" android:layout_width="wrap_content" android:layout_height="wrap_content">
-        <RadioButton android:layout_height="wrap_content" android:checked="true" android:layout_width="wrap_content" android:id="@+id/radioNewAccount" android:text="@string/wizard_new_account"></RadioButton>
-        <RadioButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/radioExsistingAccount" android:text="@string/wizard_existing_account"></RadioButton>
-    </RadioGroup>
+        android:layout_weight="10"
+        />
     
     <LinearLayout 
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,12 +23,15 @@
         > 
         
         <Button 
+            android:text="@string/wizard_back_to_mainscreen" 
+            android:id="@+id/backToMainscreen"
             android:layout_height="40dp" 
             android:layout_width="fill_parent" 
             android:layout_weight=".5"
             android:fitsSystemWindows="true" 
             android:gravity="center" 
-            android:layout_gravity="center" android:id="@+id/nextBut" android:text="@string/wizard_next"/> 
+            android:layout_gravity="center"
+            /> 
             
     </LinearLayout>
     
