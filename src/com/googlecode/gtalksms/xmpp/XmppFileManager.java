@@ -32,7 +32,7 @@ public class XmppFileManager implements FileTransferListener {
     
     private static XmppFileManager xmppFileManager;
     
-    private static final String gtalksmsDir = "GTalkSMS";
+    private static final String gtalksmsDir = Tools.APP_NAME;
     
     private XmppFileManager(Context context) {
         _settings = SettingsManager.getSettingsManager(context);

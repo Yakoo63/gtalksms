@@ -30,7 +30,7 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMuc {
 	
-	private static final String ROOM_START_TAG = "GTalkSMS_";
+	private static final String ROOM_START_TAG = Tools.APP_NAME + "_";
 	private static final int ROOM_START_TAG_LENGTH = ROOM_START_TAG.length();
 	private static final int REPLAY_TIMEOUT = 500;
 

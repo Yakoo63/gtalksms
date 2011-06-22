@@ -102,13 +102,13 @@ public class GoogleAnalyticsHelper {
         if (!run && (gAnalytics != null)) {
             switch (isNewInstallUpdate()) {
             case GoogleAnalyticsHelper.FRESH_INSTALL:
-                gAnalytics.trackEvent("GTalkSMS", // Category
+                gAnalytics.trackEvent(Tools.APP_NAME, // Category
                         "Fresh Install", // Action
                         "Fresh Install:  " + Tools.getVersionName(ctx), // Label
                         0); // Value
                 break;
             case GoogleAnalyticsHelper.UPDATE:
-                gAnalytics.trackEvent("GTalkSMS", // Category
+                gAnalytics.trackEvent(Tools.APP_NAME, // Category
                         "Update", // Action
                         "Update: " + Tools.getVersionName(ctx), // Label
                         0); // Value
@@ -254,7 +254,7 @@ public class GoogleAnalyticsHelper {
         try {
             FileOutputStream fOut = ctx.openFileOutput(version_filename, Context.MODE_PRIVATE);
             OutputStreamWriter osw = new OutputStreamWriter(fOut);
-            osw.write("GTalkSMS Version File. Versioin: " + version);
+            osw.write(Tools.APP_NAME + " Version File. Versioin: " + version);
             osw.close();
         } catch (IOException ioe) {
             return false;

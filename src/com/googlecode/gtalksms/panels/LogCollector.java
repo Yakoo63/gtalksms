@@ -74,7 +74,7 @@ public class LogCollector extends Activity {
     private void sendLog(String logString) {
         try {
             Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "GTalkSMS log - <Enter Issue # Here>");
+            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, Tools.APP_NAME + " log - <Enter Issue # Here>");
             emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {"gtalksms-logs@googlegroups.com"});
             emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, logString);
             emailIntent.setType("text/plain");

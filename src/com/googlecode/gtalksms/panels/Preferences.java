@@ -14,7 +14,7 @@ public class Preferences extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         Tools.setLocale(SettingsManager.getSettingsManager(this), this);
         
-        getPreferenceManager().setSharedPreferencesName("GTalkSMS");
+        getPreferenceManager().setSharedPreferencesName(Tools.APP_NAME);
         Intent intent = getIntent();
         int prefs_id = intent.getIntExtra("panel", 0);
         addPreferencesFromResource(prefs_id);

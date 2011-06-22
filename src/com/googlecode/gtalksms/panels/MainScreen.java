@@ -214,7 +214,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         setContentView(R.layout.main);
 
         TextView label = (TextView) findViewById(R.id.VersionLabel);
-        label.setText(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
+        label.setText(StringFmt.Style(Tools.APP_NAME + " " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
 
         Button prefBtn = (Button) findViewById(R.id.Preferences);
         prefBtn.setOnClickListener(new OnClickListener() {

@@ -116,7 +116,7 @@ public class SettingsManager {
     
     private SettingsManager(Context context) {
         _context = context;
-        _sharedPreferences = _context.getSharedPreferences("GTalkSMS", 0);
+        _sharedPreferences = _context.getSharedPreferences(Tools.APP_NAME, 0);
         _sharedPreferences.registerOnSharedPreferenceChangeListener(_changeListener);
         
         importPreferences();

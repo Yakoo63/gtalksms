@@ -90,7 +90,7 @@ public class XmppManager {
     
     // Indicates the current state of the service (disconnected/connecting/connected)
     private static int _status = DISCONNECTED;
-    private static String _presenceMessage = "GTalkSMS";
+    private static String _presenceMessage = Tools.APP_NAME;
     
     private static List<XmppConnectionChangeListener> connectionChangeListeners;
     private static XMPPConnection _connection = null;
