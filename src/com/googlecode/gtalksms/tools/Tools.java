@@ -130,6 +130,16 @@ public class Tools {
         return res;
     }
     
+    
+    public final static Integer parseInt(String value, Integer defaultValue) {
+        Integer res = defaultValue;
+        try { 
+            res = Integer.parseInt(value); 
+        } catch(Exception e) {}
+        
+        return res;
+    }
+    
     public final static int getMinNonNeg(int... x) {
         int min = Integer.MAX_VALUE;
         for(int i : x) {
