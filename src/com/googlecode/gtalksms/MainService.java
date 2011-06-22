@@ -108,7 +108,7 @@ public class MainService extends Service {
     
     private static Context _uiContext;
     
-    private static volatile Handler _toastHandler;  
+    private static volatile Handler _toastHandler = new Handler();  
     
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
@@ -352,7 +352,6 @@ public class MainService extends Service {
         _serviceHandler = new ServiceHandler(_serviceLooper);
         
         _uiContext = this;
-        _toastHandler = new Handler();
         
         _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
         

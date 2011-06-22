@@ -190,6 +190,8 @@ public class MainScreen extends Activity implements InterstitialAdListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         _settingsMgr = SettingsManager.getSettingsManager(this);
+//        MenuItem mi = (MenuItem) findViewById(R.id.wizard);
+//        mi.setEnabled(false);
         createView();
         
         _interstitialAd.requestAd(this);

@@ -7,13 +7,12 @@
     android:layout_height="fill_parent" >
     
     <TextView 
-        android:text="@string/wizard_welcome_text" 
+        android:text="@string/wizard_create_success" 
+        android:layout_height="wrap_content" 
         android:layout_width="fill_parent" 
         android:gravity="top|left" 
-        android:layout_weight="10" android:layout_height="wrap_content"/>
-    <EditText android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/notificationAddress" android:text="username@jabber.server"></EditText>
-    <RadioGroup android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/radioGroupWelcome">
-    </RadioGroup>
+        android:layout_weight="10"
+        />
     
     <LinearLayout 
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -24,12 +23,15 @@
         > 
         
         <Button 
+            android:text="@string/wizard_back_to_mainscreen" 
+            android:id="@+id/backToMainscreen"
             android:layout_height="40dp" 
             android:layout_width="fill_parent" 
             android:layout_weight=".5"
             android:fitsSystemWindows="true" 
             android:gravity="center" 
-            android:layout_gravity="center" android:id="@+id/nextBut" android:text="@string/wizard_next"/> 
+            android:layout_gravity="center"
+            /> 
             
     </LinearLayout>
     

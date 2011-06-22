@@ -2,8 +2,7 @@
 <menu
   xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/wizard"
-          android:title="@string/wizard" 
-          android:visible="false"/>
+          android:title="@string/wizard" />  
     <item android:id="@+id/connection_settings"
           android:icon="@drawable/ic_menu_preferences"
           android:title="@string/pref_con" />

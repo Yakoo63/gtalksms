@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.googlecode.gtalksms"
+    android:orientation="vertical"
+    android:layout_height="fill_parent" android:layout_width="match_parent">
+    <RadioGroup android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/radioGroupServer">
+        <RadioButton android:layout_height="wrap_content" android:checked="true" android:layout_width="wrap_content" android:id="@+id/radioChooseServer" android:text="@string/wizard_choose_server"></RadioButton>
+        <Spinner android:layout_height="wrap_content" android:id="@+id/serverChooser" android:layout_width="match_parent"></Spinner>
+        <RadioButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/radioManualServer" android:text="@string/wizard_manual_server"></RadioButton>
+        <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="jabber.ccc.de" android:id="@+id/textServer"></EditText>
+    </RadioGroup>
+    
+    <LinearLayout 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" 
+        android:layout_weight="1" android:orientation="horizontal">
+        <Button android:gravity="center" android:layout_gravity="center" android:layout_weight=".5" android:layout_width="fill_parent" android:fitsSystemWindows="true" android:id="@+id/backBut" android:layout_height="40dp" android:text="@string/wizard_back_button"></Button> 
+        
+        <Button 
+            android:layout_height="40dp" 
+            android:layout_width="fill_parent" 
+            android:layout_weight=".5"
+            android:fitsSystemWindows="true" 
+            android:gravity="center" 
+            android:layout_gravity="center" android:id="@+id/nextBut" android:text="@string/wizard_next"/> 
+            
+    </LinearLayout>
+    
+    <TextView 
+        android:text="Version X.X.X @Yakooo" 
+        android:id="@+id/VersionLabel"
+        android:layout_height="wrap_content" 
+        android:layout_width="fill_parent" 
+        android:gravity="bottom|right" android:layout_weight="0"/>
+
+</LinearLayout>

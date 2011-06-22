@@ -152,11 +152,23 @@ public class XmppManager {
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
         _connection = createNewConnection();
     }
-    
+        
     public static XmppManager getInstance(Context ctx) {
         if (xmppManager == null) {
             xmppManager = new XmppManager(ctx);            
         }
+        return xmppManager;
+    }
+    
+    public static XmppManager getInstance(Context ctx, XMPPConnection connection) {
+        if (xmppManager == null) {
+            xmppManager = new XmppManager(ctx);            
+        }
+        if (_connection != null && _connection.isConnected()) {
+            xmppDisconnect(_connection);
+        }
+        _connection = connection;
+        informListeners(_connection);
         return xmppManager;
     }
     

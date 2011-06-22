@@ -18,20 +18,7 @@
             android:text="@string/wizard_create_text" 
             android:gravity="top|left" 
             android:layout_width="fill_parent" 
-            android:layout_weight="0" 
-            android:layout_height="100dip"
-            />
-        <TextView 
-            android:text="@string/wizard_create_server" 
-            android:layout_width="wrap_content" 
-            android:layout_height="wrap_content"
-            />
-        <EditText 
-            android:text="draugr.de" 
-            android:id="@+id/server" 
-            android:layout_width="match_parent" 
-            android:layout_height="wrap_content"
-            />
+            android:layout_weight="0" android:layout_height="wrap_content"/>
         <TextView 
             android:text="@string/wizard_create_login" 
             android:layout_width="wrap_content" 
@@ -55,7 +42,7 @@
             android:layout_width="match_parent" 
             android:layout_height="wrap_content"
             />
-        <!--<TextView 
+        <TextView 
             android:text="@string/wizard_create_password2" 
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content"
@@ -83,7 +70,6 @@
         >
         
         <Button 
-            android:text="@string/wizard_create_back_button" 
             android:id="@+id/backBut"
             android:layout_height="40dp" 
             android:layout_width="fill_parent" 
@@ -91,18 +77,7 @@
             android:fitsSystemWindows="true" 
             android:gravity="center" 
             android:layout_gravity="center"
-            /> 
-        
-        <Button 
-            android:text="@string/wizard_create_delete_button" 
-            android:id="@+id/deleteBut"
-            android:layout_height="40dp" 
-            android:layout_width="fill_parent" 
-            android:layout_weight=".5"
-            android:fitsSystemWindows="true" 
-            android:gravity="center" 
-            android:layout_gravity="center"
-            /> 
+            android:text="@string/wizard_back_button"/> 
  
          <Button 
             android:text="@string/wizard_create_create_button" 
