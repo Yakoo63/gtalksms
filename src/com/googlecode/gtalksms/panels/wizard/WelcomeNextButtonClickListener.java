@@ -25,6 +25,7 @@ public class WelcomeNextButtonClickListener implements OnClickListener {
         if (!XmppTools.isValidJID(notificationAddress)) {
             MainService.displayToast("Not a valid JID", null);
         } else {
+            mWizard.mNotifiedAddress = notificationAddress;
             mWizard.initView(Wizard.VIEW_CHOOSE_METHOD);
         }
     }

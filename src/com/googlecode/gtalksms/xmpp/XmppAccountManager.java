@@ -14,16 +14,14 @@ public class XmppAccountManager {
     
     /**
      * Tries to create a new account and if successful 
-     * will write the account data to the SharedPreferences.
-     * Will return the XMPPConnection on success, otherwise a XMPPException
+     * returns the XMPPConnection on success, otherwise throws an XMPPException
      * 
      * @param jid
      * @param password
-     * @param settings
      * @return
      * @throws XMPPException
      */
-    public static XMPPConnection tryToCreateAccount(String jid, String password, SettingsManager settings) throws XMPPException {
+    public static XMPPConnection tryToCreateAccount(String jid, String password) throws XMPPException {
         String host = StringUtils.parseServer(jid);
         String username = StringUtils.parseName(jid);
         if (host.equals("")) {
@@ -41,9 +39,24 @@ public class XmppAccountManager {
             throw new XMPPException("Server does not support account creation");
         }
         accManager.createAccount(username, password);
-        
+
+        return connection;
+    }
+    
+    /**
+     * Writes the given minimal settings to the shared preferences.
+     * The jid needs to be in the form of user@server.tld
+     * because smack will do automatic DNS SRV lookups on server.tld
+     * to find the right XMPP server
+     * 
+     * @param jid
+     * @param password
+     * @param settings
+     */
+    public static void savePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) {
         Editor editor = settings.getEditor();
         
+        editor.putString("notifiedAddress", notifiedAddress);
         editor.putString("xmppSecurityMode", "opt");
         editor.putBoolean("useCompression", false);
         editor.putBoolean("manuallySpecifyServerSettings", false);
@@ -51,7 +64,5 @@ public class XmppAccountManager {
         editor.putString("password", password);
         
         editor.commit();
-        
-        return connection;
     }
 }

@@ -37,7 +37,7 @@ public class CreateButtonClickListener implements OnClickListener {
             String res = null;
             XMPPConnection  con = null;
             try {
-                con = XmppAccountManager.tryToCreateAccount(jid, psw2, mSettingsMgr);
+                con = XmppAccountManager.tryToCreateAccount(jid, psw2);
             } catch (XMPPException e) {
                 res = e.getLocalizedMessage();
             }

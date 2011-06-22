@@ -21,12 +21,15 @@ public class ChooseMethodNextButtonClickListener implements OnClickListener {
         int checkedButton = mRg.getCheckedRadioButtonId();
         switch (checkedButton) {
         case R.id.radioDifferentAccount:
+            mWizard.mChoosenMethod = Wizard.METHOD_CREATE_NEW;
             mWizard.initView(Wizard.VIEW_CREATE_CHOOSE_SERVER);
             break;
         case R.id.radioSameAccount:
+            mWizard.mChoosenMethod = Wizard.METHOD_USE_SAME;
             mWizard.initView(Wizard.VIEW_SAME_ACCOUNT);
             break;
         case R.id.radioExsistingAccount:
+            mWizard.mChoosenMethod = Wizard.METHOD_USE_EXISTING;
             mWizard.initView(Wizard.VIEW_EXISTING_ACCOUNT);
             break;
         default:

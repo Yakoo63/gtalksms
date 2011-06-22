@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -42,9 +43,73 @@ public class Wizard extends Activity {
     protected final static int VIEW_CREATE_SUCCESS = 4;
     protected final static int VIEW_EXISTING_ACCOUNT = 5;
     protected final static int VIEW_SAME_ACCOUNT = 6;
+    
+    protected final static int METHOD_CREATE_NEW = 1;
+    protected final static int METHOD_USE_EXISTING = 2;
+    protected final static int METHOD_USE_SAME = 3;
+    
+    protected final static int CHOOSEN_SERVER_PREDEFINED = 1;
+    protected final static int CHOOSEN_SERVER_MANUAL = 2;
+        
+    // these attributes define the state of the wizzard
+    // they should be save restored from savedInstanceState
+    protected String mNotifiedAddress;
+    protected int mChoosenMethod;
+    protected int mChoosenServer;
+    protected String mChoosenServername;
+    protected String mLogin;
+    protected String mPassword1;
+    protected String mPassword2;
  
     private int mCurrentView = 0;
     private SettingsManager mSettingsMgr;
+    
+    public void onSaveInstanceState(Bundle savedBundle) {
+        if (mNotifiedAddress != null) 
+            savedBundle.putString("mNotifiedAddress", mNotifiedAddress);
+        if (mChoosenMethod != 0) 
+            savedBundle.putInt("mChoosenMethod", mChoosenMethod);
+        if (mChoosenServer != 0)
+            savedBundle.putInt("mChoosenServer", mChoosenServer);
+        if (mChoosenServername != null)
+            savedBundle.putString("mChoosenServername", mChoosenServername);
+        if (mLogin != null)
+            savedBundle.putString("mLogin", mLogin);
+        if (mPassword1 != null)
+            savedBundle.putString("mPassword1", mPassword1);
+        if (mPassword2 != null)
+            savedBundle.putString("mPassword2", mPassword2);
+        if (mCurrentView != 0)
+            savedBundle.putInt("mCurrentView", mCurrentView);
+    }
+    
+    private void restoreStateFromBundle(Bundle savedBundle) {
+        String nA = savedBundle.getString("mNotifiedAddress");
+        int cM = savedBundle.getInt("mChoosenMethod");
+        int cS = savedBundle.getInt("mChoosenServer");
+        String cSN = savedBundle.getString("mChoosenServername");
+        String l = savedBundle.getString("mLogin");
+        String psw1 = savedBundle.getString("mPassword1");
+        String psw2 = savedBundle.getString("mPassword2");
+        int cV = savedBundle.getInt("mCurrentView");
+        
+        if (nA != null)
+            mNotifiedAddress = nA;
+        if (cM != 0)
+            mChoosenMethod = cM;
+        if (cS != 0)
+            mChoosenServer = cS;
+        if (cSN != null)
+            mChoosenServername = cSN;
+        if (l != null)
+            mLogin = l;
+        if (psw1 != null)
+            mPassword1 = psw1;
+        if (psw2 != null)
+            mPassword2 = psw2;
+        if (cV != 0) 
+            mCurrentView = cV;
+    }
     
     /** 
      * Called when the activity is first created. 
@@ -52,10 +117,13 @@ public class Wizard extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            restoreStateFromBundle(savedInstanceState);
+        }
         mSettingsMgr = SettingsManager.getSettingsManager(this);
         
         Log.initialize(mSettingsMgr);
-        initView(VIEW_WELCOME);
+        initView(mCurrentView);
     }
     
     class WizardButtonListener implements View.OnClickListener {
@@ -89,6 +157,9 @@ public class Wizard extends Activity {
                 setContentView(R.layout.wizard_welcome);
                 next = (Button) findViewById(R.id.nextBut);
                 EditText textNotiAddress = (EditText) findViewById(R.id.notificationAddress);
+                if (mNotifiedAddress != null) {
+                    textNotiAddress.setText(mNotifiedAddress);
+                }
                 next.setOnClickListener(new WelcomeNextButtonClickListener(this, textNotiAddress));
                 break;
             case VIEW_CHOOSE_METHOD:
@@ -96,6 +167,17 @@ public class Wizard extends Activity {
                 mapWizardButton(R.id.backBut, VIEW_WELCOME);
                 next = (Button) findViewById(R.id.nextBut);
                 rg = (RadioGroup) findViewById(R.id.radioGroupMethod);
+                switch (mChoosenMethod) {
+                    case METHOD_CREATE_NEW:
+                       ((RadioButton) findViewById(R.id.radioDifferentAccount)).setChecked(true);
+                       break;
+                    case METHOD_USE_EXISTING:
+                        ((RadioButton) findViewById(R.id.radioExsistingAccount)).setChecked(true);
+                        break;
+                    case METHOD_USE_SAME:
+                        ((RadioButton) findViewById(R.id.radioSameAccount)).setChecked(true);
+                        break;
+                }
                 next.setOnClickListener(new ChooseMethodNextButtonClickListener(this, rg));
                 break;
             case VIEW_CREATE_CHOOSE_SERVER:
@@ -115,6 +197,8 @@ public class Wizard extends Activity {
                 mapWizardButton(R.id.backBut, VIEW_CREATE_CHOOSE_SERVER);
                 Button create = (Button) findViewById(R.id.createBut);
                 create.setOnClickListener(new CreateButtonClickListener(this, mSettingsMgr));
+                break;
+            case VIEW_EXISTING_ACCOUNT:
                 break;
             case VIEW_SAME_ACCOUNT:
                 setContentView(R.layout.wizard_existing_account);
