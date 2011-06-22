@@ -562,7 +562,7 @@ public class XmppManager {
             // "No response from server" usually means that the connection is somehow in an undefined state
             // so we throw away the XMPPConnection by null ing it
             // see also issue 133 - http://code.google.com/p/gtalksms/issues/detail?id=133
-            if (e.getMessage().startsWith("Connection failed. No response from server")) {
+            if (e.getMessage() != null && e.getMessage().startsWith("Connection failed. No response from server")) {
                 Log.w("xmpp connection in an unusable state, marking it as obsolete", e);
                 _connection = null;
             }
