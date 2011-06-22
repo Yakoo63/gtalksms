@@ -25,16 +25,18 @@ class MUCPacketListener implements PacketListener {
 	private String roomName;
 	private SettingsManager settings;
 	private Context ctx;
+	private int mode;
 
-	public MUCPacketListener(String number, MultiUserChat muc, String name, Context ctx) {
+	public MUCPacketListener(String number, MultiUserChat muc, String name, int mode, Context ctx) {
 		this.name = name;
 		this.number = number;
 		this.lastDate = new Date(0);
 		this.muc = muc;
 		this.roomName = muc.getRoom();
 		this.settings = SettingsManager.getSettingsManager(ctx);
+		this.mode = mode;
 		this.ctx = ctx;
-		
+        
 		Log.initialize(settings);
 	}
 
@@ -55,56 +57,59 @@ class MUCPacketListener implements PacketListener {
 			// fromMuc sounds right at first, but it servers no purpose here atm
 			// intent.putExtra("fromMuc", true);
 			ctx.startService(intent);
-		} else if (!fromBareResource.equals(name)) {
-			if (message.getBody() != null) {
-				DelayInformation inf = (DelayInformation) message.getExtension(
-						"x", "jabber:x:delay");
-				Date sentDate;
-				if (inf != null) {
-					sentDate = inf.getStamp();
-				} else {
-					sentDate = new Date();
-				}
-
-				if (sentDate.compareTo(lastDate) > 0) {
-					Intent intent = new Intent(MainService.ACTION_COMMAND);
-					intent.setClass(ctx, MainService.class);
-
-					intent.putExtra("from", roomName);
-					intent.putExtra("cmd", "sms");
-					intent.putExtra("fromMuc", true);
-					// if there are more than 2 users in the
-					// room, we include also a tag in the response of the sms message
-					if (muc.getOccupantsCount() > 2) { 
-						intent.putExtra("args", number + ":" + fromBareResource + ": "
-								+ message.getBody());
-					} else {
-						intent.putExtra("args", number + ":"
-								+ message.getBody());
-					}
-
-					ctx.startService(intent);
-					lastDate = sentDate;
-				} else {
-					// this seems to be caused by the history replay of MUC rooms
-					// which is now disabled, lets get some metrics and decide later if we 
-					// can remove this check
-					Log.w("MUCPacketListener: Received old message: date="
-							+ sentDate.toLocaleString() + " ; message="
-							+ message.getBody());
-					GoogleAnalyticsHelper.trackAndLogError("MUCPacketListener: Received old message");
-				}
-			}
-		} else if (name.equals("Shell")) {
-		    Intent intent = new Intent(MainService.ACTION_COMMAND);
-            intent.setClass(ctx, MainService.class);
-
-            intent.putExtra("args", message.getBody());
-            intent.putExtra("cmd", "cmd");
-            intent.putExtra("from", number);
-            intent.putExtra("fromMuc", true);
-		} else {
-			Log.i("MUCPacketListener: Received message which equals our room nick. message=" + message.getBody());
-		}
+		} else if (mode == XmppMuc.MODE_SMS) {
+	        if (!fromBareResource.equals(name)) {
+				if (message.getBody() != null) {
+    				DelayInformation inf = (DelayInformation) message.getExtension("x", "jabber:x:delay");
+    				Date sentDate;
+    				if (inf != null) {
+    					sentDate = inf.getStamp();
+    				} else {
+    					sentDate = new Date();
+    				}
+    
+    				if (sentDate.compareTo(lastDate) > 0) {
+    					Intent intent = new Intent(MainService.ACTION_COMMAND);
+    					intent.setClass(ctx, MainService.class);
+    
+    					intent.putExtra("from", roomName);
+    					intent.putExtra("cmd", "sms");
+    					intent.putExtra("fromMuc", true);
+    					// if there are more than 2 users in the
+    					// room, we include also a tag in the response of the sms message
+    					if (muc.getOccupantsCount() > 2) { 
+    						intent.putExtra("args", number + ":" + fromBareResource + ": " + message.getBody());
+    					} else {
+    						intent.putExtra("args", number + ":" + message.getBody());
+    					}
+    
+						ctx.startService(intent);
+    					lastDate = sentDate;
+    				} else {
+    					// this seems to be caused by the history replay of MUC rooms
+    					// which is now disabled, lets get some metrics and decide later if we 
+    					// can remove this check
+    					Log.w("MUCPacketListener: Received old message: date="
+    							+ sentDate.toLocaleString() + " ; message="
+    							+ message.getBody());
+    					GoogleAnalyticsHelper.trackAndLogError("MUCPacketListener: Received old message");
+    				}
+    			}
+	        } else {
+	            Log.i("MUCPacketListener: Received message which equals our room nick. message=" + message.getBody());
+	        }
+		} else if (mode == XmppMuc.MODE_SHELL) {
+		    if (!fromBareResource.equals(name)) {
+	            Intent intent = new Intent(MainService.ACTION_COMMAND);
+                intent.setClass(ctx, MainService.class);
+    
+                intent.putExtra("args", message.getBody());
+                intent.putExtra("cmd", "cmd");
+                intent.putExtra("from", number);
+                intent.putExtra("fromMuc", true);
+                
+                ctx.startService(intent);
+		    }
+    	}
 	}
 }

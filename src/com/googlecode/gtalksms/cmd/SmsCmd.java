@@ -137,7 +137,7 @@ public class SmsCmd extends CommandHandlerBase {
                 inviteRoom(_aliasHelper.convertAliasToNumber(args));
         	} else if (_lastRecipient != null) {
         	    try {
-					XmppMuc.getInstance(sContext).inviteRoom(_lastRecipient, _lastRecipientName);
+					XmppMuc.getInstance(sContext).inviteRoom(_lastRecipient, _lastRecipientName, XmppMuc.MODE_SMS);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}
@@ -282,7 +282,7 @@ public class SmsCmd extends CommandHandlerBase {
                 number = contact;
                 name = ContactsManager.getContactName(sContext, contact);                
                 try {
-					XmppMuc.getInstance(sContext).inviteRoom(number, name);
+					XmppMuc.getInstance(sContext).inviteRoom(number, name, XmppMuc.MODE_SMS);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}
@@ -296,7 +296,7 @@ public class SmsCmd extends CommandHandlerBase {
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 try {
-                    XmppMuc.getInstance(sContext).inviteRoom(phone.cleanNumber, phone.contactName);
+                    XmppMuc.getInstance(sContext).inviteRoom(phone.cleanNumber, phone.contactName, XmppMuc.MODE_SMS);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}

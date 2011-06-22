@@ -7,6 +7,7 @@ import org.jivesoftware.smack.XMPPException;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.shell.Shell;
+import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFont;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
@@ -31,17 +32,16 @@ public class ShellCmd extends CommandHandlerBase {
         
         if (cmd.getCommand().equals("cmd")) {
             try {
-                mShells.get(Integer.getInteger(cmd.getReplyTo(), 0)).executeCommand(cmd.getAllArguments());
+                mShells.get(Tools.parseInt(cmd.getReplyTo(), 0)).executeCommand(cmd.getAllArguments());
             } catch (Exception e) {
                 send("Failed to access to the shell #" + cmd.getReplyTo() + " : " + e.getLocalizedMessage());     
             }
         } else if (cmd.getCommand().equals("shell")) {
             
             // TODO see how to re-use shells 
-            
             try {
                 ++sIndex;
-                XmppMuc.getInstance(sContext).inviteRoom(sIndex.toString(), sRoomName);
+                XmppMuc.getInstance(sContext).inviteRoom(sIndex.toString(), sRoomName, XmppMuc.MODE_SHELL);
                 mShells.add(new Shell(sIndex, this, sContext));
                 
             } catch (XMPPException e) {
@@ -60,7 +60,7 @@ public class ShellCmd extends CommandHandlerBase {
             send(msg);
         } else {
             try {
-                XmppMuc.getInstance(sContext).writeRoom(id.toString(), sRoomName, msg);
+                XmppMuc.getInstance(sContext).writeRoom(id.toString(), sRoomName, msg, XmppMuc.MODE_SHELL);
             } catch (XMPPException e) {
                 // room creation and/or writing failed - 
                 // notify about this error

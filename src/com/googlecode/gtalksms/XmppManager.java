@@ -707,7 +707,6 @@ public class XmppManager {
             msg.setType(Message.Type.chat);
         } else {
             msg.setType(Message.Type.groupchat);
-
         }
 
         if (_connection.isConnected()) {

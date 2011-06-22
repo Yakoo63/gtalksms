@@ -220,7 +220,7 @@ public class MainService extends Service {
                 }
                 if (_settingsMgr.notifySmsInChatRooms || roomExists) {
                     try {
-                        XmppMuc.getInstance(this).writeRoom(number, name, message);
+                        XmppMuc.getInstance(this).writeRoom(number, name, message, XmppMuc.MODE_SMS);
                     } catch (XMPPException e) {
                         // room creation and/or writing failed - 
                         // notify about this error

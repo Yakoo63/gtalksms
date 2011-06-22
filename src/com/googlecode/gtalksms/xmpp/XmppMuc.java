@@ -11,7 +11,9 @@ import java.util.Set;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.Form;
+import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -30,7 +32,10 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMuc {
 	
-	private static final String ROOM_START_TAG = "GTalkSMS_";
+    public static final int MODE_SMS = 0;
+    public static final int MODE_SHELL = 1;
+
+    private static final String ROOM_START_TAG = "GTalkSMS_";
 	private static final int ROOM_START_TAG_LENGTH = ROOM_START_TAG.length();
 	private static final int REPLAY_TIMEOUT = 500;
 
@@ -83,8 +88,8 @@ public class XmppMuc {
      * @param message
      * @throws XMPPException
      */
-    public void writeRoom(String number, String contact, String message) throws XMPPException {
-        writeRoom(number, contact, new XmppMsg(message));
+    public void writeRoom(String number, String contact, String message, int mode) throws XMPPException {
+        writeRoom(number, contact, new XmppMsg(message), mode);
     }
     
     /**
@@ -97,11 +102,19 @@ public class XmppMuc {
      * @param message
      * @throws XMPPException
      */
-    public void writeRoom(String number, String contact, XmppMsg message) throws XMPPException {
+    public void writeRoom(String number, String contact, XmppMsg message, int mode) throws XMPPException {
         MultiUserChat muc;
-        muc = inviteRoom(number, contact);
+        muc = inviteRoom(number, contact, mode);
         if (muc != null) {
-            muc.sendMessage(message.generateFmtTxt());
+            try {
+                Message msg = new Message(muc.getRoom());
+                msg.setBody(message.generateFmtTxt());
+                XHTMLManager.addBody(msg, message.generateXHTMLText().toString());
+                msg.setType(Message.Type.groupchat);
+                muc.sendMessage(msg);
+            } catch (Exception e) {
+                muc.sendMessage(message.generateTxt());
+            }
         }
     }
     
@@ -114,11 +127,11 @@ public class XmppMuc {
      * @return true if successful, otherwise false
      * @throws XMPPException 
      */
-	public MultiUserChat inviteRoom(String number, String contact)
+	public MultiUserChat inviteRoom(String number, String contact, int mode)
 			throws XMPPException {
 		MultiUserChat muc;
 		if (!_rooms.containsKey(number)) {
-			muc = createRoom(number, contact);
+			muc = createRoom(number, contact, mode);
 			_rooms.put(number, muc);
 
 		} else {
@@ -172,21 +185,39 @@ public class XmppMuc {
      * @return
      * @throws XMPPException 
      */
-    private MultiUserChat createRoom(String number, String name) throws XMPPException {
+    private MultiUserChat createRoom(String number, String name, int mode) throws XMPPException {
         String room = getRoomString(number, name);
         MultiUserChat multiUserChat = null;
         boolean passwordMode = false;
-        Integer randomInt;                
-        // TODO localize
-        final String subjectInviteStr =  "SMS conversation with " + getRoomString(number, name);
+        Integer randomInt;
+ 
+        // With "@conference.jabber.org" messages are sent several times...
+        // Jwchat seems to work fine and is the default
+        final String roomJID;
+        final String subjectInviteStr;
 
         do {
             randomInt = _rndGen.nextInt();
         } while (_roomNumbers.contains(randomInt));
 
-        // With "@conference.jabber.org" messages are sent several times...
-        // Jwchat seems to work fine and is the default
-        final String roomJID = ROOM_START_TAG + randomInt + "_" + _settings.login.replaceAll("@", "_") + "@" + _settings.mucServer;
+        
+        // TODO localize
+        switch (mode) {
+            case MODE_SMS:
+                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + _settings.login.replaceAll("@", "_") + "@" + _settings.mucServer;
+                subjectInviteStr =  "SMS conversation with " + getRoomString(number, name);
+                break;
+
+            case MODE_SHELL:
+                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + _settings.login.replaceAll("@", "_") + "@" + _settings.mucServer;
+                subjectInviteStr =  "New Android Terminal " + getRoomString(number, name);
+                break;
+
+            default:
+                roomJID = null;
+                subjectInviteStr = null;
+                break;
+        }
         
         // See issue 136
         try {
@@ -234,7 +265,7 @@ public class XmppMuc {
         }
 
         multiUserChat.invite(_settings.notifiedAddress, subjectInviteStr);
-        registerRoom(multiUserChat, number, name, randomInt);
+        registerRoom(multiUserChat, number, name, randomInt, mode);
         return multiUserChat;
     }
     
@@ -324,11 +355,11 @@ public class XmppMuc {
     private void registerRoom(MultiUserChat muc, String number, String name) {
     	String roomJID = muc.getRoom();
     	Integer randomInt = getRoomInt(roomJID);
-    	registerRoom(muc, number, name, randomInt);
+    	registerRoom(muc, number, name, randomInt, roomJID.toUpperCase().contains("_SMS_") ? MODE_SMS : MODE_SHELL);
     }
     
-    private void registerRoom(MultiUserChat muc, String number, String name, Integer randomInt) {
-        MUCPacketListener chatListener = new MUCPacketListener(number, muc, name,  ctx);
+    private void registerRoom(MultiUserChat muc, String number, String name, Integer randomInt, int mode) {
+        MUCPacketListener chatListener = new MUCPacketListener(number, muc, name, mode, ctx);
         muc.addMessageListener(chatListener);
         _roomNumbers.add(randomInt);
         _rooms.put(number, muc);
@@ -390,8 +421,4 @@ public class XmppMuc {
     private static void send(String msg) {
         Tools.send(msg, null, ctx);
     }
-    
-//    private static void send(XmppMsg msg) {
-//        Tools.send(msg, null, ctx);
-//    }
 }
