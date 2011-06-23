@@ -82,6 +82,16 @@ public class Shell {
             mCurrentCommand = null;
         }
         
+        /**
+         * Reads the given InputStream and sends a XmppMsg every 5000 chars
+         * or every 10 seconds, whatever comes first.
+         * If we happen to encouter an InputStream that never stops, like from
+         * "tail -f" or "logcat" without the "-d" option, the method will never 
+         * return. See executeCommand on how we handle this.
+         * 
+         * @param is
+         * @throws Exception
+         */
         void readStream(InputStream is) throws Exception {
             String line;
             Date start = new Date();
@@ -99,13 +109,20 @@ public class Shell {
                         XmppMsg msg = new XmppMsg(_font);
                         msg.append(mResults.substring(0, last + 1));
                         mCmdBase.send(mShellId, msg);
-                        mResults.delete(0, last + 1);
+                        // fastest way to empty a StringBuilder
+                        mResults.setLength(0);
                     }
                 }
             }
         }
     };
     
+    /**
+     * Executes a given command, if the previous command is still running, it's
+     * thread will be stopped.
+     * 
+     * @param shellCmd
+     */
     public void executeCommand(String shellCmd) {
         // check if the previous Command Thread still exists
         if (mThread != null && mThread.isAlive()) {
