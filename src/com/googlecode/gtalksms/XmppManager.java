@@ -71,7 +71,7 @@ public class XmppManager {
     
     private static final boolean DEBUG = false;
     
-    // my first measurings showed that the disconnect in fact does not hang
+    // my first measuring showed that the disconnect in fact does not hang
     // but takes sometimes a lot of time
     // disconnectED xmpp connection. Took: 1048.576 s
     public static final int DISCON_TIMEOUT = 1000 * 10; // 10s
