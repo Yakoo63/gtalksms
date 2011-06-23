@@ -160,15 +160,25 @@ public class XmppManager {
         return xmppManager;
     }
     
+    /**
+     * This getter is soley for the purpose that the setup wizard is able to
+     * inform the XmppManager that a new connection has been created
+     * and that the XmppManager should use this connection from now on
+     * 
+     * @param ctx
+     * @param connection
+     * @return
+     */
     public static XmppManager getInstance(Context ctx, XMPPConnection connection) {
         if (xmppManager == null) {
             xmppManager = new XmppManager(ctx);            
         }
-        if (_connection != null && _connection.isConnected()) {
-            xmppDisconnect(_connection);
-        }
-        _connection = connection;
-        informListeners(_connection);
+        // remove all possible references to the old connection
+        // note that this will note change sStatus
+        cleanupConnection();
+        // init XmppManager with the new connection
+        // setting up all packetListeners etc.
+        onConnectionEstablished(connection);
         return xmppManager;
     }
     
@@ -426,6 +436,8 @@ public class XmppManager {
             return;
         }
 
+        // create a new connection if the connection is obsolete or if the
+        // old connection is still active
         if (SettingsManager.connectionSettingsObsolete 
                 || _connection == null 
                 || _connection.isConnected() ) {
@@ -446,8 +458,12 @@ public class XmppManager {
                 return;
             }
             reusedConnectionCount++;
-        }                
+        }
         // this code is only executed if we have an connection established
+        onConnectionEstablished(connection);
+    }
+    
+    private static void onConnectionEstablished(XMPPConnection connection) {
         _connection = connection;               
         _connectionListener = new ConnectionListener() {
             @Override
@@ -515,19 +531,18 @@ public class XmppManager {
             // the connection drops while we are in initConnection()
             GoogleAnalyticsHelper.trackAndLogError("xmppMgr exception caught", e);
             if (!_connection.isConnected()) {
-                // TODO maybe this is handled by the connectinListener
-                // connectionClosedOnError()
                 maybeStartReconnect();
                 return;
             } else {
+                // we are connected but got an Exception during the last
+                // setup process for a new connection, something is terrible wrong
                 throw new IllegalStateException(e);
             }
         }    
         
         setStatus(_presenceMessage);
         
-        Log.i("connection established");
-        Log.i("connection parameters: con=" + _connection.isConnected() + 
+        Log.i("connection established with parameters: con=" + _connection.isConnected() + 
                 " auth=" + _connection.isAuthenticated() + 
                 " enc=" + _connection.isUsingTLS() + 
                 " comp=" + _connection.isUsingCompression());
