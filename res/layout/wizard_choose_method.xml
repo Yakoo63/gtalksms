@@ -5,30 +5,15 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
-    <RadioGroup android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/radioGroupMethod">
+    <RadioGroup android:layout_width="wrap_content" android:id="@+id/radioGroupMethod" android:layout_height="wrap_content">
         <RadioButton android:layout_width="wrap_content" android:text="@string/wizard_different_account" android:layout_height="wrap_content" android:checked="true" android:id="@+id/radioDifferentAccount"></RadioButton>
         <RadioButton android:layout_width="wrap_content" android:text="@string/wizard_existing_account" android:layout_height="wrap_content" android:id="@+id/radioExsistingAccount"></RadioButton>
         <RadioButton android:layout_height="wrap_content" android:id="@+id/radioSameAccount" android:text="@string/wizard_same_account" android:layout_width="match_parent"></RadioButton>
+        <LinearLayout android:id="@+id/linearLayout1" android:orientation="horizontal" android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="fill_parent">
+            <Button android:fitsSystemWindows="true" android:text="@string/wizard_back_button" android:layout_height="40dp" android:layout_weight=".5" android:id="@+id/backBut" android:layout_gravity="center" android:layout_width="fill_parent" android:gravity="center"></Button>
+            <Button android:fitsSystemWindows="true" android:text="@string/wizard_next_button" android:layout_height="40dp" android:layout_weight=".5" android:id="@+id/nextBut" android:layout_gravity="center" android:layout_width="fill_parent" android:gravity="center"></Button>
+        </LinearLayout>
     </RadioGroup>
-    
-    <LinearLayout 
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" 
-        android:layout_weight="1"
-        >
-        <Button android:layout_gravity="center" android:layout_width="fill_parent" android:id="@+id/backBut" android:layout_height="40dp" android:text="@string/wizard_back_button" android:fitsSystemWindows="true" android:layout_weight=".5" android:gravity="center"></Button> 
-        
-        <Button 
-            android:layout_height="40dp" 
-            android:layout_width="fill_parent" 
-            android:layout_weight=".5"
-            android:fitsSystemWindows="true" 
-            android:gravity="center" 
-            android:layout_gravity="center" android:id="@+id/nextBut" android:text="@string/wizard_next"/> 
-            
-    </LinearLayout>
     
     <TextView 
         android:text="Version X.X.X @Yakooo" 

@@ -8,7 +8,7 @@
         <RadioButton android:layout_height="wrap_content" android:checked="true" android:layout_width="wrap_content" android:id="@+id/radioChooseServer" android:text="@string/wizard_choose_server"></RadioButton>
         <Spinner android:layout_height="wrap_content" android:id="@+id/serverChooser" android:layout_width="match_parent"></Spinner>
         <RadioButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/radioManualServer" android:text="@string/wizard_manual_server"></RadioButton>
-        <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="jabber.ccc.de" android:id="@+id/textServer"></EditText>
+        <EditText android:layout_height="wrap_content" android:text="jabber.ccc.de" android:id="@+id/textServer" android:layout_width="match_parent"></EditText>
     </RadioGroup>
     
     <LinearLayout 
@@ -24,7 +24,7 @@
             android:layout_weight=".5"
             android:fitsSystemWindows="true" 
             android:gravity="center" 
-            android:layout_gravity="center" android:id="@+id/nextBut" android:text="@string/wizard_next"/> 
+            android:layout_gravity="center" android:id="@+id/nextBut" android:text="@string/wizard_next_button"/> 
             
     </LinearLayout>
     

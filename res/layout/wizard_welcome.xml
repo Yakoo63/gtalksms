@@ -29,7 +29,7 @@
             android:layout_weight=".5"
             android:fitsSystemWindows="true" 
             android:gravity="center" 
-            android:layout_gravity="center" android:id="@+id/nextBut" android:text="@string/wizard_next"/> 
+            android:layout_gravity="center" android:id="@+id/nextBut" android:text="@string/wizard_next_button"/> 
             
     </LinearLayout>
     

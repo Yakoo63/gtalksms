@@ -40,12 +40,7 @@
             android:layout_width="match_parent" 
             android:layout_height="wrap_content"
             />-->
-        <TextView 
-            android:id="@+id/result" 
-            android:textAppearance="?android:attr/textAppearanceMedium" 
-            android:layout_width="match_parent" 
-            android:layout_height="match_parent"
-            />
+        
     </LinearLayout>
     
     <LinearLayout 
@@ -67,15 +62,13 @@
             android:text="@string/wizard_back_button"/> 
  
          <Button 
-            android:text="@string/wizard_create_create_button" 
-            android:id="@+id/createBut"
             android:layout_height="40dp" 
             android:layout_width="fill_parent" 
             android:layout_weight=".5"
             android:fitsSystemWindows="true" 
             android:gravity="center" 
             android:layout_gravity="center"
-            /> 
+            android:id="@+id/loginBut" android:text="@string/wizard_login_button"/> 
             
     </LinearLayout>
     
