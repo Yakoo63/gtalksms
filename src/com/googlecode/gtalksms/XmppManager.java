@@ -735,8 +735,10 @@ public class XmppManager {
         } else {
             msg.setType(Message.Type.groupchat);
         }
-
-        if (_connection.isConnected()) {
+        
+        // TODO find out why connection seems to be sometimes null
+        // see Issue 192 for an example
+        if (_connection != null && _connection.isConnected()) {
             if (muc == null) {
                 _connection.sendPacket(msg);
             } else {
@@ -851,6 +853,5 @@ public class XmppManager {
         pm.addIQProvider("sharedgroup","http://www.jivesoftware.org/protocol/sharedgroup", new SharedGroupsInfo.Provider());
         //  JEP-33: Extended Stanza Addressing
         pm.addExtensionProvider("addresses","http://jabber.org/protocol/address", new MultipleAddressesProvider());
-    }
-    
+    }    
 }
