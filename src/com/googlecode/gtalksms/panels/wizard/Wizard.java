@@ -43,19 +43,13 @@ public class Wizard extends Activity {
     protected final static int VIEW_CREATE_SUCCESS = 4;
     protected final static int VIEW_EXISTING_ACCOUNT = 5;
     protected final static int VIEW_SAME_ACCOUNT = 6;
-    
-    protected final static int METHOD_CREATE_NEW = 1;
-    protected final static int METHOD_USE_EXISTING = 2;
-    protected final static int METHOD_USE_SAME = 3;
-    
-    protected final static int CHOOSEN_SERVER_PREDEFINED = 1;
-    protected final static int CHOOSEN_SERVER_MANUAL = 2;
         
     // these attributes define the state of the wizzard
     // they should be save restored from savedInstanceState
     protected String mNotifiedAddress;
     protected int mChoosenMethod;
     protected int mChoosenServer;
+    protected int mChoosenServerSpinner;
     protected String mChoosenServername;
     protected String mLogin;
     protected String mPassword1;
@@ -65,12 +59,18 @@ public class Wizard extends Activity {
     private SettingsManager mSettingsMgr;
     
     public void onSaveInstanceState(Bundle savedBundle) {
+        // TODO if it is possible save the contents from the widgets of 
+        // the View Create to mLogoin mPassword etc 
+        // with an if mCurrentview == VIEW_CREATE 
+        
         if (mNotifiedAddress != null) 
             savedBundle.putString("mNotifiedAddress", mNotifiedAddress);
         if (mChoosenMethod != 0) 
             savedBundle.putInt("mChoosenMethod", mChoosenMethod);
         if (mChoosenServer != 0)
             savedBundle.putInt("mChoosenServer", mChoosenServer);
+        if (mChoosenServerSpinner != 0)
+            savedBundle.putInt("mChoosenServerSpinner", mChoosenServerSpinner);
         if (mChoosenServername != null)
             savedBundle.putString("mChoosenServername", mChoosenServername);
         if (mLogin != null)
@@ -87,6 +87,7 @@ public class Wizard extends Activity {
         String nA = savedBundle.getString("mNotifiedAddress");
         int cM = savedBundle.getInt("mChoosenMethod");
         int cS = savedBundle.getInt("mChoosenServer");
+        int cSS = savedBundle.getInt("mChoosenServerSpinner");
         String cSN = savedBundle.getString("mChoosenServername");
         String l = savedBundle.getString("mLogin");
         String psw1 = savedBundle.getString("mPassword1");
@@ -99,6 +100,8 @@ public class Wizard extends Activity {
             mChoosenMethod = cM;
         if (cS != 0)
             mChoosenServer = cS;
+        if (cSS != 0)
+            mChoosenServerSpinner = cSS;
         if (cSN != null)
             mChoosenServername = cSN;
         if (l != null)
@@ -152,6 +155,8 @@ public class Wizard extends Activity {
         
         Button next;
         RadioGroup rg;
+        EditText textLogin;
+        EditText textPassword;
         switch (viewId) {
             case VIEW_WELCOME:
                 setContentView(R.layout.wizard_welcome);
@@ -168,13 +173,13 @@ public class Wizard extends Activity {
                 next = (Button) findViewById(R.id.nextBut);
                 rg = (RadioGroup) findViewById(R.id.radioGroupMethod);
                 switch (mChoosenMethod) {
-                    case METHOD_CREATE_NEW:
+                    case R.id.radioDifferentAccount:
                        ((RadioButton) findViewById(R.id.radioDifferentAccount)).setChecked(true);
                        break;
-                    case METHOD_USE_EXISTING:
+                    case R.id.radioExsistingAccount:
                         ((RadioButton) findViewById(R.id.radioExsistingAccount)).setChecked(true);
                         break;
-                    case METHOD_USE_SAME:
+                    case R.id.radioSameAccount:
                         ((RadioButton) findViewById(R.id.radioSameAccount)).setChecked(true);
                         break;
                 }
@@ -182,6 +187,7 @@ public class Wizard extends Activity {
                 break;
             case VIEW_CREATE_CHOOSE_SERVER:
                 setContentView(R.layout.wizard_create_choose_server);
+                // find and setup the widgets
                 Spinner spinner = (Spinner) findViewById(R.id.serverChooser);
                 ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.predefined_xmpp_servers, android.R.layout.simple_spinner_item);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -189,6 +195,23 @@ public class Wizard extends Activity {
                 EditText textServer = (EditText) findViewById(R.id.textServer);
                 rg = (RadioGroup) findViewById(R.id.radioGroupServer);
                 rg.setOnCheckedChangeListener(new ChooseServerRadioGroupChangeListener(spinner, textServer));
+                next = (Button) findViewById(R.id.nextBut);
+                // restore the old state
+                switch (mChoosenServer) {
+                    case R.id.radioChooseServer:
+                        ((RadioButton) findViewById(R.id.radioChooseServer)).setChecked(true);
+                        if (mChoosenServerSpinner != 0) {
+                            spinner.setSelection(mChoosenServerSpinner);
+                        }
+                        break;
+                    case R.id.radioManualServer:
+                        ((RadioButton) findViewById(R.id.radioManualServer)).setChecked(true);
+                        if (mChoosenServername != null) {
+                            ((EditText) findViewById(R.id.textServer)).setText(mChoosenServername);
+                        }
+                        break;
+                }
+                // map the listeneres to the buttons
                 mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
                 mapWizardButton(R.id.nextBut, VIEW_CREATE);
                 break;
@@ -199,13 +222,24 @@ public class Wizard extends Activity {
                 create.setOnClickListener(new CreateButtonClickListener(this, mSettingsMgr));
                 break;
             case VIEW_EXISTING_ACCOUNT:
+                setContentView(R.layout.wizard_existing_account);
+                textLogin = (EditText) findViewById(R.id.login);
+                textPassword = (EditText) findViewById(R.id.password1);
+
+                // TODO restore from savedBundle
+                mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
+                // TODO map next button
                 break;
             case VIEW_SAME_ACCOUNT:
                 setContentView(R.layout.wizard_existing_account);
-                String login = ((EditText)findViewById(R.id.notificationAddress)).getText().toString();
-                EditText loginText = (EditText) findViewById(R.id.login);
-                loginText.setEnabled(false);
-                loginText.setText(login);
+                textLogin = (EditText) findViewById(R.id.login);
+                textPassword = (EditText) findViewById(R.id.password1);
+                // the user wants to use the same account for notification and gtalksms
+                // so just enter as login the notificationAddress
+                String loginStr = ((EditText)findViewById(R.id.notificationAddress)).getText().toString();
+                textLogin.setEnabled(false);
+                textLogin.setText(loginStr);
+                // TODO restore from savedBundle
                 mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
                 // TODO map next button
             default:

@@ -10,7 +10,6 @@ import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppAccountManager;
 
-import android.content.Context;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -18,38 +17,46 @@ import android.widget.EditText;
 public class CreateButtonClickListener implements OnClickListener {
     
     private SettingsManager mSettingsMgr;
-    private Context mContext;
+    private Wizard mWizard;
     
-    public CreateButtonClickListener(Context ctx, SettingsManager sm) {
+    public CreateButtonClickListener(Wizard wiz, SettingsManager sm) {
         this.mSettingsMgr = sm;
-        this.mContext = ctx;
+        this.mWizard = wiz;
     }
 
     @Override
     public void onClick(View v) {
-        EditText login = (EditText)v.findViewById(R.id.login);
-        EditText pass1 = (EditText)v.findViewById(R.id.password1);
-        EditText pass2 = (EditText)v.findViewById(R.id.password2);
-        String jid = login.getText().toString().trim();
-        String psw1 = pass1.getText().toString().trim();
-        String psw2 = pass2.getText().toString().trim();
+        EditText textLogin = (EditText)v.findViewById(R.id.login);
+        EditText textPass1 = (EditText)v.findViewById(R.id.password1);
+        EditText textPass2 = (EditText)v.findViewById(R.id.password2);
+        String login = textLogin.getText().toString().trim();
+        String psw1 = textPass1.getText().toString().trim();
+        String psw2 = textPass2.getText().toString().trim();
         if (psw1.equals(psw2)) {
-            String res = null;
+            String res = "Error on account creation";
             XMPPConnection  con = null;
             try {
-                con = XmppAccountManager.tryToCreateAccount(jid, psw2);
+                con = XmppAccountManager.tryToCreateAccount(login, mWizard.mChoosenServername, psw1);
             } catch (XMPPException e) {
                 res = e.getLocalizedMessage();
             }
-            if (res == null) {
-                res = "Account succesfull created";
+            String toastMessage;
+            if (con != null) {
+                toastMessage = "Account succesfull created";
+            } else {
+                toastMessage = res;
             }
-            MainService.displayToast(res, null);
-            // this will inform the XmppManager about the newly created
-            // connection and also reuse the connection
-            XmppManager.getInstance(mContext, con);
-            Tools.startSvcIntent(mContext, MainService.ACTION_CONNECT);
-            // TODO go here to wizard_create_successfull view
+            MainService.displayToast(toastMessage, null);
+            
+            if (con != null) {
+                String jid = login + "@" + mWizard.mChoosenServername;
+                // this will inform the XmppManager about the newly created
+                // connection and also reuse the connection
+                XmppManager.getInstance(mWizard, con);
+                Tools.startSvcIntent(mWizard, MainService.ACTION_CONNECT);
+                XmppAccountManager.savePreferences(jid, psw1, mWizard.mNotifiedAddress, mSettingsMgr);
+                mWizard.initView(Wizard.VIEW_CREATE_SUCCESS);
+            }
         }   
     }
 

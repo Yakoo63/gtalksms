@@ -4,32 +4,27 @@ import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.util.StringUtils;
 
 import android.content.SharedPreferences.Editor;
 
 import com.googlecode.gtalksms.SettingsManager;
 
 public class XmppAccountManager {
+    private static final String[] USERNAME_IS_FULL_JID = new String[] {"gmail.com", "googlemail.com"};                                
     
     /**
-     * Tries to create a new account and if successful 
-     * returns the XMPPConnection on success, otherwise throws an XMPPException
+     * Tries to create a new account with help of XMPP in-band registration
+     * and if successful returns the XMPPConnection on success, 
+     * otherwise throws an XMPPException
      * 
      * @param jid
+     * @param host
      * @param password
      * @return
      * @throws XMPPException
      */
-    public static XMPPConnection tryToCreateAccount(String jid, String password) throws XMPPException {
-        String host = StringUtils.parseServer(jid);
-        String username = StringUtils.parseName(jid);
-        if (host.equals("")) {
-            throw new XMPPException("JID without server part");
-        }
-        if (username.equals("")) {
-            throw new XMPPException("JID without user part");
-        }
+    public static XMPPConnection tryToCreateAccount(String username, String host, String password) throws XMPPException {
+        username = needsDomainPart(username, host);
         
         ConnectionConfiguration conf = new ConnectionConfiguration(host);
         XMPPConnection connection = new XMPPConnection(conf);
@@ -43,6 +38,26 @@ public class XmppAccountManager {
         return connection;
     }
     
+    /**
+     * Tries to return the correct username for the given host.
+     * 
+     * Some XMPP service provider (like gTalk) require the username
+     * to be concatenated with the host part
+     * e.g. user -> user@server.tld
+     * 
+     * @param username
+     * @param host
+     * @return
+     */
+    private static String needsDomainPart(String username, String host) {
+        for (String s : USERNAME_IS_FULL_JID) {
+            if (host.equals(s)) {
+                return username + "@" + host;
+            }
+        }
+        return username;
+    }
+
     /**
      * Writes the given minimal settings to the shared preferences.
      * The jid needs to be in the form of user@server.tld
@@ -65,4 +80,6 @@ public class XmppAccountManager {
         
         editor.commit();
     }
+    
+    
 }

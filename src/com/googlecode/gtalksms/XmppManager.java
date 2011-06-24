@@ -530,14 +530,8 @@ public class XmppManager {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
             GoogleAnalyticsHelper.trackAndLogError("xmppMgr exception caught", e);
-            if (!_connection.isConnected()) {
-                maybeStartReconnect();
-                return;
-            } else {
-                // we are connected but got an Exception during the last
-                // setup process for a new connection, something is terrible wrong
-                throw new IllegalStateException(e);
-            }
+            maybeStartReconnect();
+            return;
         }    
         
         setStatus(_presenceMessage);

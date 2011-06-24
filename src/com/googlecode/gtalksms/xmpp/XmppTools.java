@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo;
 import org.jivesoftware.smackx.packet.DiscoverInfo.Feature;
@@ -52,6 +51,27 @@ public class XmppTools {
      */
     public static boolean isValidJID(String jid) {
         if (jid.contains("/") || !jid.contains("@")) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Basic check that servername is valid FQDN.
+     * Currently checks that there is one one or more dots and that
+     * the String does not start or end with an dot
+     * 
+     * @param servername
+     * @return
+     */
+    public static boolean isValidServername(String servername) {
+        int len = servername.length();
+        int LastPosOfDot = servername.lastIndexOf('.');
+        int FirstPosOfDot = servername.indexOf('c');
+        if (len < 3 ||
+                LastPosOfDot == -1 ||               
+                LastPosOfDot == len-1 ||
+                FirstPosOfDot == 0) {
             return false;
         }
         return true;
