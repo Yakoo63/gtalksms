@@ -58,7 +58,7 @@ public class AliasCmd extends CommandHandlerBase {
                     send(R.string.chat_error_unkown_name);
                 } else {
                     Phone p = res.get(0);
-                    send(R.string.chat_alias_add_by_name, subCommand[1], p.contactName, p.number);
+                    send(R.string.chat_alias_add_by_name, subCommand[1], p.getContactName(), p.getNumber());
                 }
             }
     }

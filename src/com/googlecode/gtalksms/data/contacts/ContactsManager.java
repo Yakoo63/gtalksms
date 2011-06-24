@@ -236,19 +236,15 @@ public class ContactsManager {
                 String number = Tools.getString(c, CommonDataKinds.Phone.NUMBER);
                 String label = Tools.getString(c,CommonDataKinds.Phone.LABEL);
                 int type = Tools.getLong(c, CommonDataKinds.Phone.TYPE).intValue();
+                int super_primary = Tools.getInt(c, ContactsContract.Data.IS_SUPER_PRIMARY);
     
                 if (label == null || label.compareTo("") != 0) {
                     label = ContactsContract.CommonDataKinds.Phone.getTypeLabel(ctx.getResources(), type, "").toString();
                 }
     
-                Phone phone = new Phone();
-                phone.number = number;
-                phone.cleanNumber = Phone.cleanPhoneNumber(phone.number);
-                phone.isCellPhoneNumber = Phone.isCellPhoneNumber(phone.number);
-                phone.label = label;
-                phone.type = type;
+                Phone phone = new Phone(number, label, type, super_primary);
     
-                if (phones.add(phone.cleanNumber)) {
+                if (phones.add(phone.getCleanNumber())) {
                     res.add(phone);
                 } else if (MainService.getSettingsManager().debugLog) {
                     Log.i(Tools.LOG_TAG, "Duplicated phone number: " + number);
@@ -259,6 +255,11 @@ public class ContactsManager {
         
         return res;
     }
+    
+//    public static ArrayList<Phone> getPhonesNew(Context ctx, Long contactId) {
+//        ArrayList<Phone> res = new ArrayList<Phone>();
+//        return res;
+//    }
 
     /**
      * Returns a ArrayList < Phone >
@@ -269,13 +270,7 @@ public class ContactsManager {
         HashSet<String> resPhones = new HashSet<String>();
         
         if (Phone.isCellPhoneNumber(searchedText)) {
-            Phone phone = new Phone();
-            phone.number = searchedText;
-            phone.cleanNumber = Phone.cleanPhoneNumber(phone.number);
-            phone.contactName = getContactName(ctx, searchedText);
-            phone.isCellPhoneNumber = true;
-            phone.type = CommonDataKinds.Phone.TYPE_MOBILE;
-
+            Phone phone = new Phone(getContactName(ctx, searchedText), searchedText);
             res.add(phone);
         } else {
             // get the matching contacts, dictionary of < id, names >
@@ -284,11 +279,12 @@ public class ContactsManager {
                 for (Contact contact : contacts) {
                     ArrayList<Phone> phones = getPhones(ctx, contact.id);
                     for (Phone phone : phones) {
-                        phone.contactName = contact.name;
-                        if (resPhones.add(phone.cleanNumber)) {
+                        // TODO set the contact name in the phone constructor
+                        phone.setContactName(contact.name);
+                        if (resPhones.add(phone.getCleanNumber())) {
                             res.add(phone);
                         } else if (MainService.getSettingsManager().debugLog) {
-                            Log.i(Tools.LOG_TAG, "Duplicated phone number: " + phone.contactName + " " + phone.cleanNumber);
+                            Log.i(Tools.LOG_TAG, "Duplicated phone number: " + phone.getContactName() + " " + phone.getCleanNumber());
                         }
                     }
                 }
@@ -306,7 +302,7 @@ public class ContactsManager {
         ArrayList<Phone> phones = getPhones(ctx, searchedText);
 
         for (Phone phone : phones) {
-            if (phone.type == CommonDataKinds.Phone.TYPE_MOBILE) {
+            if (phone.getType() == CommonDataKinds.Phone.TYPE_MOBILE) {
                 res.add(phone);
             }
         }

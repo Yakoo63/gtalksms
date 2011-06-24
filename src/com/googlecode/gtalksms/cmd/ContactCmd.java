@@ -38,7 +38,12 @@ public class ContactCmd extends CommandHandlerBase {
                 if (mobilePhones.size() > 0) {
                     strContact.appendItalicLine(getString(R.string.chat_phones));
                     for (Phone phone : mobilePhones) {
-                        strContact.appendLine(phone.label + " - " + phone.cleanNumber);
+                        strContact.append(phone.getLabel() + " - " + phone.getCleanNumber());
+                        // append an asterix to mark the default number
+                        if (phone.isDefaultNumber()) {
+                            strContact.appendBold(" *");
+                        }
+                        strContact.newLine();
                     }
                 }
 

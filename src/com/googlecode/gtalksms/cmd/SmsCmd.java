@@ -291,12 +291,12 @@ public class SmsCmd extends CommandHandlerBase {
             if (mobilePhones.size() > 1) {
                 send(R.string.chat_specify_details);
                 for (Phone phone : mobilePhones) {
-                    send(phone.contactName + " - " + phone.cleanNumber);
+                    send(phone.getContactName() + " - " + phone.getCleanNumber());
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 try {
-                    XmppMuc.getInstance(sContext).inviteRoom(phone.cleanNumber, phone.contactName, XmppMuc.MODE_SMS);
+                    XmppMuc.getInstance(sContext).inviteRoom(phone.getCleanNumber(), phone.getContactName(), XmppMuc.MODE_SMS);
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 				}
@@ -408,17 +408,26 @@ public class SmsCmd extends CommandHandlerBase {
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contact);
             if (mobilePhones.size() > 1) {
+                // start searching for a default mobile number
+                for (Phone phone : mobilePhones) {
+                    if (phone.isDefaultNumber()) {
+                        sendSMSByPhoneNumber(message, phone.getCleanNumber(), phone.getContactName());
+                        return;
+                    }
+                }
+                // there are more then 1 mobile phones for this contact
+                // and none of them is marked as default
                 send(R.string.chat_specify_details);
 
                 for (Phone phone : mobilePhones) {
-                    send(phone.contactName + " - " + phone.cleanNumber);
+                    send(phone.getContactName() + " - " + phone.getCleanNumber());
                 }
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
                 if (sSettingsMgr.notifySmsSent) {
-                    send(R.string.chat_send_sms, phone.contactName + " (" + phone.cleanNumber + ")"  + ": \"" + Tools.shortenMessage(message) + "\"");
+                    send(R.string.chat_send_sms, phone.getContactName() + " (" + phone.getCleanNumber() + ")"  + ": \"" + Tools.shortenMessage(message) + "\"");
                 }
-                sendSMSByPhoneNumber(message, phone.cleanNumber, phone.contactName);
+                sendSMSByPhoneNumber(message, phone.getCleanNumber(), phone.getContactName());
             } else {
                 send(R.string.chat_no_match_for, contact);
             }
@@ -433,10 +442,10 @@ public class SmsCmd extends CommandHandlerBase {
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contact);
             if (mobilePhones.size() > 0) {
-                send(R.string.chat_mark_as_read, mobilePhones.get(0).contactName);
+                send(R.string.chat_mark_as_read, mobilePhones.get(0).getContactName());
 
                 for (Phone phone : mobilePhones) {
-                    _smsMgr.markAsRead(phone.number);
+                    _smsMgr.markAsRead(phone.getNumber());
                 }
             } else {
                 send(R.string.chat_no_match_for, contact);

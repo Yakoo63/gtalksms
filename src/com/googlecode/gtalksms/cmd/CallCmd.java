@@ -99,13 +99,13 @@ public class CallCmd extends CommandHandlerBase {
                 XmppMsg phones = new XmppMsg(getString(R.string.chat_specify_details));
                 phones.newLine();
                 for (Phone phone : mobilePhones) {
-                    phones.appendLine(phone.contactName + " - " + phone.cleanNumber);
+                    phones.appendLine(phone.getContactName() + " - " + phone.getCleanNumber());
                 }
                 send(phones);
             } else if (mobilePhones.size() == 1) {
                 Phone phone = mobilePhones.get(0);
-                contact = phone.contactName;
-                number = phone.cleanNumber;
+                contact = phone.getContactName();
+                number = phone.getCleanNumber();
             } else {
                 send(R.string.chat_no_match_for, contactInfo);
             }

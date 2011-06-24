@@ -73,7 +73,7 @@ public class AliasHelper {
         res = ContactsManager.getMobilePhones(ctx, name);
             if(res.size() == 1) {
                 Phone p = res.get(0);
-                addOrUpdate(aliasName, p.cleanNumber, p.contactName);
+                addOrUpdate(aliasName, p.getCleanNumber(), p.getContactName());
             }
         return res;
     }
