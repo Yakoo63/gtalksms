@@ -16,10 +16,19 @@ public class ChooseServerNextButtonClickListener implements OnClickListener {
     private RadioGroup mRadioGroupServer;
     private Spinner mPredefinedServer;
     private EditText mTextServer;
-
+    
+    /**
+     * 
+     * @param wizard
+     * @param rg
+     * @param sp
+     * @param et
+     */
     public ChooseServerNextButtonClickListener(Wizard wizard, RadioGroup rg, Spinner sp, EditText et) {
         mWizard = wizard;
         mRadioGroupServer = rg;
+        mPredefinedServer = sp;
+        mTextServer = et;
     }
     
     @Override

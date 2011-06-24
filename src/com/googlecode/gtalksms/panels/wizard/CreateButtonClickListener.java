@@ -18,23 +18,27 @@ public class CreateButtonClickListener implements OnClickListener {
     
     private SettingsManager mSettingsMgr;
     private Wizard mWizard;
+    private EditText mTextUsername;
+    private EditText mTextPsw1;
+    private EditText mTextPsw2;
     
-    public CreateButtonClickListener(Wizard wiz, SettingsManager sm) {
+    public CreateButtonClickListener(Wizard wiz, SettingsManager sm, EditText username, EditText psw1, EditText psw2) {
         this.mSettingsMgr = sm;
         this.mWizard = wiz;
+        this.mTextUsername = username;
+        this.mTextPsw1 = psw1;
+        this.mTextPsw2 = psw2;
     }
 
     @Override
     public void onClick(View v) {
-        EditText textLogin = (EditText)v.findViewById(R.id.login);
-        EditText textPass1 = (EditText)v.findViewById(R.id.password1);
-        EditText textPass2 = (EditText)v.findViewById(R.id.password2);
-        String login = textLogin.getText().toString().trim();
-        String psw1 = textPass1.getText().toString().trim();
-        String psw2 = textPass2.getText().toString().trim();
+
+        String login = mTextUsername.getText().toString().trim();
+        String psw1 = mTextPsw1.getText().toString().trim();
+        String psw2 = mTextPsw2.getText().toString().trim();
         if (psw1.equals(psw2)) {
             String res = "Error on account creation";
-            XMPPConnection  con = null;
+            XMPPConnection con = null;
             try {
                 con = XmppAccountManager.tryToCreateAccount(login, mWizard.mChoosenServername, psw1);
             } catch (XMPPException e) {
@@ -57,7 +61,9 @@ public class CreateButtonClickListener implements OnClickListener {
                 XmppAccountManager.savePreferences(jid, psw1, mWizard.mNotifiedAddress, mSettingsMgr);
                 mWizard.initView(Wizard.VIEW_CREATE_SUCCESS);
             }
-        }   
+        } else {
+            MainService.displayToast("The passwords do not match", null);
+        }
     }
 
 }

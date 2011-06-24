@@ -156,7 +156,8 @@ public class Wizard extends Activity {
         Button next;
         RadioGroup rg;
         EditText textLogin;
-        EditText textPassword;
+        EditText textPassword1;
+        EditText textPassword2;
         switch (viewId) {
             case VIEW_WELCOME:
                 setContentView(R.layout.wizard_welcome);
@@ -188,11 +189,13 @@ public class Wizard extends Activity {
             case VIEW_CREATE_CHOOSE_SERVER:
                 setContentView(R.layout.wizard_create_choose_server);
                 // find and setup the widgets
+                next = (Button) findViewById(R.id.nextBut);
                 Spinner spinner = (Spinner) findViewById(R.id.serverChooser);
                 ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.predefined_xmpp_servers, android.R.layout.simple_spinner_item);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
                 EditText textServer = (EditText) findViewById(R.id.textServer);
+                textServer.setEnabled(false);
                 rg = (RadioGroup) findViewById(R.id.radioGroupServer);
                 rg.setOnCheckedChangeListener(new ChooseServerRadioGroupChangeListener(spinner, textServer));
                 next = (Button) findViewById(R.id.nextBut);
@@ -213,18 +216,27 @@ public class Wizard extends Activity {
                 }
                 // map the listeneres to the buttons
                 mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
-                mapWizardButton(R.id.nextBut, VIEW_CREATE);
+                next.setOnClickListener(new ChooseServerNextButtonClickListener(this, rg, spinner, textServer));
                 break;
             case VIEW_CREATE:
                 setContentView(R.layout.wizard_create);
-                mapWizardButton(R.id.backBut, VIEW_CREATE_CHOOSE_SERVER);
+                // find and setup the widgets
                 Button create = (Button) findViewById(R.id.createBut);
-                create.setOnClickListener(new CreateButtonClickListener(this, mSettingsMgr));
+                textLogin = (EditText) findViewById(R.id.login);
+                textPassword1 = (EditText) findViewById(R.id.password1);
+                textPassword2 = (EditText) findViewById(R.id.password2);
+                mapWizardButton(R.id.backBut, VIEW_CREATE_CHOOSE_SERVER);
+                create.setOnClickListener(new CreateButtonClickListener(this, mSettingsMgr, textLogin, textPassword1, textPassword2));
+                break;
+            case VIEW_CREATE_SUCCESS:
+                setContentView(R.layout.wizard_create_success);
+                Button backToMain = (Button) findViewById(R.id.backToMainscreen);
+                backToMain.setOnClickListener(new BackToMainClickListener(this));
                 break;
             case VIEW_EXISTING_ACCOUNT:
                 setContentView(R.layout.wizard_existing_account);
                 textLogin = (EditText) findViewById(R.id.login);
-                textPassword = (EditText) findViewById(R.id.password1);
+                textPassword1 = (EditText) findViewById(R.id.password1);
 
                 // TODO restore from savedBundle
                 mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
@@ -233,7 +245,7 @@ public class Wizard extends Activity {
             case VIEW_SAME_ACCOUNT:
                 setContentView(R.layout.wizard_existing_account);
                 textLogin = (EditText) findViewById(R.id.login);
-                textPassword = (EditText) findViewById(R.id.password1);
+                textPassword1 = (EditText) findViewById(R.id.password1);
                 // the user wants to use the same account for notification and gtalksms
                 // so just enter as login the notificationAddress
                 String loginStr = ((EditText)findViewById(R.id.notificationAddress)).getText().toString();
@@ -242,6 +254,7 @@ public class Wizard extends Activity {
                 // TODO restore from savedBundle
                 mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
                 // TODO map next button
+                break;
             default:
                 throw new IllegalStateException();
         }
