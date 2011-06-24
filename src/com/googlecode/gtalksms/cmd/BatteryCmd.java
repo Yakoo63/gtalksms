@@ -103,7 +103,7 @@ public class BatteryCmd extends CommandHandlerBase {
 
     @Override
     public void cleanUp() {
-        if (sBatInfoReceiver != null) {
+        if (sReceiverRegistered == true) {
             sContext.unregisterReceiver(sBatInfoReceiver);
             sReceiverRegistered = false;
         }
