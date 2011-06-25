@@ -76,17 +76,17 @@ public class XmppManager {
     // disconnectED xmpp connection. Took: 1048.576 s
     public static final int DISCON_TIMEOUT = 1000 * 10; // 10s
     
-    public static final int DISCONNECTED = 0;
+    public static final int DISCONNECTED = 1;
     // A "transient" state - will only be CONNECTING *during* a call to start()
-    public static final int CONNECTING = 1;
-    public static final int CONNECTED = 2;
+    public static final int CONNECTING = 2;
+    public static final int CONNECTED = 3;
     // A "transient" state - will only be DISCONNECTING *during* a call to stop()
-    public static final int DISCONNECTING = 3;
+    public static final int DISCONNECTING = 4;
     // This state means we are waiting for a retry attempt etc.
     // mostly because a connection went down
-    public static final int WAITING_TO_CONNECT = 4;
+    public static final int WAITING_TO_CONNECT = 5;
     // We are waiting for a valid data connection
-    public static final int WAITING_FOR_NETWORK = 5;
+    public static final int WAITING_FOR_NETWORK = 6;
     
     // Indicates the current state of the service (disconnected/connecting/connected)
     private static int _status = DISCONNECTED;
@@ -301,7 +301,7 @@ public class XmppManager {
             }
             break;
         default:
-            throw new IllegalStateException("xmppRequestStateChange() invalid state to switch to: " + newState);
+            throw new IllegalStateException("xmppRequestStateChange() invalid state to switch to: " + statusAsString(newState));
         }
         // Now we have requested a new state, our state receiver will see when
         // the state actually changes and update everything accordingly.
@@ -397,7 +397,7 @@ public class XmppManager {
             int old = _status;
             _status = status;     
             sXmppStatus.setState(status);
-            Log.i("broadcasting state transition from " + old + " to " + status + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
+            Log.i("broadcasting state transition from " + statusAsString(old) + " to " + statusAsString(status) + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
             broadcastStatus(_context, old, status);
         }
     }
@@ -470,8 +470,7 @@ public class XmppManager {
             public void connectionClosed() {
                 // connection was closed by the foreign host
                 // or we have closed the connection
-                // maybeStartReconnect();
-                Log.i("ConnectionListener: connectionClosed() called");
+                Log.i("ConnectionListener: connectionClosed() called - connection was shutdown by foreign host or by us");
             }
 
             @Override
@@ -847,5 +846,36 @@ public class XmppManager {
         pm.addIQProvider("sharedgroup","http://www.jivesoftware.org/protocol/sharedgroup", new SharedGroupsInfo.Provider());
         //  JEP-33: Extended Stanza Addressing
         pm.addExtensionProvider("addresses","http://jabber.org/protocol/address", new MultipleAddressesProvider());
-    }    
+    }
+    
+    public static String statusAsString(int state) {
+        String res;
+        switch(state) {
+        case 1:
+            res = "Disconnected";
+            break;
+        case 2:
+            res = "Connecting";
+            break;
+        case 3:
+            res = "Connected";
+            break;
+        case 4:
+            res = "Disconnecting";
+            break;
+        case 5:
+            res = "Waiting to connect";
+            break;
+        case 6:
+            res = "Waiting for network";
+            break;
+        default:
+            throw new IllegalStateException();
+        }
+        return res;                        
+    }
+    
+    public static String statusString() {
+        return statusAsString(_status);
+    }
 }

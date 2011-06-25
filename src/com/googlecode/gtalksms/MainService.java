@@ -163,7 +163,7 @@ public class MainService extends Service {
         updateListenersToCurrentState(initialState);
         
         String action = intent.getAction();
-        Log.i("handling action '" + action + "' while in state " + initialState);
+        Log.i("handling action '" + action + "' while in state " + XmppManager.statusAsString(initialState));
         
         if (action.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
@@ -206,8 +206,8 @@ public class MainService extends Service {
 
             Log.i(MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
             if (message.trim().toLowerCase().compareTo("gtalksms") == 0) {
-                Log.i("Connection command received by SMS from " + name);
-                _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+                Log.i("Connection command received by SMS from " + name + " issuing intent " + ACTION_CONNECT);
+                Tools.startSvcIntent(this, ACTION_CONNECT);
             } else {
                 if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
                     XmppMsg msg = new XmppMsg();
@@ -222,7 +222,7 @@ public class MainService extends Service {
                     try {
                         XmppMuc.getInstance(this).writeRoom(number, name, message, XmppMuc.MODE_SMS);
                     } catch (XMPPException e) {
-                        // room creation and/or writing failed - 
+                        // room creation and/or writing failed -
                         // notify about this error
                         // and send the message to the notification address
                         XmppMsg msg = new XmppMsg();
@@ -235,7 +235,7 @@ public class MainService extends Service {
             }
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
-            Log.i("network_changed with available=" + available + " and with state=" + initialState);
+            Log.i("network_changed with available=" + available + " and when in state: " + XmppManager.statusAsString(initialState));
             if(available) {
                 GoogleAnalyticsHelper.dispatch();
             }
@@ -252,29 +252,20 @@ public class MainService extends Service {
             }
         } else if (action.equals(ACTION_COMMAND)) {
             String cmd = intent.getStringExtra("cmd");
-            if (cmd != null) { 
-                if (cmd.equals("sms")) {
-                    String args = intent.getStringExtra("args");
-                    String from = intent.getStringExtra("from");
-                    if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc) {
-                        from = null;
-                    }
-                    executeCommand(cmd, args, from);
-                } else if (cmd.equals("cmd")) {
-                    String args = intent.getStringExtra("args");
-                    String from = intent.getStringExtra("from");
-                    executeCommand(cmd, args, from);
-                } else {
-                    Log.w("Intent " + MainService.ACTION_COMMAND + " not rocognized");
+            if (cmd != null) {
+                String args = intent.getStringExtra("args");
+                String from = intent.getStringExtra("from");
+                if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc) {
+                    from = null;
                 }
+                executeCommand(cmd, args, from);
             } else {
                 Log.w("Intent " + MainService.ACTION_COMMAND + " without extra cmd");
-            }
-                
+            }            
         } else if(!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {            
             GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
-        Log.i("handled action '" + action + "' - state now " + getConnectionStatus());
+        Log.i("handled action '" + action + "' - state now: " + XmppManager.statusString());
         // stop the service if we are disconnected (but stopping the service
         // doesn't mean the process is terminated - onStart can still happen.)
         if (getConnectionStatus() == XmppManager.DISCONNECTED) {
@@ -690,7 +681,7 @@ public class MainService extends Service {
                 wantListeners = false;
                 break;
             default:
-                throw new IllegalStateException("updateListeners found invalid state: " + currentState);
+                throw new IllegalStateException("updateListeners found invalid  int: " + currentState);
         }
         
         if (wantListeners) {
