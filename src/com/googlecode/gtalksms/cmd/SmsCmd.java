@@ -69,12 +69,14 @@ public class SmsCmd extends CommandHandlerBase {
                 _sentSmsReceiver = new SentIntentReceiver(sMainService, _smsMap, _smsHelper);
             }
             sMainService.registerReceiver(_sentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
+            sSentIntentReceiverRegistered = true;
         }
         if (sSettingsMgr.notifySmsDelivered && !sDelIntentReceiverRegistered) {
             if (_deliveredSmsReceiver == null) {
                 _deliveredSmsReceiver = new DeliveredIntentReceiver(sMainService, _smsMap, _smsHelper);
             }
             sMainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
+            sDelIntentReceiverRegistered = true;
         }
     }
 
