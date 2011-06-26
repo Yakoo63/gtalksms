@@ -87,6 +87,8 @@ public class MainService extends Service {
     // the service is running, and therefore whether to tell the service
     // about some events
     public static boolean IsRunning = false;
+    
+    private static boolean sListenersActive = false;
 
     private static SettingsManager _settingsMgr;
     private static XmppManager _xmppMgr;
@@ -688,10 +690,12 @@ public class MainService extends Service {
                 throw new IllegalStateException("updateListeners found invalid  int: " + currentState);
         }
         
-        if (wantListeners) {
+        if (wantListeners && !sListenersActive) {
             setupListenersForConnection();
-        } else {
+            sListenersActive = true;
+        } else if (!wantListeners && sListenersActive) {
             teardownListenersForConnection();
+            sListenersActive = false;
         }
         
         return currentState;
@@ -702,7 +706,7 @@ public class MainService extends Service {
      *  
      */
     private void setupListenersForConnection() {
-        Log.i("setupListeners()");          
+        Log.i("setupListenersForConnection()");          
         for(CommandHandlerBase c : _commandSet) {
             c.setup();
         }
