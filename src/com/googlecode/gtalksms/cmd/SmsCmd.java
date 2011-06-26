@@ -675,9 +675,11 @@ public class SmsCmd extends CommandHandlerBase {
     public void cleanUp() {
         if (_sentSmsReceiver != null && sSentIntentReceiverRegistered) {
             sContext.unregisterReceiver(_sentSmsReceiver);
+            sSentIntentReceiverRegistered = false;
         }
         if (_deliveredSmsReceiver != null && sDelIntentReceiverRegistered) {
             sContext.unregisterReceiver(_deliveredSmsReceiver);
+            sDelIntentReceiverRegistered = false;
         }
     }    
 }
