@@ -65,6 +65,7 @@ import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
 import com.googlecode.gtalksms.xmpp.XmppOfflineMessages;
+import com.googlecode.gtalksms.xmpp.XmppPresenceStatus;
 import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class XmppManager {
@@ -90,7 +91,6 @@ public class XmppManager {
     
     // Indicates the current state of the service (disconnected/connecting/connected)
     private static int _status = DISCONNECTED;
-    private static String _presenceMessage = Tools.APP_NAME;
     
     private static List<XmppConnectionChangeListener> connectionChangeListeners;
     private static XMPPConnection _connection = null;
@@ -105,6 +105,7 @@ public class XmppManager {
     private static XmppFileManager _xmppFileMgr;
     private static ClientOfflineMessages sClientOfflineMessages;
     private static XmppStatus sXmppStatus;
+    private static XmppPresenceStatus sXmppPresenceStatus;
 //    private ServiceDiscoveryManager serviceDiscoMgr;
     
     private static int reusedConnectionCount = 0;
@@ -135,10 +136,12 @@ public class XmppManager {
         _xmppMuc = XmppMuc.getInstance(context);
         sClientOfflineMessages = ClientOfflineMessages.getInstance(context);
         sXmppStatus = XmppStatus.getInstance(context);
+        sXmppPresenceStatus = XmppPresenceStatus.getInstance(context);
         _xmppBuddies.registerListener(this);
         _xmppFileMgr.registerListener(this);
         _xmppMuc.registerListener(this);
         sClientOfflineMessages.registerListener(this);
+        sXmppPresenceStatus.registerListener(this);
         reusedConnectionCount = 0;
         newConnectionCount = 0;
         ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
@@ -531,9 +534,7 @@ public class XmppManager {
             GoogleAnalyticsHelper.trackAndLogError("xmppMgr exception caught", e);
             maybeStartReconnect();
             return;
-        }    
-        
-        setStatus(_presenceMessage);
+        } 
         
         Log.i("connection established with parameters: con=" + _connection.isConnected() + 
                 " auth=" + _connection.isAuthenticated() + 
@@ -617,17 +618,7 @@ public class XmppManager {
             return false;
         }
         return true;
-    }
-    
-    /** 
-     * returns true if the service is correctly connected
-     * and authenticated
-     */
-    private static boolean isConnected() {
-        return    (_connection != null
-                && _connection.isConnected()
-                && _connection.isAuthenticated());
-    }
+    }    
     
     private static XMPPConnection createNewConnection() {
         ConnectionConfiguration conf;
@@ -745,24 +736,6 @@ public class XmppManager {
         } else {
             Log.d("Offline client message \"" + message.toShortString() + "\" because we are not connected");
             return sClientOfflineMessages.addOfflineMessage(msg);
-        }
-    }
-    
-    /**
-     * Sets the XMPP presence status
-     * @param status
-     * @return true if the presence could be set
-     */
-    public static boolean setStatus(String status) {
-        _presenceMessage = status;
-        Presence presence = new Presence(Presence.Type.available);
-        presence.setStatus(_presenceMessage);
-        presence.setPriority(24);   
-        if (isConnected()) {                
-            _connection.sendPacket(presence);
-            return true;
-        } else {
-            return false;
         }
     }
     

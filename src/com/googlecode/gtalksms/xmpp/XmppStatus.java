@@ -8,6 +8,13 @@ import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 import android.content.Context;
 
+/**
+ * This class provides an interface to the keyValue database
+ * the last known state of the XMPP connection is saved. This helps
+ * MainService to detect an unintentional restart of GTalkSMS and restore 
+ * the last known state.
+ *
+ */
 public class XmppStatus {
     
     private static final String STATEFILE_NAME = "xmppStatus";

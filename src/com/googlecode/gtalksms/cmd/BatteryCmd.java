@@ -8,8 +8,7 @@ import android.os.BatteryManager;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
-import com.googlecode.gtalksms.XmppManager;
-import com.googlecode.gtalksms.xmpp.XmppBuddies;
+import com.googlecode.gtalksms.xmpp.XmppPresenceStatus;
 
 public class BatteryCmd extends CommandHandlerBase {
     private static boolean sReceiverRegistered = false; 
@@ -18,11 +17,11 @@ public class BatteryCmd extends CommandHandlerBase {
     private static String sPowerSource;
     private static int sLastStatusPercentage = -1;
     private static String sLastStatusPowersource;
-    private static XmppBuddies sXmppBuddies;
+    private static XmppPresenceStatus sXmppPresenceStatus;    
     
     public BatteryCmd(MainService mainService) {
         super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
-        sXmppBuddies = XmppBuddies.getInstance(sContext);
+        sXmppPresenceStatus = XmppPresenceStatus.getInstance(sContext);
         sPowerSource = "Unknown";
         setup();
     }
@@ -75,11 +74,9 @@ public class BatteryCmd extends CommandHandlerBase {
             send(R.string.chat_battery_level, sLastKnownPercentage);
         }
         if (sSettingsMgr.notifyBatteryInStatus) {
-            // only send an notification to the user if he is available
-            // and if something has changed
-            if (sXmppBuddies.isNotificationAddressAvailable() 
-                    && (sLastKnownPercentage != sLastStatusPercentage || !sPowerSource.equals(sLastStatusPowersource))) {
-                XmppManager.setStatus("GTalkSMS - " + sLastKnownPercentage + "%" + " - " + sPowerSource);
+            // set only if something has changed
+            if (sLastKnownPercentage != sLastStatusPercentage || !sPowerSource.equals(sLastStatusPowersource)) {
+                sXmppPresenceStatus.setPowerInfo(sLastKnownPercentage, sPowerSource);
                 sLastStatusPercentage = sLastKnownPercentage;
                 sLastStatusPowersource = sPowerSource;
             }

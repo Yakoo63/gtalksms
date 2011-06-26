@@ -221,6 +221,11 @@ public class XmppBuddies implements RosterListener {
         }       
     }
     
+    /**
+     * Checks if the notification address is available
+     * return also true if no roster is loaded
+     * @return
+     */
     public boolean isNotificationAddressAvailable() {
         if (sRoster != null) {
             // getPresence retrieves eventually the status of the notified Address in an internal data structure cache
