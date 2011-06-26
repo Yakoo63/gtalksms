@@ -646,7 +646,11 @@ public class MainService extends Service {
      */
     private static void cleanupCommands() {
         for (CommandHandlerBase cmd : _commandSet) {
-            cmd.cleanUp();
+            try {
+                cmd.cleanUp();
+            } catch (Exception e) {
+                Log.e("Failed to cleanup command", e);
+            }
         }
     }
     
