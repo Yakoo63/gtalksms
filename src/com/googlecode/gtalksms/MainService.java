@@ -237,16 +237,16 @@ public class MainService extends Service {
             }
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
-            Log.i("network_changed with available=" + available + " and when in state: " + XmppManager.statusAsString(initialState));
+            boolean failover = intent.getBooleanExtra("failover", false);
+            Log.i("network_changed with available=" + available + ", failover=" + failover +" and when in state: " + XmppManager.statusAsString(initialState));
             if(available) {
                 GoogleAnalyticsHelper.dispatch();
             }
-            // TODO wait few seconds if network not available ? to avoid multiple reconnections
+            // We are in a waiting state and have a network - try to connect.
             if (available && ( initialState == XmppManager.WAITING_TO_CONNECT || 
             				   initialState == XmppManager.WAITING_FOR_NETWORK )) {
-                // We are in a waiting state and have a network - try to connect.
                 _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
-            } else if (!available && initialState == XmppManager.CONNECTED) {
+            } else if (!available && !failover && initialState == XmppManager.CONNECTED) {
                 // We are connected but the network has gone down - disconnect and go
                 // into WAITING state so we auto-connect when we get a future 
                 // notification that a network is available.

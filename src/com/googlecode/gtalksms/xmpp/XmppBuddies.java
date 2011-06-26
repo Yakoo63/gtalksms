@@ -186,17 +186,14 @@ public class XmppBuddies implements RosterListener {
 
     @Override
     public void entriesAdded(Collection<String> addresses) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void entriesDeleted(Collection<String> addresses) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void entriesUpdated(Collection<String> addresses) {
-        // TODO Auto-generated method stub
     }
 
     // carefull, this method does also get called by the SmackListener Thread
@@ -211,6 +208,8 @@ public class XmppBuddies implements RosterListener {
         intent.putExtra("status", presence.getStatus());
         sContext.sendBroadcast(intent);
         
+        // TODO Make this a general intent action.NOTIFICATION_ADDRESS_AVAILABLE
+        // and handle it for example within XmppPresenceStatus
         // if the notification address is/has become available, update the resource status string
         if (bareUserId.equals(sSettings.notifiedAddress) && presence.isAvailable()) {
             intent = new Intent(MainService.ACTION_COMMAND);
