@@ -44,8 +44,9 @@ public class SmsReceiver extends BroadcastReceiver {
                 for (int i = 0; i < nbrOfpdus; i++) {
                     msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
                     
-                    String msgString = msg.get(msgs[i].getOriginatingAddress()); // Check if index with number exists
+                    String msgString = msg.get(msgs[i].getOriginatingAddress());
                     
+                    // Check if index with number exists                    
                     if(msgString == null) { // Index with number doesn't exist                                               
                         // Save string into associative array with sender number as index
                         msg.put(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody()); 

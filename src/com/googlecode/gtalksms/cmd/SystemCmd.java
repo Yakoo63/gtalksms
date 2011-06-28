@@ -174,7 +174,7 @@ public class SystemCmd extends CommandHandlerBase {
         if (memInfoProc == null) 
             return;
         
-        msg.appendBoldLine("GTalkSMS Memory Information");
+        msg.appendBoldLine(Tools.APP_NAME + " Memory Information");
         msg.appendItalicLine("Total");
         msg.appendLine("Private dirty: " + memInfoProc.getTotalPrivateDirty()
                         + XmppMsg.makeBold(" Proportial set size: ") + memInfoProc.getTotalPss()

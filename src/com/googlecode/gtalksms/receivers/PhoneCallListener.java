@@ -26,27 +26,29 @@ public class PhoneCallListener extends PhoneStateListener {
     private static boolean manageIncoming = true;
 
     public void onCallStateChanged(int state, String incomingNumber) {
-        switch (state) {
-        case TelephonyManager.CALL_STATE_IDLE:
-            manageIncoming = true;
-            break;
-        case TelephonyManager.CALL_STATE_OFFHOOK:
-            manageIncoming = true;
-            break;
-        case TelephonyManager.CALL_STATE_RINGING:
-            if (settingsMgr.debugLog)
-                Log.d(Tools.LOG_TAG, "PhoneCallListener Call State Ringing with incomingNumber=" + incomingNumber + " manageIncoming=" + manageIncoming);
-            if (manageIncoming) {
-                manageIncoming = false;
-                String contact = ContactsManager.getContactName(svc, incomingNumber);
-                if (!contact.equals(incomingNumber)) {
-                    contact = contact + " ( " + incomingNumber + " )";
+        if (MainService.IsRunning) {
+            switch (state) {
+            case TelephonyManager.CALL_STATE_IDLE:
+                manageIncoming = true;
+                break;
+            case TelephonyManager.CALL_STATE_OFFHOOK:
+                manageIncoming = true;
+                break;
+            case TelephonyManager.CALL_STATE_RINGING:
+                if (settingsMgr.debugLog)
+                    Log.d(Tools.LOG_TAG, "PhoneCallListener Call State Ringing with incomingNumber=" + incomingNumber + " manageIncoming=" + manageIncoming);
+                if (manageIncoming) {
+                    manageIncoming = false;
+                    String contact = ContactsManager.getContactName(svc, incomingNumber);
+                    if (!contact.equals(incomingNumber)) {
+                        contact = contact + " ( " + incomingNumber + " )";
+                    }
+                    svc.send(svc.getString(R.string.chat_is_calling, contact), null);
                 }
-                svc.send(svc.getString(R.string.chat_is_calling, contact), null);
+                break;
+            default:
+                break;
             }
-            break;
-        default:
-            break;
         }
     }
 }

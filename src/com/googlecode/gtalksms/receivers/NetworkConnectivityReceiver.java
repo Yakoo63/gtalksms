@@ -15,7 +15,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        SharedPreferences prefs = context.getSharedPreferences("GTalkSMS", 0);
+        SharedPreferences prefs = context.getSharedPreferences(Tools.APP_NAME, 0);
         boolean debugLog = prefs.getBoolean("debugLog", false);
         boolean failover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
         boolean connected;
