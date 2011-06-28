@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -21,11 +22,23 @@ public class SmsReceiver extends BroadcastReceiver {
         // However, send long SMS of same sender in one message
         Map<String, String> msg = RetrieveMessages(intent);
            
-        // Finally, send all SMS via XMPP by sender
-        for(String sender : msg.keySet()) {
-            Intent svcintent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
-            svcintent.putExtra("sender", sender);
-            context.startService(svcintent);
+        if (MainService.IsRunning) {
+            // send all SMS via XMPP by sender
+            for (String sender : msg.keySet()) {
+                Intent svcintent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
+                svcintent.putExtra("sender", sender);
+                context.startService(svcintent);
+            }
+        // MainService is not active, test if we find a sms with the magic word
+        } else {
+            // TODO if we want to make the magic word configurable, fetch the settings manager here
+            for (String sender : msg.keySet()) {
+                String message = msg.get(sender);
+                if (message.trim().toLowerCase().compareTo("gtalksms") == 0) {
+                    Log.i("Connection command received by SMS from " + sender + " issuing intent " + MainService.ACTION_CONNECT);
+                    Tools.startSvcIntent(context, MainService.ACTION_CONNECT);
+                }
+            }
         }
     }
     

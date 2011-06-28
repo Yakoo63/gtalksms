@@ -207,32 +207,27 @@ public class MainService extends Service {
             boolean roomExists = XmppMuc.getInstance(this).roomExists(number);
 
             Log.i(MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
-            if (message.trim().toLowerCase().compareTo("gtalksms") == 0) {
-                Log.i("Connection command received by SMS from " + name + " issuing intent " + ACTION_CONNECT);
-                Tools.startSvcIntent(this, ACTION_CONNECT);
-            } else {
-                if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
+            if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
+                XmppMsg msg = new XmppMsg();
+                msg.appendBold(getString(R.string.chat_sms_from, name));
+                msg.append(message);
+                _xmppMgr.send(msg, null);
+                if (_commands.containsKey("sms")) {
+                    ((SmsCmd) _commands.get("sms")).setLastRecipient(number);
+                }
+            }
+            if (_settingsMgr.notifySmsInChatRooms || roomExists) {
+                try {
+                    XmppMuc.getInstance(this).writeRoom(number, name, message, XmppMuc.MODE_SMS);
+                } catch (XMPPException e) {
+                    // room creation and/or writing failed -
+                    // notify about this error
+                    // and send the message to the notification address
                     XmppMsg msg = new XmppMsg();
+                    msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
                     _xmppMgr.send(msg, null);
-                    if (_commands.containsKey("sms")) {
-                        ((SmsCmd) _commands.get("sms")).setLastRecipient(number);
-                    }
-                }
-                if (_settingsMgr.notifySmsInChatRooms || roomExists) {
-                    try {
-                        XmppMuc.getInstance(this).writeRoom(number, name, message, XmppMuc.MODE_SMS);
-                    } catch (XMPPException e) {
-                        // room creation and/or writing failed -
-                        // notify about this error
-                        // and send the message to the notification address
-                        XmppMsg msg = new XmppMsg();
-                        msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
-                        msg.appendBold(getString(R.string.chat_sms_from, name));
-                        msg.append(message);
-                        _xmppMgr.send(msg, null);
-                    }
                 }
             }
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
