@@ -251,7 +251,11 @@ public class MainService extends Service {
             String cmd = intent.getStringExtra("cmd");
             if (cmd != null) {
                 String args = intent.getStringExtra("args");
+                // from can be a regular user JID with or without resource part
+                // or a MUC, 
                 String from = intent.getStringExtra("from");
+                // Send to the notification address (from = null) if the command is from a MUC
+                // and we don't want to be notified about status messages in MUCs
                 if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc) {
                     from = null;
                 }

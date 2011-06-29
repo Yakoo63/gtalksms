@@ -163,7 +163,7 @@ public class XmppMuc {
      * Returns the MultiUserChat given in roomname, 
      * which is a full JID (e.g. room@conference.jabber.com),
      * if the room is in your internal data structure.
-     * Return null otherwise
+     * Otherwise null will be returned
      * 
      * 
      * @param roomname - the full roomname as JID

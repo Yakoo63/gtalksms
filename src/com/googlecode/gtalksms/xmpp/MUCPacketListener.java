@@ -26,7 +26,17 @@ class MUCPacketListener implements PacketListener {
 	private SettingsManager settings;
 	private Context ctx;
 	private int mode;
-
+	
+	/**
+	 * Creates a new MUCPacketListener
+	 * The MUC can either be use for a SMS chat/converstation or for a shell session
+	 * 
+	 * @param number
+	 * @param muc
+	 * @param name
+	 * @param mode
+	 * @param ctx
+	 */
 	public MUCPacketListener(String number, MultiUserChat muc, String name, int mode, Context ctx) {
 		this.name = name;
 		this.number = number;
@@ -49,12 +59,13 @@ class MUCPacketListener implements PacketListener {
 		Log.d("MUCPacketListener: packet received. messageFrom=" + message.getFrom()
 					+ " messageBody=" + message.getBody());
 		
-		// messages from the room JID itself, are matched here, because they have no resource part
-		// these are normally status messages about the room
+		// messages from the room JID itself, are matched here, because they have no 
+		// resource part these are normally status messages about the room we send them 
+		// to the notification address
 		if (from.equals(roomName)) {
 			Intent intent = new Intent(MainService.ACTION_SEND);
 			intent.putExtra("message", name + ": " + message.getBody());
-			// fromMuc sounds right at first, but it servers no purpose here atm
+			// fromMuc sounds right at first, but it servers no purpose here atm			
 			// intent.putExtra("fromMuc", true);
 			ctx.startService(intent);
 		} else if (mode == XmppMuc.MODE_SMS) {
@@ -106,7 +117,8 @@ class MUCPacketListener implements PacketListener {
                 intent.putExtra("args", message.getBody());
                 intent.putExtra("cmd", "cmd");
                 intent.putExtra("from", number);
-                // Must not be set for Shell because we use the from field instead
+                // Must not be set for Shell because everything in a shell session
+                // should be returned to the according MUC
                 // intent.putExtra("fromMuc", true);
                 
                 ctx.startService(intent);

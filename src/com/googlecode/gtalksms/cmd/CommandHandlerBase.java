@@ -79,7 +79,7 @@ public abstract class CommandHandlerBase {
      */
     public final void execute(String cmd, String args, String answerTo) {
     	/*
-    	 * This method should be deprecated, and currently contains an 
+    	 * This method should be depreciated, and currently contains an 
     	 * experiment to isolate Xmpp From the commands altogether.
     	 * As the XmppUserCommand class is verified to be good, the XmppUserCommand
     	 * initialization should be moved out to the caller of this method.

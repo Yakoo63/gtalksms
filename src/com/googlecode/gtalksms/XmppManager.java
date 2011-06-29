@@ -695,6 +695,7 @@ public class XmppManager {
             msg = new Message(_settings.notifiedAddress, Message.Type.chat);
         } else {
             msg = new Message(to);
+            // check if to is an known MUC JID
             muc = _xmppMuc.getRoomViaRoomName(to);
         }
 
@@ -724,6 +725,9 @@ public class XmppManager {
         // see Issue 192 for an example
         if (_connection != null && _connection.isConnected()) {
             if (muc == null) {
+                // TODO find out what happens if the receiver is unknown
+                // for example when we try to send here to an MUC address
+                // because the MUC got lost in the database somehow
                 _connection.sendPacket(msg);
             } else {
                 try {
