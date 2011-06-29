@@ -10,8 +10,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
@@ -27,6 +27,7 @@ public class SmsMmsManager {
     public SmsMmsManager(SettingsManager settings, Context baseContext) {
         _settings = settings;
         _context = baseContext;
+        Log.initialize(_settings);
     }
 
     /**
@@ -35,14 +36,14 @@ public class SmsMmsManager {
      */
     public ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName) {
         if (rawIds.size() > 0) {
-            return getAllSms("content://sms/inbox", contactName, "person IN (" + TextUtils.join(", ", rawIds) + ")", false);
+            return getAllSms("content://sms/inbox", false, contactName, "person IN (" + TextUtils.join(", ", rawIds) + ")", false);
         }
         return new ArrayList<Sms>();
     }
     
     public ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName, String message) {
         if (rawIds.size() > 0) {
-            return getAllSms("content://sms/inbox", contactName, 
+            return getAllSms("content://sms/inbox", false, contactName, 
                     "person IN (" + TextUtils.join(", ", rawIds) + ") and body LIKE '%" + StringFmt.encodeSQL(message) + "%'", false);
         }
         return new ArrayList<Sms>();
@@ -53,23 +54,22 @@ public class SmsMmsManager {
      * argument
      */
     public ArrayList<Sms> getAllSentSms() {
-        return getAllSms("content://sms/sent", _context.getString(R.string.chat_me), null, true);
+        return getAllSms("content://sms/sent", true, null, null, true);
     }
     
     public ArrayList<Sms> getAllSentSms(String message) {
-        return getAllSms("content://sms/sent", _context.getString(R.string.chat_me), 
-                         "body LIKE '%" + StringFmt.encodeSQL(message) + "%'", true);
+        return getAllSms("content://sms/sent", true, null, "body LIKE '%" + StringFmt.encodeSQL(message) + "%'", true);
     }
 
     public ArrayList<Sms> getAllReceivedSms() {
-        return getAllSms("content://sms/inbox", null, null, false);
+        return getAllSms("content://sms/inbox", false, null, null, false);
     }
 
     public ArrayList<Sms> getAllUnreadSms() {
-        return getAllSms("content://sms/inbox", null, "read = 0", false);
+        return getAllSms("content://sms/inbox", false, null, "read = 0", false);
     }
     
-    private ArrayList<Sms> getAllSms(String folder, String sender, String where, Boolean getMax) {
+    private ArrayList<Sms> getAllSms(String folder, boolean isSentSms, String sender, String where, Boolean getMax) {
         ArrayList<Sms> res = new ArrayList<Sms>();
 
         Uri mSmsQueryUri = Uri.parse(folder);
@@ -82,16 +82,15 @@ public class SmsMmsManager {
 
         if (c != null) {
             for (boolean hasData = c.moveToFirst(); hasData && (getMax || nbSms < maxSms); hasData = c.moveToNext(), ++nbSms) {
-                Sms sms = new Sms(Tools.getString(c, "address"), Tools.getString(c, "body"),  Tools.getDateMilliSeconds(c, "date"));
+                String address = Tools.getString(c, "address");
+                Sms sms = new Sms(address, Tools.getString(c, "body"),  Tools.getDateMilliSeconds(c, "date"));
+                String receiver = isSentSms ? ContactsManager.getContactName(_context, address) : _context.getString(R.string.chat_me);
                 if (sender == null) {
-                    sms.setSender(ContactsManager.getContactName(_context, Tools.getLong(c, "person")));
-                } else {
-                    sms.setSender(sender);
+                    sender = isSentSms ? _context.getString(R.string.chat_me) : ContactsManager.getContactName(_context, Tools.getLong(c, "person"));
                 }
+                sms.setSender(sender + " --> " + receiver);
                 res.add(sms);
-    
             }
-            
             c.close();
         }
         
@@ -133,7 +132,7 @@ public class SmsMmsManager {
             
             cr.update(smsUri, values, " address='" + smsNumber + "'", null);
         } catch (Exception e) {
-            Log.i("exception in setRead:", e.getMessage());
+            Log.w("exception in setRead:", e);
         }
     }
 
@@ -181,7 +180,7 @@ public class SmsMmsManager {
                 result += cr.delete(Uri.parse(uri), null, null);
             }
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "exception in deleteSms:", e);
+            Log.e("exception in deleteSms:", e);
             if (result == 0) {
                 result = -1;
             }
@@ -203,7 +202,7 @@ public class SmsMmsManager {
                 result += cr.delete(Uri.parse(uri), null, null);
             }
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "exception in deleteSms:", e);
+            Log.e("exception in deleteSms:", e);
             if (result == 0) {
                 result = -1;
             }
@@ -237,7 +236,7 @@ public class SmsMmsManager {
                 result += cr.delete(Uri.parse(uri), null, null);
             }
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "exception in deleteSms:", e);
+            Log.e("exception in deleteSms:", e);
             if (result == 0) {
                 result = -1;
             }
