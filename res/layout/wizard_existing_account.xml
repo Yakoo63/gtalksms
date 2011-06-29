@@ -4,42 +4,37 @@
     xmlns:app="http://schemas.android.com/apk/res/com.googlecode.gtalksms"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" 
-    >
+    android:layout_height="fill_parent" >
     <LinearLayout 
         android:id="@+id/linearLayout1" 
         android:layout_width="match_parent" 
         android:layout_height="wrap_content" 
         android:orientation="vertical" 
-        android:layout_weight="10"
-        >
+        android:layout_weight="10" >
         
         <TextView 
             android:gravity="top|left" 
             android:layout_width="fill_parent" 
-            android:layout_weight="0" android:layout_height="wrap_content" android:text="@string/wizard_enter_login"/>
+            android:layout_weight="0" 
+            android:layout_height="wrap_content" 
+            android:text="@string/wizard_enter_login" />
         <TextView 
             android:text="@string/wizard_create_login" 
             android:layout_width="wrap_content" 
-            android:layout_height="wrap_content"
-            />
-            <!--  android:text="AndroidTest" --> 
+            android:layout_height="wrap_content" />
         <EditText 
             android:id="@+id/login" 
             android:layout_width="match_parent" 
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
         <TextView 
             android:text="@string/wizard_create_password1" 
             android:layout_width="wrap_content" 
-            android:layout_height="wrap_content"
-            />
-            <!-- android:text="azertyuiop" --> 
+            android:layout_height="wrap_content" />
         <EditText 
             android:id="@+id/password1" 
             android:inputType="textPassword" 
             android:layout_width="match_parent" 
-            android:layout_height="wrap_content"
-            />-->
+            android:layout_height="wrap_content" />
         
     </LinearLayout>
     
@@ -48,8 +43,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" 
-        android:layout_weight="1"
-        >
+        android:layout_weight="0" >
         
         <Button 
             android:id="@+id/backBut"
@@ -59,7 +53,7 @@
             android:fitsSystemWindows="true" 
             android:gravity="center" 
             android:layout_gravity="center"
-            android:text="@string/wizard_back_button"/> 
+            android:text="@string/wizard_back_button" /> 
  
          <Button 
             android:layout_height="40dp" 
@@ -68,7 +62,8 @@
             android:fitsSystemWindows="true" 
             android:gravity="center" 
             android:layout_gravity="center"
-            android:id="@+id/loginBut" android:text="@string/wizard_login_button"/> 
+            android:id="@+id/loginBut" 
+            android:text="@string/wizard_login_button" /> 
             
     </LinearLayout>
     
@@ -78,6 +73,7 @@
         android:gravity="bottom|right" 
         android:id="@+id/VersionLabel" 
         android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" android:layout_weight="0"/>
+        android:layout_height="wrap_content" 
+        android:layout_weight="0"/>
 
 </LinearLayout>
