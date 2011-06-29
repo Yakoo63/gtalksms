@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms.cmd.shell;
+package com.googlecode.gtalksms.cmd.shellCmd;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

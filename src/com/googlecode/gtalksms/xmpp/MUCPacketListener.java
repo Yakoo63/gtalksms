@@ -106,10 +106,11 @@ class MUCPacketListener implements PacketListener {
                 intent.putExtra("args", message.getBody());
                 intent.putExtra("cmd", "cmd");
                 intent.putExtra("from", number);
-                intent.putExtra("fromMuc", true);
+                // Must not be set for Shell because we use the from field instead
+                // intent.putExtra("fromMuc", true);
                 
                 ctx.startService(intent);
-		    }
-    	}
-	}
+            }
+        }
+    }
 }

@@ -1,12 +1,11 @@
 package com.googlecode.gtalksms.panels.wizard;
 
-import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.R;
-import com.googlecode.gtalksms.xmpp.XmppTools;
-
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+
+import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.xmpp.XmppTools;
 
 
 public class WelcomeNextButtonClickListener implements OnClickListener {

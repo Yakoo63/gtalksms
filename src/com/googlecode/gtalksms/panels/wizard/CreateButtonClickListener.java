@@ -3,16 +3,15 @@ package com.googlecode.gtalksms.panels.wizard;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.EditText;
+
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppAccountManager;
-
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.EditText;
 
 public class CreateButtonClickListener implements OnClickListener {
     
