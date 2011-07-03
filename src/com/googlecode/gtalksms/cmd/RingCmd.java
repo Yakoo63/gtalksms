@@ -144,6 +144,7 @@ public class RingCmd extends CommandHandlerBase {
     public void stop() {
         if (_canRing && _mediaPlayer != null) {
             _mediaPlayer.stop();
+            _mediaPlayer.release();
         }
         _vibrator.cancel();
     }
