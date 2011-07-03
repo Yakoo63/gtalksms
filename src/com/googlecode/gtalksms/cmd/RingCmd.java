@@ -16,16 +16,17 @@ import com.googlecode.gtalksms.tools.Tools;
 
 
 public class RingCmd extends CommandHandlerBase {
-    private static AudioManager _audioManager;
-    private MediaPlayer _mediaPlayer;
-    private Vibrator _vibrator;
-    private boolean _canRing;
-    private long[] _pattern = {0, 1000, 100};
+    private final static long[] VIB_PATTERN = {0, 1000, 100};
+    
+    private static AudioManager sAudioManager;
+    private MediaPlayer mMediaPlayer;
+    private Vibrator mVibrator;
+    private boolean mCanRing;
    
     public RingCmd(MainService mainService) {
         super(mainService, new String[] {"ring", "ringmode"}, CommandHandlerBase.TYPE_SYSTEM);
-        _audioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
-        _vibrator = (Vibrator) mainService.getSystemService(Context.VIBRATOR_SERVICE);
+        sAudioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
+        mVibrator = (Vibrator) mainService.getSystemService(Context.VIBRATOR_SERVICE);
     }
     
     @Override
@@ -42,19 +43,20 @@ public class RingCmd extends CommandHandlerBase {
             } else {
                 send(R.string.chat_error_ringing);
             }
-        } else { //command "ringmode" given
+        // command "ringmode" given
+        } else {
             int mode;
             if (args.equals("vibrate")) {
-                _audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                sAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
             } else if (args.equals("normal")) {
-                _audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                sAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
             } else if (args.equals("silent")) {
-                _audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                sAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             } else if (!args.equals("")) {
                 send(R.string.chat_ringer_error_cmd, args);
                 return;
             }
-            mode = _audioManager.getRingerMode();
+            mode = sAudioManager.getRingerMode();
             switch (mode) {
             case AudioManager.RINGER_MODE_VIBRATE:
                 send(R.string.chat_ringer_vibrate);
@@ -83,22 +85,22 @@ public class RingCmd extends CommandHandlerBase {
             initMediaPlayer();
             
             final AudioManager audioManager = (AudioManager) sContext.getSystemService(Context.AUDIO_SERVICE);
-            if (_canRing && audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+            if (mCanRing && audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
                 
                 try {
-                    _mediaPlayer.prepare();
+                    mMediaPlayer.prepare();
                 } catch (Exception e) {
-                    _canRing = false;
+                    mCanRing = false;
                 }
                 
-                _mediaPlayer.setVolume(volume / 100, volume / 100);
-                if (!_mediaPlayer.isPlaying()) {
-                    _mediaPlayer.start();
+                mMediaPlayer.setVolume(volume / 100, volume / 100);
+                if (!mMediaPlayer.isPlaying()) {
+                    mMediaPlayer.start();
                 }                         
                 res = true;
             } 
         } else {
-            _vibrator.vibrate(_pattern, 0);
+            mVibrator.vibrate(VIB_PATTERN, 0);
             res = true;
         }
         return res;
@@ -106,47 +108,48 @@ public class RingCmd extends CommandHandlerBase {
 
     /** init the media player */
     private void initMediaPlayer() {
-        _canRing = true;
+        mCanRing = true;
         Uri alert = Uri.parse(sSettingsMgr.ringtone);
-        if(alert.toString().equals("")) { //if URI is empty string user has set ringtone to "no sound"/"silent"
-            _canRing = false;
+        // if URI is empty string user has set ringtone to "no sound"/"silent"
+        if (alert.toString().equals("")) { 
+            mCanRing = false;
             return;
         }
-        _mediaPlayer = new MediaPlayer();
+        mMediaPlayer = new MediaPlayer();
         try {
-            _mediaPlayer.setDataSource(sContext, alert);
+            mMediaPlayer.setDataSource(sContext, alert);
         } catch (IOException ioe) {
             try {
                 Log.w(Tools.LOG_TAG, "Could not set choosen ringtone, falling back to system default ringtone");
-                _mediaPlayer.setDataSource(sContext, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)); //the emulator wont find the default ringtone as he has none
+                mMediaPlayer.setDataSource(sContext, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)); //the emulator wont find the default ringtone as he has none
             } catch (Exception e) {
-                _canRing = false;
+                mCanRing = false;
             }
         } catch (Exception e) {
-            _canRing = false;
+            mCanRing = false;
         }
-        if(_canRing) { 
-        _mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-        _mediaPlayer.setLooping(true);
+        if (mCanRing) { 
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+        mMediaPlayer.setLooping(true);
         } else {
-            _mediaPlayer = null;
+            mMediaPlayer = null;
         }
     }
    
     /** clears the media player */
     private void clearMediaPlayer() {
-        if (_mediaPlayer != null) {
-            _mediaPlayer.stop();
+        if (mMediaPlayer != null) {
+            // stop will throw an IllegalStateEx when called but not initialized
+            // we have the mCanRing bool to signal an successful initialization
+            if (mCanRing) mMediaPlayer.stop();
+            mMediaPlayer.release();
         }
-        _mediaPlayer = null;
+        mMediaPlayer = null;
     }
     
     public void stop() {
-        if (_canRing && _mediaPlayer != null) {
-            _mediaPlayer.stop();
-            _mediaPlayer.release();
-        }
-        _vibrator.cancel();
+        clearMediaPlayer();        
+        mVibrator.cancel();
     }
     
     public void cleanUp() {
