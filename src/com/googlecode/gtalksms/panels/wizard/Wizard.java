@@ -227,7 +227,7 @@ public class Wizard extends Activity {
                 textPassword1 = (EditText) findViewById(R.id.password1);
                 textPassword2 = (EditText) findViewById(R.id.password2);
                 mapWizardButton(R.id.backBut, VIEW_CREATE_CHOOSE_SERVER);
-                create.setOnClickListener(new CreateButtonClickListener(this, mSettingsMgr, textLogin, textPassword1, textPassword2));
+                create.setOnClickListener(new CreateButtonClickListener(this, textLogin, textPassword1, textPassword2));
                 break;
             case VIEW_CREATE_SUCCESS:
                 setContentView(R.layout.wizard_create_success);
