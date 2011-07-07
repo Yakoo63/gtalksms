@@ -21,8 +21,8 @@ public class CreateButtonClickListener implements OnClickListener {
     private EditText mTextPsw1;
     private EditText mTextPsw2;
     
-    public CreateButtonClickListener(Wizard wiz, SettingsManager sm, EditText username, EditText psw1, EditText psw2) {
-        this.mSettingsMgr = sm;
+    public CreateButtonClickListener(Wizard wiz, EditText username, EditText psw1, EditText psw2) {
+        this.mSettingsMgr = SettingsManager.getSettingsManager(wiz);
         this.mWizard = wiz;
         this.mTextUsername = username;
         this.mTextPsw1 = psw1;

@@ -154,6 +154,7 @@ public class Wizard extends Activity {
     protected void initView(int viewId) {
         
         Button next;
+        Button login;
         RadioGroup rg;
         EditText textLogin;
         EditText textPassword1;
@@ -235,25 +236,27 @@ public class Wizard extends Activity {
                 break;
             case VIEW_EXISTING_ACCOUNT:
                 setContentView(R.layout.wizard_existing_account);
+                login = (Button) findViewById(R.id.loginBut);
                 textLogin = (EditText) findViewById(R.id.login);
                 textPassword1 = (EditText) findViewById(R.id.password1);
 
                 // TODO restore from savedBundle
                 mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
-                // TODO map next button
+                login.setOnClickListener(new UseAccountLoginButtonClickListener(this, textLogin, textPassword1));
                 break;
             case VIEW_SAME_ACCOUNT:
                 setContentView(R.layout.wizard_existing_account);
+                login = (Button) findViewById(R.id.loginBut);
                 textLogin = (EditText) findViewById(R.id.login);
                 textPassword1 = (EditText) findViewById(R.id.password1);
                 // the user wants to use the same account for notification and gtalksms
                 // so just enter as login the notificationAddress
-                String loginStr = ((EditText)findViewById(R.id.notificationAddress)).getText().toString();
+                String loginStr = mNotifiedAddress;
                 textLogin.setEnabled(false);
                 textLogin.setText(loginStr);
                 // TODO restore from savedBundle
                 mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
-                // TODO map next button
+                login.setOnClickListener(new UseAccountLoginButtonClickListener(this, loginStr, textPassword1));
                 break;
             default:
                 throw new IllegalStateException();

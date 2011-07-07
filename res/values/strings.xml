@@ -11,7 +11,7 @@
     <string name="wizard_login_text">Enter your login and your password</string>
     <string name="wizard_back_button">Back</string>
     <string name="wizard_login_button">Login</string>
-    <string name="wizard_create_success">Account successfully created, you can now return to the main screen</string>
+    <string name="wizard_success">GTalkSMS successfully configured, you can now return to the main screen</string>
     <string name="wizard_back_to_mainscreen">Back to main screen</string>
     <string name="wizard_next_button">Next</string>
     <string name="wizard_choose_server">I want to choose a server from the predefined list</string>

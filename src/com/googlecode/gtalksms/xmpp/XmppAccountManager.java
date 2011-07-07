@@ -81,5 +81,21 @@ public class XmppAccountManager {
         editor.commit();
     }
     
+    /**
+     * Tries to make a connection. If successfull returns this connection and 
+     * saves the settings. If jid == notifiedAddress, same account mode is
+     * assumed.
+     * Throws an XMPPException on error.
+     * 
+     * @param jid
+     * @param password
+     * @param notifiedAddress
+     * @param settings
+     * @return
+     */
+    public static XMPPConnection makeConnectionAndSavePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) {
+        // TODO
+        return null;
+    }
     
 }

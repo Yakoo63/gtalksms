@@ -14,7 +14,7 @@
         android:layout_weight="10" >
         
 	    <TextView 
-	        android:text="@string/wizard_create_success" 
+	        android:text="@string/wizard_success" 
 	        android:layout_height="wrap_content" 
 	        android:layout_width="fill_parent" 
 	        android:gravity="top|left" 
