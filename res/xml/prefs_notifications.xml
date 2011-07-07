@@ -9,9 +9,8 @@
         android:summary="@string/pref_notif_application_connection_help"/>
     <CheckBoxPreference
         android:key="notifyBattery"
-        android:defaultValue="true"
         android:title="@string/pref_notif_battery_state"
-        android:summary="@string/pref_notif_battery_state_help"/>
+        android:summary="@string/pref_notif_battery_state_help" android:defaultValue="false"/>
     <ListPreference
         android:key="batteryNotificationInterval"
         android:dependency="notifyBattery"

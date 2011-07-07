@@ -709,7 +709,7 @@ public class XmppManager {
         // we don't know the recipient
         // we know that the recipient is able to read XHTML-IM
         // we are disconnected and therefore send the message later
-        if ((to == null) || XHTMLManager.isServiceEnabled(_connection, to) || !_connection.isAuthenticated()) {
+        if ((to == null) || XHTMLManager.isServiceEnabled(_connection, to) || !_connection.isConnected()) {
             String xhtmlBody = message.generateXHTMLText().toString();
             XHTMLManager.addBody(msg, xhtmlBody);
         }
