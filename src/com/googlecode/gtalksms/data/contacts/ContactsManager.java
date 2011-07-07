@@ -2,6 +2,7 @@ package com.googlecode.gtalksms.data.contacts;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import android.content.ContentResolver;
@@ -13,6 +14,7 @@ import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.PhoneLookup;
 import android.provider.ContactsContract.RawContacts;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
@@ -112,6 +114,8 @@ public class ContactsManager {
      */
     public static ArrayList<Contact> getMatchingContacts(Context ctx, String searchedName) {
         ArrayList<Contact> res = new ArrayList<Contact>();
+        HashMap<String, Contact> contacts = new HashMap<String, Contact>();
+        
         if (Phone.isCellPhoneNumber(searchedName)) {
             searchedName = getContactName(ctx, searchedName);
         }
@@ -124,26 +128,31 @@ public class ContactsManager {
             if (c != null) {
                 for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
                     Long id = Tools.getLong(c, Contacts._ID);
-                    if (null != id) {
+                    String contactName = Tools.getString(c, Contacts.DISPLAY_NAME);
+                    
+                    if (null == id || null == contactName) {
+                        continue;
+                    }
+                    
+                    Contact contact;
+                    if (contacts.containsKey(contactName)) {
+                        contact = contacts.get(contactName);
+                    } else {
+                        contact = new Contact();
+                        contact.name = contactName;
                         
-                        String contactName = Tools.getString(c, Contacts.DISPLAY_NAME);
-                        if(null != contactName) {
-                            Contact contact = new Contact();
-                            contact.id = id;
-                            contact.name = contactName;
-                            
-                            Cursor c1 = resolver.query(RawContacts.CONTENT_URI,
-                                    new String[]{RawContacts._ID},
-                                    RawContacts.CONTACT_ID + "=?",
-                                    new String[]{String.valueOf(id)}, null);
-                            if (c1 != null) {
-                                for (boolean hasData1 = c1.moveToFirst() ; hasData1 ; hasData1 = c1.moveToNext()) {
-                                    contact.rawIds.add(Tools.getLong(c1, RawContacts._ID));
-                                }
-                                c1.close();
-                            }
-                            res.add(contact);
-                        }   
+                        res.add(contact);
+                        contacts.put(contact.name, contact);
+                    }
+                    
+                    contact.ids.add(id);
+                    Cursor c1 = resolver.query(RawContacts.CONTENT_URI, new String[]{RawContacts._ID},
+                            RawContacts.CONTACT_ID + "=?", new String[]{String.valueOf(id)}, null);
+                    if (c1 != null) {
+                        for (boolean hasData1 = c1.moveToFirst() ; hasData1 ; hasData1 = c1.moveToNext()) {
+                            contact.rawIds.add(Tools.getLong(c1, RawContacts._ID));
+                        }
+                        c1.close();
                     }
                 }
                 c.close();
@@ -156,12 +165,12 @@ public class ContactsManager {
     /**
      * Returns a ArrayList of <ContactAddress> containing postal addresses which match to contact id
      */
-    public static ArrayList<ContactAddress> getPostalAddresses(Context ctx, Long contactId) {
+    public static ArrayList<ContactAddress> getPostalAddresses(Context ctx, ArrayList<Long> ids) {
         ArrayList<ContactAddress> res = new ArrayList<ContactAddress>();
         
-        if(null != contactId) {
-            String where = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
-            String[] whereParams = new String[]{contactId.toString(), ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE}; 
+        if (ids.size() > 0) {
+            String where = ContactsContract.Data.CONTACT_ID + " IN (" + TextUtils.join(", ", ids) + ") AND " + ContactsContract.Data.MIMETYPE + " = ?"; 
+            String[] whereParams = new String[]{ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE}; 
         
             Cursor c = ctx.getContentResolver().query(ContactsContract.Data.CONTENT_URI, 
                         null, where, whereParams, null); 
@@ -177,7 +186,7 @@ public class ContactsManager {
 //                String postalCode   = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE);
 //                String country      = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY);
 
-                if (label == null || label.compareTo("") != 0) {
+                if (type != 0 && (label == null || label.compareTo("") != 0)) {
                     label = ContactsContract.CommonDataKinds.StructuredPostal.getTypeLabel(ctx.getResources(), type, "").toString();
                 }
                 
@@ -195,18 +204,18 @@ public class ContactsManager {
     /**
      * Returns a ArrayList of <ContactAddress> containing email addresses which match to contact id
      */
-    public static ArrayList<ContactAddress> getEmailAddresses(Context ctx, Long contactId) {
+    public static ArrayList<ContactAddress> getEmailAddresses(Context ctx, ArrayList<Long> ids) {
         ArrayList<ContactAddress> res = new ArrayList<ContactAddress>();
 
-        if(null != contactId) {
-            String where =  ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId;
+        if (ids.size() > 0) {
+            String where =  ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " IN (" + TextUtils.join(", ", ids) + ")";
             Cursor c = ctx.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, where, null, null); 
             while(c.moveToNext()) {
 
                 String label = Tools.getString(c, ContactsContract.CommonDataKinds.Email.LABEL);
                 int type = Tools.getLong(c, ContactsContract.CommonDataKinds.Email.TYPE).intValue();
 
-                if (label == null || label.compareTo("") != 0) {
+                if (type != 0 && (label == null || label.compareTo("") != 0)) {
                     label = ContactsContract.CommonDataKinds.Email.getTypeLabel(ctx.getResources(), type, "").toString();
                 }
 
@@ -224,12 +233,12 @@ public class ContactsManager {
      * Returns a ArrayList < Phone > of a specific contact
      * ! phone.contactName not set
      */
-    public static ArrayList<Phone> getPhones(Context ctx, Long contactId) {
+    public static ArrayList<Phone> getPhones(Context ctx, ArrayList<Long> ids) {
         ArrayList<Phone> res = new ArrayList<Phone>();
         HashSet<String> phones = new HashSet<String>();
         
-        if(null != contactId) {
-            String where =  ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId;
+        if (ids.size() > 0) {
+            String where =  ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " IN (" + TextUtils.join(", ", ids) + ")";
             Cursor c = ctx.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, where, null, null);
             
             while (c.moveToNext()) {
@@ -252,7 +261,7 @@ public class ContactsManager {
             }
             c.close();
         }
-        
+             
         return res;
     }
     
@@ -277,7 +286,7 @@ public class ContactsManager {
             ArrayList<Contact> contacts = getMatchingContacts(ctx, searchedText);
             if (contacts.size() > 0) {
                 for (Contact contact : contacts) {
-                    ArrayList<Phone> phones = getPhones(ctx, contact.id);
+                    ArrayList<Phone> phones = getPhones(ctx, contact.ids);
                     for (Phone phone : phones) {
                         // TODO set the contact name in the phone constructor
                         phone.setContactName(contact.name);

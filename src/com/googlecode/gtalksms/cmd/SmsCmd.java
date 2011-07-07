@@ -334,7 +334,7 @@ public class SmsCmd extends CommandHandlerBase {
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name, message);
                 if (sentSms != null) {
-                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(sContext, contact.id), sentSms));
+                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
                 }
                 Collections.sort(smsArrayList);
 
@@ -461,7 +461,6 @@ public class SmsCmd extends CommandHandlerBase {
      *  @param searchedText 
      */
     private void readSMS(String searchedText) {
-
         ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, searchedText);
         ArrayList<Sms> sentSms = new ArrayList<Sms>();
         if (sSettingsMgr.showSentSms) {
@@ -475,7 +474,7 @@ public class SmsCmd extends CommandHandlerBase {
             for (Contact contact : contacts) {
                 ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name);
                 if (sSettingsMgr.showSentSms) {
-                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(sContext, contact.id), sentSms));
+                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
                 }
                 Collections.sort(smsArrayList);
 
@@ -483,7 +482,7 @@ public class SmsCmd extends CommandHandlerBase {
                 if (smsList.size() > 0) {
                     hasMatch = true;
                     XmppMsg smsContact = new XmppMsg();
-                    smsContact.append(contact.name);
+                    smsContact.appendBold(contact.name);
                     smsContact.append(" - ");
                     smsContact.appendItalicLine(getString(R.string.chat_sms_search_results, smsArrayList.size()));
                     

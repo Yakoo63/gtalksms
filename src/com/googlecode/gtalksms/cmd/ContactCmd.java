@@ -34,7 +34,7 @@ public class ContactCmd extends CommandHandlerBase {
                 // strContact.append(Tools.LineSep + "Raw Ids : " + TextUtils.join(" ",
                 // contact.rawIds));
 
-                ArrayList<Phone> mobilePhones = ContactsManager.getPhones(sContext, contact.id);
+                ArrayList<Phone> mobilePhones = ContactsManager.getPhones(sContext, contact.ids);
                 if (mobilePhones.size() > 0) {
                     strContact.appendItalicLine(getString(R.string.chat_phones));
                     for (Phone phone : mobilePhones) {
@@ -47,19 +47,19 @@ public class ContactCmd extends CommandHandlerBase {
                     }
                 }
 
-                ArrayList<ContactAddress> emails = ContactsManager.getEmailAddresses(sContext, contact.id);
+                ArrayList<ContactAddress> emails = ContactsManager.getEmailAddresses(sContext, contact.ids);
                 if (emails.size() > 0) {
                     strContact.appendItalicLine(getString(R.string.chat_emails));
                     for (ContactAddress email : emails) {
-                        strContact.appendLine(email.label + " - " + email.address);
+                        strContact.appendLine((email.label != null ? email.label + " - " : "") + email.address);
                     }
                 }
 
-                ArrayList<ContactAddress> addresses = ContactsManager.getPostalAddresses(sContext, contact.id);
+                ArrayList<ContactAddress> addresses = ContactsManager.getPostalAddresses(sContext, contact.ids);
                 if (addresses.size() > 0) {
                     strContact.appendItalicLine(getString(R.string.chat_addresses));
                     for (ContactAddress address : addresses) {
-                        strContact.appendLine(address.label + " - " + address.address);
+                        strContact.appendLine((address.label != null ? address.label + " - " : "") + address.address);
                     }
                 }
                 send(strContact);
