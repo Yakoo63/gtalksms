@@ -250,4 +250,46 @@
     <string name="chat_alias_show_non_existent">Alias \'%1$s\' does not exists.</string>
     <string name="chat_alias_empty">No aliases set.</string>
     <string name="chat_alias_invalid_char">Alias name can not contain a single quote ("'").</string>
+    
+   
+    <string name="chat_sc_error_framebuffer">Framebuffer decoder not set</string>
+    <string name="chat_sc_error">Error while getting picture: %1$s</string>
+    <string name="chat_sc_saved">%1$s screenshot saved as %2$s</string>
+    <string name="chat_file_error">File \'%1$s\' doesn\'t exist!</string>
+    <string name="chat_file_sending">Sending you: %1$s to: %2$s</string>
+    <string name="chat_file_transfer_started">File transfer starting: %1$s - %2$d KB</string>
+    <string name="chat_file_transfer_refused">Could not send the file. Refused by peer.</string>
+    <string name="chat_file_transfer_error">Cannot send the file because an error occurred during the process: %1$s</string>
+    <string name="chat_file_transfer_dir">Directories within %1$s</string>
+    <string name="chat_file_transfer_files">Files within %1$s</string>
+    <string name="chat_file_transfer_no_file">No file in %1$s</string>
+    <string name="chat_file_transfer_not_dir">%1$s is not a directory</string>
+    <string name="chat_file_transfer_file_kilobytes">File transfer: %1$s - %2$d KB</string>
+    <string name="chat_file_transfer_file_bytes">File transfer: %1$s - %2$d B</string>
+    <string name="chat_file_transfer_file_rejected">File transfer from %1$s rejected.</string>
+    <string name="chat_file_transfer_file_not_mount">External Media not mounted read/write</string>
+    <string name="chat_file_transfer_file_already_exists">The file %1$s already exists</string>
+    <string name="chat_file_transfer_file_status">File transfer: %1$s - %2$s</string>
+    <string name="chat_file_transfer_file_percents">File transfer: %1$s - %2$d%</string>
+    <string name="chat_file_transfer_file_complete">File transfer complete. File saved as %1$s</string>
+    <string name="chat_file_transfer_error_msg">File Transfer Error</string>
+    <string name="chat_file_transfer_error_stream">Negotiating stream failed</string>
+    <string name="chat_bt_command_error">Unknown argument \"%1$s\" for command \"%2$s\"</string>
+    <string name="chat_bt_startup">Bluetooth adapter startup has begun</string>
+    <string name="chat_bt_shutdown">Bluetooth adapter shutdown has begun</string>
+    <string name="chat_bt_adapter_state">Bluetooth adapter is %1$s</string>
+    <string name="chat_bt_adapter_error">Error on Bluetooth adapter</string>
+    <string name="chat_bt_state_off">off</string>
+    <string name="chat_bt_state_on">on</string>
+    <string name="chat_bt_state_turning_off">turning off</string>
+    <string name="chat_bt_state_turning_on">turning on</string>
+    <string name="chat_camera_back_activated">Back camera activated</string>
+    <string name="chat_camera_front_activated">Front camera activated</string>
+    <string name="chat_camera_back"> - Back camera</string>
+    <string name="chat_camera_front"> - Front camera</string>
+    <string name="chat_camera_error_version">Your Android version doesn\'t allow this command.</string>
+    <string name="chat_camera_error_picture">Error while getting picture: %1$s</string>
+    <string name="chat_shell_error_muc_write">SHELL_RESULTS - Error writing to MUC: %1$s</string>
+    <string name="chat_shell_error_instance">Failed to create shell instance: %1$s</string>
+    <string name="chat_shell_error_access">Failed to access to the shell #%1$d: %2$s</string>
 </resources>

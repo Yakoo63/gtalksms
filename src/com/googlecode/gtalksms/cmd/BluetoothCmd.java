@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.bluetoothCmd.BluetoothStateReceiver;
 
 public class BluetoothCmd extends CommandHandlerBase {
@@ -24,13 +25,13 @@ public class BluetoothCmd extends CommandHandlerBase {
         } else if (args.equals("state")) {
             showState();
         } else {
-            send("Unkown argument \"" + args + "\" for command \"" + cmd + "\"");
+            send(R.string.chat_bt_command_error, args, cmd);
         }
     }
     
     private void enableAdapter() {
         if (sBluetoothAdapter.enable()) {
-            send("Bluetooth adapter startup has begun");
+            send(R.string.chat_bt_startup);
             addBroadcastReceiver();
         } else {
             sendFailure();
@@ -39,7 +40,7 @@ public class BluetoothCmd extends CommandHandlerBase {
     
     private void disableAdapter() {
         if (sBluetoothAdapter.disable()) {
-            send("Bluetooth adapter shutdown has begun");
+            send(R.string.chat_bt_shutdown);
             addBroadcastReceiver();
         } else {
             sendFailure();
@@ -48,13 +49,11 @@ public class BluetoothCmd extends CommandHandlerBase {
     
     private void showState() {
         int state = sBluetoothAdapter.getState();
-        String res = "Bluetooth adapter is ";
-        res += stateInt2String(state);
-        send(res);
+        send(R.string.chat_bt_adapter_state, stateInt2String(state));
     }
     
     private void sendFailure() {
-        send("Error on Bluetooth adapter");
+        send(R.string.chat_bt_adapter_error);
     }
     
     private void addBroadcastReceiver() {
@@ -67,16 +66,16 @@ public class BluetoothCmd extends CommandHandlerBase {
         String res;
         switch(state) {
         case BluetoothAdapter.STATE_OFF:
-            res = "off";
+            res = sContext.getString(R.string.chat_bt_state_off);
             break;
         case BluetoothAdapter.STATE_ON:
-            res = "on";
+            res = sContext.getString(R.string.chat_bt_state_on);
             break;
         case BluetoothAdapter.STATE_TURNING_OFF:
-            res = "turning off";
+            res = sContext.getString(R.string.chat_bt_state_turning_off);
             break;
         case BluetoothAdapter.STATE_TURNING_ON:
-            res = "turning on";
+            res = sContext.getString(R.string.chat_bt_state_turning_on);
             break;
         default:
             throw new IllegalStateException();        
@@ -86,6 +85,10 @@ public class BluetoothCmd extends CommandHandlerBase {
     
     @Override
     public String[] help() {
+        // TODO HELP
+        String[] s = { 
+        };
+        //return s;
         return null;
     }
 

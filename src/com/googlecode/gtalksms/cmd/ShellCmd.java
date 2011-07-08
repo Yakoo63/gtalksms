@@ -34,7 +34,7 @@ public class ShellCmd extends CommandHandlerBase {
             try {
                 mShells.get(Tools.parseInt(cmd.getReplyTo(), 0)).executeCommand(cmd.getAllArguments());
             } catch (Exception e) {
-                send("Failed to access to the shell #" + cmd.getReplyTo() + " : " + e.getLocalizedMessage());     
+                send(R.string.chat_shell_error_access, cmd.getReplyTo(), e.getLocalizedMessage());     
             }
         } else if (cmd.getCommand().equals("shell")) {
             
@@ -45,8 +45,7 @@ public class ShellCmd extends CommandHandlerBase {
                 mShells.add(new Shell(sIndex, this, sContext));
                 
             } catch (XMPPException e) {
-                // TODO internationalization
-                send("Failed to create shell instance:" + e.getLocalizedMessage());
+                send(R.string.chat_shell_error_instance, e.getLocalizedMessage());
             }
         }
     }
@@ -66,7 +65,7 @@ public class ShellCmd extends CommandHandlerBase {
                 // notify about this error
                 // and send the message to the notification address
                 XmppMsg msgError = new XmppMsg();
-                msgError.appendLine("SHELL_RESULTS - Error writing to MUC: " + e);
+                msgError.appendLine(getString(R.string.chat_shell_error_muc_write, e.getLocalizedMessage()));
                 msgError.appendBold(getString(R.string.chat_sms_from, sRoomName + " " + id));
                 msgError.append(msg);
                 send(msgError);

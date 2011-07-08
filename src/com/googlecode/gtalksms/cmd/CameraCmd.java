@@ -15,6 +15,7 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.cmd.cameraCmd.EmailCallback;
 import com.googlecode.gtalksms.cmd.cameraCmd.VoidCallback;
@@ -88,16 +89,14 @@ public class CameraCmd extends CommandHandlerBase {
                 Camera.getCameraInfo(cameraId, info);
                 
                 if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
-                    send("Back camera activated");
+                    send(R.string.chat_camera_back_activated);
                 } else if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
-                    send("Front camera activated");
+                    send(R.string.chat_camera_front_activated);
                 }    
             }                
         } else {
-            // TODO internationalization
-            String msg = "Your Android version doesn't allow this command.";
-            Log.w(Tools.LOG_TAG, msg);
-            send(msg);
+            Log.w(Tools.LOG_TAG, "Android version doesn't allow setCamera command.");
+            send(R.string.chat_camera_error_version);
         }
     }
 
@@ -108,19 +107,17 @@ public class CameraCmd extends CommandHandlerBase {
                 CameraInfo info = new CameraInfo(); 
                 Camera.getCameraInfo(i, info);
                 
-                res.append(i + " - ");
+                res.append(i);
                 if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
-                    res.append(" Back camera\n");
+                    res.append(sContext.getString(R.string.chat_camera_back) + Tools.LineSep);
                 } else if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
-                    res.append(" Front camera\n");
+                    res.append(sContext.getString(R.string.chat_camera_front) + Tools.LineSep);
                 }    
             }
             send(res.toString());
         } else {
-            // TODO internationalization
-            String msg = "Your Android version doesn't allow this command.";
-            Log.w(Tools.LOG_TAG, msg);
-            send(msg);
+            Log.w(Tools.LOG_TAG, "Android version doesn't allow listCamera command.");
+            send(R.string.chat_camera_error_version);
         }
     }
     
@@ -186,7 +183,7 @@ public class CameraCmd extends CommandHandlerBase {
 
             camera.takePicture(cb, null, pictureCallback);
         } catch (Exception e) {
-            send("error while getting picture: " + e);
+            send(R.string.chat_camera_error_picture, e.getLocalizedMessage());
         }
     }
        
@@ -205,6 +202,10 @@ public class CameraCmd extends CommandHandlerBase {
 
     @Override
     public String[] help() {
+        // TODO HELP
+        String[] s = { 
+            };
+        //return s;
         return null;
     }
 }

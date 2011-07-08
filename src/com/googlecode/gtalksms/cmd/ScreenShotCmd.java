@@ -17,6 +17,7 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.RootTools;
 import com.googlecode.gtalksms.tools.Tools;
@@ -89,8 +90,9 @@ public class ScreenShotCmd extends CommandHandlerBase {
             process.waitFor();
 
             File rawTmpFile = new File(raw);
-            if (!rawTmpFile.exists())
+            if (!rawTmpFile.exists()) {
                 throw new Exception("File doesn't exist");
+            }
 
             InputStream in = null;
             in = new FileInputStream(rawTmpFile);
@@ -134,7 +136,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 
                 bitmap = Bitmap.createBitmap(sBuffer2, displayWidth, displayHeight, Bitmap.Config.ARGB_8888);
             } else {
-                Tools.send("Framebuffer decoder not set", mAnswerTo, sContext);
+                send(R.string.chat_sc_error_framebuffer);
                 rawTmpFile.delete();
                 return;
             }
@@ -144,7 +146,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             fos.close();
-            Tools.send(sSettingsMgr.framebufferMode + " screenshot saved as " + picture.getAbsolutePath(), mAnswerTo, sContext);
+            send(R.string.chat_sc_saved, sSettingsMgr.framebufferMode, picture.getAbsolutePath());
             
             rawTmpFile.delete();
             
@@ -156,12 +158,16 @@ public class ScreenShotCmd extends CommandHandlerBase {
             i.putExtra("args", picture.getAbsolutePath());
             sContext.startService(i);
         } catch (Exception e) {
-            send("error while getting picture: " + e);
+            send(R.string.chat_sc_error, e);
         }
     }
 
     @Override
     public String[] help() {
+        // TODO ADD HELP
+        String[] s = { 
+        };
+        //return s;
         return null;
     }
 }

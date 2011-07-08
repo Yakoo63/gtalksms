@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
@@ -79,31 +80,31 @@ public class XmppFileManager implements FileTransferListener {
         File saveTo;
         answerTo = request.getRequestor();  // set answerTo for replies and send()        
         if (!answerTo.startsWith(_settings.notifiedAddress)) { 
-            send("File transfer from " + answerTo + " rejected.");
+            send(R.string.chat_file_transfer_file_rejected, answerTo);
             request.reject();
             return;                
         } else if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            send("External Media not mounted read/write");
+            send(R.string.chat_file_transfer_file_not_mount);
             request.reject();
             return;
         } else if (!landingDir.isDirectory()) {
-            send("The directory " + landingDir.getAbsolutePath() + " is not a directory");
+            send(R.string.chat_file_transfer_not_dir, landingDir.getAbsolutePath());
             request.reject();
             return;
         }
         
         saveTo = new File(landingDir, request.getFileName());
         if (saveTo.exists()) {
-            send("The file " + saveTo.getAbsolutePath() + " already exists");
+            send(R.string.chat_file_transfer_file_already_exists, saveTo.getAbsolutePath());
             request.reject();
             return;
         }
         
         IncomingFileTransfer transfer = request.accept();
-        send("File transfer: " + saveTo.getName() + " - " + request.getFileSize() / 1024 + " KB");
+        send(R.string.chat_file_transfer_file_kilobytes, saveTo.getName(), request.getFileSize() / 1024);
         try {
             transfer.recieveFile(saveTo);
-            send("File transfer: " + saveTo.getName() + " - " + transfer.getStatus());
+            send(R.string.chat_file_transfer_file_status, saveTo.getName(), transfer.getStatus());
             double percents = 0.0;
             
             // We allow 30s before that status go to in progress
@@ -111,7 +112,7 @@ public class XmppFileManager implements FileTransferListener {
             while (!transfer.isDone()) {
                 if (transfer.getStatus() == Status.in_progress) {
                     percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
-                    send("File transfer: " + saveTo.getName() + " - " + percents + "%");
+                    send(R.string.chat_file_transfer_file_percents, saveTo.getName(), percents);
                 } else if (transfer.getStatus() == Status.error) {
                     send(returnAndLogError(transfer));
                     if (saveTo.exists()) {
@@ -128,21 +129,19 @@ public class XmppFileManager implements FileTransferListener {
                 Thread.sleep(1000);
             }
             if (transfer.getStatus().equals(Status.complete)) {
-                send("File transfer complete. File saved as " + saveTo.getAbsolutePath());
+                send(R.string.chat_file_transfer_file_complete, saveTo.getAbsolutePath());
             } else {
                 send(returnAndLogError(transfer));
             }
         } catch (Exception ex) {
-            String message = "Cannot receive the file because an error occured during the process." 
-                + Tools.LineSep + ex;
-            Log.e(Tools.LOG_TAG, message, ex);
-            send(message);
+            Log.e(Tools.LOG_TAG, "Cannot send the file because an error occured during the process.", ex);
+            send(R.string.chat_file_transfer_error, ex.getMessage());
         }
     }
 
     public static XmppMsg returnAndLogError(FileTransfer transfer) {
         XmppMsg message = new XmppMsg();
-        message.appendBoldLine("File Transfer Error");
+        message.appendBoldLine(ctx.getString(R.string.chat_file_transfer_error_msg));
         if (transfer.getError() != null) {
             message.appendLine(transfer.getError().getMessage());
             Log.w(Tools.LOG_TAG, transfer.getError().getMessage());
@@ -152,7 +151,7 @@ public class XmppFileManager implements FileTransferListener {
             Log.w(Tools.LOG_TAG, transfer.getException().getMessage(), transfer.getException());
         }
         if (transfer.getStatus() == Status.negotiating_stream) {
-            message.appendLine("Negotiating stream failed");
+            message.appendLine(ctx.getString(R.string.chat_file_transfer_error_stream));
             Log.w(Tools.LOG_TAG, "Negotiating stream failed");
         }
         return message;
@@ -169,4 +168,8 @@ public class XmppFileManager implements FileTransferListener {
     private void send(XmppMsg msg) {
         Tools.send(msg, answerTo, ctx);
     }
+    
+    private void send(int id, Object... args) {
+        send(ctx.getString(id, args));
+    }    
 }

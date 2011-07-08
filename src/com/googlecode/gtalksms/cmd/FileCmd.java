@@ -10,6 +10,7 @@ import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
@@ -37,19 +38,15 @@ public class FileCmd extends CommandHandlerBase {
     
     @Override
     protected void execute(String cmd, String args) {
-        if ( ex != null)
+        if ( ex != null) {
             throw new IllegalStateException(ex);
+        }
         
         if (cmd.equals("send")) {
             sendFile(args);
         } else if (cmd.equals("ls")) {
             ls(args);
         }
-    }
-    
-    @Override
-    public String[] help() {
-        return null;
     }
     
     private void sendFile(String args) {
@@ -66,7 +63,7 @@ public class FileCmd extends CommandHandlerBase {
         if (file.exists()) {
             sendFile(file);
         } else {
-            send("File '" + file.getAbsolutePath() + "' doesn't exist!");  // TODO localization
+            send(R.string.chat_file_error, file.getAbsolutePath());
         }
     }
     
@@ -75,14 +72,14 @@ public class FileCmd extends CommandHandlerBase {
         OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(mAnswerTo);
 
         try {
-            transfer.sendFile(file, "Sending you: " + file.getAbsolutePath() + " to: " + mAnswerTo);
-            send("File transfer starting: " + file.getAbsolutePath() + " - " + transfer.getFileSize() / 1024 + " KB");
+            transfer.sendFile(file, getString(R.string.chat_file_sending, file.getAbsolutePath(), mAnswerTo));
+            send(R.string.chat_file_transfer_started, file.getAbsolutePath(), transfer.getFileSize() / 1024);
             
             // We allow 30s before that status go to in progress
            int currentCycle = 0;
             while (!transfer.isDone()) {
                 if (transfer.getStatus() == FileTransfer.Status.refused) {
-                    send("Could not send the file. Refused by peer.");
+                    send(R.string.chat_file_transfer_refused);
                     return;
                 } else if (transfer.getStatus() == FileTransfer.Status.error) {
                     send(XmppFileManager.returnAndLogError(transfer));
@@ -102,10 +99,8 @@ public class FileCmd extends CommandHandlerBase {
                 Thread.sleep(1000);
             }
         } catch (Exception ex) {
-            String message = "Cannot send the file because an error occured during the process." 
-                + Tools.LineSep + ex.getMessage();
-            Log.e(Tools.LOG_TAG, message, ex);
-            send(message);
+            Log.e(Tools.LOG_TAG, "Cannot send the file because an error occured during the process.", ex);
+            send(R.string.chat_file_transfer_error, ex.getMessage());
         }
     }
     
@@ -130,35 +125,35 @@ public class FileCmd extends CommandHandlerBase {
             File[] files = dir.listFiles(new FileCmd.FileFileFilter());
 
             if (dirs.length != 0) {
-                res.appendBoldLine("Directories within " + dir.getAbsolutePath());
+                res.appendBoldLine(getString(R.string.chat_file_transfer_dir, dir.getAbsolutePath()));
                 for (File d : dirs) {
                     res.appendLine(d.getName() + "/");
                 }
             }
             if (files.length != 0) {
-                res.appendBoldLine("Files within " + dir.getAbsolutePath());
+                res.appendBoldLine(getString(R.string.chat_file_transfer_files, dir.getAbsolutePath()));
                 for (File f : files) {
                     appendFileInfo(res, f);
                 }
             }
             
             if (files.length == 0 && dirs.length == 0) {
-                res.append("No file in " + dir.getAbsolutePath());
+                res.append(getString(R.string.chat_file_transfer_no_file, dir.getAbsolutePath()));
             }
             
             send(res);
         } else {
-            send(dir.getAbsolutePath() + " is not a direcotry");
+            send(R.string.chat_file_transfer_not_dir, dir.getAbsolutePath());
         }      
     }
     
-    private static void appendFileInfo(XmppMsg msg, File f) {
+    private void appendFileInfo(XmppMsg msg, File f) {
         String name = f.getName();
         long size = f.length(); // the size of the file in bytes
         if (size > 1023) {
-            msg.appendLine(name + " - " + size / 1024 + " KiB");
+            msg.appendLine(getString(R.string.chat_file_transfer_file_kilobytes, name, size / 1024));
         } else {
-            msg.appendLine(name + " - " + size + " Bytes");  
+            msg.appendLine(getString(R.string.chat_file_transfer_file_bytes, name, size));  
         }
     }
     
@@ -196,5 +191,14 @@ public class FileCmd extends CommandHandlerBase {
         public boolean accept(File pathname) {
             return pathname.isFile();
         }      
+    }
+    
+    @Override
+    public String[] help() {
+        // TODO ADD HELP
+        String[] s = { 
+        };
+        //return s;
+        return null;
     }
 }
