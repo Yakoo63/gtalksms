@@ -20,7 +20,6 @@ public class UseAccountLoginButtonClickListener implements OnClickListener {
     private Wizard mWizard;
     private EditText mLogin;
     private EditText mPassword;
-    private String mLoginStr;
     private boolean mUseSameAccount;
     private SettingsManager mSettings;
     
@@ -48,10 +47,9 @@ public class UseAccountLoginButtonClickListener implements OnClickListener {
      * @param login
      * @param password
      */
-    public UseAccountLoginButtonClickListener(Wizard wizard, String login, EditText password) {
+    public UseAccountLoginButtonClickListener(Wizard wizard, EditText password) {
         mSettings = SettingsManager.getSettingsManager(wizard);
         mWizard = wizard;
-        mLoginStr = login;
         mPassword = password;
         mUseSameAccount = true;
     }

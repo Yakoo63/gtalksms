@@ -256,7 +256,7 @@ public class Wizard extends Activity {
                 textLogin.setText(loginStr);
                 // TODO restore from savedBundle
                 mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);
-                login.setOnClickListener(new UseAccountLoginButtonClickListener(this, loginStr, textPassword1));
+                login.setOnClickListener(new UseAccountLoginButtonClickListener(this, textPassword1));
                 break;
             default:
                 throw new IllegalStateException();

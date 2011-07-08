@@ -311,7 +311,6 @@ public class MainScreen extends Activity implements InterstitialAdListener{
 
     private void updateBuddiesList() {
         Collections.sort(_friends, new Comparator<HashMap<String, String>> () {
-            @Override
             public int compare(HashMap<String, String> object1, HashMap<String, String> object2) {
                 if (object1.get("name") != null && object2.get("name") != null) {
                     return object1.get("name").compareTo(object2.get("name"));

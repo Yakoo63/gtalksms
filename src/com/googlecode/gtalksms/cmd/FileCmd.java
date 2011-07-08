@@ -180,14 +180,12 @@ public class FileCmd extends CommandHandlerBase {
     }
     
     private class DirFileFilter implements FileFilter {
-        @Override
         public boolean accept(File pathname) {
             return pathname.isDirectory();
         }      
     }
     
     private class FileFileFilter implements FileFilter {
-        @Override
         public boolean accept(File pathname) {
             return pathname.isFile();
         }      
