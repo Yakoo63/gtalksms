@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="wizard">Setup wizard</string>
+    <string name="wizard_welcome_text">Welcome to the GTalkSMS setup wizard.\nPlease enter your XMPP (Jabber) or GTalk Address (username@googlemail.com) below. This Address will be able to control your android phone via Jabber/GTalk and will be notified about new events on your phone.</string>
+    <string name="wizard_create_text">Choose your login and your password</string>
+    <string name="wizard_delete_button">Delete</string>
+    <string name="wizard_create_button">Create</string>
+    <string name="wizard_create_login">Enter your login</string>
+    <string name="wizard_create_password1">Enter your password</string>
+    <string name="wizard_create_password2">Retype your password</string>
+    <string name="wizard_login_text">Enter your login and your password</string>
+    <string name="wizard_back_button">Back</string>
+    <string name="wizard_login_button">Login</string>
+    <string name="wizard_success">GTalkSMS successfully configured, you can now return to the main screen</string>
+    <string name="wizard_back_to_mainscreen">Back to main screen</string>
+    <string name="wizard_next_button">Next</string>
+    <string name="wizard_choose_server">I want to choose a server from the predefined list</string>
+    <string name="wizard_manual_server">I know the server on which I want to create the account</string>
+    <string name="wizard_different_account">Create an extra account for GTalkSMS</string>
+    <string name="wizard_existing_account">Use an existing account exclusively for GTalkSMS</string>    
+    <string name="wizard_same_account">Use the same account (not recommended)</string>
+    <string name="wizard_enter_login">Enter your existing login and password</string>
     <string name="pref_app">Application</string>
     <string name="pref_app_advanced">Paramètres avancés</string>
     <string name="pref_app_auto_start_options">Lancement auto.</string>
@@ -230,7 +250,6 @@
     <string name="chat_alias_show_non_existent">L\'alias \'%1$s\' n\'existe pas</string>
     <string name="chat_alias_empty">Aucun alias</string>
     <string name="chat_alias_invalid_char">Les alias ne peuvent pas contenir d\'apostrophe ("'").</string>
-    
     <string name="chat_sc_error_framebuffer">Décodeur FrameBuffer non sélectionné</string>
     <string name="chat_sc_error">Erreur lors de la récupération de l\'image : %1$s</string>
     <string name="chat_sc_saved">%1$s capture d\'écran sauvée sous %2$s</string>

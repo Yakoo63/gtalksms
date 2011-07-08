@@ -250,8 +250,6 @@
     <string name="chat_alias_show_non_existent">Alias \'%1$s\' does not exists.</string>
     <string name="chat_alias_empty">No aliases set.</string>
     <string name="chat_alias_invalid_char">Alias name can not contain a single quote ("'").</string>
-    
-   
     <string name="chat_sc_error_framebuffer">Framebuffer decoder not set</string>
     <string name="chat_sc_error">Error while getting picture: %1$s</string>
     <string name="chat_sc_saved">%1$s screenshot saved as %2$s</string>
