@@ -258,13 +258,10 @@
     <string name="chat_file_transfer_files">Files within %1$s</string>
     <string name="chat_file_transfer_no_file">No file in %1$s</string>
     <string name="chat_file_transfer_not_dir">%1$s is not a directory</string>
-    <string name="chat_file_transfer_file_kilobytes">File transfer: %1$s - %2$d KB</string>
-    <string name="chat_file_transfer_file_bytes">File transfer: %1$s - %2$d B</string>
+    <string name="chat_file_transfer_file">File transfer: %1$s - %2$s</string>
     <string name="chat_file_transfer_file_rejected">File transfer from %1$s rejected.</string>
     <string name="chat_file_transfer_file_not_mount">External Media not mounted read/write</string>
     <string name="chat_file_transfer_file_already_exists">The file %1$s already exists</string>
-    <string name="chat_file_transfer_file_status">File transfer: %1$s - %2$s</string>
-    <string name="chat_file_transfer_file_percents">File transfer: %1$s - %2$d%</string>
     <string name="chat_file_transfer_file_complete">File transfer complete. File saved as %1$s</string>
     <string name="chat_file_transfer_error_msg">File Transfer Error</string>
     <string name="chat_file_transfer_error_stream">Negotiating stream failed</string>

@@ -151,9 +151,9 @@ public class FileCmd extends CommandHandlerBase {
         String name = f.getName();
         long size = f.length(); // the size of the file in bytes
         if (size > 1023) {
-            msg.appendLine(getString(R.string.chat_file_transfer_file_kilobytes, name, size / 1024));
+            msg.appendLine(getString(R.string.chat_file_transfer_file, name, size / 1024 + " KiB"));
         } else {
-            msg.appendLine(getString(R.string.chat_file_transfer_file_bytes, name, size));  
+            msg.appendLine(getString(R.string.chat_file_transfer_file, name, size + " B"));  
         }
     }
     

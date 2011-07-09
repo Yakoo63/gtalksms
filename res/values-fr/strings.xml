@@ -258,13 +258,10 @@
     <string name="chat_file_transfer_files">Fichiers %1$s</string>
     <string name="chat_file_transfer_no_file">Aucun fichier dans %1$s</string>
     <string name="chat_file_transfer_not_dir">%1$s n\'est pas un répertoire.</string>
-    <string name="chat_file_transfer_file_kilobytes">Transfert de fichier : %1$s - %2$d KO</string>
-    <string name="chat_file_transfer_file_bytes">Transfert de fichier : %1$s - %2$d octets</string>
+    <string name="chat_file_transfer_file">Transfert de fichier : %1$s - %2$s</string>
     <string name="chat_file_transfer_file_rejected">Transfert de fichier depuis %1$s refusé.</string>
     <string name="chat_file_transfer_file_not_mount">Lecteur non monté en lecture/écriture</string>
     <string name="chat_file_transfer_file_already_exists">Le fichier %1$s existe déjà</string>
-    <string name="chat_file_transfer_file_status">Transfert de fichier : %1$s - %2$s</string>
-    <string name="chat_file_transfer_file_percents">Transfert de fichier : %1$s - %2$d%</string>
     <string name="chat_file_transfer_file_complete">Transfert de fichier fini. Fichier sauvé sous %1$s</string>
     <string name="chat_file_transfer_error_msg">Erreur lors du transfert de fichier</string>
     <string name="chat_file_transfer_error_stream">Echec lors de la négociation du flux</string>

@@ -104,7 +104,7 @@ public class XmppFileManager implements FileTransferListener {
         send(R.string.chat_file_transfer_file_kilobytes, saveTo.getName(), request.getFileSize() / 1024);
         try {
             transfer.recieveFile(saveTo);
-            send(R.string.chat_file_transfer_file_status, saveTo.getName(), transfer.getStatus());
+            send(R.string.chat_file_transfer_file, saveTo.getName(), transfer.getStatus());
             double percents = 0.0;
             
             // We allow 30s before that status go to in progress
@@ -112,7 +112,7 @@ public class XmppFileManager implements FileTransferListener {
             while (!transfer.isDone()) {
                 if (transfer.getStatus() == Status.in_progress) {
                     percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
-                    send(R.string.chat_file_transfer_file_percents, saveTo.getName(), percents);
+                    send(R.string.chat_file_transfer_file, saveTo.getName(), percents);
                 } else if (transfer.getStatus() == Status.error) {
                     send(returnAndLogError(transfer));
                     if (saveTo.exists()) {
