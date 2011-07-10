@@ -193,10 +193,10 @@ public class FileCmd extends CommandHandlerBase {
     
     @Override
     public String[] help() {
-        // TODO ADD HELP
         String[] s = { 
+            getString(R.string.chat_help_send, makeBold("\"send:#file#\"")),
+            getString(R.string.chat_help_ls, makeBold("\"ls:#path#\"")),
         };
-        //return s;
-        return null;
+        return s;
     }
 }

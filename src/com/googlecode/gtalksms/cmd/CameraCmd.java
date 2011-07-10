@@ -202,10 +202,13 @@ public class CameraCmd extends CommandHandlerBase {
 
     @Override
     public String[] help() {
-        // TODO HELP
         String[] s = { 
-            };
-        //return s;
-        return null;
+            getString(R.string.chat_help_camera, makeBold("\"camera\""), makeBold("\"photo\"")),
+            getString(R.string.chat_help_camera_email, makeBold("\"camera:email\""), makeBold("\"photo:email\"")),
+            getString(R.string.chat_help_camera_xmpp, makeBold("\"camera:xmpp\""), makeBold("\"photo:xmpp\"")),
+            getString(R.string.chat_help_camera_list, makeBold("\"camera:list\""), makeBold("\"photo:list\"")),
+            getString(R.string.chat_help_camera_set, makeBold("\"camera:set:#number#\""), makeBold("\"photo:set:#number#\"")),
+        };
+        return s;
     }
 }
