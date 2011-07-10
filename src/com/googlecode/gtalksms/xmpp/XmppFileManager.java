@@ -101,7 +101,7 @@ public class XmppFileManager implements FileTransferListener {
         }
         
         IncomingFileTransfer transfer = request.accept();
-        send(R.string.chat_file_transfer_file_kilobytes, saveTo.getName(), request.getFileSize() / 1024);
+        send(R.string.chat_file_transfer_file, saveTo.getName(), request.getFileSize() / 1024 + " KiB");
         try {
             transfer.recieveFile(saveTo);
             send(R.string.chat_file_transfer_file, saveTo.getName(), transfer.getStatus());
