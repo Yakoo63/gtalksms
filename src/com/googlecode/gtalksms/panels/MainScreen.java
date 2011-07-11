@@ -49,7 +49,7 @@ import com.googlecode.gtalksms.xmpp.XmppFriend;
 public class MainScreen extends Activity implements InterstitialAdListener{
 
     /** AdMob Interstitial Ad */
-    private InterstitialAd _interstitialAd = new InterstitialAd(Event.APP_START, this);
+    private InterstitialAd _interstitialAd;
     
     private MainService _mainService;
     private SettingsManager _settingsMgr;
@@ -194,7 +194,10 @@ public class MainScreen extends Activity implements InterstitialAdListener{
 //        mi.setEnabled(false);
         createView();
         
-        _interstitialAd.requestAd(this);
+        if (!Tools.isDonateAppInstalled(this)) {
+            if (_interstitialAd == null) _interstitialAd = new InterstitialAd(Event.APP_START, this);
+            _interstitialAd.requestAd(this);
+        }
     }
 
     /** Called when the activity is first created. */
@@ -207,6 +210,13 @@ public class MainScreen extends Activity implements InterstitialAdListener{
     private void createView() {
     	if (_settingsMgr.connectOnMainscreenShow) {
     	    Tools.startSvcIntent(this, MainService.ACTION_CONNECT);
+    	}
+    	
+    	boolean isDonate = Tools.isDonateAppInstalled(getBaseContext());
+    	
+    	// create an Ad object if the donate version is not installed
+    	if (!isDonate && _interstitialAd == null) {
+    	    _interstitialAd = new InterstitialAd(Event.APP_START, this);
     	}
     	
         Tools.setLocale(_settingsMgr, this);
@@ -232,7 +242,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
             }
         });
 
-        if (_interstitialAd.isReady()) {
+        if (_interstitialAd != null && _interstitialAd.isReady()) {
             _interstitialAd.show(this);
         }
         
@@ -247,7 +257,7 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         });
 
         // Set FREE label for not donate version
-        if (Tools.isDonateAppInstalled(getBaseContext())) {
+        if (isDonate) {
             ad.setVisibility(View.GONE);
             donateBtn.setVisibility(View.GONE);
         } else {
