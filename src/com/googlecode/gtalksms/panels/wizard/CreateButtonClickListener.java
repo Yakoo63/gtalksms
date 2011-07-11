@@ -56,6 +56,7 @@ public class CreateButtonClickListener implements OnClickListener {
                 // this will inform the XmppManager about the newly created
                 // connection and also reuse the connection
                 XmppManager.getInstance(mWizard, con);
+                // inform the service that it should be now in a CONNECTED state
                 Tools.startSvcIntent(mWizard, MainService.ACTION_CONNECT);
                 XmppAccountManager.savePreferences(jid, psw1, mWizard.mNotifiedAddress, mSettingsMgr);
                 mWizard.initView(Wizard.VIEW_CREATE_SUCCESS);

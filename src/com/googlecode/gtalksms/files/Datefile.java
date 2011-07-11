@@ -33,8 +33,8 @@ public abstract class Datefile extends File {
         return dis;
     }
     
-    protected DataOutputStream getDataOutputStream() throws FileNotFoundException {
-        FileOutputStream fos = new FileOutputStream(this);
+    protected DataOutputStream getDataOutputStream(boolean append) throws FileNotFoundException {
+        FileOutputStream fos = new FileOutputStream(this, append);
         DataOutputStream dos = new DataOutputStream(fos);
         return dos;
     }

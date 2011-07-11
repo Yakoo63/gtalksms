@@ -15,7 +15,7 @@ import android.telephony.TelephonyManager;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.XmppManager;
-import com.googlecode.gtalksms.tools.NullIntentStartCounter;
+import com.googlecode.gtalksms.tools.CrashedStartCounter;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -27,7 +27,7 @@ public class SystemCmd extends CommandHandlerBase {
     private static ConnectivityManager connectivityManager;
     private static MainService mainService;
     private static TelephonyManager telephonyManager;
-    private static NullIntentStartCounter sNullIntentStartCounter;
+    private static CrashedStartCounter sNullIntentStartCounter;
     
     public SystemCmd(MainService mainService) {
         super(mainService, new String[] {"sysinfo"}, CommandHandlerBase.TYPE_SYSTEM);
@@ -37,7 +37,7 @@ public class SystemCmd extends CommandHandlerBase {
             connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
             telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
             SystemCmd.mainService = mainService;
-            sNullIntentStartCounter = NullIntentStartCounter.getInstance(ctx);
+            sNullIntentStartCounter = CrashedStartCounter.getInstance(ctx);
         }
     }
 

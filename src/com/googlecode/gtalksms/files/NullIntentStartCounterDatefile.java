@@ -23,7 +23,7 @@ public class NullIntentStartCounterDatefile extends Datefile {
     }
     
     public void count() throws IOException, FileNotFoundException {
-        DataOutputStream dos = getDataOutputStream();
+        DataOutputStream dos = getDataOutputStream(true);
         dos.writeByte(0);
         dos.close();
     }

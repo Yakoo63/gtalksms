@@ -4,6 +4,7 @@ import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.util.StringUtils;
 
 import android.content.SharedPreferences.Editor;
 
@@ -92,10 +93,18 @@ public class XmppAccountManager {
      * @param notifiedAddress
      * @param settings
      * @return
+     * @throws XMPPException 
      */
-    public static XMPPConnection makeConnectionAndSavePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) {
-        // TODO
-        return null;
+    public static XMPPConnection makeConnectionAndSavePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) throws XMPPException {
+        String domain = StringUtils.parseServer(jid);
+        ConnectionConfiguration config = new ConnectionConfiguration(domain);
+        XMPPConnection con = new XMPPConnection(config);
+        con.connect();
+        con.login(jid, password);
+        // looks like we have successfully established a connection
+        // save the settings
+        savePreferences(jid, password, notifiedAddress, settings);
+        return con;
     }
     
 }

@@ -12,22 +12,26 @@ import com.googlecode.gtalksms.files.NullIntentStartCounterDatefile;
 import android.content.Context;
 import java.text.ParseException;
 
-public class NullIntentStartCounter {
+/**
+ * A helper that counts the starts of GTalkSMS after a crash
+ *
+ */
+public class CrashedStartCounter {
     private static final String DIRECTORY = "nullIntentStartCounterData";
     private static File sDirFile;
     
-    private static NullIntentStartCounter sNullIntentStartCounter;
+    private static CrashedStartCounter sNullIntentStartCounter;
 
-    private NullIntentStartCounter(Context ctx) {
+    private CrashedStartCounter(Context ctx) {
         sDirFile = new File(ctx.getFilesDir(), DIRECTORY);
         if (!sDirFile.exists())
             sDirFile.mkdir();
         cleanUp();
     }
     
-    public static NullIntentStartCounter getInstance(Context ctx) {
+    public static CrashedStartCounter getInstance(Context ctx) {
         if (sNullIntentStartCounter == null) {
-            sNullIntentStartCounter = new NullIntentStartCounter(ctx);
+            sNullIntentStartCounter = new CrashedStartCounter(ctx);
         }        
         return sNullIntentStartCounter;
     }

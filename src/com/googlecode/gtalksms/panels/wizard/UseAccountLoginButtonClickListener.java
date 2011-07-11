@@ -2,7 +2,6 @@ package com.googlecode.gtalksms.panels.wizard;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.util.StringUtils;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
@@ -68,13 +67,16 @@ public class UseAccountLoginButtonClickListener implements OnClickListener {
         } else { 
             login = mWizard.mNotifiedAddress;
         }
+        
         XMPPConnection con;
         try {
-            String host = StringUtils.parseServer(login);
-            con = XmppAccountManager.tryToCreateAccount(login, host, password);
-                XmppAccountManager.savePreferences(login, password, mWizard.mNotifiedAddress, mSettings);
-                XmppManager.getInstance(mWizard, con);
-                Tools.startSvcIntent(mWizard, MainService.ACTION_CONNECT);
+            con = XmppAccountManager.makeConnectionAndSavePreferences(login, password, mWizard.mNotifiedAddress, mSettings);
+            // inform the xmppManager about the new connection
+            XmppManager.getInstance(mWizard, con);
+            // inform the service that it should be now in a CONNECTED state
+            Tools.startSvcIntent(mWizard, MainService.ACTION_CONNECT);
+            // show the success view
+            mWizard.initView(Wizard.VIEW_CREATE_SUCCESS);
         } catch (XMPPException e) {            
             MainService.displayToast("Could not configure: " + e.getLocalizedMessage(), null);
         }

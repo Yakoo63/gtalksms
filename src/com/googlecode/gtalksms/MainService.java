@@ -47,7 +47,7 @@ import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
 import com.googlecode.gtalksms.tools.DisplayToast;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
-import com.googlecode.gtalksms.tools.NullIntentStartCounter;
+import com.googlecode.gtalksms.tools.CrashedStartCounter;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -360,7 +360,7 @@ public class MainService extends Service {
                         + "lastStatus is " + lastStatus
                         + " and currentStatus is " + currentStatus);
                 startService(new Intent(MainService.ACTION_CONNECT));
-                NullIntentStartCounter.getInstance(getApplicationContext()).count();
+                CrashedStartCounter.getInstance(getApplicationContext()).count();
             }
         }
     }
@@ -373,7 +373,7 @@ public class MainService extends Service {
             // we try to restart the connection
             // this null intent behavoir is only for SDK < 9
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
-                NullIntentStartCounter.getInstance(getApplicationContext()).count();
+                CrashedStartCounter.getInstance(getApplicationContext()).count();
                 startService(new Intent(MainService.ACTION_CONNECT));
             } else {
                 GoogleAnalyticsHelper.trackAndLogWarning("onStartCommand() null intent with Gingerbread or higher");
