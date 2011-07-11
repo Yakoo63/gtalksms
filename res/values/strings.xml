@@ -200,7 +200,7 @@
     <string name="chat_help_bt_on">- %1$s or %2$s: turn on the bluetooth adapter.</string>
     <string name="chat_help_bt_off">- %1$s or %2$s: turn off the bluetooth adapter.</string>
     <string name="chat_help_bt_state">- %1$s or %2$s: give the current state of the bluetooth adapter.</string>
-    <string name="chat_help_send">- %s: send the specified file through XMPP.</string>
+    <string name="chat_help_send">- %s: send the specified file through XMPP. Use an absolut path, otherwise the last listed directory will be prefixed</string>
     <string name="chat_help_ls">- %s: display the list of files and folders in the specified folder.</string>
     <string name="chat_help_sc">- %1$s or %2$s: take a screenshot and store it in the picture directory.</string>
     <string name="chat_help_sc_email">- %1$s or %2$s: take a screenshot, store it and send it by email.</string>

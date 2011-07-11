@@ -200,9 +200,9 @@
     <string name="chat_help_bt_on">- %1$s oder %2$s: Aktiviert Bluetooth.</string>
     <string name="chat_help_bt_off">- %1$s oder %2$s: Deaktiviert Bluetooth.</string>
     <string name="chat_help_bt_state">- %1$s oder %2$s: Zeigt den aktuellen Bluetooth status an.</string>
-    <string name="chat_help_send">- %s: Sended die Datei via XMPP</string>
+    <string name="chat_help_send">- %s: Sendet die Datei via XMPP. Entweder einen absoluten Pfad zur Datei angeben, anonsten wird das letzte aufgelistete Verzeichnis vorangestellt.</string>
     <string name="chat_help_ls">- %s: Zeigt den Inhalt des Verzeichnisses an.</string>
-    <string name="chat_help_sc">- %1$s oder %2$s: Erstellt einen Screenshot im gegebenen Verzeichnis</string>
+    <string name="chat_help_sc">- %1$s oder %2$s: Erstellt einen Screenshot und speichert ihn.</string>
     <string name="chat_help_sc_email">- %1$s oder %2$s: Erstellt einen Screenshot und sendet ihn per E-Mail</string>
     <string name="chat_help_sc_xmpp">- %1$s oder %2$s: Erstellt einen SCreenshot und sendet ihn per XMPP.</string>
     <string name="chat_help_camera">- %1$s oder %2$s: Macht ein Foto und speichert es.</string>
