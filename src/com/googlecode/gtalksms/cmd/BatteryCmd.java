@@ -17,6 +17,8 @@ public class BatteryCmd extends CommandHandlerBase {
     private static String sPowerSource;
     private static int sLastStatusPercentage = -1;
     private static String sLastStatusPowersource;
+    private static int sLastSendPercentage = -1;
+    private static String sLastSendPowersource;
     private static XmppPresenceStatus sXmppPresenceStatus;    
     
     public BatteryCmd(MainService mainService) {
@@ -70,7 +72,7 @@ public class BatteryCmd extends CommandHandlerBase {
      * @param force
      */
     private void sendBatteryInfos(boolean force) {
-        if (force || (sSettingsMgr.notifyBattery && sLastKnownPercentage % sSettingsMgr.batteryNotificationIntervalInt == 0)) {
+        if (force || mustNotifyUser()) {
             send(R.string.chat_battery_level, sLastKnownPercentage);
         }
         if (sSettingsMgr.notifyBatteryInStatus) {
@@ -81,6 +83,23 @@ public class BatteryCmd extends CommandHandlerBase {
                 sLastStatusPowersource = sPowerSource;
             }
         }
+    }
+    
+    /**
+     * Checks if the preconditions for an automatic notification about the
+     * current power status to the user via an XMPP message are given
+     * 
+     * @return
+     */
+    private boolean mustNotifyUser() {
+        if (sSettingsMgr.notifyBattery)
+            if (sLastKnownPercentage != sLastSendPercentage || !sPowerSource.equals(sLastSendPowersource)) {
+                sLastSendPercentage = sLastKnownPercentage;
+                sLastSendPowersource = sPowerSource;
+                if (sLastKnownPercentage % sSettingsMgr.batteryNotificationIntervalInt == 0)
+                    return true;
+            }
+        return false;
     }
     
     private void notifyAndSave(int level, String powerSource) {
