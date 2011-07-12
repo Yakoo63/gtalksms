@@ -84,6 +84,7 @@ public class SettingsManager {
     public boolean notifySmsInSameConversation;
     public boolean notifyInMuc;
     public boolean smsReplySeparate;
+    public boolean markSmsReadOnReply;
     
     // screen shots
     public String framebufferMode;
@@ -206,6 +207,7 @@ public class SettingsManager {
             notifySmsSentDelivered = notifySmsSent || notifySmsDelivered;
             ringtone = _sharedPreferences.getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
             showSentSms = _sharedPreferences.getBoolean("showSentSms", false);
+            markSmsReadOnReply = _sharedPreferences.getBoolean("markSmsReadOnReply", false);
             smsNumber = _sharedPreferences.getInt("smsNumber", 5);
             callLogsNumber = _sharedPreferences.getInt("callLogsNumber", 10);
             formatResponses = _sharedPreferences.getBoolean("formatResponses", false);

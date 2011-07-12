@@ -95,6 +95,9 @@ public class SmsCmd extends CommandHandlerBase {
             }
             
             if (message != null && message.length() > 0) {
+            	if (sSettingsMgr.markSmsReadOnReply) {
+                	_smsMgr.markAsRead(contact);
+            	}
                 sendSMS(message, contact);
             } else if (args.length() > 0) {
                 if (args.equals("unread")) {
@@ -111,7 +114,9 @@ public class SmsCmd extends CommandHandlerBase {
             } else if (_lastRecipient == null) {
                 send(R.string.chat_error_no_recipient);
             } else {
-                _smsMgr.markAsRead(_lastRecipient);
+            	if (sSettingsMgr.markSmsReadOnReply) {
+            		_smsMgr.markAsRead(_lastRecipient);
+            	}
                 sendSMS(args, _lastRecipient);
             }
         } else if (command.equals("findsms") || command.equals("fs")) {

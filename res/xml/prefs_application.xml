@@ -95,6 +95,11 @@
                 android:defaultValue="10" android:key="callLogsNumber" 
                 android:title="@string/pref_app_call_logs_number" 
                 android:numeric="integer"/>
+            <CheckBoxPreference
+            	android:key="markSmsReadOnReply"
+            	android:title="@string/pref_app_mark_read_on_send"
+            	android:summary="@string/pref_app_mark_read_on_send_help"
+            	android:defaultValue="false"/>
             <CheckBoxPreference 
                 android:key="smsReplySeparate" 
                 android:title="@string/pref_notif_sms_separate" 
