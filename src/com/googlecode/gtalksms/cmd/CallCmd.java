@@ -10,10 +10,10 @@ import android.telephony.TelephonyManager;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
+import com.googlecode.gtalksms.data.contacts.ContactsResolver;
+import com.googlecode.gtalksms.data.contacts.ResolvedContact;
 import com.googlecode.gtalksms.data.phone.Call;
-import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.data.phone.PhoneManager;
-import com.googlecode.gtalksms.databases.AliasHelper;
 import com.googlecode.gtalksms.receivers.PhoneCallListener;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -23,16 +23,15 @@ public class CallCmd extends CommandHandlerBase {
     private PhoneManager _phoneMgr;
     private PhoneCallListener _phoneListener = null;
     private TelephonyManager _telephonyMgr = null;
-    
-    private AliasHelper _aliasHelper;
-    
+    private ContactsResolver mContactsResolver = null;
+        
     public CallCmd(MainService mainService) {
         super(mainService, new String[] {"calls", "dial"}, CommandHandlerBase.TYPE_CONTACTS);
         _phoneMgr = new PhoneManager(sContext);
         _telephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
+        mContactsResolver = ContactsResolver.getInstance(sContext);
         
         setup();
-        _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
     }
     
     public void setup() {
@@ -85,37 +84,17 @@ public class CallCmd extends CommandHandlerBase {
     }
     
     /** dial the specified contact */
-    private void dial(String contactInfo) {
-        String number = null;
-        String contact = null;
-        contactInfo = _aliasHelper.convertAliasToNumber(contactInfo);
-        
-        if (Phone.isCellPhoneNumber(contactInfo)) {
-            number = contactInfo;
-            contact = ContactsManager.getContactName(sContext, number);
-        } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contactInfo);
-            if (mobilePhones.size() > 1) {
-                XmppMsg phones = new XmppMsg(getString(R.string.chat_specify_details));
-                phones.newLine();
-                for (Phone phone : mobilePhones) {
-                    phones.appendLine(phone.getContactName() + " - " + phone.getCleanNumber());
-                }
-                send(phones);
-            } else if (mobilePhones.size() == 1) {
-                Phone phone = mobilePhones.get(0);
-                contact = phone.getContactName();
-                number = phone.getCleanNumber();
-            } else {
-                send(R.string.chat_no_match_for, contactInfo);
-            }
-        }
-
-        if (number != null) {
-            send(R.string.chat_dial, contact + " (" + number + ")");
-            if (!_phoneMgr.Dial(number)) {
+    private void dial(String contactInformation) {
+        ResolvedContact resolvedContact = mContactsResolver.resolveContact(contactInformation, ContactsResolver.TYPE_ALL);
+        if (resolvedContact == null) {
+            send(R.string.chat_no_match_for, contactInformation);
+        } else if (resolvedContact.isDistinct()) {
+            send(R.string.chat_dial, resolvedContact.getName() + " (" + resolvedContact.getNumber() + ")");
+            if (!_phoneMgr.Dial(resolvedContact.getNumber())) {
                 send(R.string.chat_error_dial);
             }
+        } else if (!resolvedContact.isDistinct()) {
+            askForMoreDetails(resolvedContact.getCandidates());
         }
     }
     

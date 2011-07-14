@@ -23,6 +23,8 @@ import com.googlecode.gtalksms.cmd.smsCmd.Sms;
 import com.googlecode.gtalksms.cmd.smsCmd.SmsMmsManager;
 import com.googlecode.gtalksms.data.contacts.Contact;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
+import com.googlecode.gtalksms.data.contacts.ContactsResolver;
+import com.googlecode.gtalksms.data.contacts.ResolvedContact;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.databases.AliasHelper;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
@@ -34,29 +36,31 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 public class SmsCmd extends CommandHandlerBase {
     private static boolean sSentIntentReceiverRegistered = false;
     private static boolean sDelIntentReceiverRegistered = false;
-    private SmsMmsManager _smsMgr;
-    private String _lastRecipient = null;
-    private String _lastRecipientName = null;    
+    private static Integer sSmsID;
+
+    private ContactsResolver mContactsResolver;
+    private SmsMmsManager mSmsMmsManager;
+    private String mLastRecipient = null;
+    private String mLastRecipientName = null;    
+    private SetLastRecipientRunnable mSetLastrecipientRunnable;  
+    private BroadcastReceiver mSentSmsReceiver = null;
+    private BroadcastReceiver mDeliveredSmsReceiver = null;
     
-    public BroadcastReceiver _sentSmsReceiver = null;
-    public BroadcastReceiver _deliveredSmsReceiver = null;
-    
-    private static Integer smsID;
-    private SetLastRecipientRunnable _setLastrecipientRunnable;
     
     // synchronizedMap because the worker thread and the intent receivers work with this map
-    private static Map<Integer, Sms> _smsMap; 
+    private static Map<Integer, Sms> mSmsMap; 
     
-    private AliasHelper _aliasHelper;
-    private KeyValueHelper _keyValueHelper;
-    private SMSHelper _smsHelper;
+    private AliasHelper mAliasHelper;
+    private KeyValueHelper mKeyValueHelper;
+    private SMSHelper mSmsHelper;
           
     public SmsCmd(MainService mainService) {
         super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"}, CommandHandlerBase.TYPE_MESSAGE);
-        _smsMgr = new SmsMmsManager(sSettingsMgr, sContext);
-        _smsHelper = SMSHelper.getSMSHelper(sContext);
-        _aliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
-        _keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());
+        mSmsMmsManager = new SmsMmsManager(sSettingsMgr, sContext);
+        mSmsHelper = SMSHelper.getSMSHelper(sContext);
+        mAliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
+        mKeyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());
+        mContactsResolver = ContactsResolver.getInstance(sContext);
         
         restoreSmsInformation();
         setup();
@@ -65,88 +69,89 @@ public class SmsCmd extends CommandHandlerBase {
     
     public void setup() {
         if (sSettingsMgr.notifySmsSent && !sSentIntentReceiverRegistered) {
-            if (_sentSmsReceiver == null) {
-                _sentSmsReceiver = new SentIntentReceiver(sMainService, _smsMap, _smsHelper);
+            if (mSentSmsReceiver == null) {
+                mSentSmsReceiver = new SentIntentReceiver(sMainService, mSmsMap, mSmsHelper);
             }
-            sMainService.registerReceiver(_sentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
+            sMainService.registerReceiver(mSentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
             sSentIntentReceiverRegistered = true;
         }
         if (sSettingsMgr.notifySmsDelivered && !sDelIntentReceiverRegistered) {
-            if (_deliveredSmsReceiver == null) {
-                _deliveredSmsReceiver = new DeliveredIntentReceiver(sMainService, _smsMap, _smsHelper);
+            if (mDeliveredSmsReceiver == null) {
+                mDeliveredSmsReceiver = new DeliveredIntentReceiver(sMainService, mSmsMap, mSmsHelper);
             }
-            sMainService.registerReceiver(_deliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
+            sMainService.registerReceiver(mDeliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
             sDelIntentReceiverRegistered = true;
         }
     }
 
     @Override
     protected void execute(String command, String args) {
-    	String contact;
+    	String contactInformation;
         if (command.equals("sms")) {
             int separatorPos = args.indexOf(":");
-            contact = null;
+            contactInformation = null;
             String message = null;
             
+            // There is more than 1 argument
             if (-1 != separatorPos) {
-                contact = args.substring(0, separatorPos);
-                contact = _aliasHelper.convertAliasToNumber(contact);
+                contactInformation = args.substring(0, separatorPos);
                 message = args.substring(separatorPos + 1);
             }
             
+            // If there is a message, send it. Contact should be a phone number
+            // by then. 
             if (message != null && message.length() > 0) {
-            	if (sSettingsMgr.markSmsReadOnReply) {
-                	_smsMgr.markAsRead(contact);
-            	}
-                sendSMS(message, contact);
+                sendSMS(message, contactInformation);
             } else if (args.length() > 0) {
                 if (args.equals("unread")) {
                     readUnreadSMS();
                 } else {
-                    readSMS(_aliasHelper.convertAliasToNumber(args));
+                    readSMS(args);
                 }
+            // Action when only "sms" is given
             } else {
                 readLastSMS();
             }
         } else if (command.equals("reply")) {
             if (args.length() == 0) {
                 displayLastRecipient();
-            } else if (_lastRecipient == null) {
+            } else if (mLastRecipient == null) {
                 send(R.string.chat_error_no_recipient);
             } else {
             	if (sSettingsMgr.markSmsReadOnReply) {
-            		_smsMgr.markAsRead(_lastRecipient);
+            		mSmsMmsManager.markAsRead(mLastRecipient);
             	}
-                sendSMS(args, _lastRecipient);
+                sendSMS(args, mLastRecipient);
             }
         } else if (command.equals("findsms") || command.equals("fs")) {
             int separatorPos = args.indexOf(":");
-            contact = null;
+            contactInformation = null;
             String message = null;
             if (-1 != separatorPos) {
-                contact = args.substring(0, separatorPos);
-                contact = _aliasHelper.convertAliasToNumber(contact);
+                contactInformation = args.substring(0, separatorPos);
+                contactInformation = mAliasHelper.convertAliasToNumber(contactInformation);
                 message = args.substring(separatorPos + 1);
-                searchSMS(message, contact);
+                searchSMS(message, contactInformation);
             } else if (args.length() > 0) {
                 searchSMS(args, null);
             }
         } else if (command.equals("markasread") || command.equals("mar")) {
             if (args.length() > 0) {
-                markSmsAsRead(_aliasHelper.convertAliasToNumber(args));
-            } else if (_lastRecipient == null) {
+                markSmsAsRead(mAliasHelper.convertAliasToNumber(args));
+            } else if (mLastRecipient == null) {
                 send(R.string.chat_error_no_recipient);
             } else {
-                markSmsAsRead(_lastRecipient);
+                markSmsAsRead(mLastRecipient);
             }
         } else if (command.equals("chat")) {
         	if (args.length() > 0) {
-                inviteRoom(_aliasHelper.convertAliasToNumber(args));
-        	} else if (_lastRecipient != null) {
+                inviteRoom(args);
+        	} else if (mLastRecipient != null) {
         	    try {
-					XmppMuc.getInstance(sContext).inviteRoom(_lastRecipient, _lastRecipientName, XmppMuc.MODE_SMS);
+					XmppMuc.getInstance(sContext).inviteRoom(mLastRecipient, mLastRecipientName, XmppMuc.MODE_SMS);
 				} catch (XMPPException e) {
-					// TODO Auto-generated catch block
+					// Creation of chat with last recipient failed
+				    send(R.string.chat_error, e.getLocalizedMessage());
 				}
         	}
         } else if (command.equals("delsms")) {
@@ -159,7 +164,7 @@ public class SmsCmd extends CommandHandlerBase {
                 if (-1 != separatorPos) {
                     subCommand = args.substring(0, separatorPos);
                     search = args.substring(separatorPos + 1);
-                    search = _aliasHelper.convertAliasToNumber(search);
+                    search = mAliasHelper.convertAliasToNumber(search);
                 } else if (args.length() > 0) {
                     subCommand = args;
                 }
@@ -190,10 +195,10 @@ public class SmsCmd extends CommandHandlerBase {
     
     public void setLastRecipient(String phoneNumber) {
         SetLastRecipientRunnable slrRunnable = new SetLastRecipientRunnable(this, phoneNumber);
-        if (_setLastrecipientRunnable != null) {
-            _setLastrecipientRunnable.setOutdated();
+        if (mSetLastrecipientRunnable != null) {
+            mSetLastrecipientRunnable.setOutdated();
         }
-        _setLastrecipientRunnable = slrRunnable;
+        mSetLastrecipientRunnable = slrRunnable;
         Thread t = new Thread(slrRunnable);
         t.setDaemon(true);
         t.start();
@@ -207,21 +212,23 @@ public class SmsCmd extends CommandHandlerBase {
      * @param phoneNumber
      */
     public synchronized void setLastRecipientNow(String phoneNumber, boolean silentAndUpdate) {
-        if (_lastRecipient == null || !phoneNumber.equals(_lastRecipient)) {
-            _lastRecipient = phoneNumber;
-            _lastRecipientName = ContactsManager.getContactName(sContext, phoneNumber);
+        if (mLastRecipient == null || !phoneNumber.equals(mLastRecipient)) {
+            mLastRecipient = phoneNumber;
+            mLastRecipientName = ContactsManager.getContactName(sContext, phoneNumber);
             if (!silentAndUpdate) { 
             	displayLastRecipient();
-            	_keyValueHelper.addKey(KeyValueHelper.KEY_LAST_RECIPIENT, phoneNumber);
+            	mKeyValueHelper.addKey(KeyValueHelper.KEY_LAST_RECIPIENT, phoneNumber);
             }
         }
     }
     
     /**
      * "delsms" cmd - deletes sms, either
-     * - all sms
-     * - all sent sms
+     * - all sms 
+     * - all sent sms 
      * - sms from specified contact
+     * - # last messages
+     * - # last incoming/outgoing messages
      * 
      * @param cmd - all, sent, contact
      * @param search - if cmd == contact the name of the contact
@@ -229,9 +236,9 @@ public class SmsCmd extends CommandHandlerBase {
     private void deleteSMS(String cmd, String search) {    
         int nbDeleted = -2;
         if (cmd.equals("all")) {
-            nbDeleted = _smsMgr.deleteAllSms();
+            nbDeleted = mSmsMmsManager.deleteAllSms();
         } else if (cmd.equals("sent")) {
-            nbDeleted = _smsMgr.deleteSentSms();
+            nbDeleted = mSmsMmsManager.deleteSentSms();
         } else if (cmd.startsWith("last")) {
             Integer number = Tools.parseInt(search);
             if (number == null) {
@@ -239,11 +246,11 @@ public class SmsCmd extends CommandHandlerBase {
             }
 
             if (cmd.equals("last")) { 
-                nbDeleted = _smsMgr.deleteLastSms(number);
+                nbDeleted = mSmsMmsManager.deleteLastSms(number);
             } else if (cmd.equals("lastin")) { 
-                nbDeleted = _smsMgr.deleteLastInSms(number);
+                nbDeleted = mSmsMmsManager.deleteLastInSms(number);
             } else if (cmd.equals("lastout")) { 
-                nbDeleted = _smsMgr.deleteLastOutSms(number);
+                nbDeleted = mSmsMmsManager.deleteLastOutSms(number);
             } else {
                 send(R.string.chat_del_sms_error);
             }
@@ -260,7 +267,7 @@ public class SmsCmd extends CommandHandlerBase {
             } else if (contacts.size() == 1) {
                 Contact contact = contacts.get(0);
                 send(R.string.chat_del_sms_from, contact.name);
-                nbDeleted = _smsMgr.deleteSmsByContact(contact.rawIds);
+                nbDeleted = mSmsMmsManager.deleteSmsByContact(contact.rawIds);
             } else {
                 send(R.string.chat_no_match_for, search);
             }
@@ -281,36 +288,21 @@ public class SmsCmd extends CommandHandlerBase {
      * in case the contact isn't distinct
      * the user is informed
      * 
-     * @param contact
+     * @param contactInformation
      */
-    private void inviteRoom(String contact) {
-        String name, number;
-        if (Phone.isCellPhoneNumber(contact)) {
-                number = contact;
-                name = ContactsManager.getContactName(sContext, contact);                
-                try {
-					XmppMuc.getInstance(sContext).inviteRoom(number, name, XmppMuc.MODE_SMS);
-				} catch (XMPPException e) {
-					// TODO Auto-generated catch block
-				}
-        } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contact);
-            if (mobilePhones.size() > 1) {
-                send(R.string.chat_specify_details);
-                for (Phone phone : mobilePhones) {
-                    send(phone.getContactName() + " - " + phone.getCleanNumber());
-                }
-            } else if (mobilePhones.size() == 1) {
-                Phone phone = mobilePhones.get(0);
-                try {
-                    XmppMuc.getInstance(sContext).inviteRoom(phone.getCleanNumber(), phone.getContactName(), XmppMuc.MODE_SMS);
-				} catch (XMPPException e) {
-					// TODO Auto-generated catch block
-				}
-//                setLastRecipient(phone.cleanNumber); // issue 117
-            } else {
-                send(R.string.chat_no_match_for, contact);
+    private void inviteRoom(String contactInformation) {
+        ResolvedContact res = mContactsResolver.resolveContact(contactInformation, ContactsResolver.TYPE_CELL);
+        
+        if (res == null) {
+            send(R.string.chat_no_match_for, contactInformation);
+        } else if (res.isDistinct()) {
+            try {
+                XmppMuc.getInstance(sContext).inviteRoom(res.getNumber(), res.getName(), XmppMuc.MODE_SMS);
+            } catch (XMPPException e) {
+                send(R.string.chat_error, e.getLocalizedMessage());
             }
+        } else if (!res.isDistinct()) {
+            askForMoreDetails(res.getCandidates());
         }
     }
     
@@ -330,16 +322,16 @@ public class SmsCmd extends CommandHandlerBase {
         contacts = ContactsManager.getMatchingContacts(sContext, contactName != null ? contactName : "*");
         
         if (sSettingsMgr.showSentSms) {
-            sentSms = _smsMgr.getAllSentSms(message);
+            sentSms = mSmsMmsManager.getAllSentSms(message);
         }
         
         if (contacts.size() > 0) {
             send(R.string.chat_sms_search, message, contacts.size());
             
             for (Contact contact : contacts) {
-                ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name, message);
+                ArrayList<Sms> smsArrayList = mSmsMmsManager.getSms(contact.rawIds, contact.name, message);
                 if (sentSms != null) {
-                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
+                    smsArrayList.addAll(mSmsMmsManager.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
                 }
                 Collections.sort(smsArrayList);
 
@@ -403,41 +395,17 @@ public class SmsCmd extends CommandHandlerBase {
      * returns an error to the user if the contact could not be found
      * 
      * @param message the message to send
-     * @param contact the name or number
+     * @param contactInformation
      */
-    private void sendSMS(String message, String contact) {
-        if (Phone.isCellPhoneNumber(contact)) {
-            String resolvedName = ContactsManager.getContactName(sContext, contact);
-            if (sSettingsMgr.notifySmsSent) {
-                send(R.string.chat_send_sms,  resolvedName + ": \"" + Tools.shortenMessage(message) + "\"");
-            }
-            sendSMSByPhoneNumber(message, contact, resolvedName);           
-        } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contact);
-            if (mobilePhones.size() > 1) {
-                // start searching for a default mobile number
-                for (Phone phone : mobilePhones) {
-                    if (phone.isDefaultNumber()) {
-                        sendSMSByPhoneNumber(message, phone.getCleanNumber(), phone.getContactName());
-                        return;
-                    }
-                }
-                // there are more then 1 mobile phones for this contact
-                // and none of them is marked as default
-                send(R.string.chat_specify_details);
+    private void sendSMS(String message, String contactInformation) {
+        ResolvedContact rc = mContactsResolver.resolveContact(contactInformation, ContactsResolver.TYPE_CELL);
 
-                for (Phone phone : mobilePhones) {
-                    send(phone.getContactName() + " - " + phone.getCleanNumber());
-                }
-            } else if (mobilePhones.size() == 1) {
-                Phone phone = mobilePhones.get(0);
-                if (sSettingsMgr.notifySmsSent) {
-                    send(R.string.chat_send_sms, phone.getContactName() + " (" + phone.getCleanNumber() + ")"  + ": \"" + Tools.shortenMessage(message) + "\"");
-                }
-                sendSMSByPhoneNumber(message, phone.getCleanNumber(), phone.getContactName());
-            } else {
-                send(R.string.chat_no_match_for, contact);
-            }
+        if (rc == null) {
+            send(R.string.chat_no_match_for, contactInformation);
+        } else if (rc.isDistinct()) {
+            sendSMSByPhoneNumber(message, rc.getNumber(), rc.getName());
+        } else if (!rc.isDistinct()) {
+            askForMoreDetails(rc.getCandidates());
         }
     }
 
@@ -445,14 +413,14 @@ public class SmsCmd extends CommandHandlerBase {
 
         if (Phone.isCellPhoneNumber(contact)) {
             send(R.string.chat_mark_as_read, ContactsManager.getContactName(sContext, contact));
-            _smsMgr.markAsRead(contact);
+            mSmsMmsManager.markAsRead(contact);
         } else {
             ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contact);
             if (mobilePhones.size() > 0) {
                 send(R.string.chat_mark_as_read, mobilePhones.get(0).getContactName());
 
                 for (Phone phone : mobilePhones) {
-                    _smsMgr.markAsRead(phone.getNumber());
+                    mSmsMmsManager.markAsRead(phone.getNumber());
                 }
             } else {
                 send(R.string.chat_no_match_for, contact);
@@ -466,10 +434,13 @@ public class SmsCmd extends CommandHandlerBase {
      *  @param searchedText 
      */
     private void readSMS(String searchedText) {
+        // We do not use the ContactsResolver here because readSMS() has 
+        // a slightly different behavior when searching for contacts
+        searchedText = mAliasHelper.convertAliasToNumber(searchedText);
         ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, searchedText);
         ArrayList<Sms> sentSms = new ArrayList<Sms>();
         if (sSettingsMgr.showSentSms) {
-            sentSms = _smsMgr.getAllSentSms();
+            sentSms = mSmsMmsManager.getAllSentSms();
         }
 
         if (contacts.size() > 0) {
@@ -477,9 +448,9 @@ public class SmsCmd extends CommandHandlerBase {
             XmppMsg noSms = new XmppMsg();
             boolean hasMatch = false;
             for (Contact contact : contacts) {
-                ArrayList<Sms> smsArrayList = _smsMgr.getSms(contact.rawIds, contact.name);
+                ArrayList<Sms> smsArrayList = mSmsMmsManager.getSms(contact.rawIds, contact.name);
                 if (sSettingsMgr.showSentSms) {
-                    smsArrayList.addAll(_smsMgr.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
+                    smsArrayList.addAll(mSmsMmsManager.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
                 }
                 Collections.sort(smsArrayList);
 
@@ -515,7 +486,7 @@ public class SmsCmd extends CommandHandlerBase {
     /** reads unread SMS from all contacts */
     private void readUnreadSMS() {
 
-        ArrayList<Sms> smsArrayList = _smsMgr.getAllUnreadSms();
+        ArrayList<Sms> smsArrayList = mSmsMmsManager.getAllUnreadSms();
         XmppMsg allSms = new XmppMsg();
 
         List<Sms> smsList = Tools.getLastElements(smsArrayList, sSettingsMgr.smsNumber);
@@ -532,10 +503,10 @@ public class SmsCmd extends CommandHandlerBase {
     /** reads last (count) SMS from all contacts */
     private void readLastSMS() {
 
-        ArrayList<Sms> smsArrayList = _smsMgr.getAllReceivedSms();
+        ArrayList<Sms> smsArrayList = mSmsMmsManager.getAllReceivedSms();
 
         if (sSettingsMgr.showSentSms) {
-            smsArrayList.addAll(_smsMgr.getAllSentSms());
+            smsArrayList.addAll(mSmsMmsManager.getAllSentSms());
         }
         Collections.sort(smsArrayList);
 
@@ -560,30 +531,46 @@ public class SmsCmd extends CommandHandlerBase {
     }
     
     private void displayLastRecipient() {
-        if (_lastRecipient == null) {
+        if (mLastRecipient == null) {
             send(R.string.chat_error_no_recipient);
         } else {
-            String contact = ContactsManager.getContactName(sContext, _lastRecipient);
-            if (Phone.isCellPhoneNumber(_lastRecipient) && contact.compareTo(_lastRecipient) != 0) {
-                contact += " (" + _lastRecipient + ")";
+            String contact = ContactsManager.getContactName(sContext, mLastRecipient);
+            if (Phone.isCellPhoneNumber(mLastRecipient) && contact.compareTo(mLastRecipient) != 0) {
+                contact += " (" + mLastRecipient + ")";
             }
             send(R.string.chat_reply_contact, contact);
         }
     }
 
-    /** Sends a sms to the specified phone number with a receiver name */
+    /** 
+     * Sends a sms to the specified phone number with a custom receiver name
+     * Creates the pendingIntents for send/delivery notifications, if needed.
+     * Adds the sent SMS to the systems SentBox
+     * 
+     * @param message
+     * @param phoneNumber
+     * @param toName
+     */
     private void sendSMSByPhoneNumber(String message, String phoneNumber, String toName) {
+        if (sSettingsMgr.notifySmsSent) {
+            send(R.string.chat_send_sms, toName + " (" + phoneNumber + ")"  + ": \"" + Tools.shortenMessage(message) + "\"");
+        }
+        
+        if (sSettingsMgr.markSmsReadOnReply) {
+            mSmsMmsManager.markAsRead(phoneNumber);
+        }
+        
         ArrayList<PendingIntent> SentPenIntents = null;
         ArrayList<PendingIntent> DelPenIntents = null;
-        SmsManager sms = SmsManager.getDefault();
-        ArrayList<String> messages = sms.divideMessage(message);
+        SmsManager smsManager = SmsManager.getDefault();
+        ArrayList<String> messages = smsManager.divideMessage(message);
 
         if(sSettingsMgr.notifySmsSentDelivered) {
             String shortendMessage = Tools.shortenMessage(message);
             Integer smsID = getSmsID();
             Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size(), mAnswerTo, smsID);          
-            _smsMap.put(smsID, s);
-            _smsHelper.addSMS(s);
+            mSmsMap.put(smsID, s);
+            mSmsHelper.addSMS(s);
             if(sSettingsMgr.notifySmsSent) {
                 SentPenIntents = createSPendingIntents(messages.size(), smsID);
             }
@@ -592,9 +579,9 @@ public class SmsCmd extends CommandHandlerBase {
             }
         }
 
-        sms.sendMultipartTextMessage(phoneNumber, null, messages, SentPenIntents, DelPenIntents);
+        smsManager.sendMultipartTextMessage(phoneNumber, null, messages, SentPenIntents, DelPenIntents);
         setLastRecipient(phoneNumber);
-        _smsMgr.addSmsToSentBox(message, phoneNumber);
+        mSmsMmsManager.addSmsToSentBox(message, phoneNumber);
     }
     
     private ArrayList<PendingIntent> createSPendingIntents(int size, int smsID) {
@@ -629,60 +616,65 @@ public class SmsCmd extends CommandHandlerBase {
      * restores the lastRecipient from the database if possible
      */
     private void restoreLastRecipient() {
-    	String phoneNumber = _keyValueHelper.getValue(KeyValueHelper.KEY_LAST_RECIPIENT);
+    	String phoneNumber = mKeyValueHelper.getValue(KeyValueHelper.KEY_LAST_RECIPIENT);
     	if (phoneNumber != null) {
     		setLastRecipientNow(phoneNumber, true);
     	}
     }
     
+    /**
+     * Restores the SMS information from the database
+     * Creates the smsMap object and fills it if there are any old SMS from the
+     * database
+     */
     private void restoreSmsInformation() {
-        if (smsID == null) {
-            smsID = _keyValueHelper.getIntegerValue(KeyValueHelper.KEY_SMS_ID);
-            // this is the first time, init the values
-            if (smsID == null) {
-                _keyValueHelper.addKey(KeyValueHelper.KEY_SMS_ID, "0");
-                _keyValueHelper.addKey(KeyValueHelper.KEY_SINTENT, "0");
-                _keyValueHelper.addKey(KeyValueHelper.KEY_DINTENT, "0");
-                smsID = 0;
+        if (sSmsID == null) {
+            sSmsID = mKeyValueHelper.getIntegerValue(KeyValueHelper.KEY_SMS_ID);
+            // This is the first time the method was called, init the values
+            if (sSmsID == null) {
+                mKeyValueHelper.addKey(KeyValueHelper.KEY_SMS_ID, "0");
+                mKeyValueHelper.addKey(KeyValueHelper.KEY_SINTENT, "0");
+                mKeyValueHelper.addKey(KeyValueHelper.KEY_DINTENT, "0");
+                sSmsID = 0;
             }
-            _smsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
-            _smsHelper.deleteOldSMS();
-            Sms[] toAdd = _smsHelper.getFullDatabase();
+            mSmsMap = Collections.synchronizedMap(new HashMap<Integer, Sms>());
+            mSmsHelper.deleteOldSMS();
+            Sms[] toAdd = mSmsHelper.getFullDatabase();
             for (Sms s : toAdd) {
-                _smsMap.put(s.getID(), s);
+                mSmsMap.put(s.getID(), s);
             }
         }
     }
     
     private Integer getSmsID() {
-        int res = smsID;
-        smsID++;
-        _keyValueHelper.addKey(KeyValueHelper.KEY_SMS_ID, smsID.toString());        
+        int res = sSmsID;
+        sSmsID++;
+        mKeyValueHelper.addKey(KeyValueHelper.KEY_SMS_ID, sSmsID.toString());        
         return new Integer(res);
     }
     
     private int getSIntentStart(int size) {
-        Integer res = _keyValueHelper.getIntegerValue(KeyValueHelper.KEY_SINTENT);
+        Integer res = mKeyValueHelper.getIntegerValue(KeyValueHelper.KEY_SINTENT);
         Integer newValue = res + size;
-        _keyValueHelper.addKey(KeyValueHelper.KEY_SINTENT, newValue.toString());
+        mKeyValueHelper.addKey(KeyValueHelper.KEY_SINTENT, newValue.toString());
         return res;
     }
     
     private int getDIntentStart(int size) {
-        Integer res = _keyValueHelper.getIntegerValue(KeyValueHelper.KEY_DINTENT);
+        Integer res = mKeyValueHelper.getIntegerValue(KeyValueHelper.KEY_DINTENT);
         Integer newValue = res + size;
-        _keyValueHelper.addKey(KeyValueHelper.KEY_DINTENT, newValue.toString());
+        mKeyValueHelper.addKey(KeyValueHelper.KEY_DINTENT, newValue.toString());
         return res;
     }
     
     @Override
     public void cleanUp() {
-        if (_sentSmsReceiver != null && sSentIntentReceiverRegistered) {
-            sContext.unregisterReceiver(_sentSmsReceiver);
+        if (mSentSmsReceiver != null && sSentIntentReceiverRegistered) {
+            sContext.unregisterReceiver(mSentSmsReceiver);
             sSentIntentReceiverRegistered = false;
         }
-        if (_deliveredSmsReceiver != null && sDelIntentReceiverRegistered) {
-            sContext.unregisterReceiver(_deliveredSmsReceiver);
+        if (mDeliveredSmsReceiver != null && sDelIntentReceiverRegistered) {
+            sContext.unregisterReceiver(mDeliveredSmsReceiver);
             sDelIntentReceiverRegistered = false;
         }
     }    

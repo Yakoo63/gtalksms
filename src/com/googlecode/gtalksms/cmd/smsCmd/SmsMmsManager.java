@@ -121,7 +121,12 @@ public class SmsMmsManager {
 
         return res;
     }
-
+    
+    /**
+     * Marks all SMS from a given phone number as read
+     * 
+     * @param smsNumber The phone number
+     */
     public void markAsRead(String smsNumber) {
         try {
             ContentResolver cr = _context.getContentResolver();

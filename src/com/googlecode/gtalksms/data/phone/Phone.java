@@ -60,7 +60,7 @@ public class Phone {
         }
         return false;
     } 
-
+    
     public static boolean isCellPhoneNumber(String number) {
         return Phone.cleanPhoneNumber(number).matches(cellPhonePattern);
     }

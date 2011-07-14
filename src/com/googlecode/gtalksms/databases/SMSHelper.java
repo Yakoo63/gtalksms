@@ -6,7 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 
 /**
- * Middle-end Helper
+ * Middle-end helper. Adds and restores SMS to the database backend.
  * 
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
  *

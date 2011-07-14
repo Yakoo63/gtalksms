@@ -5,8 +5,10 @@ import java.util.StringTokenizer;
 import android.content.Context;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.data.contacts.ResolvedContact;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public abstract class CommandHandlerBase { 
@@ -228,5 +230,14 @@ public abstract class CommandHandlerBase {
     		throw new IllegalStateException("Command.sSettingsMgr is not set.");
     	}
     	return sSettingsMgr;
+    }
+    
+    protected void askForMoreDetails(ResolvedContact[] candidates) {
+        XmppMsg msg = new XmppMsg(getString(R.string.chat_specify_details));
+        msg.newLine();
+        for (ResolvedContact rc : candidates) {
+            msg.appendLine(rc.getName() + " - " + rc.getNumber());
+        }
+        send(msg);
     }
 }

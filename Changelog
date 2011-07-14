@@ -1,10 +1,11 @@
-3.0
+Upcoming 3.0
 * File transfer
 * Take photo and receive them via XMPP with front and back camera
 * Screenshot feature (Rooted phones only)
 * Bluetooth command, enable/disable adapter, show status, ...
 * Setup Wizard
 * Bug fixes
+* Option to mark messages as read on reply
 
 2.4
 * Application starts when a SMS containing "GTalkSMS" is received

@@ -71,10 +71,10 @@ public class AliasHelper {
         
         ArrayList<Phone> res;
         res = ContactsManager.getMobilePhones(ctx, name);
-            if(res.size() == 1) {
-                Phone p = res.get(0);
-                addOrUpdate(aliasName, p.getCleanNumber(), p.getContactName());
-            }
+        if (res.size() == 1) {
+            Phone p = res.get(0);
+            addOrUpdate(aliasName, p.getCleanNumber(), p.getContactName());
+        }
         return res;
     }
     

@@ -61,6 +61,8 @@
     <string name="pref_app_enable_debug">Debug Log</string>
     <string name="pref_app_enable_debug_help">Aktiviert debug log</string>  
     <string name="pref_app_connect_mainscreen">Verbinde bei Anwendungsstart</string>
+    <string name="pref_app_mark_read_on_send">SMS automatisch als gelesen markieren</string>
+    <string name="pref_app_mark_read_on_send_help">Markiert alle Nachrichten eines Kontaktes automatisch als gelesen, sobald man eine Nachricht an diesen sendet.</string>
     <string name="pref_app_connect_mainscreen_help">Verbindet GTalkSMS automatisch wenn die Anwedung gestartet wird</string>    
     <string name="pref_con_notified_address_cat">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address">Benachrichtigungs- / Steueradresse</string>

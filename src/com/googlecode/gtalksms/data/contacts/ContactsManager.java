@@ -315,14 +315,6 @@ public class ContactsManager {
                 res.add(phone);
             }
         }
-
-        // manage all phones number
-        if (res.size() == 0) {
-            for (Phone phone : phones) {
-                res.add(phone);
-            }
-        }
-
         return res;
     }
 }
