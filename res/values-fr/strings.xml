@@ -91,6 +91,8 @@
     <string name="pref_con_muc_server_help">Serveur XMPP Groupchat (A modifier en connaissance de cause !)</string>
     <string name="pref_con_manually_specify_server_settings">Paramètres serveur manuels</string>
     <string name="pref_con_manually_specify_server_settings_help">Permet de configurer manuellement les paramètres de connexion XMPP</string>
+    <string name="pref_app_start_sms_key">Message SMS pour lancer l\'application</string>
+    <string name="pref_app_start_sms_key_help">Corps du message SMS qui permettra de démarrer l\'application à distance</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_application_connection">Connexion de l\'application</string>
     <string name="pref_notif_application_connection_help">Notification pour les connexions au service de messagerie</string>

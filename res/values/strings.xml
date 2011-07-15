@@ -63,6 +63,8 @@
     <string name="pref_app_framebufferMode_help">FrameBuffer decoder type to take a screenshot on your phone</string>
     <string name="pref_app_mark_read_on_send">Mark SMS as read on reply</string>
     <string name="pref_app_mark_read_on_send_help">Automatically mark a conversation as being read when you reply to the person</string>
+    <string name="pref_app_start_sms_key">Magic SMS message</string>
+    <string name="pref_app_start_sms_key_help">Magic SMS message body to start GTalkSMS</string>
     <string name="pref_con">Connection settings</string>
     <string name="pref_con_notified_address_cat">Address to notify</string>
     <string name="pref_con_notified_address">Address to notify</string>

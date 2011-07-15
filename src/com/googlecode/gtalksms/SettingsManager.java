@@ -85,6 +85,7 @@ public class SettingsManager {
     public boolean notifyInMuc;
     public boolean smsReplySeparate;
     public boolean markSmsReadOnReply;
+    public String smsMagicWord;
     
     // screen shots
     public String framebufferMode;
@@ -238,7 +239,7 @@ public class SettingsManager {
                 notifySmsInSameConversation = true;
                 notifySmsInChatRooms = false;
             }
-                    
+            smsMagicWord = _sharedPreferences.getString("smsMagicWord", "GTalkSMS");
             notifyInMuc = _sharedPreferences.getBoolean("notifyInMuc", false); 
             smsReplySeparate = _sharedPreferences.getBoolean("smsReplySeparate", false);
             framebufferMode = _sharedPreferences.getString("framebufferMode", "ARGB_8888");

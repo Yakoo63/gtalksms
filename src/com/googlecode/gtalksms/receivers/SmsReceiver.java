@@ -31,10 +31,11 @@ public class SmsReceiver extends BroadcastReceiver {
             }
         // MainService is not active, test if we find a sms with the magic word
         } else {
-            // TODO if we want to make the magic word configurable, fetch the settings manager here
+            String magicWord = MainService.getSettingsManager().smsMagicWord.trim().toLowerCase();
+            
             for (String sender : msg.keySet()) {
                 String message = msg.get(sender);
-                if (message.trim().toLowerCase().compareTo("gtalksms") == 0) {
+                if (message.trim().toLowerCase().compareTo(magicWord) == 0) {
                     Log.i("Connection command received by SMS from " + sender + " issuing intent " + MainService.ACTION_CONNECT);
                     Tools.startSvcIntent(context, MainService.ACTION_CONNECT);
                 }

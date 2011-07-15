@@ -110,5 +110,10 @@
                 android:title="@string/pref_app_connect_mainscreen" 
                 android:summary="@string/pref_app_connect_mainscreen_help" 
                 android:defaultValue="false"/>
+            <EditTextPreference
+	            android:key="smsMagicWord"
+	            android:defaultValue="GTalkSMS"
+	            android:title="@string/pref_app_start_sms_key"
+	            android:summary="@string/pref_app_start_sms_key_help"/>
         </PreferenceScreen>
 </PreferenceScreen>
