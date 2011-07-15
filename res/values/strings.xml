@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="wizard">Setup wizard</string>
+    <string name="wizard">Setup wizard (Beta)</string>
     <string name="wizard_welcome_text">Welcome to the GTalkSMS setup wizard.\nPlease enter your XMPP (Jabber) or GTalk Address (username@googlemail.com) below. This Address will be able to control your android phone via Jabber/GTalk and will be notified about new events on your phone.</string>
     <string name="wizard_create_text">Choose your login and your password</string>
     <string name="wizard_delete_button">Delete</string>
