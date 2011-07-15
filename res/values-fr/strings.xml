@@ -61,6 +61,8 @@
     <string name="pref_app_connect_mainscreen_help">Connexion de GTalkSMS quand l\'écran d\'accueil est affiché</string>    
     <string name="pref_app_framebufferMode">Encodage images</string>
     <string name="pref_app_framebufferMode_help">Type d\'encodage utilisé par le driver graphique de votre téléphone</string>
+    <string name="pref_app_mark_read_on_send">Marquer les SMS comme lus sur une réponse</string>
+    <string name="pref_app_mark_read_on_send_help">Marquer automatiquement une conversation comme lue lorsqu\'on répond à la personne</string>
     <string name="pref_con">Connexion</string>
     <string name="pref_con_notified_address_cat">Adresse de notification</string>
     <string name="pref_con_notified_address">Adresse de notification</string>
