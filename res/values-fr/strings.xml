@@ -197,7 +197,7 @@
     <string name="chat_help_del_sms_sent">- %s: Supprime tous les SMS envoyé sans confirmation !</string>    
     <string name="chat_help_del_sms_last">- %1$s ou %2$s ou %3$s : Supprime les [number] derniers SMS, 1 par défaut.</string>    
     <string name="chat_help_del_sms_contact">- %s: Supprime tous les SMS échangés avec le contact spécifié sans confirmation !</string>    
-    <string name="chat_help_alias_general">%1$s: Permet la gestion d\'alias permanents qui peuvent être utilisés à la place d\'un nom de contact ou d\'un numéro de téléphone dans GTalkSMS</string>
+    <string name="chat_help_alias_general">- %1$s: Permet la gestion d\'alias permanents qui peuvent être utilisés à la place d\'un nom de contact ou d\'un numéro de téléphone dans GTalkSMS</string>
     <string name="chat_help_alias_add">- %1$s: Ajoute ou met à jour un alias.</string>
     <string name="chat_help_alias_del">- %1$s: Supprime un alias.</string>
     <string name="chat_help_alias_show">- %1$s: Affiche le détail d\'un alias. Si #aliasname# est \"all\", tous les alias sont affichés.</string>    
