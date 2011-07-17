@@ -63,6 +63,8 @@
     <string name="pref_app_connect_mainscreen">Verbinde bei Anwendungsstart</string>
     <string name="pref_app_mark_read_on_send">SMS automatisch als gelesen markieren</string>
     <string name="pref_app_mark_read_on_send_help">Markiert alle Nachrichten eines Kontaktes automatisch als gelesen, sobald man eine Nachricht an diesen sendet.</string>
+    <string name="pref_app_start_sms_key">Magic SMS</string>
+    <string name="pref_app_start_sms_key_help">Startet GTalkSMS sobald eine SMS mit diesem Inhalt empfangen wird.</string>
     <string name="pref_app_connect_mainscreen_help">Verbindet GTalkSMS automatisch wenn die Anwedung gestartet wird</string>    
     <string name="pref_con_notified_address_cat">Benachrichtigungs- / Steueradresse</string>
     <string name="pref_con_notified_address">Benachrichtigungs- / Steueradresse</string>
@@ -195,10 +197,10 @@
     <string name="chat_help_del_sms_sent">- %s: Lösche alle gesendeten SMS Nachrichten ohne Nachfrage!</string>
     <string name="chat_help_del_sms_last">- %1$s oder %2$s oder %3$s : Löscht letzten [number] SMS. Ohne Angabe einer Wertes wird nur die letzte gelöscht.</string>
     <string name="chat_help_del_sms_contact">- %s: Lösche alle SMS Nachrichten an und von dem gewählen Kontakt ohne Nachfrage!</string>
-    <string name="chat_help_alias_general">%1$s: Ermöglicht die erzeugung und aktualisierung von Aliasen, welche anstatt Namen oder Nummern verwendet werden können</string>
+    <string name="chat_help_alias_general">%1$s: Ermöglicht die Erzeugung und Bearbeitung von Aliasen, welche anstatt Namen oder Nummern verwendet werden können</string>
     <string name="chat_help_alias_add">- %1$s: Erzeugt oder aktulalisiert einen neuen Alias.</string>
     <string name="chat_help_alias_del">- %1$s: Löscht den Alias.</string>
-    <string name="chat_help_alias_show">- %1$s: Zeigt die Informationen über den Alias an. Fall #aliasname# gleich \"all\", werden alle bekannten Aliases ausgegeben.</string>
+    <string name="chat_help_alias_show">- %1$s: Zeigt die Informationen über den Alias an. Falls #aliasname# gleich \"all\", werden alle bekannten Aliases ausgegeben.</string>
     <string name="chat_help_bt_on">- %1$s oder %2$s: Aktiviert Bluetooth.</string>
     <string name="chat_help_bt_off">- %1$s oder %2$s: Deaktiviert Bluetooth.</string>
     <string name="chat_help_bt_state">- %1$s oder %2$s: Zeigt den aktuellen Bluetooth status an.</string>
