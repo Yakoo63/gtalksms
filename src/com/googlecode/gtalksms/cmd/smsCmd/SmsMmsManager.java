@@ -23,6 +23,11 @@ public class SmsMmsManager {
 
     private Context _context;
     private SettingsManager _settings;
+    
+    private static final String INBOX = "content://sms/inbox";
+    private static final String SENTBOX = "content://sms/sent";
+    private static final String COLUMNS[] = new String[] { "person", "address", "body", "date", "status" };
+    private static final String SORT_ORDER = "date DESC";
 
     public SmsMmsManager(SettingsManager settings, Context baseContext) {
         _settings = settings;
@@ -36,14 +41,14 @@ public class SmsMmsManager {
      */
     public ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName) {
         if (rawIds.size() > 0) {
-            return getAllSms("content://sms/inbox", false, contactName, "person IN (" + TextUtils.join(", ", rawIds) + ")", false);
+            return getAllSms(false, contactName, "person IN (" + TextUtils.join(", ", rawIds) + ")", false);
         }
         return new ArrayList<Sms>();
     }
     
     public ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName, String message) {
         if (rawIds.size() > 0) {
-            return getAllSms("content://sms/inbox", false, contactName, 
+            return getAllSms(false, contactName, 
                     "person IN (" + TextUtils.join(", ", rawIds) + ") and body LIKE '%" + StringFmt.encodeSQL(message) + "%'", false);
         }
         return new ArrayList<Sms>();
@@ -54,41 +59,59 @@ public class SmsMmsManager {
      * argument
      */
     public ArrayList<Sms> getAllSentSms() {
-        return getAllSms("content://sms/sent", true, null, null, true);
+        return getAllSms(true, null, null, true);
     }
     
     public ArrayList<Sms> getAllSentSms(String message) {
-        return getAllSms("content://sms/sent", true, null, "body LIKE '%" + StringFmt.encodeSQL(message) + "%'", true);
+        return getAllSms(true, null, "body LIKE '%" + StringFmt.encodeSQL(message) + "%'", true);
     }
 
     public ArrayList<Sms> getAllReceivedSms() {
-        return getAllSms("content://sms/inbox", false, null, null, false);
+        return getAllSms(false, null, null, false);
     }
 
     public ArrayList<Sms> getAllUnreadSms() {
-        return getAllSms("content://sms/inbox", false, null, "read = 0", false);
+        return getAllSms(false, null, "read = 0", false);
     }
     
-    private ArrayList<Sms> getAllSms(String folder, boolean isSentSms, String sender, String where, Boolean getMax) {
+    /**
+     * Returns an ArrayList with all SMS that match the given criteria.
+     * 
+     * @param outgoingSms
+     * @param sender
+     * @param where
+     * @param getMax
+     * @return
+     */
+    private ArrayList<Sms> getAllSms(boolean outgoingSms, String sender, String where, boolean getMax) {
         ArrayList<Sms> res = new ArrayList<Sms>();
-
+        String folder;
+        // Select the data resource based on the boolean flag
+        if (outgoingSms) {
+            folder = SENTBOX;
+        } else {
+            folder = INBOX;
+        }
+        
         Uri mSmsQueryUri = Uri.parse(folder);
-        String columns[] = new String[] { "person", "address", "body", "date", "status" };
-        String sortOrder = "date DESC";
 
-        Cursor c = _context.getContentResolver().query(mSmsQueryUri, columns, where, null, sortOrder);
-        int maxSms = _settings.smsNumber;
-        int nbSms = 0;
+        Cursor c = _context.getContentResolver().query(mSmsQueryUri, COLUMNS, where, null, SORT_ORDER);
+        final int maxSms = _settings.smsNumber;
+        int smsCount = 0;
 
         if (c != null) {
-            for (boolean hasData = c.moveToFirst(); hasData && (getMax || nbSms < maxSms); hasData = c.moveToNext(), ++nbSms) {
+            for (boolean hasData = c.moveToFirst(); hasData && (getMax || smsCount < maxSms); hasData = c.moveToNext(), ++smsCount) {
                 String address = Tools.getString(c, "address");
-                Sms sms = new Sms(address, Tools.getString(c, "body"),  Tools.getDateMilliSeconds(c, "date"));
-                String receiver = isSentSms ? ContactsManager.getContactName(_context, address) : _context.getString(R.string.chat_me);
-                if (sender == null) {
-                    sender = isSentSms ? _context.getString(R.string.chat_me) : ContactsManager.getContactName(_context, Tools.getLong(c, "person"));
+                String receiver = outgoingSms ? ContactsManager.getContactName(_context, address) : _context.getString(R.string.chat_me);
+                Sms sms = new Sms(address, Tools.getString(c, "body"),  Tools.getDateMilliSeconds(c, "date"), receiver);
+                String currentSender = sender;                
+                if (currentSender == null) {
+                    currentSender = outgoingSms ? _context.getString(R.string.chat_me) : ContactsManager.getContactName(_context, Tools.getLong(c, "person"));
                 }
-                sms.setSender(sender + " --> " + receiver);
+                // Setting sender to null here is OK, because it just means
+                // that the name of the sender could not be determined
+                // and therefore the number will be used
+                sms.setSender(currentSender);
                 res.add(sms);
             }
             c.close();

@@ -2,7 +2,13 @@ package com.googlecode.gtalksms.cmd.smsCmd;
 
 import java.util.Date;
 
-
+/**
+ * This is "our" internal class for holding SMS information in memory
+ * It's currently used when:
+ * - querying for SMS messages
+ * - tracking delivery and sent notifications for SMS
+ *
+ */
 public class Sms implements Comparable<Sms> {
     private String message;          
     private String shortendMessage;
@@ -10,6 +16,7 @@ public class Sms implements Comparable<Sms> {
     private String sender;
     private String to;
     private String answerTo;
+    private String receiver;
     private Date date;
     private int resSentIntent;
     private int resDelIntent;
@@ -24,10 +31,11 @@ public class Sms implements Comparable<Sms> {
      * @param message
      * @param date
      */
-    public Sms(String phoneNumber, String message, Date date) {
+    public Sms(String phoneNumber, String message, Date date, String receiver) {
     	this.setNumber(phoneNumber);
     	this.setMessage(message);
     	this.date = date;
+    	this.receiver = receiver;
     }
     
     /**
@@ -135,7 +143,16 @@ public class Sms implements Comparable<Sms> {
     }
 
     public String getSender() {
-        return sender;
+        if (sender != null) {
+            return sender;    
+        } else {
+            return number;
+        }
+        
+    }
+    
+    public String getReceiver() {
+        return receiver;
     }
 
     public void setTo(String to) {

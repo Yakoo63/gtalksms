@@ -386,7 +386,7 @@ public class SmsCmd extends CommandHandlerBase {
      * @param sms
      */
     private static void appendSMS(XmppMsg msg, Sms sms) {
-        msg.appendItalicLine(sms.getDate().toLocaleString() + " - " + sms.getSender());
+        msg.appendItalicLine(sms.getDate().toLocaleString() + " - " + sms.getSender() + " --> " + sms.getReceiver());
         msg.appendLine(sms.getMessage());
     }
 
@@ -431,13 +431,13 @@ public class SmsCmd extends CommandHandlerBase {
     /**
      * reads (count) SMS from all contacts matching pattern
      * 
-     *  @param searchedText 
+     *  @param namePattern 
      */
-    private void readSMS(String searchedText) {
+    private void readSMS(String namePattern) {
         // We do not use the ContactsResolver here because readSMS() has 
         // a slightly different behavior when searching for contacts
-        searchedText = mAliasHelper.convertAliasToNumber(searchedText);
-        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, searchedText);
+        namePattern = mAliasHelper.convertAliasToNumber(namePattern);
+        ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, namePattern);
         ArrayList<Sms> sentSms = new ArrayList<Sms>();
         if (sSettingsMgr.showSentSms) {
             sentSms = mSmsMmsManager.getAllSentSms();
@@ -479,7 +479,7 @@ public class SmsCmd extends CommandHandlerBase {
                 send(noSms);
             }
         } else {
-            send(R.string.chat_no_match_for, searchedText);
+            send(R.string.chat_no_match_for, namePattern);
         }
     }
 

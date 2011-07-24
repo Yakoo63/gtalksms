@@ -76,10 +76,10 @@ public class ContactsManager {
 
     /**
      * Tries to get the contact display name of the specified phone number.
-     * If not found, returns the argument.
+     * If not contact could be found null is returned.
      */
     public static String getContactName(Context ctx, long rawId) {
-        String res = ctx.getString(R.string.chat_call_unknown);
+        String res = null;
         
         ContentResolver resolver = ctx.getContentResolver();
         Cursor c = resolver.query(RawContacts.CONTENT_URI,
