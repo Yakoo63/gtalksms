@@ -48,8 +48,10 @@ public class ContactsManager {
     }
 
     /**
-     * Tries to get the contact display name of the specified phone number.
-     * If not found, returns the argument.
+     * Tries to get the contact's display name of the specified phone number.
+     * If not found, returns the argument. If there is an error or phoneNumber
+     * is null, R.string.chat_call_hidden will be returned.
+     * 
      */
     public static String getContactName (Context ctx, String phoneNumber) {
         String res;

@@ -20,11 +20,17 @@ public class PhoneCallListener extends PhoneStateListener {
     private MainService svc;
     private SettingsManager settingsMgr;
     
-    // android seems to send the intent not only once per call
+    // Android seems to send the intent not only once per call
     // but every 10 seconds for ongoing ringing
     // we prevent multiple "is calling" notifications with this boolean
     private static boolean manageIncoming = true;
 
+    /**
+     * incomingNumber is null when the caller ID is hidden
+     * 
+     * @param state
+     * @param incomingNumber
+     */
     public void onCallStateChanged(int state, String incomingNumber) {
         if (MainService.IsRunning) {
             switch (state) {
@@ -40,7 +46,10 @@ public class PhoneCallListener extends PhoneStateListener {
                 if (manageIncoming) {
                     manageIncoming = false;
                     String contact = ContactsManager.getContactName(svc, incomingNumber);
-                    if (!contact.equals(incomingNumber)) {
+                    // Display the incoming number with the contact name only
+                    // if it is not null (and therefore known) and if the contact
+                    // name could be determined
+                    if ((incomingNumber != null) && !contact.equals(incomingNumber)) {
                         contact = contact + " ( " + incomingNumber + " )";
                     }
                     svc.send(svc.getString(R.string.chat_is_calling, contact), null);
