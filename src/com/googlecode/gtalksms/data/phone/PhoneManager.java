@@ -47,7 +47,7 @@ public class PhoneManager {
             for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
                 Call call = new Call();
                 call.phoneNumber = Tools.getString(c, CallLog.Calls.NUMBER);
-                if (call.phoneNumber.equals("-1")) {
+                if (call.phoneNumber.equals("-1") || call.phoneNumber.equals("-2")) {
                     call.phoneNumber = null;
                 }
                 call.duration = Tools.getLong(c, CallLog.Calls.DURATION);
