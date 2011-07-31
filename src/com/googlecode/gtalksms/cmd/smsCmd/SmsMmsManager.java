@@ -41,7 +41,7 @@ public class SmsMmsManager {
      */
     public ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName) {
         if (rawIds.size() > 0) {
-            return getAllSms(false, contactName, "person IN (" + TextUtils.join(", ", rawIds) + ")", false);
+            return getAllSms(false, contactName, "person IN (" + TextUtils.join(", ", rawIds) + ") or person is null", false);
         }
         return new ArrayList<Sms>();
     }
@@ -49,7 +49,7 @@ public class SmsMmsManager {
     public ArrayList<Sms> getSms(ArrayList<Long> rawIds, String contactName, String message) {
         if (rawIds.size() > 0) {
             return getAllSms(false, contactName, 
-                    "person IN (" + TextUtils.join(", ", rawIds) + ") and body LIKE '%" + StringFmt.encodeSQL(message) + "%'", false);
+                    "(person IN (" + TextUtils.join(", ", rawIds) + ") or person is null) and body LIKE '%" + StringFmt.encodeSQL(message) + "%'", false);
         }
         return new ArrayList<Sms>();
     }
@@ -101,13 +101,26 @@ public class SmsMmsManager {
 
         if (c != null) {
             for (boolean hasData = c.moveToFirst(); hasData && (getMax || smsCount < maxSms); hasData = c.moveToNext(), ++smsCount) {
-                String address = Tools.getString(c, "address");
-                String receiver = outgoingSms ? ContactsManager.getContactName(_context, address) : _context.getString(R.string.chat_me);
-                Sms sms = new Sms(address, Tools.getString(c, "body"),  Tools.getDateMilliSeconds(c, "date"), receiver);
-                String currentSender = sender;                
-                if (currentSender == null) {
-                    currentSender = outgoingSms ? _context.getString(R.string.chat_me) : ContactsManager.getContactName(_context, Tools.getLong(c, "person"));
+            	Long rawId = Tools.getLong(c, "person");
+            	String address = Tools.getString(c, "address");
+            	String addressName = ContactsManager.getContactName(_context, address);
+            	
+            	// Sometime, if it's only an external contact to gmail (exchange by instance)
+            	// the rawId is not set and with have to check the address (phone number)
+            	if (!outgoingSms && rawId == 0 && sender != null && addressName.compareTo(sender) != 0) {
+            		smsCount--;
+                	continue;
                 }
+            	
+            	String receiver = outgoingSms ? addressName : _context.getString(R.string.chat_me);
+                String body = 	Tools.getString(c, "body");
+                Sms sms = new Sms(address, body,  Tools.getDateMilliSeconds(c, "date"), receiver);
+                String currentSender = sender;   
+                
+                if (currentSender == null) {
+                    currentSender = outgoingSms ? _context.getString(R.string.chat_me) : addressName;
+                }
+                
                 // Setting sender to null here is OK, because it just means
                 // that the name of the sender could not be determined
                 // and therefore the number will be used
