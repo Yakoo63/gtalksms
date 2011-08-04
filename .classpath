@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="lib/asmack-jse.jar" sourcepath="lib/asmack-jse-source.zip">
+	<classpathentry kind="lib" path="lib/asmack-android-5.jar" sourcepath="lib/asmack-android-5-source.zip">
 		<attributes>
 			<attribute name="javadoc_location" value="http://www.igniterealtime.org/builds/smack/docs/3.1.0/javadoc/"/>
 		</attributes>
