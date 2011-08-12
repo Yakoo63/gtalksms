@@ -22,13 +22,15 @@ public class FileCmd extends CommandHandlerBase {
     private File landingDir;
     private File sendDir;  // where the files come from if send:filename is given
     private KeyValueHelper keyValueHelper;
+    private XmppFileManager mXmppFileManager;
 
     private Exception ex;
     
     public FileCmd(MainService mainService) {
         super(mainService, new String[] {"send", "ls"}, CommandHandlerBase.TYPE_SYSTEM);
+        mXmppFileManager = XmppFileManager.getInstance(sContext);
         try {
-            landingDir = XmppFileManager.getLandingDir();
+            landingDir = mXmppFileManager.getLandingDir();
         } catch (Exception e) {
             ex = e;
         }
@@ -82,7 +84,7 @@ public class FileCmd extends CommandHandlerBase {
                     send(R.string.chat_file_transfer_refused);
                     return;
                 } else if (transfer.getStatus() == FileTransfer.Status.error) {
-                    send(XmppFileManager.returnAndLogError(transfer));
+                    send(mXmppFileManager.returnAndLogError(transfer));
                     return;
                 } else if (transfer.getStatus() == FileTransfer.Status.negotiating_transfer) {
                     // user has not accepted the transfer yet
@@ -93,7 +95,7 @@ public class FileCmd extends CommandHandlerBase {
                     currentCycle++;
                 }
                 if (currentCycle > MAX_CYCLES) {
-                    send(XmppFileManager.returnAndLogError(transfer));
+                    send(mXmppFileManager.returnAndLogError(transfer));
                     break;
                 }
                 Thread.sleep(1000);

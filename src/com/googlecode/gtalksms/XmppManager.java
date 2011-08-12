@@ -112,7 +112,7 @@ public class XmppManager {
     private static int newConnectionCount = 0;
         
     // Our current retry attempt, plus a runnable and handler to implement retry
-    private static int _currentRetryCount = 0;
+    private static int sCurrentRetryCount = 0;
     private static Runnable _reconnectRunnable = new Runnable() {
         public void run() {
             Log.i("attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
@@ -409,15 +409,15 @@ public class XmppManager {
             int timeout;
             updateStatus(WAITING_TO_CONNECT);
             cleanupConnection();
-            _currentRetryCount += 1;
-            if (_currentRetryCount < 20) {
+            sCurrentRetryCount += 1;
+            if (sCurrentRetryCount < 20) {
                 // a simple linear-backoff strategy.
-                timeout = 5000 * _currentRetryCount;
+                timeout = 5000 * sCurrentRetryCount;
             } else {
                 // every 5 min
                 timeout = 1000 * 60 * 5;
             }
-            Log.i("maybeStartReconnect scheduling retry in " + timeout);
+            Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + sCurrentRetryCount);
             _reconnectHandler.postDelayed(_reconnectRunnable, timeout);
     }
     
@@ -546,7 +546,7 @@ public class XmppManager {
             Tools.send((_context.getString(R.string.chat_welcome, Tools.getVersionName(_context))), null, _context);
         }
         
-        _currentRetryCount = 0;        
+        sCurrentRetryCount = 0;        
         updateStatus(CONNECTED);
     }
     
