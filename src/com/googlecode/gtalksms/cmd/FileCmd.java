@@ -27,7 +27,7 @@ public class FileCmd extends CommandHandlerBase {
     private Exception ex;
     
     public FileCmd(MainService mainService) {
-        super(mainService, new String[] {"send", "ls"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, new String[] {"send", "ls", "rm"}, CommandHandlerBase.TYPE_SYSTEM);
         mXmppFileManager = XmppFileManager.getInstance(sContext);
         try {
             landingDir = mXmppFileManager.getLandingDir();
@@ -48,6 +48,8 @@ public class FileCmd extends CommandHandlerBase {
             sendFile(args);
         } else if (cmd.equals("ls")) {
             ls(args);
+        } else if (cmd.equals("rm")) {
+            rm(args);
         }
     }
     
@@ -119,6 +121,23 @@ public class FileCmd extends CommandHandlerBase {
         }
     }
     
+    private void rm(String args) {
+        File f;
+        if (args.startsWith("/")) {
+            f = new File(args);
+        } else if (args.startsWith("./")) { // emulate the current working directory with help of sendDir
+            f = new File(sendDir, args.substring(1));
+        } else {
+            send("Wrong Syntax");
+            return;
+        }
+        if (f.delete()) {
+            send("Deleted " + f.getAbsoluteFile());
+        } else {
+            send("Failed to delete " + f.getAbsolutePath());
+        }
+    }
+    
     private void listDir(File dir) {
         if (dir.isDirectory()) {
             setSendDir(dir);
@@ -153,9 +172,9 @@ public class FileCmd extends CommandHandlerBase {
         String name = f.getName();
         long size = f.length(); // the size of the file in bytes
         if (size > 1023) {
-            msg.appendLine(getString(R.string.chat_file_transfer_file, name, size / 1024 + " KiB"));
+            msg.appendLine(name + " " + size / 1024 + " KiB");
         } else {
-            msg.appendLine(getString(R.string.chat_file_transfer_file, name, size + " B"));  
+            msg.appendLine(name + " " + size + " B");  
         }
     }
     
