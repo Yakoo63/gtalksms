@@ -1,3 +1,7 @@
+3.1
+* Bug fixes
+* New Xmpp library
+
 3.0
 * File transfer
 * Take photo and receive them via XMPP with front and back camera
