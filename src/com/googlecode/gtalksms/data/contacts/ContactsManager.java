@@ -258,7 +258,7 @@ public class ContactsManager {
                 if (phones.add(phone.getCleanNumber())) {
                     res.add(phone);
                 } else if (MainService.getSettingsManager().debugLog) {
-                    Log.i(Tools.LOG_TAG, "Duplicated phone number: " + number);
+                    Log.i(Tools.LOG_TAG, "getPhones(ids) Duplicated phone number: " + number);
                 }
             }
             c.close();
@@ -295,7 +295,7 @@ public class ContactsManager {
                         if (resPhones.add(phone.getCleanNumber())) {
                             res.add(phone);
                         } else if (MainService.getSettingsManager().debugLog) {
-                            Log.i(Tools.LOG_TAG, "Duplicated phone number: " + phone.getContactName() + " " + phone.getCleanNumber());
+                            Log.i(Tools.LOG_TAG, "getPhones(searchedText): Duplicated phone number: " + phone.getContactName() + " " + phone.getCleanNumber());
                         }
                     }
                 }

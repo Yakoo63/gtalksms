@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.telephony.SmsManager;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.smsCmd.DeliveredIntentReceiver;
@@ -409,22 +410,17 @@ public class SmsCmd extends CommandHandlerBase {
         }
     }
 
-    private void markSmsAsRead(String contact) {
-
-        if (Phone.isCellPhoneNumber(contact)) {
-            send(R.string.chat_mark_as_read, ContactsManager.getContactName(sContext, contact));
-            mSmsMmsManager.markAsRead(contact);
+    /**
+     * Marks all SMS from the given number a read.
+     * @param number The (cell) phone number, do not provide a contact name here!
+     */
+    private void markSmsAsRead(String number) {
+        if (Phone.isCellPhoneNumber(number)) {
+            send(R.string.chat_mark_as_read, ContactsManager.getContactName(sContext, number));
+            mSmsMmsManager.markAsRead(number);
         } else {
-            ArrayList<Phone> mobilePhones = ContactsManager.getMobilePhones(sContext, contact);
-            if (mobilePhones.size() > 0) {
-                send(R.string.chat_mark_as_read, mobilePhones.get(0).getContactName());
-
-                for (Phone phone : mobilePhones) {
-                    mSmsMmsManager.markAsRead(phone.getNumber());
-                }
-            } else {
-                send(R.string.chat_no_match_for, contact);
-            }
+            Log.e("markSmsAsRead() called with a contact name and not with a number");
+            throw new IllegalStateException("markSmsAsRead() called with a contact name and not with a number");
         }
     }
 

@@ -184,6 +184,7 @@ public class CameraCmd extends CommandHandlerBase {
             camera.takePicture(cb, null, pictureCallback);
         } catch (Exception e) {
             send(R.string.chat_camera_error_picture, e.getLocalizedMessage());
+            cleanUp();
         }
     }
        
