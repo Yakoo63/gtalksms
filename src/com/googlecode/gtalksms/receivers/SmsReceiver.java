@@ -11,6 +11,7 @@ import android.telephony.SmsMessage;
 
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 
@@ -18,8 +19,12 @@ public class SmsReceiver extends BroadcastReceiver {
     
     @Override
     public void onReceive(Context context, Intent intent) {
+        // TODO remove the settingsManager when issues 203 and 149 are resolved
+        Log.initialize(SettingsManager.getSettingsManager(context));
+        
         // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
         // However, send long SMS of same sender in one message
+        Log.i("SmsReceiver: got new sms intent, calling RetriefeMessages");
         Map<String, String> msg = RetrieveMessages(intent);
            
         if (MainService.IsRunning) {
@@ -27,6 +32,7 @@ public class SmsReceiver extends BroadcastReceiver {
             for (String sender : msg.keySet()) {
                 Intent svcintent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
                 svcintent.putExtra("sender", sender);
+                Log.i("SmsReceiver: Issuing service intent for incoming SMS. sender=" + sender + " message=" + msg.get(sender).substring(0,  20));
                 context.startService(svcintent);
             }
         // MainService is not active, test if we find a sms with the magic word
