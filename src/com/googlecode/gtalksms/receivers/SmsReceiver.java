@@ -24,7 +24,7 @@ public class SmsReceiver extends BroadcastReceiver {
         
         // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
         // However, send long SMS of same sender in one message
-        Log.i("SmsReceiver: got new sms intent, calling RetriefeMessages");
+        Log.i("SmsReceiver: got new sms intent, calling RetrieveMessages");
         Map<String, String> msg = RetrieveMessages(intent);
            
         if (MainService.IsRunning) {
