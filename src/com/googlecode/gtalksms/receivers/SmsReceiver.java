@@ -37,7 +37,7 @@ public class SmsReceiver extends BroadcastReceiver {
             }
         // MainService is not active, test if we find a sms with the magic word
         } else {
-            String magicWord = MainService.getSettingsManager().smsMagicWord.trim().toLowerCase();
+            String magicWord = SettingsManager.getSettingsManager(context).smsMagicWord.trim().toLowerCase();
             
             for (String sender : msg.keySet()) {
                 String message = msg.get(sender);

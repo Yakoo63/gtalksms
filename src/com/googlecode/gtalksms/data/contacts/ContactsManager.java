@@ -19,6 +19,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
@@ -257,7 +258,7 @@ public class ContactsManager {
     
                 if (phones.add(phone.getCleanNumber())) {
                     res.add(phone);
-                } else if (MainService.getSettingsManager().debugLog) {
+                } else if (SettingsManager.getSettingsManager(ctx).debugLog) {
                     Log.i(Tools.LOG_TAG, "getPhones(ids) Duplicated phone number: " + number);
                 }
             }
@@ -294,7 +295,7 @@ public class ContactsManager {
                         phone.setContactName(contact.name);
                         if (resPhones.add(phone.getCleanNumber())) {
                             res.add(phone);
-                        } else if (MainService.getSettingsManager().debugLog) {
+                        } else if (SettingsManager.getSettingsManager(ctx).debugLog) {
                             Log.i(Tools.LOG_TAG, "getPhones(searchedText): Duplicated phone number: " + phone.getContactName() + " " + phone.getCleanNumber());
                         }
                     }

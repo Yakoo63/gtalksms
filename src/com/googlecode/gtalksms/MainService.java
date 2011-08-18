@@ -466,10 +466,6 @@ public class MainService extends Service {
         }
     }
     
-    public static SettingsManager getSettingsManager() {
-        return _settingsMgr;
-    }
-    
     public void setKeyboard(KeyboardInputMethod keyboard) {
         _keyboard = keyboard;
     }

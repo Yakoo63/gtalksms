@@ -20,7 +20,7 @@ public abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
     
     public SmsPendingIntentReceiver(MainService mainService, Map<Integer, Sms> smsMap, SMSHelper smsHelper) {
         this.mainService = mainService;
-        this.settings = MainService.getSettingsManager();
+        this.settings = SettingsManager.getSettingsManager(mainService);
         this.smsMap = smsMap;
         this.smsHelper = smsHelper;
     }

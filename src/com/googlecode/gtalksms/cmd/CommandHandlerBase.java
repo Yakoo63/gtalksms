@@ -28,7 +28,7 @@ public abstract class CommandHandlerBase {
     CommandHandlerBase(MainService mainService, String[] commands, int cmdType) {
         if (sMainService == null) {
             sMainService = mainService;
-            sSettingsMgr = MainService.getSettingsManager();
+            sSettingsMgr = SettingsManager.getSettingsManager(sContext);
             sContext = mainService.getBaseContext();
         }
         this.mCommands = commands;
