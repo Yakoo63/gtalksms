@@ -27,25 +27,25 @@
             android:layout_width="match_parent" 
             android:layout_height="wrap_content"
             android:text="loginname" 
-            android:inputType="textPassword" />
+            android:inputType="textEmailAddress" />
         <TextView 
             android:text="@string/wizard_create_password1" 
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content" />
         <EditText 
             android:id="@+id/password1" 
-            android:inputType="textPassword" 
             android:layout_width="match_parent" 
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
         <TextView 
             android:text="@string/wizard_create_password2" 
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content" />
         <EditText 
             android:id="@+id/password2" 
-            android:inputType="textPassword" 
             android:layout_width="match_parent" 
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
             
     </LinearLayout>
     

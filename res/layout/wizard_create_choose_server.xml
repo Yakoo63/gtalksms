@@ -35,7 +35,8 @@
                 android:layout_height="wrap_content" 
                 android:text="jabber.ccc.de" 
                 android:id="@+id/textServer" 
-                android:layout_width="match_parent"/>
+                android:layout_width="match_parent"
+                android:inputType="textUri"/>
         </RadioGroup>
     
      </LinearLayout>
