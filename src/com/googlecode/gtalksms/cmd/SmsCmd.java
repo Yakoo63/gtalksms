@@ -38,15 +38,14 @@ public class SmsCmd extends CommandHandlerBase {
     private static boolean sSentIntentReceiverRegistered = false;
     private static boolean sDelIntentReceiverRegistered = false;
     private static Integer sSmsID;
+    private static BroadcastReceiver sSentSmsReceiver = null;
+    private static BroadcastReceiver sDeliveredSmsReceiver = null;
 
     private ContactsResolver mContactsResolver;
     private SmsMmsManager mSmsMmsManager;
     private String mLastRecipient = null;
     private String mLastRecipientName = null;    
-    private SetLastRecipientRunnable mSetLastrecipientRunnable;  
-    private BroadcastReceiver mSentSmsReceiver = null;
-    private BroadcastReceiver mDeliveredSmsReceiver = null;
-    
+    private SetLastRecipientRunnable mSetLastrecipientRunnable;    
     
     // synchronizedMap because the worker thread and the intent receivers work with this map
     private static Map<Integer, Sms> mSmsMap; 
@@ -70,17 +69,17 @@ public class SmsCmd extends CommandHandlerBase {
     
     public void setup() {
         if (sSettingsMgr.notifySmsSent && !sSentIntentReceiverRegistered) {
-            if (mSentSmsReceiver == null) {
-                mSentSmsReceiver = new SentIntentReceiver(sMainService, mSmsMap, mSmsHelper);
+            if (sSentSmsReceiver == null) {
+                sSentSmsReceiver = new SentIntentReceiver(sMainService, mSmsMap, mSmsHelper);
             }
-            sMainService.registerReceiver(mSentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
+            sMainService.registerReceiver(sSentSmsReceiver, new IntentFilter(MainService.ACTION_SMS_SENT));
             sSentIntentReceiverRegistered = true;
         }
         if (sSettingsMgr.notifySmsDelivered && !sDelIntentReceiverRegistered) {
-            if (mDeliveredSmsReceiver == null) {
-                mDeliveredSmsReceiver = new DeliveredIntentReceiver(sMainService, mSmsMap, mSmsHelper);
+            if (sDeliveredSmsReceiver == null) {
+                sDeliveredSmsReceiver = new DeliveredIntentReceiver(sMainService, mSmsMap, mSmsHelper);
             }
-            sMainService.registerReceiver(mDeliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
+            sMainService.registerReceiver(sDeliveredSmsReceiver, new IntentFilter(MainService.ACTION_SMS_DELIVERED));
             sDelIntentReceiverRegistered = true;
         }
     }
@@ -665,12 +664,12 @@ public class SmsCmd extends CommandHandlerBase {
     
     @Override
     public void cleanUp() {
-        if (mSentSmsReceiver != null && sSentIntentReceiverRegistered) {
-            sContext.unregisterReceiver(mSentSmsReceiver);
+        if (sSentSmsReceiver != null && sSentIntentReceiverRegistered) {
+            sContext.unregisterReceiver(sSentSmsReceiver);
             sSentIntentReceiverRegistered = false;
         }
-        if (mDeliveredSmsReceiver != null && sDelIntentReceiverRegistered) {
-            sContext.unregisterReceiver(mDeliveredSmsReceiver);
+        if (sDeliveredSmsReceiver != null && sDelIntentReceiverRegistered) {
+            sContext.unregisterReceiver(sDeliveredSmsReceiver);
             sDelIntentReceiverRegistered = false;
         }
     }    
