@@ -29,10 +29,13 @@ public abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
         int smsID = intent.getIntExtra("smsID", -1);
         int partNum = intent.getIntExtra("partNum", -1);
         int res = getResultCode();
+        // check if we found the sms in our database
         Sms s = getSms(smsID);
         if (s != null) {
+            // we have found a sms in our database
             onReceiveWithSms(context, s, partNum, res, smsID);
         } else {
+            // the sms is missing in our database
             onReceiveWithoutSms(context, partNum, res);
         }
     }

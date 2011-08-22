@@ -20,14 +20,14 @@ public class SmsReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO remove the settingsManager when issues 203 and 149 are resolved
-        Log.initialize(SettingsManager.getSettingsManager(context));
-        
-        // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
-        // However, send long SMS of same sender in one message
+        Log.initialize(SettingsManager.getSettingsManager(context));        
         Log.i("SmsReceiver: got new sms intent, calling RetrieveMessages");
         Map<String, String> msg = RetrieveMessages(intent);
            
-        if (MainService.IsRunning) {
+        if (msg == null) {
+          // unable to retrieve sms
+          return;  
+        } else if (MainService.IsRunning) {
             // send all SMS via XMPP by sender
             for (String sender : msg.keySet()) {
                 Intent svcintent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
@@ -50,31 +50,37 @@ public class SmsReceiver extends BroadcastReceiver {
     }
     
     private static Map<String, String> RetrieveMessages(Intent intent) {
-        Map<String, String> msg = new HashMap<String, String>();
-        Bundle bundle = intent.getExtras();
+        Map<String, String> msg = null; 
         SmsMessage[] msgs = null;
+        Bundle bundle = intent.getExtras();
         
         if (bundle != null && bundle.containsKey("pdus")) {
             Object[] pdus = (Object[]) bundle.get("pdus");
 
             if (pdus != null) {
                 int nbrOfpdus = pdus.length;
+                msg = new HashMap<String, String>(nbrOfpdus);
                 msgs = new SmsMessage[nbrOfpdus];
                 
+                // There can be multiple SMS from multiple senders, there can be a maximum of nbrOfpdus different senders
+                // However, send long SMS of same sender in one message
                 for (int i = 0; i < nbrOfpdus; i++) {
                     msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
                     
-                    String msgString = msg.get(msgs[i].getOriginatingAddress());
+                    String originatinAddress = msgs[i].getOriginatingAddress();
                     
                     // Check if index with number exists                    
-                    if(msgString == null) { // Index with number doesn't exist                                               
+                    if (msg.containsKey(originatinAddress)) { 
+                        // Index with number doesn't exist                                               
                         // Save string into associative array with sender number as index
                         msg.put(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody()); 
                         
-                    } else {    // Number has been there, add content
-                        // msgString already contains sms:sndrNbr:previousparts of SMS, just add this part
-                        msgString = msgString + msgs[i].getMessageBody();
-                        msg.put(msgs[i].getOriginatingAddress(), msgString);
+                    } else {    
+                        // Number has been there, add content but consider that
+                        // msg.get(originatinAddress) already contains sms:sndrNbr:previousparts of SMS, 
+                        // so just add the part of the current PDU
+                        String msgString = msg.get(originatinAddress) + msgs[i].getMessageBody();
+                        msg.put(originatinAddress, msgString);
                     }
                 }
             }
