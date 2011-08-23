@@ -37,9 +37,9 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 public class SmsCmd extends CommandHandlerBase {
     private static boolean sSentIntentReceiverRegistered = false;
     private static boolean sDelIntentReceiverRegistered = false;
-    private static Integer sSmsID;
     private static BroadcastReceiver sSentSmsReceiver = null;
     private static BroadcastReceiver sDeliveredSmsReceiver = null;
+    private static Integer sSmsID;
 
     private ContactsResolver mContactsResolver;
     private SmsMmsManager mSmsMmsManager;
@@ -63,10 +63,10 @@ public class SmsCmd extends CommandHandlerBase {
         mContactsResolver = ContactsResolver.getInstance(sContext);
         
         restoreSmsInformation();
-        setup();
         restoreLastRecipient();
+        setup();
     }
-    
+
     public void setup() {
         if (sSettingsMgr.notifySmsSent && !sSentIntentReceiverRegistered) {
             if (sSentSmsReceiver == null) {
@@ -567,9 +567,11 @@ public class SmsCmd extends CommandHandlerBase {
             mSmsMap.put(smsID, s);
             mSmsHelper.addSMS(s);
             if(sSettingsMgr.notifySmsSent) {
+                Log.i("SmsCmd sendSMSByPhoneNumber() - creating SentPendingIntents");
                 SentPenIntents = createSPendingIntents(messages.size(), smsID);
             }
             if(sSettingsMgr.notifySmsDelivered) {
+                Log.i("SmsCmd sendSMSByPhoneNumber() - creating DeliveredPendingIntents");
                 DelPenIntents = createDPendingIntents(messages.size(), smsID);
             }
         }

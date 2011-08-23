@@ -22,17 +22,18 @@ public class SmsReceiver extends BroadcastReceiver {
         // TODO remove the settingsManager when issues 203 and 149 are resolved
         Log.initialize(SettingsManager.getSettingsManager(context));        
         Log.i("SmsReceiver: got new sms intent, calling RetrieveMessages");
+        try {
         Map<String, String> msg = RetrieveMessages(intent);
            
         if (msg == null) {
-          // unable to retrieve sms
+          // unable to retrieve SMS
           return;  
         } else if (MainService.IsRunning) {
             // send all SMS via XMPP by sender
             for (String sender : msg.keySet()) {
                 Intent svcintent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg.get(sender), null);
                 svcintent.putExtra("sender", sender);
-                Log.i("SmsReceiver: Issuing service intent for incoming SMS. sender=" + sender + " message=" + msg.get(sender).substring(0,  20));
+                Log.i("SmsReceiver: Issuing service intent for incoming SMS. sender=" + sender + " message=" + Tools.shortenMessage(msg.get(sender)));
                 context.startService(svcintent);
             }
         // MainService is not active, test if we find a sms with the magic word
@@ -46,6 +47,9 @@ public class SmsReceiver extends BroadcastReceiver {
                     Tools.startSvcIntent(context, MainService.ACTION_CONNECT);
                 }
             }
+        }
+        } catch (Exception e) {
+            android.util.Log.i(Tools.LOG_TAG, "Ex in smsreceiver", e);
         }
     }
     
@@ -70,7 +74,7 @@ public class SmsReceiver extends BroadcastReceiver {
                     String originatinAddress = msgs[i].getOriginatingAddress();
                     
                     // Check if index with number exists                    
-                    if (msg.containsKey(originatinAddress)) { 
+                    if (!msg.containsKey(originatinAddress)) { 
                         // Index with number doesn't exist                                               
                         // Save string into associative array with sender number as index
                         msg.put(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody()); 
@@ -79,7 +83,8 @@ public class SmsReceiver extends BroadcastReceiver {
                         // Number has been there, add content but consider that
                         // msg.get(originatinAddress) already contains sms:sndrNbr:previousparts of SMS, 
                         // so just add the part of the current PDU
-                        String msgString = msg.get(originatinAddress) + msgs[i].getMessageBody();
+                        String previousparts = msg.get(originatinAddress);
+                        String msgString = previousparts + msgs[i].getMessageBody();
                         msg.put(originatinAddress, msgString);
                     }
                 }

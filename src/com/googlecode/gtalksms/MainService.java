@@ -201,12 +201,17 @@ public class MainService extends Service {
                 onCommandReceived(message, intent.getStringExtra("from"));
             }
         } else if (action.equals(ACTION_SMS_RECEIVED)) {
+            // A incoming SMS has been received by our SmsReceiver
             String number = intent.getStringExtra("sender");
             String name = ContactsManager.getContactName(this, number);
             String message = intent.getStringExtra("message");
             boolean roomExists = XmppMuc.getInstance(this).roomExists(number);
 
             Log.i(MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
+            
+            // The user wants to be notified in the same conversation window,
+            // which just means that we do not notify a MUC but the default
+            // notification address BUT ONLY IF THERE IS NO MUC ALREADY
             if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
                 XmppMsg msg = new XmppMsg();
                 msg.appendBold(getString(R.string.chat_sms_from, name));
@@ -216,6 +221,9 @@ public class MainService extends Service {
                     ((SmsCmd) _commands.get("sms")).setLastRecipient(number);
                 }
             }
+            // Forward the incoming SMS message to an MUC
+            // either because the user want's all notifications in MUCs or
+            // because there is already an MUC for the senders number
             if (_settingsMgr.notifySmsInChatRooms || roomExists) {
                 try {
                     XmppMuc.getInstance(this).writeRoom(number, name, message, XmppMuc.MODE_SMS);

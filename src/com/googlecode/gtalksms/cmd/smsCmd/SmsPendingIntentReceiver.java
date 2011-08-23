@@ -2,6 +2,7 @@ package com.googlecode.gtalksms.cmd.smsCmd;
 
 import java.util.Map;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.databases.SMSHelper;
@@ -29,6 +30,7 @@ public abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
         int smsID = intent.getIntExtra("smsID", -1);
         int partNum = intent.getIntExtra("partNum", -1);
         int res = getResultCode();
+        Log.i("PendingIntentReceiver onReceive(): intent=" + intent + " smsID= " + smsID + " partNum=" + partNum + " result=" + res);
         // check if we found the sms in our database
         Sms s = getSms(smsID);
         if (s != null) {
