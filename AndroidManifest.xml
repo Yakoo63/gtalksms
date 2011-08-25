@@ -133,6 +133,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" /> <!-- For answerRingingCall() -->
+    <uses-permission android:name="android.permission.CALL_PHONE" /> <!-- For endCall() -->
     
     <!--
     This declares that this app uses the instrumentation test runner targeting

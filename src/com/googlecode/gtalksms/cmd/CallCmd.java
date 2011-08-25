@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.cmd;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,8 @@ import com.googlecode.gtalksms.receivers.PhoneCallListener;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
+import com.android.internal.telephony.ITelephony;
+
 public class CallCmd extends CommandHandlerBase {
     private static boolean sListenerActive = false;
     private PhoneManager _phoneMgr;
@@ -26,7 +29,7 @@ public class CallCmd extends CommandHandlerBase {
     private ContactsResolver mContactsResolver = null;
         
     public CallCmd(MainService mainService) {
-        super(mainService, new String[] {"calls", "dial"}, CommandHandlerBase.TYPE_CONTACTS);
+        super(mainService, new String[] {"calls", "dial", "ignore", "reject"}, CommandHandlerBase.TYPE_CONTACTS);
         _phoneMgr = new PhoneManager(sContext);
         _telephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
         mContactsResolver = ContactsResolver.getInstance(sContext);
@@ -50,7 +53,11 @@ public class CallCmd extends CommandHandlerBase {
             dial(args);
         } else if (cmd.equals("calls")) {
             readCallLogs(args);
-        }  
+        } else if (cmd.equals("ignore")) {
+            ignoreIncomingCall();
+        } else if (cmd.equals("reject")) {
+            rejectIncomingCall();
+        }
     }
 
     /** reads last Call Logs from all contacts */
@@ -113,5 +120,44 @@ public class CallCmd extends CommandHandlerBase {
                 getString(R.string.chat_help_dial, makeBold("\"dial:#contact#\"")) 
                 };
         return s;
+    }
+    
+    /**
+     * Rejects an incoming call
+     * 
+     * @return true if an call was rejected, otherwise false 
+     */
+    private boolean rejectIncomingCall() {
+        send("Rejecting incoming Call");
+        ITelephony ts = getTelephonyService();
+        return ts.endCall();
+    }
+    
+    /**
+     * Ignores an incoming call
+     */
+    // TODO does not work atm gives:
+    // Exception: Neither user 10081 nor current process has android.permission.MODIFY_PHONE_STATE.
+    // Although the permission is in the manifest
+    private void ignoreIncomingCall() {
+        send("Ignoring incoming call");
+        ITelephony ts = getTelephonyService();
+        ts.silenceRinger();
+    }
+    
+    private ITelephony getTelephonyService() {
+        TelephonyManager tm = (TelephonyManager) sContext.getSystemService(Context.TELEPHONY_SERVICE);
+        com.android.internal.telephony.ITelephony telephonyService = null;
+        try {
+            @SuppressWarnings("rawtypes")
+            Class c = Class.forName(tm.getClass().getName());
+            @SuppressWarnings("unchecked")
+            Method m = c.getDeclaredMethod("getITelephony");
+            m.setAccessible(true);
+            telephonyService = (ITelephony) m.invoke(tm);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        return telephonyService;
     }
 }
