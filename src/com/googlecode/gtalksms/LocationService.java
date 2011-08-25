@@ -22,6 +22,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class LocationService extends Service {
 
@@ -57,7 +58,7 @@ public class LocationService extends Service {
         return allowedLocationProviders.contains(LocationManager.GPS_PROVIDER);
     }
 
-    private void setGPSStatus(final boolean newGPSStatus) {
+    private void setGPSStatus(final boolean newGPSStatus) throws Exception {
         String allowedLocationProviders = Settings.System.getString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED);
         // use the old way to get the GPS going
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
@@ -79,6 +80,7 @@ public class LocationService extends Service {
                 m.invoke(_locationManager, new Object[] {});
             } catch (Exception e) {
                 GoogleAnalyticsHelper.trackAndLogWarning("LocationService.setGPSStatus() exception on Android SDK Level: " + Build.VERSION.SDK_INT, e);
+                throw e;
             }
         // use the secuirty hole from http://code.google.com/p/android/issues/detail?id=7890
         } else {
@@ -88,7 +90,7 @@ public class LocationService extends Service {
                 intent.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
                 intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
                 intent.setData(Uri.parse("3"));
-                getApplicationContext().sendBroadcast(intent);
+                sendBroadcast(intent);
             }
         }
     }
@@ -98,21 +100,18 @@ public class LocationService extends Service {
      * @param location the location to send.
      */
     public void sendLocationUpdate(Location location) {
-        StringBuilder builder = new StringBuilder();
+        XmppMsg msg = new XmppMsg();
         if (_settingsManager.useGoogleMapUrl) {
-            builder.append("http://maps.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude() + Tools.LineSep);
+            msg.appendLine("http://maps.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude());
         }
         if (_settingsManager.useOpenStreetMapUrl) {
-            builder.append("http://www.openstreetmap.org/?mlat=" + location.getLatitude() + "&mlon=" + location.getLongitude() + "&zoom=14&layers=M" + Tools.LineSep);
+            msg.appendLine("http://www.openstreetmap.org/?mlat=" + location.getLatitude() + "&mlon=" + location.getLongitude() + "&zoom=14&layers=M");
         }
-        builder.append(getString(R.string.chat_geo_accuracy, location.getAccuracy()));
-        builder.append(Tools.LineSep);
-        builder.append(getString(R.string.chat_geo_altitude, location.getAltitude()));
-        builder.append(Tools.LineSep);
-        builder.append(getString(R.string.chat_geo_speed, location.getSpeed()));
-        builder.append(Tools.LineSep);
-        builder.append(getString(R.string.chat_geo_provider, location.getProvider()));
-        Tools.send(builder.toString(), answerTo, this);
+        msg.appendLine(getString(R.string.chat_geo_accuracy, location.getAccuracy()));
+        msg.appendLine(getString(R.string.chat_geo_altitude, location.getAltitude()));
+        msg.appendLine(getString(R.string.chat_geo_speed, location.getSpeed()));
+        msg.appendLine(getString(R.string.chat_geo_provider, location.getProvider()));
+        send(msg);
     }
 
     public void onStart(final Intent intent, int startId) {
@@ -132,14 +131,16 @@ public class LocationService extends Service {
         }
         
         answerTo = intent.getStringExtra("to");
-
-        try {
-            if (!getGPSStatus()) {
-                setGPSStatus(true);
-            }
-        }
-        catch (Exception e) {
-        }
+        
+        // try to enable the GPS
+        if (!getGPSStatus()) {
+			try {
+				setGPSStatus(true);
+			} catch (Exception e) {
+				send("Could not enable GPS: " + e);
+			}
+		}
+        
         _locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 if (isBetterLocation(location, _currentBestLocation)) {
@@ -163,7 +164,8 @@ public class LocationService extends Service {
             if (location != null) {
                 if (isBetterLocation(location, _currentBestLocation)) {
                     _currentBestLocation = location;
-                    Tools.send("Last known location", null, this);  //TODO localization
+                    //TODO localization
+                    send("Last known location");  
                     sendLocationUpdate(_currentBestLocation);
                 }
             }
@@ -180,6 +182,14 @@ public class LocationService extends Service {
             _locationManager = null;
             _locationListener = null;
         }
+    }
+    
+    private void send(String message) {
+    	Tools.send(message, answerTo, this);
+    }
+    
+    private void send(XmppMsg msg) {
+    	Tools.send(msg, answerTo, this);
     }
 
     /** 
