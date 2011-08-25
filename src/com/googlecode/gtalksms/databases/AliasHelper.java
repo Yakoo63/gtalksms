@@ -70,6 +70,7 @@ public class AliasHelper {
             return null;
         
         ArrayList<Phone> res;
+        // TODO use ContactsResolver here
         res = ContactsManager.getMobilePhones(ctx, name);
         if (res.size() == 1) {
             Phone p = res.get(0);

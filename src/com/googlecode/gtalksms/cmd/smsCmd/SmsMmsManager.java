@@ -162,8 +162,9 @@ public class SmsMmsManager {
      * Marks all SMS from a given phone number as read
      * 
      * @param smsNumber The phone number
+     * @return true if successfully, otherwise false
      */
-    public void markAsRead(String smsNumber) {
+    public boolean markAsRead(String smsNumber) {
         try {
             ContentResolver cr = _context.getContentResolver();
             Uri smsUri = Uri.parse("content://sms/inbox");
@@ -172,8 +173,10 @@ public class SmsMmsManager {
             values.put("read", "1");
             
             cr.update(smsUri, values, " address='" + smsNumber + "'", null);
+            return true;
         } catch (Exception e) {
-            Log.w("exception in setRead:", e);
+            Log.w("markAsRead() exception:", e);
+            return false;
         }
     }
 

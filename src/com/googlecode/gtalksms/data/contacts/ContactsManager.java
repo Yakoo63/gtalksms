@@ -17,7 +17,6 @@ import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
@@ -110,6 +109,7 @@ public class ContactsManager {
     }
 
     /**
+     * Returns all Contacts that match a given search String
      *  
      * @param ctx Application context
      * @param searchedName - the name of the contact or a phone number
@@ -206,6 +206,11 @@ public class ContactsManager {
 
     /**
      * Returns a ArrayList of <ContactAddress> containing email addresses which match to contact id
+     * You usually want to use ContactsResolver.resolveContact()
+     *      
+     * @param ctx
+     * @param ids
+     * @return
      */
     public static ArrayList<ContactAddress> getEmailAddresses(Context ctx, ArrayList<Long> ids) {
         ArrayList<ContactAddress> res = new ArrayList<ContactAddress>();
@@ -266,16 +271,15 @@ public class ContactsManager {
         }
              
         return res;
-    }
-    
-//    public static ArrayList<Phone> getPhonesNew(Context ctx, Long contactId) {
-//        ArrayList<Phone> res = new ArrayList<Phone>();
-//        return res;
-//    }
+    }    
 
     /**
-     * Returns a ArrayList < Phone >
-     * with all matching phones for the argument
+     * Search for all phones with owners containing searchedText
+     * You usually want to use ContactsResolver.resolveContact()
+     * 
+     * @param ctx
+     * @param searchedText
+     * @return ArrayList <Phone>
      */
     public static ArrayList<Phone> getPhones(Context ctx, String searchedText) {
         ArrayList<Phone> res = new ArrayList<Phone>();
@@ -306,8 +310,13 @@ public class ContactsManager {
     }
 
     /**
-     * Returns a ArrayList < Phone >
+     * Returns a ArrayList<Phone>
      * with all matching mobile phone for the argument
+     * You usually want to use ContactsResolver.resolveContact()
+     * 
+     * @param ctx
+     * @param searchedText
+     * @return ArrayList<Phone> 
      */
     public static ArrayList<Phone> getMobilePhones(Context ctx, String searchedText) {
         ArrayList<Phone> res = new ArrayList<Phone>();

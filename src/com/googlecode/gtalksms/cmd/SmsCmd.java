@@ -137,11 +137,11 @@ public class SmsCmd extends CommandHandlerBase {
             }
         } else if (command.equals("markasread") || command.equals("mar")) {
             if (args.length() > 0) {
-                markSmsAsRead(mAliasHelper.convertAliasToNumber(args));
+                markSmsAsRead(args);
             } else if (mLastRecipient == null) {
                 send(R.string.chat_error_no_recipient);
             } else {
-                markSmsAsRead(mLastRecipient);
+                markSmsAsReadByNumber(mLastRecipient, mLastRecipientName);
             }
         } else if (command.equals("chat")) {
         	if (args.length() > 0) {
@@ -408,18 +408,44 @@ public class SmsCmd extends CommandHandlerBase {
             askForMoreDetails(rc.getCandidates());
         }
     }
-
+    
+    /**
+     * Marks all SMS from a given contact or number read
+     * 
+     * @param contactInfo
+     */
+    private void markSmsAsRead(String contactInformation) {
+        ResolvedContact rc = mContactsResolver.resolveContact(contactInformation, ContactsResolver.TYPE_CELL);
+        if (rc == null) {
+            // this is a special case, where the user wants to mark a message
+            // with a named-operator string as read, see issue 149 
+            if (mSmsMmsManager.markAsRead(contactInformation)) {
+                send(R.string.chat_mark_as_read, contactInformation);
+            } else {
+                send(R.string.chat_no_match_for, contactInformation);
+            }
+        } else if (rc.isDistinct()) {
+            markSmsAsReadByNumber(rc.getNumber(), rc.getName());
+        } else {
+            askForMoreDetails(rc.getCandidates());
+        }
+    }
+    
     /**
      * Marks all SMS from the given number a read.
      * @param number The (cell) phone number, do not provide a contact name here!
+     * @param the name of the contact, use null if no name is known
      */
-    private void markSmsAsRead(String number) {
-        if (Phone.isCellPhoneNumber(number)) {
-            send(R.string.chat_mark_as_read, ContactsManager.getContactName(sContext, number));
-            mSmsMmsManager.markAsRead(number);
+    private void markSmsAsReadByNumber(String number, String name) {
+        if (!mSmsMmsManager.markAsRead(number)) {
+            send("Error marking SMS as read from number: " + number);
         } else {
-            Log.e("markSmsAsRead() called with a contact name and not with a number");
-            throw new IllegalStateException("markSmsAsRead() called with a contact name and not with a number");
+            // Inform the user about the success
+            if (name != null) {
+                send(R.string.chat_mark_as_read, name);
+            } else {
+                send(R.string.chat_mark_as_read, number);
+            }
         }
     }
 

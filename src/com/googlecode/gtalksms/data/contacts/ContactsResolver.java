@@ -47,7 +47,8 @@ public class ContactsResolver {
      * resolvedContact.isDistinct(), if there are no matching contacts, null
      * is returned.
      * If the ResolvedContact is not distinct, an array with possible candidates
-     * can be retrieved via ResolvedContact.getCandidates()
+     * can be retrieved via ResolvedContact.getCandidates() and presented the 
+     * user.
      *  
      * @param contactInformation
      * @param searchType
@@ -72,7 +73,7 @@ public class ContactsResolver {
         case TYPE_CELL:
             phones = ContactsManager.getMobilePhones(sContext, contactInformation);
             break;
-        default: 
+        default:
             throw new IllegalStateException();
         }
         

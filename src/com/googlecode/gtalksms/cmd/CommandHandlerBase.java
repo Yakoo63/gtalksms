@@ -232,6 +232,14 @@ public abstract class CommandHandlerBase {
     	return sSettingsMgr;
     }
     
+    /**
+     * This method presents the user with possible candidates, when the user
+     * given contact information is not distinct enough, so that there are
+     * more possible contacts that match these informations.
+     * This is a quite common task, so it has its own method.
+     * 
+     * @param candidates
+     */
     protected void askForMoreDetails(ResolvedContact[] candidates) {
         XmppMsg msg = new XmppMsg(getString(R.string.chat_specify_details));
         msg.newLine();
