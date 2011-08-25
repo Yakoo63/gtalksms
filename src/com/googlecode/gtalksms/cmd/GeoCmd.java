@@ -51,7 +51,9 @@ public class GeoCmd extends CommandHandlerBase {
         }
     }
     
-    /** Starts the geolocation service */
+    /** 
+     * Starts the geolocation service 
+     */
     public void startLocatingPhone() {
         Intent intent = new Intent(sContext, LocationService.class);
         intent.setAction(LocationService.START_SERVICE);
@@ -59,7 +61,9 @@ public class GeoCmd extends CommandHandlerBase {
         sContext.startService(intent);
     }
 
-    /** Stops the geolocation service */
+    /** 
+     * Stops the geolocation service 
+     */
     public void stopLocatingPhone() {
         Intent intent = new Intent(sContext, LocationService.class);
         intent.setAction(LocationService.STOP_SERVICE);

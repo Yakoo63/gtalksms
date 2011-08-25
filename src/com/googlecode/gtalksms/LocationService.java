@@ -13,11 +13,14 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class LocationService extends Service {
@@ -46,8 +49,7 @@ public class LocationService extends Service {
     /*
      * http://www.maximyudin.com/2008/12/07/android/vklyuchenievyklyuchenie-gps-na-g1-programmno/
      */
-    private boolean getGPSStatus()
-    {
+    private boolean getGPSStatus() {
         String allowedLocationProviders = Settings.System.getString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED);
         if (allowedLocationProviders == null) {
             allowedLocationProviders = "";
@@ -55,29 +57,40 @@ public class LocationService extends Service {
         return allowedLocationProviders.contains(LocationManager.GPS_PROVIDER);
     }
 
-    private void setGPSStatus(boolean pNewGPSStatus)
-    {
+    private void setGPSStatus(final boolean newGPSStatus) {
         String allowedLocationProviders = Settings.System.getString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED);
-        if (allowedLocationProviders == null) {
+        // use the old way to get the GPS going
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
+            if (allowedLocationProviders == null) {
+                allowedLocationProviders = "";
+            }
+            boolean networkProviderStatus = allowedLocationProviders.contains(LocationManager.NETWORK_PROVIDER);
             allowedLocationProviders = "";
+            if (networkProviderStatus == true) {
+                allowedLocationProviders += LocationManager.NETWORK_PROVIDER;
+            }
+            if (newGPSStatus == true) {
+                allowedLocationProviders += "," + LocationManager.GPS_PROVIDER;
+            }
+            Settings.System.putString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
+            try {
+                Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
+                m.setAccessible(true);
+                m.invoke(_locationManager, new Object[] {});
+            } catch (Exception e) {
+                GoogleAnalyticsHelper.trackAndLogWarning("LocationService.setGPSStatus() exception on Android SDK Level: " + Build.VERSION.SDK_INT, e);
+            }
+        // use the secuirty hole from http://code.google.com/p/android/issues/detail?id=7890
+        } else {
+            // the GPS is not in the requested state
+            if (!allowedLocationProviders.contains("gps") == newGPSStatus) {                
+                final Intent intent = new Intent();
+                intent.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+                intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
+                intent.setData(Uri.parse("3"));
+                getApplicationContext().sendBroadcast(intent);
+            }
         }
-        boolean networkProviderStatus = allowedLocationProviders.contains(LocationManager.NETWORK_PROVIDER);
-        allowedLocationProviders = "";
-        if (networkProviderStatus == true) {
-            allowedLocationProviders += LocationManager.NETWORK_PROVIDER;
-        }
-        if (pNewGPSStatus == true) {
-            allowedLocationProviders += "," + LocationManager.GPS_PROVIDER;
-        }
-        Settings.System.putString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
-        try {
-            Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
-            m.setAccessible(true);
-            m.invoke(_locationManager, new Object[]{});
-        }
-        catch(Exception e) {
-        }
-        return;
     }
 
     /**
@@ -169,10 +182,13 @@ public class LocationService extends Service {
         }
     }
 
-    /** From the SDK documentation. Determines whether one Location reading is better than the current Location fix
-      * @param location  The new Location that you want to evaluate
-      * @param currentBestLocation  The current Location fix, to which you want to compare the new one
-      */
+    /** 
+     * From the SDK documentation. Determines whether one Location reading is better than the current Location fix
+     * 
+     * @param location  The new Location that you want to evaluate
+     * @param currentBestLocation  The current Location fix, to which you want to compare the new one
+     * @return true if the location is better then the currentBestLocation
+     */
     protected static boolean isBetterLocation(Location location, Location currentBestLocation) {
         if (currentBestLocation == null) {
             // A new location is always better than no location
