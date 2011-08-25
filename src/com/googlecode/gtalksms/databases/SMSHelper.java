@@ -79,6 +79,7 @@ public class SMSHelper {
         String sentIntentStr = SMSDatabase.getSentIntent(smsID);
         if (sentIntentStr != null) {
             char[] sentIntent = sentIntentStr.toCharArray();
+            // OoB check, see issue 187
             if (partNum < sentIntent.length) {
                 sentIntent[partNum] = 'X';
                 SMSDatabase.putSentIntent(smsID, sentIntent.toString());
@@ -95,8 +96,16 @@ public class SMSHelper {
         String delIntentStr = SMSDatabase.getDelIntent(smsID);
         if (delIntentStr != null) {
             char[] delIntent = delIntentStr.toCharArray();
-            delIntent[partNum] = 'X';
-            SMSDatabase.putDelIntent(smsID, delIntent.toString());
+            // OoB check, see issue 208
+            if (partNum < delIntent.length) {
+                delIntent[partNum] = 'X';
+                SMSDatabase.putDelIntent(smsID, delIntent.toString());
+            } else {
+                GoogleAnalyticsHelper.trackAndLogError("SMSHelper.setSentIntent() OutOfBounds: " +
+                        "partNum=" + partNum +
+                        " length=" + delIntent.length +
+                        " sentIntentSTr= " + delIntentStr);
+            }
         } // TODO handle null case
     }       
 }
