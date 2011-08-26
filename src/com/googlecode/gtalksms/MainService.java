@@ -150,6 +150,7 @@ public class MainService extends Service {
         }
         
         // Set Disconnected state by force to manage pending tasks
+        // This is not used any more
         if (intent.getBooleanExtra("force", false) && intent.getBooleanExtra("disconnect", false)) {
             // request to disconnect.
             _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
@@ -169,10 +170,11 @@ public class MainService extends Service {
         
         if (action.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
-                // request to disconnect.
+                // Request to disconnect. We will stop the service if
+                // we are in "DISCONNECTED" state at the end of the method
                 _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
             } else {
-                // a simple 'connect' request.
+                // A simple 'connect' request.
                 _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             }
         } else if (action.equals(ACTION_TOGGLE)) {     
@@ -275,11 +277,12 @@ public class MainService extends Service {
             GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
         Log.i("handled action '" + action + "' - state now: " + XmppManager.statusString());
+        
         // stop the service if we are disconnected (but stopping the service
         // doesn't mean the process is terminated - onStart can still happen.)
         if (getConnectionStatus() == XmppManager.DISCONNECTED) {
-            if (stopSelfResult(id) == true) {
-                Log.i("service is stopping (we are disconnected and no pending intents exist.)");
+            if (stopSelfResult(id)) {
+                Log.i("service is stopping because we are disconnected and no pending intents exist");
             } else {
                 Log.i("we are disconnected, but more pending intents to be delivered - service will not stop");
             }
@@ -433,7 +436,6 @@ public class MainService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.i("service destroyed");
         IsRunning = false;
         // If the _xmppManager is non-null, then our service was "started" (as
         // opposed to simply "created" - so tell the user it has stopped.
@@ -448,6 +450,7 @@ public class MainService extends Service {
         GoogleAnalyticsHelper.stop();
         _serviceLooper.quit();
         super.onDestroy();
+        Log.i("service destroyed");
     }    
     
     /**
