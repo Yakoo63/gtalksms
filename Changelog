@@ -1,3 +1,7 @@
+3.2
+* Bug fixes
+* Ignore / reject commands for phone calls
+
 3.1
 * Bug fixes
 * New Xmpp library
