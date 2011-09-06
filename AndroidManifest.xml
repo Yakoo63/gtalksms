@@ -65,7 +65,7 @@
         </receiver>
         <receiver android:name="com.googlecode.gtalksms.receivers.SmsReceiver">
             <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" android:priority="1010"/>
             </intent-filter>
         </receiver>
         <activity android:name="com.googlecode.gtalksms.receivers.UrlActivity" android:label="GTalkSMS">
