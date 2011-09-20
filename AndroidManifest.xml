@@ -2,8 +2,8 @@
 <manifest 
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms" 
-    android:versionName="3.2.1" 
-    android:versionCode="45">
+    android:versionName="3.2.2" 
+    android:versionCode="46">
     <uses-sdk 
         android:minSdkVersion="5" android:targetSdkVersion="10"/>
     <application 
@@ -65,7 +65,7 @@
         </receiver>
         <receiver android:name="com.googlecode.gtalksms.receivers.SmsReceiver">
             <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" android:priority="1010" />
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" android:priority="2147483647" />
             </intent-filter>
         </receiver>
         <activity android:name="com.googlecode.gtalksms.receivers.UrlActivity" android:label="GTalkSMS">
