@@ -198,7 +198,7 @@ public class SettingsManager {
             
             showStatusIcon = _sharedPreferences.getBoolean("showStatusIcon", true);
             
-            notifyApplicationConnection = _sharedPreferences.getBoolean("notifyApplicationConnection", falsex);
+            notifyApplicationConnection = _sharedPreferences.getBoolean("notifyApplicationConnection", false);
             notifyBattery = _sharedPreferences.getBoolean("notifyBattery", true);
             notifyBatteryInStatus = _sharedPreferences.getBoolean("notifyBatteryInStatus", true);
             batteryNotificationInterval = _sharedPreferences.getString("batteryNotificationInterval", "10");
