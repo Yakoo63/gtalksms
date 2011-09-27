@@ -32,6 +32,7 @@ public class About extends Activity {
     }
     
     public void updateConsole() {
+      // TODO use AsyncTask here
       TextView console = (TextView) findViewById(R.id.Text);
       console.setText("");
       console.append(StringFmt.Fmt(getString(R.string.about_website) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
