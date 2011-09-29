@@ -358,10 +358,10 @@ public class MainService extends Service {
         
         _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
         
-        Log.i("onCreate(): service thread created");
+        Log.i("onCreate(): service thread created - IsRunning is set to true");
         IsRunning = true; 
         
-        // it seems that with gingerbread android does not more issue null intents when restarting a service
+        // it seems that with gingerbread android doesn't issue null intents any more when restarting a service
         // but only calls the service's onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             int lastStatus = XmppStatus.getInstance(this).getLastKnowState();
@@ -382,7 +382,7 @@ public class MainService extends Service {
         if (intent == null) { 
             // The application has been killed by Android and
             // we try to restart the connection
-            // this null intent behavoir is only for SDK < 9
+            // this null intent behavior is only for SDK < 9
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
                 CrashedStartCounter.getInstance(getApplicationContext()).count();
                 startService(new Intent(MainService.ACTION_CONNECT));
@@ -436,10 +436,12 @@ public class MainService extends Service {
 
     @Override
     public void onDestroy() {
+    	Log.i("MainService onDestroy(): IsRunning is set to false");
         IsRunning = false;
         // If the _xmppManager is non-null, then our service was "started" (as
         // opposed to simply "created" - so tell the user it has stopped.
         if (_xmppMgr != null) {
+        	// do some cleanup
             unregisterReceiver(_xmppConChangedReceiver);
             _xmppConChangedReceiver = null;
             
@@ -450,7 +452,7 @@ public class MainService extends Service {
         GoogleAnalyticsHelper.stop();
         _serviceLooper.quit();
         super.onDestroy();
-        Log.i("service destroyed");
+        Log.i("MainService onDestroy(): service destroyed");
     }    
     
     /**
@@ -579,7 +581,8 @@ public class MainService extends Service {
             notification.flags |= Notification.FLAG_ONGOING_EVENT;
             notification.flags |= Notification.FLAG_NO_CLEAR;
             notification.tickerText = null;
-
+            // we respect androids rules and only set startForeground
+            // if _settingsMgr.showStatusIcon is true
             startForeground(ID, notification);
         }
     }
