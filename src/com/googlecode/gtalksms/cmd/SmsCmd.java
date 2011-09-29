@@ -98,8 +98,7 @@ public class SmsCmd extends CommandHandlerBase {
                 message = args.substring(separatorPos + 1);
             }
             
-            // If there is a message, send it. Contact should be a phone number
-            // by then. 
+            // If there is a message, send it.
             if (message != null && message.length() > 0) {
                 sendSMS(message, contactInformation);
             } else if (args.length() > 0) {

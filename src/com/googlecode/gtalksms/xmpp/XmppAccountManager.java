@@ -27,6 +27,8 @@ public class XmppAccountManager {
     public static XMPPConnection tryToCreateAccount(String username, String host, String password) throws XMPPException {
         username = needsDomainPart(username, host);
         
+        // TODO throws NetworkOnMainThreadException on Honycomb or higher
+        // Fix it!
         ConnectionConfiguration conf = new ConnectionConfiguration(host);
         XMPPConnection connection = new XMPPConnection(conf);
         connection.connect();
@@ -97,6 +99,9 @@ public class XmppAccountManager {
      */
     public static XMPPConnection makeConnectionAndSavePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) throws XMPPException {
         String domain = StringUtils.parseServer(jid);
+        
+        // TODO throws NetworkOnMainThreadException on Honycomb or higher
+        // Fix it!
         ConnectionConfiguration config = new ConnectionConfiguration(domain);
         XMPPConnection con = new XMPPConnection(config);
         con.connect();

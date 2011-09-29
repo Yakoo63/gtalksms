@@ -3,6 +3,7 @@ package com.googlecode.gtalksms.panels.wizard;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
+import android.os.AsyncTask;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -31,36 +32,53 @@ public class CreateButtonClickListener implements OnClickListener {
 
     @Override
     public void onClick(View v) {
+        class CreateAccountAsync extends AsyncTask<String, Float, Boolean> {
+            String mToastMessage;
+
+
+            @Override
+            protected Boolean doInBackground(String... params) {
+                String login = params[0];
+                String password = params[1];
+                XMPPConnection con = null;
+                mToastMessage = "Account succesfull created";
+                try {
+                    con = XmppAccountManager.tryToCreateAccount(login, mWizard.mChoosenServername, password);
+                    publishProgress(0.5f);
+                } catch (XMPPException e) {
+                    mToastMessage = e.getLocalizedMessage();
+                }
+                
+                if (con != null) {
+                    String jid = login + "@" + mWizard.mChoosenServername;
+                    // this will inform the XmppManager about the newly created
+                    // connection and also reuse the connection
+                    XmppManager.getInstance(mWizard, con);
+                    publishProgress(0.6f);
+                    // inform the service that it should be now in a CONNECTED state
+                    Tools.startSvcIntent(mWizard, MainService.ACTION_CONNECT);
+                    publishProgress(0.8f);
+                    XmppAccountManager.savePreferences(jid, password, mWizard.mNotifiedAddress, mSettingsMgr);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            protected void onPostExecute(Boolean success) {
+                if (success) {
+                    mWizard.initView(Wizard.VIEW_CREATE_SUCCESS);
+                }
+                MainService.displayToast(mToastMessage, null);
+            }
+
+        }
 
         String login = mTextUsername.getText().toString().trim();
         String psw1 = mTextPsw1.getText().toString().trim();
         String psw2 = mTextPsw2.getText().toString().trim();
         if (psw1.equals(psw2)) {
-            String res = "Error on account creation";
-            XMPPConnection con = null;
-            try {
-                con = XmppAccountManager.tryToCreateAccount(login, mWizard.mChoosenServername, psw1);
-            } catch (XMPPException e) {
-                res = e.getLocalizedMessage();
-            }
-            String toastMessage;
-            if (con != null) {
-                toastMessage = "Account succesfull created";
-            } else {
-                toastMessage = res;
-            }
-            MainService.displayToast(toastMessage, null);
-            
-            if (con != null) {
-                String jid = login + "@" + mWizard.mChoosenServername;
-                // this will inform the XmppManager about the newly created
-                // connection and also reuse the connection
-                XmppManager.getInstance(mWizard, con);
-                // inform the service that it should be now in a CONNECTED state
-                Tools.startSvcIntent(mWizard, MainService.ACTION_CONNECT);
-                XmppAccountManager.savePreferences(jid, psw1, mWizard.mNotifiedAddress, mSettingsMgr);
-                mWizard.initView(Wizard.VIEW_CREATE_SUCCESS);
-            }
+            CreateAccountAsync createAccountAsync = new CreateAccountAsync();
+            createAccountAsync.execute(login, psw1);
         } else {
             MainService.displayToast("The passwords do not match", null);
         }

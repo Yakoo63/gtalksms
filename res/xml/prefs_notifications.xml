@@ -3,10 +3,9 @@
   android:title="@string/pref_notif"
   xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
-        android:defaultValue="true"
         android:key="notifyApplicationConnection"
         android:title="@string/pref_notif_application_connection"
-        android:summary="@string/pref_notif_application_connection_help"/>
+        android:summary="@string/pref_notif_application_connection_help" android:defaultValue="false"/>
     <CheckBoxPreference
         android:key="notifyBattery"
         android:title="@string/pref_notif_battery_state"

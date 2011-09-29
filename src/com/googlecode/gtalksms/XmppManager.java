@@ -58,6 +58,7 @@ import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;
+import com.googlecode.gtalksms.xmpp.DnsSrvConnectionConfiguration;
 import com.googlecode.gtalksms.xmpp.PresencePacketListener;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
@@ -94,7 +95,7 @@ public class XmppManager {
     
     private static List<XmppConnectionChangeListener> connectionChangeListeners;
     private static XMPPConnection _connection = null;
-    private static XmppManager xmppManager;
+    private static XmppManager xmppManager = null;
     private static PacketListener _packetListener = null;
     
     private static PacketListener sPresencePacketListener = null;
@@ -125,7 +126,7 @@ public class XmppManager {
     private static  SettingsManager _settings;
     private static Context _context;
     
-    private XmppManager(Context context) {
+    private XmppManager(Context context, XMPPConnection connection) {
         connectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
         _settings = SettingsManager.getSettingsManager(context);
         Log.initialize(_settings);
@@ -153,18 +154,25 @@ public class XmppManager {
         SmackConfiguration.setPacketReplyTimeout(10000);      // 10 secs
         SmackConfiguration.setLocalSocks5ProxyEnabled(false);
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
-        _connection = createNewConnection();
+        _connection = connection;
     }
-        
+    
+    /**
+     * This getter creates the XmppManager and inits the XmppManager
+     * with a new connection with the current preferences.
+     * 
+     * @param ctx
+     * @return
+     */
     public static XmppManager getInstance(Context ctx) {
         if (xmppManager == null) {
-            xmppManager = new XmppManager(ctx);            
+            xmppManager = new XmppManager(ctx, createNewConnection(SettingsManager.getSettingsManager(ctx)));            
         }
         return xmppManager;
     }
     
     /**
-     * This getter is soley for the purpose that the setup wizard is able to
+     * This getter is solely for the purpose that the setup wizard is able to
      * inform the XmppManager that a new connection has been created
      * and that the XmppManager should use this connection from now on
      * 
@@ -174,14 +182,15 @@ public class XmppManager {
      */
     public static XmppManager getInstance(Context ctx, XMPPConnection connection) {
         if (xmppManager == null) {
-            xmppManager = new XmppManager(ctx);            
+            xmppManager = new XmppManager(ctx, connection);
+        } else {
+            // remove all possible references to the old connection
+            // note that this will note change sStatus
+            cleanupConnection();
+            // init XmppManager with the new connection
+            // setting up all packetListeners etc.
+            onConnectionEstablished(connection);
         }
-        // remove all possible references to the old connection
-        // note that this will note change sStatus
-        cleanupConnection();
-        // init XmppManager with the new connection
-        // setting up all packetListeners etc.
-        onConnectionEstablished(connection);
         return xmppManager;
     }
     
@@ -445,7 +454,7 @@ public class XmppManager {
                 || _connection == null 
                 || _connection.isConnected() ) {
             
-            connection = createNewConnection();
+            connection = createNewConnection(_settings);
             SettingsManager.connectionSettingsObsolete = false;
             if (!connectAndAuth(connection)) {
                 // connection failure
@@ -620,24 +629,33 @@ public class XmppManager {
         return true;
     }    
     
-    private static XMPPConnection createNewConnection() {
+    /**
+     * Parses the current preferences and returns an new unconnected
+     * XMPPConnection 
+     * @return
+     */
+    private static XMPPConnection createNewConnection(SettingsManager settings) {
         ConnectionConfiguration conf;
-        if (_settings.manuallySpecifyServerSettings) {
+        if (settings.manuallySpecifyServerSettings) {
             // trim the serverHost here because of Issue 122
-            conf = new ConnectionConfiguration(_settings.serverHost.trim(), _settings.serverPort, _settings.serviceName);
+            conf = new ConnectionConfiguration(settings.serverHost.trim(), settings.serverPort, settings.serviceName);
         } else {
             // DNS SRV lookup, yeah! :)
             // Note: The Emulator will throw here an BadAddressFamily Exception
             // but on a real device it just works fine
             // see: http://stackoverflow.com/questions/2879455/android-2-2-and-bad-address-family-on-socket-connect
             // and http://code.google.com/p/android/issues/detail?id=9431
-            conf = new ConnectionConfiguration(_settings.serviceName);
+            
+            // This throws NetworkOnMainThreadException on honeycomb or higher
+            // conf = new ConnectionConfiguration(settings.serviceName);
+            // so we have to do it in an thread
+            conf = DnsSrvConnectionConfiguration.getDnsSrvConnectionConfiguration(settings.serviceName);
         }
         
         conf.setTruststorePath("/system/etc/security/cacerts.bks");
         conf.setTruststorePassword("changeit");
         conf.setTruststoreType("bks");
-        switch (_settings.xmppSecurityModeInt) {
+        switch (settings.xmppSecurityModeInt) {
         case SettingsManager.XMPPSecurityOptional:
             conf.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
             break;
@@ -649,7 +667,7 @@ public class XmppManager {
             conf.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             break;
         }
-        if (_settings.useCompression) {
+        if (settings.useCompression) {
             conf.setCompressionEnabled(true);
         }
         

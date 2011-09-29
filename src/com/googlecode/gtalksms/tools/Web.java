@@ -33,7 +33,7 @@ public class Web {
             Log.d(Tools.LOG_TAG, "downloaded in" + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
 
         } catch (IOException e) {
-            Log.d(Tools.LOG_TAG, "Error: " + e);
+            Log.d(Tools.LOG_TAG, "IOException in DownloadFromUrl(): " + e);
         }
         return baf.toString();
     }

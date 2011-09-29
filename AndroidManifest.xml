@@ -2,10 +2,16 @@
 <manifest 
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms" 
-    android:versionName="3.2" 
-    android:versionCode="44">
+    android:versionName="3.2.2" 
+    android:versionCode="46">
     <uses-sdk 
         android:minSdkVersion="5" android:targetSdkVersion="10"/>
+    <uses-feature android:required="false" android:name="android.hardware.camera"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.camera.autofocus"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.location"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.location.gps"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.bluetooth"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.telephony"></uses-feature>
     <application 
         android:icon="@drawable/icon_green" 
         android:label="GTalkSMS" 
@@ -65,7 +71,8 @@
         </receiver>
         <receiver android:name="com.googlecode.gtalksms.receivers.SmsReceiver">
             <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <!-- Receiver priority is set to SYSTEM_HIGH + 10 -->
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" android:priority="1010" />
             </intent-filter>
         </receiver>
         <activity android:name="com.googlecode.gtalksms.receivers.UrlActivity" android:label="GTalkSMS">
