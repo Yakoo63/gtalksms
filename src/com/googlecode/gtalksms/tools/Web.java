@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -22,7 +23,7 @@ public class Web {
             long startTime = System.currentTimeMillis();
             Log.d(Tools.LOG_TAG, "Downloading url:" + url);
 
-            URLConnection ucon = url.openConnection();
+            HttpURLConnection ucon = (HttpURLConnection) url.openConnection();
             InputStream is = ucon.getInputStream();
             BufferedInputStream bis = new BufferedInputStream(is);
 
