@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -15,11 +16,14 @@ import android.content.Context;
 import android.util.Log;
 
 public class Web {
-    public static String DownloadFromUrl(String urlStr) {
-        StringBuffer baf = new StringBuffer(50);
-        try {
+    public static String DownloadFromUrl(String urlStr) throws MalformedURLException {
             URL url = new URL(urlStr);
-
+            return DownloadFromUrl(url);
+    }
+    
+    public static String DownloadFromUrl(URL url) {
+        StringBuffer baf = new StringBuffer(1024);
+        try {
             long startTime = System.currentTimeMillis();
             Log.d(Tools.LOG_TAG, "Downloading url:" + url);
 
