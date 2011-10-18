@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.AndroidConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
@@ -58,7 +59,6 @@ import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;
-import com.googlecode.gtalksms.xmpp.DnsSrvConnectionConfiguration;
 import com.googlecode.gtalksms.xmpp.PresencePacketListener;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
@@ -649,7 +649,11 @@ public class XmppManager {
             // This throws NetworkOnMainThreadException on honeycomb or higher
             // conf = new ConnectionConfiguration(settings.serviceName);
             // so we have to do it in an thread
-            conf = DnsSrvConnectionConfiguration.getDnsSrvConnectionConfiguration(settings.serviceName);
+            try {
+                conf = new AndroidConnectionConfiguration(settings.serviceName);
+            } catch (XMPPException e) {
+                throw new IllegalStateException(e);
+            }
         }
         
         conf.setTruststorePath("/system/etc/security/cacerts.bks");

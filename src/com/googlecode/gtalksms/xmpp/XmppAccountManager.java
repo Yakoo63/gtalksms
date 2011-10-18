@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms.xmpp;
 
 import org.jivesoftware.smack.AccountManager;
+import org.jivesoftware.smack.AndroidConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -15,7 +16,8 @@ public class XmppAccountManager {
     
     /**
      * Tries to create a new account with help of XMPP in-band registration
-     * and if successful returns the XMPPConnection on success, 
+     * and DNS SRV Records of the server.
+     * Returns the XMPPConnection on success, 
      * otherwise throws an XMPPException
      * 
      * @param jid
@@ -29,7 +31,7 @@ public class XmppAccountManager {
         
         // TODO throws NetworkOnMainThreadException on Honycomb or higher
         // Fix it!
-        ConnectionConfiguration conf = new ConnectionConfiguration(host);
+        ConnectionConfiguration conf = new AndroidConnectionConfiguration(host);
         XMPPConnection connection = new XMPPConnection(conf);
         connection.connect();
         AccountManager accManager = new AccountManager(connection);
@@ -102,7 +104,7 @@ public class XmppAccountManager {
         
         // TODO throws NetworkOnMainThreadException on Honycomb or higher
         // Fix it!
-        ConnectionConfiguration config = new ConnectionConfiguration(domain);
+        ConnectionConfiguration config = new AndroidConnectionConfiguration(domain);
         XMPPConnection con = new XMPPConnection(config);
         con.connect();
         con.login(jid, password);
