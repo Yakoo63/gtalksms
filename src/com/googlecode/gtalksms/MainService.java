@@ -21,6 +21,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 
 import com.googlecode.gtalksms.cmd.AliasCmd;
 import com.googlecode.gtalksms.cmd.BatteryCmd;
@@ -90,33 +91,33 @@ public class MainService extends Service {
     
     private static boolean sListenersActive = false;
 
-    private static SettingsManager _settingsMgr;
-    private static XmppManager _xmppMgr;
-    private static BroadcastReceiver _xmppConChangedReceiver;
-    private static KeyboardInputMethod _keyboard;
-    private static PendingIntent _contentIntent = null;
+    private static SettingsManager sSettingsMgr;
+    private static XmppManager sXmppMgr;
+    private static BroadcastReceiver sXmppConChangedReceiver;
+    private static KeyboardInputMethod sKeyboardInputMethod;
+    private static PendingIntent sContentIntent = null;
     
-    private static Map<String, CommandHandlerBase> _commands = new HashMap<String, CommandHandlerBase>();
-    private static Set<CommandHandlerBase> _commandSet = new HashSet<CommandHandlerBase>();
+    private static Map<String, CommandHandlerBase> sCommands = new HashMap<String, CommandHandlerBase>();
+    private static Set<CommandHandlerBase> sCommandSet = new HashSet<CommandHandlerBase>();
 
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
-    private final IBinder _binder = new LocalBinder();
+    private final IBinder mBinder = new LocalBinder();
 
-    private long _handlerThreadId;
+    private long mHandlerThreadId;
     
     // to get the helper use MainService.getAnalyticsHelper()
-    private static GoogleAnalyticsHelper _gAnalytics;
+    private static GoogleAnalyticsHelper sGoogleAnalytics;
     
-    private static Context _uiContext;
+    private static Context sUiContext;
     
-    private static volatile Handler _toastHandler = new Handler();  
+    private static volatile Handler sToastHandler = new Handler();  
     
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
     // control for "foreground" services.
-    private static volatile Looper _serviceLooper;
-    private static volatile ServiceHandler _serviceHandler;
+    private static volatile Looper sServiceLooper;
+    private static volatile ServiceHandler sServiceHandler;
     
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
@@ -153,10 +154,10 @@ public class MainService extends Service {
         // This is not used any more
         if (intent.getBooleanExtra("force", false) && intent.getBooleanExtra("disconnect", false)) {
             // request to disconnect.
-            _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+            sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
         }
 
-        if (Thread.currentThread().getId() != _handlerThreadId) {
+        if (Thread.currentThread().getId() != mHandlerThreadId) {
             throw new IllegalThreadStateException();
         }
         // We need to handle xmpp state changes which happened "externally" - eg,
@@ -172,20 +173,20 @@ public class MainService extends Service {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // Request to disconnect. We will stop the service if
                 // we are in "DISCONNECTED" state at the end of the method
-                _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+                sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
             } else {
                 // A simple 'connect' request.
-                _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+                sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             }
         } else if (action.equals(ACTION_TOGGLE)) {     
             switch (initialState) {
                 case XmppManager.CONNECTED:
                 case XmppManager.WAITING_TO_CONNECT:
                 case XmppManager.WAITING_FOR_NETWORK:
-                    _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+                    sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
                     break;
                 case XmppManager.DISCONNECTED:
-                    _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+                    sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
                     break;
                 default:
                     throw new IllegalStateException("Unkown initialState while handling" + MainService.ACTION_TOGGLE);
@@ -193,9 +194,9 @@ public class MainService extends Service {
         } else if (action.equals(ACTION_SEND)) {
             XmppMsg xmppMsg = (XmppMsg) intent.getParcelableExtra("xmppMsg");
             if (xmppMsg == null) {
-                _xmppMgr.send(new XmppMsg(intent.getStringExtra("message")), intent.getStringExtra("to"));
+                sXmppMgr.send(new XmppMsg(intent.getStringExtra("message")), intent.getStringExtra("to"));
             } else {
-                _xmppMgr.send(xmppMsg, intent.getStringExtra("to"));
+                sXmppMgr.send(xmppMsg, intent.getStringExtra("to"));
             }
         } else if (action.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
             String message = intent.getStringExtra("message");
@@ -214,19 +215,19 @@ public class MainService extends Service {
             // The user wants to be notified in the same conversation window,
             // which just means that we do not notify a MUC but the default
             // notification address BUT ONLY IF THERE IS NO MUC ALREADY
-            if (_settingsMgr.notifySmsInSameConversation && !roomExists) {
+            if (sSettingsMgr.notifySmsInSameConversation && !roomExists) {
                 XmppMsg msg = new XmppMsg();
                 msg.appendBold(getString(R.string.chat_sms_from, name));
                 msg.append(message);
-                _xmppMgr.send(msg, null);
-                if (_commands.containsKey("sms")) {
-                    ((SmsCmd) _commands.get("sms")).setLastRecipient(number);
+                sXmppMgr.send(msg, null);
+                if (sCommands.containsKey("sms")) {
+                    ((SmsCmd) sCommands.get("sms")).setLastRecipient(number);
                 }
             }
             // Forward the incoming SMS message to an MUC
             // either because the user want's all notifications in MUCs or
             // because there is already an MUC for the senders number
-            if (_settingsMgr.notifySmsInChatRooms || roomExists) {
+            if (sSettingsMgr.notifySmsInChatRooms || roomExists) {
                 try {
                     XmppMuc.getInstance(this).writeRoom(number, name, message, XmppMuc.MODE_SMS);
                 } catch (XMPPException e) {
@@ -237,7 +238,7 @@ public class MainService extends Service {
                     msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
-                    _xmppMgr.send(msg, null);
+                    sXmppMgr.send(msg, null);
                 }
             }
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
@@ -250,12 +251,12 @@ public class MainService extends Service {
             // We are in a waiting state and have a network - try to connect.
             if (available && ( initialState == XmppManager.WAITING_TO_CONNECT || 
             				   initialState == XmppManager.WAITING_FOR_NETWORK )) {
-                _xmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+                sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             } else if (!available && !failover && initialState == XmppManager.CONNECTED) {
                 // We are connected but the network has gone down - disconnect and go
                 // into WAITING state so we auto-connect when we get a future 
                 // notification that a network is available.
-                _xmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
+                sXmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
             }
         } else if (action.equals(ACTION_COMMAND)) {
             String cmd = intent.getStringExtra("cmd");
@@ -266,7 +267,7 @@ public class MainService extends Service {
                 String from = intent.getStringExtra("from");
                 // Send to the notification address (from = null) if the command is from a MUC
                 // and we don't want to be notified about status messages in MUCs
-                if (intent.getBooleanExtra("fromMuc", false) && !_settingsMgr.notifyInMuc) {
+                if (intent.getBooleanExtra("fromMuc", false) && !sSettingsMgr.notifyInMuc) {
                     from = null;
                 }
                 executeCommand(cmd, args, from);
@@ -290,33 +291,33 @@ public class MainService extends Service {
     }
 
     public int getConnectionStatus() {
-        return _xmppMgr == null ? XmppManager.DISCONNECTED : XmppManager.getConnectionStatus();
+        return sXmppMgr == null ? XmppManager.DISCONNECTED : XmppManager.getConnectionStatus();
     }
     
     public Map<String, CommandHandlerBase> getCommands() {
-        return _commands;
+        return sCommands;
     }
     
     public Set<CommandHandlerBase> getCommandSet() {
-        return _commandSet;
+        return sCommandSet;
     }
     
     public boolean getTLSStatus() {
         // null check necessary
-        return _xmppMgr == null ? false : XmppManager.getTLSStatus();
+        return sXmppMgr == null ? false : XmppManager.getTLSStatus();
     }
     
     public boolean getCompressionStatus() {
         // null check necessary
-    	return _xmppMgr == null ? false : XmppManager.getCompressionStatus();   	    
+    	return sXmppMgr == null ? false : XmppManager.getCompressionStatus();   	    
     }         
     
     public static GoogleAnalyticsHelper getAnalyticsHelper() {
-    	return _gAnalytics;
+    	return sGoogleAnalytics;
     }
 
     public void updateBuddies() {
-        if (_xmppMgr != null) {
+        if (sXmppMgr != null) {
             XmppBuddies.getInstance(this).retrieveFriendList();
         }
     }       
@@ -334,29 +335,29 @@ public class MainService extends Service {
     
     @Override
     public IBinder onBind(Intent intent) {
-        return _binder;
+        return mBinder;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        _gAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
-        _gAnalytics.trackInstalls();
+        sGoogleAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
+        sGoogleAnalytics.trackInstalls();
         
-        _settingsMgr = SettingsManager.getSettingsManager(this);
+        sSettingsMgr = SettingsManager.getSettingsManager(this);
         
-        Log.initialize(_settingsMgr);
-        Tools.setLocale(_settingsMgr, this);
+        Log.initialize(sSettingsMgr);
+        Tools.setLocale(sSettingsMgr, this);
         
         HandlerThread thread = new HandlerThread(SERVICE_THREAD_NAME);
         thread.start();
-        _handlerThreadId = thread.getId();
-        _serviceLooper = thread.getLooper();
-        _serviceHandler = new ServiceHandler(_serviceLooper);
+        mHandlerThreadId = thread.getId();
+        sServiceLooper = thread.getLooper();
+        sServiceHandler = new ServiceHandler(sServiceLooper);
         
-        _uiContext = this;
+        sUiContext = this;
         
-        _contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
+        sContentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
         
         Log.i("onCreate(): service thread created - IsRunning is set to true");
         IsRunning = true; 
@@ -378,7 +379,7 @@ public class MainService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        _gAnalytics.trackServiceStartsPerDay();
+        sGoogleAnalytics.trackServiceStartsPerDay();
         if (intent == null) { 
             // The application has been killed by Android and
             // we try to restart the connection
@@ -401,10 +402,10 @@ public class MainService extends Service {
         } else {
             // OK - a real action request - ensure xmpp is setup (but not yet connected)
             // in preparation for the worker thread performing the request.
-            if (_xmppMgr == null) {
+            if (sXmppMgr == null) {
                 // check if the user has done his part
-                if (_settingsMgr.notifiedAddress == null || _settingsMgr.notifiedAddress.equals("")
-                        || _settingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
+                if (sSettingsMgr.notifiedAddress == null || sSettingsMgr.notifiedAddress.equals("")
+                        || sSettingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
                     Log.w("Preferences not set! Opens preferences page.");
                     Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
                     settingsActivity.putExtra("panel", R.xml.prefs_connection);
@@ -413,7 +414,7 @@ public class MainService extends Service {
                     return START_STICKY;
                 }
 
-                _xmppConChangedReceiver = new BroadcastReceiver() {
+                sXmppConChangedReceiver = new BroadcastReceiver() {
                     public void onReceive(Context context, Intent intent) {
                         intent.setClass(MainService.this, MainService.class);
                         onConnectionStatusChanged(intent.getIntExtra("old_state", 0), intent.getIntExtra("new_state", 0));
@@ -421,15 +422,15 @@ public class MainService extends Service {
                     }
                 };
                 IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_CONNECTION_CHANGED);
-                registerReceiver(_xmppConChangedReceiver, intentFilter);
+                registerReceiver(sXmppConChangedReceiver, intentFilter);
                 setupCommands();
-                _xmppMgr = XmppManager.getInstance(getBaseContext());
+                sXmppMgr = XmppManager.getInstance(getBaseContext());
             }
             
-            Message msg = _serviceHandler.obtainMessage();
+            Message msg = sServiceHandler.obtainMessage();
             msg.arg1 = startId;
             msg.obj = intent;
-            _serviceHandler.sendMessage(msg);
+            sServiceHandler.sendMessage(msg);
         }
         return START_STICKY;
     }    
@@ -440,17 +441,17 @@ public class MainService extends Service {
         IsRunning = false;
         // If the _xmppManager is non-null, then our service was "started" (as
         // opposed to simply "created" - so tell the user it has stopped.
-        if (_xmppMgr != null) {
+        if (sXmppMgr != null) {
         	// do some cleanup
-            unregisterReceiver(_xmppConChangedReceiver);
-            _xmppConChangedReceiver = null;
+            unregisterReceiver(sXmppConChangedReceiver);
+            sXmppConChangedReceiver = null;
             
-            _xmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
-            _xmppMgr = null;
+            sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+            sXmppMgr = null;
         }
         teardownListenersForConnection();
         GoogleAnalyticsHelper.stop();
-        _serviceLooper.quit();
+        sServiceLooper.quit();
         super.onDestroy();
         Log.i("MainService onDestroy(): service destroyed");
     }    
@@ -472,19 +473,19 @@ public class MainService extends Service {
      * @param to - the receiving jid. if null the default notification address is used
      */
     public void send(XmppMsg msg, String to) {
-        if (_xmppMgr != null) {
-            _xmppMgr.send(msg, to);
+        if (sXmppMgr != null) {
+            sXmppMgr.send(msg, to);
         } else {
             GoogleAnalyticsHelper.trackAndLogError("MainService send XmppMsg: _xmppMgr == null");
         }
     }
     
     public void setKeyboard(KeyboardInputMethod keyboard) {
-        _keyboard = keyboard;
+        sKeyboardInputMethod = keyboard;
     }
     
     public KeyboardInputMethod getKeyboard() {
-        return _keyboard;
+        return sKeyboardInputMethod;
     }
     
     /**
@@ -495,7 +496,7 @@ public class MainService extends Service {
      * @param ctx
      */
     public static void displayToast(String text, String extraInfo) {      
-        _toastHandler.post(new DisplayToast(text, extraInfo, _uiContext));
+        sToastHandler.post(new DisplayToast(text, extraInfo, sUiContext));
     }
     
     /**
@@ -505,14 +506,14 @@ public class MainService extends Service {
      * @param extraInfo can be null
      */
     public static void displayToast(int i, String extraInfo) {
-        displayToast(_uiContext.getString(i), extraInfo);
+        displayToast(sUiContext.getString(i), extraInfo);
     }
     
     private void executeCommand(String cmd, String args, String answerTo) {
         assert(cmd != null);
-        if (_commands.containsKey(cmd)) {
+        if (sCommands.containsKey(cmd)) {
             try {
-                _commands.get(cmd).execute(cmd, args == null ? "" : args, answerTo);
+                sCommands.get(cmd).execute(cmd, args == null ? "" : args, answerTo);
             } catch (Exception e) {
                 String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
                 Log.e("executeCommand: " + error, e); 
@@ -525,7 +526,7 @@ public class MainService extends Service {
     }
     
     private int getImageStatus(int color) {
-        String index = _settingsMgr.displayIconIndex;
+        String index = sSettingsMgr.displayIconIndex;
         int res = 0;
         try {
             switch(color) {
@@ -547,7 +548,7 @@ public class MainService extends Service {
     
     /** Updates the status about the service state (and the status bar) */
     private void onConnectionStatusChanged(int oldStatus, int status) {
-        if (_settingsMgr.showStatusIcon) {
+        if (sSettingsMgr.showStatusIcon) {
             Notification notification = new Notification();
             String msg = null;
             switch (status) {
@@ -577,7 +578,7 @@ public class MainService extends Service {
             	throw new IllegalStateException("onConnectionSTatusChanged: Unkown status int");
             }
 
-            notification.setLatestEventInfo(getApplicationContext(), Tools.APP_NAME, msg, _contentIntent);
+            notification.setLatestEventInfo(getApplicationContext(), Tools.APP_NAME, msg, sContentIntent);
             notification.flags |= Notification.FLAG_ONGOING_EVENT;
             notification.flags |= Notification.FLAG_NO_CLEAR;
             notification.tickerText = null;
@@ -588,7 +589,7 @@ public class MainService extends Service {
     }
     
     /**
-     * Handels the different commands that came with the xmpp connection
+     * Handles the different commands that came with the XMPP connection
      * usually from an intent with ACTION_XMPP_MESSAGE_RECEIVED
      * 
      * @param commandLine
@@ -597,6 +598,8 @@ public class MainService extends Service {
         Log.d("onCommandReceived(): \"" + Tools.shortenMessage(commandLine) + "\"");
         String command;
         String args;
+        
+        // Split the command and args from the commandLine String and trim these
         if (commandLine.indexOf(":") != -1) {
             command = commandLine.substring(0, commandLine.indexOf(":")).trim();
             args = commandLine.substring(commandLine.indexOf(":") + 1);
@@ -607,6 +610,7 @@ public class MainService extends Service {
 
         // Not case sensitive commands
         command = command.toLowerCase();
+        
         if (command.equals("stop")) {
             send(getString(R.string.chat_stop_actions), from);
             stopCommands();
@@ -656,7 +660,7 @@ public class MainService extends Service {
      * Calls cleanUp() for every registered command
      */
     private static void cleanupCommands() {
-        for (CommandHandlerBase cmd : _commandSet) {
+        for (CommandHandlerBase cmd : sCommandSet) {
             try {
                 cmd.cleanUp();
             } catch (Exception e) {
@@ -669,7 +673,7 @@ public class MainService extends Service {
      * used to stop ongoing actions, like gps updates, ringing, ... 
      */
     private static void stopCommands() {
-        for(CommandHandlerBase c : _commandSet) {
+        for(CommandHandlerBase c : sCommandSet) {
             c.stop();
         }
     }
@@ -677,9 +681,9 @@ public class MainService extends Service {
     private static void registerCommand(CommandHandlerBase cmd) {
         String[] commands = cmd.getCommands();
         for (String c : commands) {
-            _commands.put(c, cmd);
+            sCommands.put(c, cmd);
         }
-        _commandSet.add(cmd);
+        sCommandSet.add(cmd);
     } 
     
     private int updateListenersToCurrentState(int currentState) {
@@ -716,7 +720,7 @@ public class MainService extends Service {
      */
     private void setupListenersForConnection() {
         Log.i("setupListenersForConnection()");          
-        for(CommandHandlerBase c : _commandSet) {
+        for(CommandHandlerBase c : sCommandSet) {
             c.setup();
         }
     }
