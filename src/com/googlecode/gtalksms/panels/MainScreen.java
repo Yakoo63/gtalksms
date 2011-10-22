@@ -255,14 +255,23 @@ public class MainScreen extends Activity implements InterstitialAdListener{
                 openLink("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted");
             }
         });
+        
+        Button marketBtn = (Button) findViewById(R.id.Market);
+        marketBtn.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                openLink("market://details?id=com.googlecode.gtalksmsdonate");
+            }
+        });
 
         // Set FREE label for not donate version
         if (isDonate) {
             ad.setVisibility(View.GONE);
             donateBtn.setVisibility(View.GONE);
+            marketBtn.setVisibility(View.GONE);
         } else {
             ad.setVisibility(View.VISIBLE);
             donateBtn.setVisibility(View.VISIBLE);
+            marketBtn.setVisibility(View.VISIBLE);
             _interstitialAd.requestAd(this); // request a new ad
         }
 

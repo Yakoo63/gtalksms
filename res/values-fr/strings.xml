@@ -120,7 +120,8 @@
     <string name="main_but_about">A propos</string>
     <string name="about_panel">A propos de GTalkSMS</string>
     <string name="main_panel">GTalkSMS</string>
-    <string name="main_but_donate">Donner</string>
+    <string name="main_but_donate">Donner sur Paypal</string>
+    <string name="main_but_market">Enlever pub (Market)</string>
     <string name="preference_panel">Préférences</string>
     <string name="log_panel_acquiring">Acquisition des logs</string>
     <string name="log_panel_collect">Récupère les logs de GTalkSMS et compose un nouveau message. Vous pouvez vous envoyer ce message et le joindre à un bug décrivant votre problème.</string>
