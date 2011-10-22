@@ -95,6 +95,8 @@ public class MainService extends Service {
     private static XmppManager sXmppMgr;
     private static BroadcastReceiver sXmppConChangedReceiver;
     private static KeyboardInputMethod sKeyboardInputMethod;
+    private static PowerManager sPm;
+    private static PowerManager.WakeLock sWl;
     private static PendingIntent sContentIntent = null;
     
     private static Map<String, CommandHandlerBase> sCommands = new HashMap<String, CommandHandlerBase>();
@@ -199,11 +201,14 @@ public class MainService extends Service {
                 sXmppMgr.send(xmppMsg, intent.getStringExtra("to"));
             }
         } else if (action.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
+            sWl.acquire();
             String message = intent.getStringExtra("message");
             if (message != null) {
                 onCommandReceived(message, intent.getStringExtra("from"));
             }
+            sWl.release();
         } else if (action.equals(ACTION_SMS_RECEIVED)) {
+            sWl.acquire();
             // A incoming SMS has been received by our SmsReceiver
             String number = intent.getStringExtra("sender");
             String name = ContactsManager.getContactName(this, number);
@@ -241,6 +246,7 @@ public class MainService extends Service {
                     sXmppMgr.send(msg, null);
                 }
             }
+            sWl.release();
         } else if (action.equals(ACTION_NETWORK_CHANGED)) {
             boolean available = intent.getBooleanExtra("available", true);
             boolean failover = intent.getBooleanExtra("failover", false);
@@ -341,8 +347,10 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        sGoogleAnalytics = new GoogleAnalyticsHelper(getApplicationContext());
+        sGoogleAnalytics = new GoogleAnalyticsHelper(this);
         sGoogleAnalytics.trackInstalls();
+        sPm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        sWl = sPm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, Tools.APP_NAME + " WakeLock");
         
         sSettingsMgr = SettingsManager.getSettingsManager(this);
         
