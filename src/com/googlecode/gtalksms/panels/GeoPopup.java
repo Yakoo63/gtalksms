@@ -32,7 +32,7 @@ public class GeoPopup extends Activity {
                     if (items[item].compareTo("Maps") == 0) {
                         intentUrl = "geo:" + url;
                     } else if (items[item].compareTo("Navigation") == 0) {
-                        intentUrl = "google.navigation:" + url;
+                        intentUrl = "google.navigation:q=" + url;
                     } else if (items[item].compareTo("Street View") == 0) {
                         intentUrl = "google.streetview:cbll=" + url;
                     }

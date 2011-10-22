@@ -149,9 +149,7 @@ public class CallCmd extends CommandHandlerBase {
         TelephonyManager tm = (TelephonyManager) sContext.getSystemService(Context.TELEPHONY_SERVICE);
         com.android.internal.telephony.ITelephony telephonyService = null;
         try {
-            @SuppressWarnings("rawtypes")
-            Class c = Class.forName(tm.getClass().getName());
-            @SuppressWarnings("unchecked")
+            Class<?> c = Class.forName(tm.getClass().getName());
             Method m = c.getDeclaredMethod("getITelephony");
             m.setAccessible(true);
             telephonyService = (ITelephony) m.invoke(tm);
