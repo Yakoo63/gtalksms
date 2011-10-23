@@ -63,6 +63,7 @@ import com.googlecode.gtalksms.xmpp.PresencePacketListener;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
+import com.googlecode.gtalksms.xmpp.XmppLocalS5BProxyManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
 import com.googlecode.gtalksms.xmpp.XmppOfflineMessages;
@@ -143,6 +144,7 @@ public class XmppManager {
         _xmppMuc.registerListener(this);
         sClientOfflineMessages.registerListener(this);
         sXmppPresenceStatus.registerListener(this);
+        XmppLocalS5BProxyManager.getInstance(context).registerListener(this);
         reusedConnectionCount = 0;
         newConnectionCount = 0;
         ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
@@ -152,7 +154,7 @@ public class XmppManager {
         }
         SmackConfiguration.setKeepAliveInterval(60000 * 5);  // 5 mins
         SmackConfiguration.setPacketReplyTimeout(15000);      // 10 secs
-        SmackConfiguration.setLocalSocks5ProxyEnabled(false);
+        SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
         _connection = connection;
     }
