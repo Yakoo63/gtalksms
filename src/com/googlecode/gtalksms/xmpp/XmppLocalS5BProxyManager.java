@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
 import com.googlecode.gtalksms.XmppManager;
@@ -37,9 +38,15 @@ public class XmppLocalS5BProxyManager {
         XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
             public void newConnection(XMPPConnection connection) {
                 maybeUpdateLocalIP();
+                disableStreamhostPrioritization(connection);
             }            
         };
         xmppMgr.registerConnectionChangeListener(listener);
+    }
+    
+    private void disableStreamhostPrioritization(XMPPConnection connection) {
+        Socks5BytestreamManager s5bsm = Socks5BytestreamManager.getBytestreamManager(connection);
+        s5bsm.setProxyPrioritizationEnabled(false);
     }
     
     private void maybeUpdateLocalIP() {
