@@ -44,7 +44,7 @@ public class XmppLocalS5BProxyManager {
         xmppMgr.registerConnectionChangeListener(listener);
     }
     
-    private void disableStreamhostPrioritization(XMPPConnection connection) {
+    private static void disableStreamhostPrioritization(XMPPConnection connection) {
         Socks5BytestreamManager s5bsm = Socks5BytestreamManager.getBytestreamManager(connection);
         s5bsm.setProxyPrioritizationEnabled(false);
     }
