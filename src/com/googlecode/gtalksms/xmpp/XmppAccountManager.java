@@ -75,6 +75,7 @@ public class XmppAccountManager {
      */
     public static void savePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) {
         Editor editor = settings.getEditor();
+        boolean useDifferentAccount;
         
         editor.putString("notifiedAddress", notifiedAddress);
         editor.putString("xmppSecurityMode", "opt");
@@ -83,11 +84,18 @@ public class XmppAccountManager {
         editor.putString("login", jid);
         editor.putString("password", password);
         
+        if (jid.equals(notifiedAddress)) {
+            useDifferentAccount = false;
+        } else {
+            useDifferentAccount = true;
+        }
+        editor.putBoolean("useDifferentAccount", useDifferentAccount);
+        
         editor.commit();
     }
     
     /**
-     * Tries to make a connection. If successfull returns this connection and 
+     * Tries to make a connection. If successful returns this connection and 
      * saves the settings. If jid == notifiedAddress, same account mode is
      * assumed.
      * Throws an XMPPException on error.
@@ -102,7 +110,7 @@ public class XmppAccountManager {
     public static XMPPConnection makeConnectionAndSavePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) throws XMPPException {
         String domain = StringUtils.parseServer(jid);
         
-        // TODO throws NetworkOnMainThreadException on Honycomb or higher
+        // TODO throws NetworkOnMainThreadException on Honeycomb or higher
         // Fix it!
         ConnectionConfiguration config = new AndroidConnectionConfiguration(domain);
         XMPPConnection con = new XMPPConnection(config);
