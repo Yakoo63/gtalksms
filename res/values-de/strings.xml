@@ -18,7 +18,7 @@
     <string name="wizard_manual_server">Ich kenne einen anderen Server auf dem ich ein Konto erstellen möchte</string>
     <string name="wizard_different_account">Erstelle eine extra Konto für GTalkSMS</string>
     <string name="wizard_existing_account">Verwende ein existierendes Konto exclusiv für GTalkSMS</string>    
-    <string name="wizard_same_account">Verwende das selbe Konto (NICHT EMPFHOLEN!)</string>
+    <string name="wizard_same_account">Verwende das selbe Konto (Nicht empfohlen!)</string>
     <string name="wizard_enter_login">Bestehendes Login und Passwort eingeben</string>
     <string name="pref_app">GTalkSMS Einstellungen</string>
     <string name="pref_app_advanced">Erweiterte Einstellungen</string>    
