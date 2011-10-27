@@ -267,7 +267,7 @@ public class LogCollector extends Activity {
     private String getPreferences() {
         StringBuilder res = new StringBuilder();
         res.append(Tools.APP_NAME + " Preferences" + LINE_SEPARATOR);
-        SettingsManager settings = SettingsManager.getSettingsManager(getBaseContext());
+        SettingsManager settings = SettingsManager.getSettingsManager(this);
         Map<String, ?> allSharedPrefs = settings.getAllSharedPreferences();
         for (Map.Entry<String, ?> pairs : allSharedPrefs.entrySet()) {
             String key = pairs.getKey();

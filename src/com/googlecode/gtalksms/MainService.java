@@ -146,14 +146,11 @@ public class MainService extends Service {
      * @param id
      */
     protected void onHandleIntent(final Intent intent, int id) {
-        // TODO remove this if block
-        if (intent == null) {  
-            GoogleAnalyticsHelper.trackAndLogError("onHandleIntent: Intent null");  
-            return;
-        }
+        // ensure XMPP manager is setup (but not yet connected)
+        if (sXmppMgr == null) setupXmppManagerAndCommands();
         
         // Set Disconnected state by force to manage pending tasks
-        // This is not used any more
+        // This is not actively used any more
         if (intent.getBooleanExtra("force", false) && intent.getBooleanExtra("disconnect", false)) {
             // request to disconnect.
             sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
@@ -183,11 +180,13 @@ public class MainService extends Service {
         } else if (action.equals(ACTION_TOGGLE)) {     
             switch (initialState) {
                 case XmppManager.CONNECTED:
+                case XmppManager.CONNECTING:
                 case XmppManager.WAITING_TO_CONNECT:
                 case XmppManager.WAITING_FOR_NETWORK:
                     sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
                     break;
                 case XmppManager.DISCONNECTED:
+                case XmppManager.DISCONNECTING:
                     sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
                     break;
                 default:
@@ -279,7 +278,8 @@ public class MainService extends Service {
                 executeCommand(cmd, args, from);
             } else {
                 Log.w("Intent " + MainService.ACTION_COMMAND + " without extra cmd");
-            }            
+            }
+        // ACTION_XMPP_CONNECTION_CHANGED is handled implicitly by every call    
         } else if(!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {            
             GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
@@ -380,7 +380,7 @@ public class MainService extends Service {
                         + "lastStatus is " + lastStatus
                         + " and currentStatus is " + currentStatus);
                 startService(new Intent(MainService.ACTION_CONNECT));
-                CrashedStartCounter.getInstance(getApplicationContext()).count();
+                CrashedStartCounter.getInstance(this).count();
             }
         }
     }
@@ -393,7 +393,7 @@ public class MainService extends Service {
             // we try to restart the connection
             // this null intent behavior is only for SDK < 9
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
-                CrashedStartCounter.getInstance(getApplicationContext()).count();
+                CrashedStartCounter.getInstance(this).count();
                 startService(new Intent(MainService.ACTION_CONNECT));
             } else {
                 GoogleAnalyticsHelper.trackAndLogWarning("onStartCommand() null intent with Gingerbread or higher");
@@ -407,34 +407,21 @@ public class MainService extends Service {
             // A request to broadcast our current status even if _xmpp is null.
             int state = getConnectionStatus();
             XmppManager.broadcastStatus(this, state, state);
+        // A real action request
         } else {
-            // OK - a real action request - ensure xmpp is setup (but not yet connected)
-            // in preparation for the worker thread performing the request.
-            if (sXmppMgr == null) {
-                // check if the user has done his part
-                if (sSettingsMgr.notifiedAddress == null || sSettingsMgr.notifiedAddress.equals("")
-                        || sSettingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
-                    Log.w("Preferences not set! Opens preferences page.");
-                    Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
-                    settingsActivity.putExtra("panel", R.xml.prefs_connection);
-                    settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(settingsActivity);
-                    return START_STICKY;
-                }
-
-                sXmppConChangedReceiver = new BroadcastReceiver() {
-                    public void onReceive(Context context, Intent intent) {
-                        intent.setClass(MainService.this, MainService.class);
-                        onConnectionStatusChanged(intent.getIntExtra("old_state", 0), intent.getIntExtra("new_state", 0));
-                        startService(intent);
-                    }
-                };
-                IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_CONNECTION_CHANGED);
-                registerReceiver(sXmppConChangedReceiver, intentFilter);
-                setupCommands();
-                sXmppMgr = XmppManager.getInstance(getBaseContext());
+            // check if the user has done his part
+            if (sSettingsMgr.notifiedAddress == null 
+                    || sSettingsMgr.notifiedAddress.equals("") 
+                    || sSettingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
+                Log.w("Preferences not set! Showing preferences page.");
+                Intent settingsActivity = new Intent(this, Preferences.class);
+                settingsActivity.putExtra("panel", R.xml.prefs_connection);
+                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(settingsActivity);
+                return START_STICKY;
             }
-            
+
+            // redirect the intent to the service handler thread
             Message msg = sServiceHandler.obtainMessage();
             msg.arg1 = startId;
             msg.obj = intent;
@@ -517,6 +504,28 @@ public class MainService extends Service {
         displayToast(sUiContext.getString(i), extraInfo);
     }
     
+    /**
+     * Does an initial one-time setup on the MainService by
+     * - Creating a XmppManager Instance
+     * - Registering the commands
+     * - Registering a Listener for ACTION_XMPP_CONNECTION_CHANGED
+     *   which is issued by XmppManager for every state change of the
+     *   XMPP connection
+     */
+    private void setupXmppManagerAndCommands() {
+        sXmppConChangedReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                intent.setClass(MainService.this, MainService.class);
+                onConnectionStatusChanged(intent.getIntExtra("old_state", 0), intent.getIntExtra("new_state", 0));
+                startService(intent);
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(ACTION_XMPP_CONNECTION_CHANGED);
+        registerReceiver(sXmppConChangedReceiver, intentFilter);
+        setupCommands();
+        sXmppMgr = XmppManager.getInstance(this);
+    }
+    
     private void executeCommand(String cmd, String args, String answerTo) {
         assert(cmd != null);
         if (sCommands.containsKey(cmd)) {
@@ -586,7 +595,7 @@ public class MainService extends Service {
             	throw new IllegalStateException("onConnectionSTatusChanged: Unkown status int");
             }
 
-            notification.setLatestEventInfo(getApplicationContext(), Tools.APP_NAME, msg, sContentIntent);
+            notification.setLatestEventInfo(this, Tools.APP_NAME, msg, sContentIntent);
             notification.flags |= Notification.FLAG_ONGOING_EVENT;
             notification.flags |= Notification.FLAG_NO_CLEAR;
             notification.tickerText = null;

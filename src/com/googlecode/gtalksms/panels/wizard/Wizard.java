@@ -263,7 +263,7 @@ public class Wizard extends Activity {
         }
         
         TextView label = (TextView) findViewById(R.id.VersionLabel);
-        label.setText(StringFmt.Style(Tools.APP_NAME + " " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
+        label.setText(StringFmt.Style(Tools.APP_NAME + " " + Tools.getVersionName(this), Typeface.BOLD));
 
         mCurrentView = viewId;
     }

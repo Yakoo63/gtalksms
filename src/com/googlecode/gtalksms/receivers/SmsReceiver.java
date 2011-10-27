@@ -19,15 +19,11 @@ public class SmsReceiver extends BroadcastReceiver {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO remove the settingsManager when issues 203 and 149 are resolved
-        Log.initialize(SettingsManager.getSettingsManager(context));        
-        Log.i("SmsReceiver: got new sms intent, calling RetrieveMessages");
-        try {
         Map<String, String> msg = RetrieveMessages(intent);
-           
+
         if (msg == null) {
-          // unable to retrieve SMS
-          return;  
+            // unable to retrieve SMS
+            return;
         } else if (MainService.IsRunning) {
             // send all SMS via XMPP by sender
             for (String sender : msg.keySet()) {
@@ -36,10 +32,11 @@ public class SmsReceiver extends BroadcastReceiver {
                 Log.i("SmsReceiver: Issuing service intent for incoming SMS. sender=" + sender + " message=" + Tools.shortenMessage(msg.get(sender)));
                 context.startService(svcintent);
             }
-        // MainService is not active, test if we find a sms with the magic word
+            // MainService is not active, test if we find a SMS with the
+            // magic word to start GTalkSMS if so.
         } else {
             String magicWord = SettingsManager.getSettingsManager(context).smsMagicWord.trim().toLowerCase();
-            
+
             for (String sender : msg.keySet()) {
                 String message = msg.get(sender);
                 if (message.trim().toLowerCase().compareTo(magicWord) == 0) {
@@ -47,9 +44,6 @@ public class SmsReceiver extends BroadcastReceiver {
                     Tools.startSvcIntent(context, MainService.ACTION_CONNECT);
                 }
             }
-        }
-        } catch (Exception e) {
-            android.util.Log.i(Tools.LOG_TAG, "Ex in smsreceiver", e);
         }
     }
     

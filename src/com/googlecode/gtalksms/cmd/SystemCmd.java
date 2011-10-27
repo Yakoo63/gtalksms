@@ -32,7 +32,7 @@ public class SystemCmd extends CommandHandlerBase {
     public SystemCmd(MainService mainService) {
         super(mainService, new String[] {"sysinfo"}, CommandHandlerBase.TYPE_SYSTEM);
         if (SystemCmd.mainService == null) {
-            Context ctx = mainService.getBaseContext();
+            Context ctx = sContext;
             activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
             connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
             telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);

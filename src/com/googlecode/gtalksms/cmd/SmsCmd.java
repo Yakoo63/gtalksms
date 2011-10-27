@@ -58,8 +58,8 @@ public class SmsCmd extends CommandHandlerBase {
         super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"}, CommandHandlerBase.TYPE_MESSAGE);
         mSmsMmsManager = new SmsMmsManager(sSettingsMgr, sContext);
         mSmsHelper = SMSHelper.getSMSHelper(sContext);
-        mAliasHelper = AliasHelper.getAliasHelper(mainService.getBaseContext());
-        mKeyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());
+        mAliasHelper = AliasHelper.getAliasHelper(sContext);
+        mKeyValueHelper = KeyValueHelper.getKeyValueHelper(sContext);
         mContactsResolver = ContactsResolver.getInstance(sContext);
         
         restoreSmsInformation();

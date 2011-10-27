@@ -34,7 +34,7 @@ public class FileCmd extends CommandHandlerBase {
         } catch (Exception e) {
             ex = e;
         }
-        keyValueHelper = KeyValueHelper.getKeyValueHelper(mainService.getBaseContext());
+        keyValueHelper = KeyValueHelper.getKeyValueHelper(sContext);
         restoreSendDir();
     }
     
