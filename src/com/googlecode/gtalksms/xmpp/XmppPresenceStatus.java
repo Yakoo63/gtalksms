@@ -44,9 +44,8 @@ public class XmppPresenceStatus {
      * @param percentage
      * @param source
      */
-    public void setPowerInfo(int percentage, String source) {
-        String perString = (new Integer(percentage)).toString();
-        mBatteryPercentage = perString;
+    public void setPowerInfo(String percentage, String source) {
+        mBatteryPercentage = percentage;
         mPowerSource = source;
         newStatusInformationAvailable();
     }

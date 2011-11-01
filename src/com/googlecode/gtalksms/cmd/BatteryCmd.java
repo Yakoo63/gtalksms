@@ -11,12 +11,16 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.xmpp.XmppPresenceStatus;
 
 public class BatteryCmd extends CommandHandlerBase {
+    private static final int STEP = 5;
+    private static final String PSRC_USB = "USB";
+    private static final String PSRC_AC = "AC";
+    private static final String PSRC_BATT = "Battery";
+    private static final String PSRC_UNKOWN = "Unknown";
+	
     private static boolean sReceiverRegistered = false; 
     private static BroadcastReceiver sBatInfoReceiver = null;
     private static int sLastKnownPercentage = -1; // flag so the BroadcastReceiver can set the percentage
-    private static String sPowerSource;
-    private static int sLastStatusPercentage = -1;
-    private static String sLastStatusPowersource;
+    private static String sLastKnownPowerSource;
     private static int sLastSendPercentage = -1;
     private static String sLastSendPowersource;
     private static XmppPresenceStatus sXmppPresenceStatus;    
@@ -24,7 +28,7 @@ public class BatteryCmd extends CommandHandlerBase {
     public BatteryCmd(MainService mainService) {
         super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
         sXmppPresenceStatus = XmppPresenceStatus.getInstance(sContext);
-        sPowerSource = "Unknown";
+        sLastKnownPowerSource = "Unknown";
         setup();
     }
     
@@ -42,21 +46,22 @@ public class BatteryCmd extends CommandHandlerBase {
                         String pSourceStr = null;
                         switch (pSource) {
                         case 0:
-                            pSourceStr = "Battery";
+                            pSourceStr = PSRC_BATT;
                             break;
                         case BatteryManager.BATTERY_PLUGGED_AC:
-                            pSourceStr = "AC";
+                            pSourceStr = PSRC_AC;
                             break;
                         case BatteryManager.BATTERY_PLUGGED_USB:
-                            pSourceStr = "USB";
+                            pSourceStr = PSRC_USB;
                             break;
                         default:
-                            pSourceStr = "Unknown";
+                            pSourceStr = PSRC_UNKOWN;
                             break;
                         }
-                        if (sLastKnownPercentage == -1) {
-                            notifyAndSave(level, pSourceStr);
-                        } else if (level != sLastKnownPercentage || sPowerSource.compareTo(pSourceStr) != 0) {
+                        // something hand changed, update
+                        if (level != sLastKnownPercentage || sLastKnownPowerSource.compareTo(pSourceStr) != 0) {
+                            notifyAndSave(level, pSourceStr);           
+                        } else if (sLastKnownPercentage == -1) {
                             notifyAndSave(level, pSourceStr);
                         }
                     }
@@ -69,21 +74,31 @@ public class BatteryCmd extends CommandHandlerBase {
     
     /**
      * 
-     * @param force
+     * @param force - always send the battery information via an XMPP message
      */
-    private void sendBatteryInfos(boolean force) {
-        if (force || mustNotifyUser()) {
-            send(R.string.chat_battery_level, sLastKnownPercentage);
-        }
-        if (sSettingsMgr.notifyBatteryInStatus) {
-            // set only if something has changed
-            if (sLastKnownPercentage != sLastStatusPercentage || !sPowerSource.equals(sLastStatusPowersource)) {
-                sXmppPresenceStatus.setPowerInfo(sLastKnownPercentage, sPowerSource);
-                sLastStatusPercentage = sLastKnownPercentage;
-                sLastStatusPowersource = sPowerSource;
-            }
-        }
-    }
+	private void sendBatteryInfos(boolean force) {
+		if (force || mustNotifyUser()) {
+			send(R.string.chat_battery_level, sLastKnownPercentage);
+			updateBatteryInformation();
+		}
+		if (sSettingsMgr.notifyBatteryInStatus &&
+		// set only if something has changed
+				batteryInformationChanged()) {
+			// send detailed information when on AC
+			if (sLastKnownPowerSource.equals(PSRC_AC)) {
+				sXmppPresenceStatus.setPowerInfo(sLastKnownPercentage + " %", sLastKnownPowerSource);
+			} else {
+				String lastRange = intToRange(sLastSendPercentage);
+				String newRange = intToRange(sLastKnownPercentage);
+				if (!sLastSendPowersource.equals(sLastKnownPercentage)
+						&& !lastRange.equals(newRange)) {
+					sXmppPresenceStatus.setPowerInfo(newRange + " %", sLastKnownPowerSource);
+				}
+			}
+			updateBatteryInformation();
+		}
+
+	}
     
     /**
      * Checks if the preconditions for an automatic notification about the
@@ -91,20 +106,31 @@ public class BatteryCmd extends CommandHandlerBase {
      * 
      * @return
      */
-    private boolean mustNotifyUser() {
-        if (sSettingsMgr.notifyBattery)
-            if (sLastKnownPercentage != sLastSendPercentage || !sPowerSource.equals(sLastSendPowersource)) {
-                sLastSendPercentage = sLastKnownPercentage;
-                sLastSendPowersource = sPowerSource;
-                if (sLastKnownPercentage % sSettingsMgr.batteryNotificationIntervalInt == 0)
-                    return true;
-            }
-        return false;
+	private boolean mustNotifyUser() {
+		if (sSettingsMgr.notifyBattery
+				&& batteryInformationChanged()
+				&& sLastKnownPercentage
+						% sSettingsMgr.batteryNotificationIntervalInt == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+    
+    private void updateBatteryInformation() {
+        sLastSendPercentage = sLastKnownPercentage;
+        sLastSendPowersource = sLastKnownPowerSource;
     }
     
+	private boolean batteryInformationChanged() {
+		return sLastKnownPercentage != sLastSendPercentage
+				|| !sLastKnownPowerSource.equals(sLastSendPowersource);
+	}
+    
     private void notifyAndSave(int level, String powerSource) {
-        sPowerSource = powerSource;
-        sLastKnownPercentage = level;                
+        sLastKnownPowerSource = powerSource;
+        sLastKnownPercentage = level;
+        // maybe update the battery information
         sendBatteryInfos(false);
     }
     
@@ -131,5 +157,15 @@ public class BatteryCmd extends CommandHandlerBase {
                 getString(R.string.chat_help_battery, makeBold("\"battery\""), makeBold("\"batt\"")) 
                 };
         return s;
+    }
+    
+    private static String intToRange(int in) {
+    	int lowerBound = (in / 5) * STEP;
+    	if (lowerBound != 100) {
+    	int upperBound = lowerBound + STEP;
+    		return lowerBound + "-" + upperBound;
+    	} else {
+    		return Integer.toString(lowerBound);
+    	}
     }
 }
