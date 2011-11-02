@@ -28,7 +28,7 @@ public class BatteryCmd extends CommandHandlerBase {
     public BatteryCmd(MainService mainService) {
         super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
         sXmppPresenceStatus = XmppPresenceStatus.getInstance(sContext);
-        sLastKnownPowerSource = "Unknown";
+        sLastKnownPowerSource = "NotInitialized";
         setup();
     }
     
@@ -43,7 +43,7 @@ public class BatteryCmd extends CommandHandlerBase {
                         float levelFloat = ((float) level / (float) scale) * 100;
                         level = (int) levelFloat;
                         int pSource = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-                        String pSourceStr = null;
+                        String pSourceStr;
                         switch (pSource) {
                         case 0:
                             pSourceStr = PSRC_BATT;
@@ -58,8 +58,8 @@ public class BatteryCmd extends CommandHandlerBase {
                             pSourceStr = PSRC_UNKOWN;
                             break;
                         }
-                        // something hand changed, update
-                        if (level != sLastKnownPercentage || sLastKnownPowerSource.compareTo(pSourceStr) != 0) {
+                        // something has changed, update
+                        if (level != sLastKnownPercentage || !sLastKnownPowerSource.equals(pSourceStr)) {
                             notifyAndSave(level, pSourceStr);           
                         } else if (sLastKnownPercentage == -1) {
                             notifyAndSave(level, pSourceStr);
@@ -90,7 +90,7 @@ public class BatteryCmd extends CommandHandlerBase {
 			} else {
 				String lastRange = intToRange(sLastSendPercentage);
 				String newRange = intToRange(sLastKnownPercentage);
-				if (!sLastSendPowersource.equals(sLastKnownPercentage)
+				if (sLastSendPercentage != sLastKnownPercentage
 						&& !lastRange.equals(newRange)) {
 					sXmppPresenceStatus.setPowerInfo(newRange + " %", sLastKnownPowerSource);
 				}

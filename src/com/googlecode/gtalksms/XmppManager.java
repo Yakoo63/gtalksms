@@ -78,6 +78,9 @@ public class XmppManager {
     // but takes sometimes a lot of time
     // disconnectED xmpp connection. Took: 1048.576 s
     public static final int DISCON_TIMEOUT = 1000 * 10; // 10s
+    // The timeout for XMPP connections that get created with
+    // DNS SRV information
+    public static final int DNSSRV_TIMEOUT = 1000 * 30; // 30s
     
     public static final int DISCONNECTED = 1;
     // A "transient" state - will only be CONNECTING *during* a call to start()
@@ -668,8 +671,7 @@ public class XmppManager {
             // but on a real device it just works fine
             // see: http://stackoverflow.com/questions/2879455/android-2-2-and-bad-address-family-on-socket-connect
             // and http://code.google.com/p/android/issues/detail?id=9431            
-            conf = new AndroidConnectionConfiguration(settings.serviceName);
-
+            conf = new AndroidConnectionConfiguration(settings.serviceName, DNSSRV_TIMEOUT);
         }
         
         conf.setTruststorePath("/system/etc/security/cacerts.bks");
