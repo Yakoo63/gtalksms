@@ -39,7 +39,8 @@ public class XmppPresenceStatus {
     }
     
     /**
-     * For the BatteryCmd, should only be called if one of them has changed
+     * For the BatteryCmd, should only be called if one parameter
+     * has changed
      * 
      * @param percentage
      * @param source
@@ -51,9 +52,11 @@ public class XmppPresenceStatus {
     }
     
     private String composePresenceStatus() {
+        // start with the App name
         String res = Tools.APP_NAME;
+        // and add battery information
         if (mBatteryPercentage != null) {
-            res += " - " + mBatteryPercentage + "%";
+            res += " - " + mBatteryPercentage;
         }
         if (mPowerSource != null) {
             res += " - " + mPowerSource;
@@ -62,9 +65,11 @@ public class XmppPresenceStatus {
     }    
     
     /**
-     * Sets the XMPP presence status
+     * Sets the XMPP presence status, but only if
+     * - we are connected
+     * - the notification address is online
      * 
-     * @param force
+     * @param force - don't check if the notification address is online
      * @return true if the presence was set
      */
     private boolean setStatus(boolean force) {
