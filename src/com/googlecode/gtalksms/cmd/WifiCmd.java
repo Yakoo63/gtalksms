@@ -1,25 +1,28 @@
 package com.googlecode.gtalksms.cmd;
 
 import android.content.Context;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class WifiCmd extends CommandHandlerBase {
+    
+    private static final int RSSI_LEVEL = 5;
 	
 	private static WifiManager sWifiManager;
 
     public WifiCmd(MainService mainService) {
         super(mainService, new String[] {"wifi", "wlan"}, CommandHandlerBase.TYPE_SYSTEM);
-        // TODO if your command needs references, init them here
         if (sWifiManager == null) {
         	sWifiManager = (WifiManager) mainService.getSystemService(Context.WIFI_SERVICE);
         }
     }
 
     protected void execute(String cmd, String args) {
-       // TODO Start here
         if (args.equals("on")) {
         	enableWifi();
         } else if (args.equals("off")) {
@@ -50,7 +53,12 @@ public class WifiCmd extends CommandHandlerBase {
     	}
     }
     
-    private void sendStatus() {
+    public void sendStatus() {
+        send(getStatus());
+    }
+    
+    private static XmppMsg getStatus() {
+        XmppMsg res = new XmppMsg();
     	int status = sWifiManager.getWifiState();
     	String statusStr;
     	switch (status) {
@@ -69,21 +77,71 @@ public class WifiCmd extends CommandHandlerBase {
     	default:
     		statusStr = "unkown";
     		break;
-    	}
-    	boolean supplicant_alive = sWifiManager.pingSupplicant();
-    	String supplicant_status;
-    	if (supplicant_alive) {
-    		supplicant_status = "WPA Supplicant is responding";
-    	} else {
-    		supplicant_status = "WPA Supplicant is NOT responding";
-    	}
-    	
-    	XmppMsg res = new XmppMsg();
+    	}    	
     	res.append("Wifi state is ");
     	res.appendBold(statusStr);
     	res.newLine();
+    	
+        boolean supplicant_alive = sWifiManager.pingSupplicant();
+        String supplicant_status;
+        if (supplicant_alive) {
+            supplicant_status = "WPA Supplicant is responding";
+        } else {
+            supplicant_status = "WPA Supplicant is NOT responding";
+        }
     	res.appendLine(supplicant_status);
-    	send(res);    	
+    	
+    	WifiInfo info = sWifiManager.getConnectionInfo();
+    	if (info != null) {
+    	    res.newLine();
+    	    String bssid = info.getBSSID();
+    	    String ip = Tools.ipIntToString(info.getIpAddress());
+    	    String ssid = info.getSSID();
+    	    int rssi = info.getRssi();
+    	    
+    	    // bssid
+    	    res.appendBold("BSSID: ");
+    	    res.appendLine(bssid);
+    	    // ssid
+    	    res.appendBold("SSID: ");
+    	    res.appendLine(ssid);
+    	    // ip
+    	    res.appendBold("IP: ");
+    	    res.appendLine(ip);
+    	    // link speed
+    	    res.appendBold("Current link speed: ");
+    	    res.append(info.getLinkSpeed());
+    	    res.appendLine(WifiInfo.LINK_SPEED_UNITS);
+    	    // rssi
+    	    res.appendBold("Received signal strength indicator: ");
+    	    res.appendLine(rssi);
+    	    // rssi - level
+    	    res.appendBold("RSSI on a scale from 1 to " + RSSI_LEVEL + ": ");
+    	    res.appendLine(Integer.toString(WifiManager.calculateSignalLevel(rssi, RSSI_LEVEL)));
+    	}
+    	
+    	DhcpInfo dhcpInfo = sWifiManager.getDhcpInfo();
+    	if (dhcpInfo != null) {    	  
+    	    res.newLine();
+    	    res.appendBoldLine("DHCP Info");
+    	    res.appendBold("DNS1: ");
+    	    res.appendLine(Tools.ipIntToString(dhcpInfo.dns1));
+    	    res.appendBold("DNS2: ");
+            res.appendLine(Tools.ipIntToString(dhcpInfo.dns2));
+            res.appendBold("Gateway: ");
+            res.appendLine(Tools.ipIntToString(dhcpInfo.gateway));
+            res.appendBold("IP: ");
+            res.appendLine(Tools.ipIntToString(dhcpInfo.ipAddress));
+            res.appendBold("Netmask: ");
+            res.appendLine(Tools.ipIntToString(dhcpInfo.netmask));
+            res.appendBold("Lease Duraction: ");
+            res.appendLine(dhcpInfo.leaseDuration + "s");
+            res.appendBold("DHCP Server IP: ");
+            res.appendLine(Tools.ipIntToString(dhcpInfo.serverAddress));
+            
+    	}
+    	
+    	return res;    	
     }
     
     @Override

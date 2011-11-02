@@ -84,8 +84,8 @@ public class BatteryCmd extends CommandHandlerBase {
 		if (sSettingsMgr.notifyBatteryInStatus &&
 		// set only if something has changed
 				batteryInformationChanged()) {
-			// send detailed information when on AC
-			if (sLastKnownPowerSource.equals(PSRC_AC)) {
+			// send detailed information when on AC or USB
+			if (sLastKnownPowerSource.equals(PSRC_AC) || sLastKnownPowerSource.equals(PSRC_USB)) {
 				sXmppPresenceStatus.setPowerInfo(sLastKnownPercentage + "%", sLastKnownPowerSource);
 			} else {
 				String lastRange = intToRange(sLastSendPercentage);

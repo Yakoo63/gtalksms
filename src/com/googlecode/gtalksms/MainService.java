@@ -43,6 +43,7 @@ import com.googlecode.gtalksms.cmd.ShellCmd;
 import com.googlecode.gtalksms.cmd.SmsCmd;
 import com.googlecode.gtalksms.cmd.SystemCmd;
 import com.googlecode.gtalksms.cmd.UrlsCmd;
+import com.googlecode.gtalksms.cmd.WifiCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
@@ -662,6 +663,7 @@ public class MainService extends Service {
             registerCommand(new AliasCmd(this));
             registerCommand(new SettingsCmd(this));
             registerCommand(new BluetoothCmd(this));
+            registerCommand(new WifiCmd(this));
             // used for debugging
             registerCommand(new SystemCmd(this));
             // help command needs to be registered as last

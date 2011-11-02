@@ -314,4 +314,12 @@ public class Tools {
         Calendar cal = Calendar.getInstance();
         return DATE_FORMAT.format(cal.getTime());
     }
+    
+    public static String ipIntToString(int ip) {
+        return String.format("%d.%d.%d.%d", 
+        (ip & 0xff), 
+        (ip >> 8 & 0xff),
+        (ip >> 16 & 0xff),
+        (ip >> 24 & 0xff));
+    }
 }

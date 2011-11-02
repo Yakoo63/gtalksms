@@ -52,10 +52,18 @@ public class XmppMsg implements Parcelable {
     public void append(String msg) {
         _message.append(msg);
     }
+    
+    public void append(int value) {
+        append(Integer.toString(value));
+    }
 
     public void appendLine(String msg) {
         _message.append(msg);
         newLine();
+    }
+    
+    public void appendLine(int value) {
+        appendLine(Integer.toString(value));
     }
 
     public void insertLineBegin(String msg) {

@@ -262,6 +262,7 @@ public class XmppManager {
         _packetListener = null; 
         _connectionListener = null;
         sPresencePacketListener = null;
+        sCurrentRetryCount = 0;
     }
     
     /** 

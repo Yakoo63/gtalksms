@@ -8,6 +8,7 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.tools.Tools;
 
 import android.content.Context;
 import android.net.wifi.WifiInfo;
@@ -55,7 +56,7 @@ public class XmppLocalS5BProxyManager {
 
         if (info != null) {
             // There is an active Wifi connection
-            String ip = ipIntToString(info.getIpAddress());
+            String ip = Tools.ipIntToString(info.getIpAddress());
             addresses.add(ip);
 
         } 
@@ -63,14 +64,6 @@ public class XmppLocalS5BProxyManager {
         // otherwise addresses will be empty and local S5B proxy
         // will not be used
         mProxy.replaceLocalAddresses(addresses);
-    }
-    
-    private static String ipIntToString(int ip) {
-        return String.format("%d.%d.%d.%d", 
-        (ip & 0xff), 
-        (ip >> 8 & 0xff),
-        (ip >> 16 & 0xff),
-        (ip >> 24 & 0xff));
-    }
+    }    
 
 }
