@@ -63,8 +63,12 @@ public class ContactsResolver {
         if (Phone.isCellPhoneNumber(number)) {
             resolvedName = ContactsManager.getContactName(sContext, number);
             return new ResolvedContact(resolvedName, number);
-        }
+        }              
         
+        return resolveContactRec(contactInformation, searchType);
+    }
+    
+    private ResolvedContact resolveContactRec(String contactInformation, int searchType) {
         ArrayList<Phone> phones;
         switch (searchType) {
         case TYPE_ALL:
@@ -97,13 +101,11 @@ public class ContactsResolver {
             Phone phone = phones.get(0);
             return new ResolvedContact(phone.getContactName(), phone.getCleanNumber());
         // We have not found a matching contact with TYPE_CELL
-        // In this case we fall back to return any machting contacts numbers
+        // In this case we fall back to return any matching contacts numbers
         // this could cause some SMS to be send to a regular phone instead of a
         // cell.
-        // TODO this is a quick fix for issue 221, try to avoid the duplicate 
-        // alias and isCellPhoneCheck
         } else if (searchType == TYPE_CELL) {
-            return resolveContact(contactInformation, TYPE_ALL);
+            return resolveContactRec(contactInformation, TYPE_ALL);
         }
         
         // We found no matching phone

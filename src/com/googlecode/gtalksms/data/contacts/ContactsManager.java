@@ -238,8 +238,11 @@ public class ContactsManager {
     }
 
     /**
-     * Returns a ArrayList < Phone > of a specific contact
-     * ! phone.contactName not set
+     * Returns and ArrayList<Phone> for specific contact IDs
+     * 
+     * @param ctx Context
+     * @param ids An ArrayList with the contact IDs
+     * @return An ArrayList<Phone> with all phones from the IDs
      */
     public static ArrayList<Phone> getPhones(Context ctx, ArrayList<Long> ids) {
         ArrayList<Phone> res = new ArrayList<Phone>();
@@ -251,7 +254,7 @@ public class ContactsManager {
             
             while (c.moveToNext()) {
                 String number = Tools.getString(c, CommonDataKinds.Phone.NUMBER);
-                String label = Tools.getString(c,CommonDataKinds.Phone.LABEL);
+                String label = Tools.getString(c, CommonDataKinds.Phone.LABEL);
                 int type = Tools.getLong(c, CommonDataKinds.Phone.TYPE).intValue();
                 int super_primary = Tools.getInt(c, ContactsContract.Data.IS_SUPER_PRIMARY);
     
