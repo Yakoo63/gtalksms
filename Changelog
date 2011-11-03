@@ -1,3 +1,8 @@
+Upcoming
+* Improved file transfers by adding an local XMPP S5B proxy
+* Added support for tablet (Honeycomb) devices
+* Added "wifi" command to enable/disable and view WiFi status
+
 3.2
 * Bug fixes
 * Ignore / reject commands for phone calls
