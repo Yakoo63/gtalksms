@@ -168,6 +168,7 @@ public class XmppManager {
         SmackConfiguration.setPacketReplyTimeout(15000);      // 10 secs
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
+        // connection can be null, it is created on demand
         sConnection = connection;
     }
     
@@ -262,7 +263,6 @@ public class XmppManager {
         _packetListener = null; 
         _connectionListener = null;
         sPresencePacketListener = null;
-        sCurrentRetryCount = 0;
     }
     
     /** 
@@ -746,10 +746,10 @@ public class XmppManager {
             msg.setBody(message.generateTxt());
         }
 
-        // add an XTHML Body when
-        // we don't know the recipient
-        // we know that the recipient is able to read XHTML-IM
-        // we are disconnected and therefore send the message later
+        // add an XTHML Body either when
+        // - we don't know the recipient
+        // - we know that the recipient is able to read XHTML-IM
+        // - we are disconnected and therefore send the message later
         if ((to == null) || 
                 (sConnection != null && (XHTMLManager.isServiceEnabled(sConnection, to) || !sConnection.isConnected()))) {
             String xhtmlBody = message.generateXHTMLText().toString();
@@ -765,7 +765,7 @@ public class XmppManager {
         
         // TODO find out why connection seems to be sometimes null
         // see Issue 192 for an example
-        if (sConnection != null && sConnection.isConnected()) {
+        if (isConnected()) {
             if (muc == null) {
                 // TODO find out what happens if the receiver is unknown
                 // for example when we try to send here to an MUC address
@@ -783,6 +783,13 @@ public class XmppManager {
             Log.d("Adding message: \"" + message.toShortString() + "\" to offline queue, because we are not connected. Status=" + statusString());
             return sClientOfflineMessages.addOfflineMessage(msg);
         }
+    }
+    
+    public boolean isConnected() {
+        boolean res = (sConnection != null 
+                && sConnection.isConnected() 
+                && _status == CONNECTED);
+        return res;
     }
     
     public void registerConnectionChangeListener(XmppConnectionChangeListener listener) {

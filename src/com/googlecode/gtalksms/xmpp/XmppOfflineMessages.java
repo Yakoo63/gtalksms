@@ -34,5 +34,6 @@ public class XmppOfflineMessages {
             }
         }
         offlineMessageManager.deleteMessages();
+        Log.i("End of retrival of offline messages from server");
     }
 }
