@@ -2,6 +2,7 @@ package com.googlecode.gtalksms.cmd;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Arrays;
 
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
@@ -71,41 +72,59 @@ public class FileCmd extends CommandHandlerBase {
         }
     }
     
-    private void sendFile(File file) {
-        FileTransferManager fileTransferManager = XmppFileManager.getInstance(sContext).getFileTransferManager();
-        OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(mAnswerTo);
-
-        try {
-            transfer.sendFile(file, getString(R.string.chat_file_sending, file.getAbsolutePath(), mAnswerTo));
-            send(R.string.chat_file_transfer_started, file.getAbsolutePath(), transfer.getFileSize() / 1024);
-            
-            // We allow 30s before that status go to in progress
-           int currentCycle = 0;
-            while (!transfer.isDone()) {
-                if (transfer.getStatus() == FileTransfer.Status.refused) {
-                    send(R.string.chat_file_transfer_refused);
-                    return;
-                } else if (transfer.getStatus() == FileTransfer.Status.error) {
-                    send(mXmppFileManager.returnAndLogError(transfer));
-                    return;
-                } else if (transfer.getStatus() == FileTransfer.Status.negotiating_transfer) {
-                    // user has not accepted the transfer yet
-                    // reset the cycle count
-                    currentCycle = 0; 
-                } else if (transfer.getStatus() != FileTransfer.Status.in_progress) {
-                    // there is still not transfer going on
-                    currentCycle++;
-                }
-                if (currentCycle > MAX_CYCLES) {
-                    send(mXmppFileManager.returnAndLogError(transfer));
-                    break;
-                }
-                Thread.sleep(1000);
-            }
-        } catch (Exception ex) {
-            Log.e(Tools.LOG_TAG, "Cannot send the file because an error occured during the process.", ex);
-            send(R.string.chat_file_transfer_error, ex.getMessage());
+    class SendFileThread extends Thread {
+        
+        private File mFile;
+        
+        public SendFileThread(File file) {
+            this.mFile = file;
         }
+        
+        public void run() {
+            FileTransferManager fileTransferManager = XmppFileManager.getInstance(sContext).getFileTransferManager();
+            OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(mAnswerTo);
+
+            try {
+                transfer.sendFile(mFile, getString(R.string.chat_file_sending, mFile.getAbsolutePath(), mAnswerTo));
+                send(R.string.chat_file_transfer_started, mFile.getAbsolutePath(), transfer.getFileSize() / 1024);
+                
+                // We allow 30s before that status go to in progress
+               int currentCycle = 0;
+                while (!transfer.isDone()) {
+                    if (transfer.getStatus() == FileTransfer.Status.refused) {
+                        send(R.string.chat_file_transfer_refused);
+                        return;
+                    } else if (transfer.getStatus() == FileTransfer.Status.error) {
+                        send(mXmppFileManager.returnAndLogError(transfer));
+                        return;
+                    } else if (transfer.getStatus() == FileTransfer.Status.negotiating_transfer) {
+                        // user has not accepted the transfer yet
+                        // reset the cycle count
+                        currentCycle = 0; 
+                    } else if (transfer.getStatus() != FileTransfer.Status.in_progress) {
+                        // there is still not transfer going on
+                        currentCycle++;
+                    }
+                    
+                    if (currentCycle > MAX_CYCLES) {
+                        send(mXmppFileManager.returnAndLogError(transfer));
+                        break;
+                    }
+                    Thread.sleep(1000);
+                }
+            } catch (Exception ex) {
+                Log.e(Tools.LOG_TAG, "Cannot send the file because an error occured during the process.", ex);
+                send(R.string.chat_file_transfer_error, ex.getMessage());
+            }
+        }
+    }
+    
+    private void sendFile(File file) {
+        SendFileThread t = new SendFileThread(file);
+        // we don't want this thread to block the shutdown
+        t.setDaemon(true);
+        t.setName("sendFileThread:" + file.getName());
+        t.start();
     }
     
     private void ls(String args) {
@@ -146,12 +165,14 @@ public class FileCmd extends CommandHandlerBase {
             File[] files = dir.listFiles(new FileCmd.FileFileFilter());
 
             if (dirs.length != 0) {
+                Arrays.sort(dirs);
                 res.appendBoldLine(getString(R.string.chat_file_transfer_dir, dir.getAbsolutePath()));
                 for (File d : dirs) {
                     res.appendLine(d.getName() + "/");
                 }
             }
             if (files.length != 0) {
+                Arrays.sort(files);
                 res.appendBoldLine(getString(R.string.chat_file_transfer_files, dir.getAbsolutePath()));
                 for (File f : files) {
                     appendFileInfo(res, f);
