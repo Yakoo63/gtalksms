@@ -6,6 +6,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -146,6 +147,11 @@ public class WifiCmd extends CommandHandlerBase {
     
     @Override
     public String[] help() {
-        return null;
+        String[] s = { 
+                getString(R.string.chat_help_wifi_on, makeBold("\"wifi:on\""), makeBold("\"wlan:on\"")),
+                getString(R.string.chat_help_wifi_off, makeBold("\"wifi:off\""), makeBold("\"wlan:off\"")),
+                getString(R.string.chat_help_wifi_state, makeBold("\"wifi:state\""), makeBold("\"wlan:state\"")),
+        };
+        return s;
     }
 }

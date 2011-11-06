@@ -215,6 +215,9 @@
     <string name="chat_help_camera_xmpp">- %1$s or %2$s: take a photo, store it and send it through xmpp connection.</string>
     <string name="chat_help_camera_list">- %1$s or %2$s: list all camera.</string>
     <string name="chat_help_camera_set">- %1$s or %2$s: set the default camera to take photo.</string>
+    <string name="chat_help_wifi_on">- %1$s or %2$s: turn on the WiFi adapter.</string>
+    <string name="chat_help_wifi_off">- %1$s or %2$s: turn off the WiFi adapter.</string>
+    <string name="chat_help_wifi_state">- %1$s or %2$s: give the current state of the Wifi adapter.</string>
     <string name="chat_call_unknown">Unknown</string>
     <string name="chat_call_incoming">Incoming</string>
     <string name="chat_call_outgoing">Outgoing</string>

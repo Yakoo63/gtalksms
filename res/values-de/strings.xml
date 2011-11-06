@@ -204,7 +204,7 @@
     <string name="chat_help_alias_show">- %1$s: Zeigt die Informationen über den Alias an. Falls #aliasname# gleich \"all\", werden alle bekannten Aliases ausgegeben.</string>
     <string name="chat_help_bt_on">- %1$s oder %2$s: Aktiviert Bluetooth.</string>
     <string name="chat_help_bt_off">- %1$s oder %2$s: Deaktiviert Bluetooth.</string>
-    <string name="chat_help_bt_state">- %1$s oder %2$s: Zeigt den aktuellen Bluetooth status an.</string>
+    <string name="chat_help_bt_state">- %1$s oder %2$s: Zeigt den aktuellen Bluetooth Status an.</string>
     <string name="chat_help_send">- %s: Sendet die Datei via XMPP. Entweder einen absoluten Pfad zur Datei angeben, anonsten wird das letzte aufgelistete Verzeichnis vorangestellt.</string>
     <string name="chat_help_ls">- %s: Zeigt den Inhalt des Verzeichnisses an.</string>
     <string name="chat_help_sc">- %1$s oder %2$s: Erstellt einen Screenshot und speichert ihn.</string>
@@ -214,7 +214,10 @@
     <string name="chat_help_camera_email">- %1$s oder %2$s: Macht ein Foto und sendet es per E-Mail.</string>
     <string name="chat_help_camera_xmpp">- %1$s oder %2$s: Macht ein Foto und sendet es via XMPP.</string>
     <string name="chat_help_camera_list">- %1$s oder %2$s: Listet alle Kameras des Smartphones auf.</string>
-    <string name="chat_help_camera_set">- %1$s oder %2$s: Standardkamera für Fotos festlegen.</string>   
+    <string name="chat_help_camera_set">- %1$s oder %2$s: Standardkamera für Fotos festlegen.</string>
+    <string name="chat_help_wifi_on">- %1$s or %2$s: Aktiviert WLAN.</string>
+    <string name="chat_help_wifi_off">- %1$s or %2$s: Deaktiviert WLAN.</string>
+    <string name="chat_help_wifi_state">- %1$s or %2$s: Zeigt den aktuellen WLAN Status an.</string>   
     <string name="chat_call_unknown">Unbekannt</string>
     <string name="chat_call_incoming">Eingehender Anruf</string>
     <string name="chat_call_outgoing">Ausgehender Anruf</string>
