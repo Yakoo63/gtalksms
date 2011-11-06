@@ -44,7 +44,7 @@ public class CameraCmd extends CommandHandlerBase {
         audioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         
         SettingsManager settings = SettingsManager.getSettingsManager(sContext);
-        if (Build.VERSION.SDK_INT >= 8) {  // API Level >= 8 check
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {  // API Level >= 8 check
             path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         } else {
             path = new File(Environment.getExternalStorageDirectory(), "DCIM");

@@ -10,10 +10,12 @@ import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
@@ -21,7 +23,8 @@ import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppFileManager implements FileTransferListener {
-   private static final int MAX_CYCLES = 30; 
+    private static final int MAX_CYCLES = 30;
+    private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
     
     private SettingsManager mSettings;
     private XMPPConnection mConnection;
@@ -67,13 +70,14 @@ public class XmppFileManager implements FileTransferListener {
         return xmppFileManager;
     }
    
-   /**
-    * returns the FileTransferManager for the current connection
-    * @return
-    */
-   public FileTransferManager getFileTransferManager() {
-       return mFileTransferManager;
-   }
+    /**
+     * returns the FileTransferManager for the current connection
+     * 
+     * @return
+     */
+    public FileTransferManager getFileTransferManager() {
+        return mFileTransferManager;
+    }
 
     @Override
     public void fileTransferRequest(FileTransferRequest request) {
@@ -111,8 +115,12 @@ public class XmppFileManager implements FileTransferListener {
             int currentCycle = 0; 
             while (!transfer.isDone()) {
                 if (transfer.getStatus() == Status.in_progress) {
-                    percents = ((int)(transfer.getProgress() * 10000)) / 100.0;
-                    send(R.string.chat_file_transfer_file, saveTo.getName(), percents);
+                    // Maybe we could decouple this from the debugLog setting
+                    // But for now it's OK so
+                    if (mSettings.debugLog) {
+                        percents = ((int) (transfer.getProgress() * 10000)) / 100.0;
+                        send(R.string.chat_file_transfer_file, saveTo.getName(), percents + "%");
+                    }
                 } else if (transfer.getStatus() == Status.error) {
                     send(returnAndLogError(transfer));
                     if (saveTo.exists()) {
@@ -130,6 +138,11 @@ public class XmppFileManager implements FileTransferListener {
             }
             if (transfer.getStatus().equals(Status.complete)) {
                 send(R.string.chat_file_transfer_file_complete, saveTo.getAbsolutePath());
+               // downloadManager only works from API 12 or higher
+               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+                   DownloadManager dm = (DownloadManager) mCtx.getSystemService(Context.DOWNLOAD_SERVICE);
+                   dm.addCompletedDownload(saveTo.getName(), "Received by " + Tools.APP_NAME + " from " + mAnswerTo, false, guessMimeType(saveTo), mLandingDir.getAbsolutePath(), saveTo.length(), true);
+               }
             } else {
                 send(returnAndLogError(transfer));
             }
@@ -171,5 +184,20 @@ public class XmppFileManager implements FileTransferListener {
     
     private void send(int id, Object... args) {
         send(mCtx.getString(id, args));
-    }    
+    }
+    
+    private static String guessMimeType(File f) {       
+        String filename = f.getName();
+        int lastDot = filename.lastIndexOf('.');
+        if (lastDot == -1) return DEFAULT_MIME_TYPE;
+        
+        String extension = filename.substring(lastDot);
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        if (mimeType == null) {
+            return DEFAULT_MIME_TYPE;
+        } else {
+            return mimeType;
+        }
+    }
+    
 }

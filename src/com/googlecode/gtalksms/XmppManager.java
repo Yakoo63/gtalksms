@@ -717,6 +717,7 @@ public class XmppManager {
     
     /**
      * Sends a XMPP Message, but only if we are connected
+     * This method is thread safe.
      * 
      * @param message
      * @param to - the receiving JID - if null the default notification address will be used

@@ -5,7 +5,7 @@
     android:versionName="3.2.5" 
     android:versionCode="49">
     <uses-sdk 
-        android:minSdkVersion="5" android:targetSdkVersion="10"/>
+        android:minSdkVersion="5" android:targetSdkVersion="12"/>
     <uses-feature android:required="false" android:name="android.hardware.camera"></uses-feature>
     <uses-feature android:required="false" android:name="android.hardware.camera.autofocus"></uses-feature>
     <uses-feature android:required="false" android:name="android.hardware.location"></uses-feature>
