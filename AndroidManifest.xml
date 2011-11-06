@@ -2,8 +2,8 @@
 <manifest 
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms" 
-    android:versionName="3.2.5" 
-    android:versionCode="49">
+    android:versionName="3.2.6" 
+    android:versionCode="50">
     <uses-sdk 
         android:minSdkVersion="5" android:targetSdkVersion="12"/>
     <uses-feature android:required="false" android:name="android.hardware.camera"></uses-feature>
