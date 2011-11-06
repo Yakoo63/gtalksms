@@ -90,8 +90,8 @@ public class BatteryCmd extends CommandHandlerBase {
 			} else {
 				String lastRange = intToRange(sLastSendPercentage);
 				String newRange = intToRange(sLastKnownPercentage);
-				if (sLastSendPercentage != sLastKnownPercentage
-						&& !lastRange.equals(newRange)) {
+				if (!sLastKnownPowerSource.equals(sLastSendPowersource)
+						|| !lastRange.equals(newRange)) {
 					sXmppPresenceStatus.setPowerInfo(newRange + "%", sLastKnownPowerSource);
 				}
 			}
