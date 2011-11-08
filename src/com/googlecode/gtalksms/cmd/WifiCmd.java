@@ -28,7 +28,7 @@ public class WifiCmd extends CommandHandlerBase {
         	enableWifi();
         } else if (args.equals("off")) {
         	disableWifi();
-        } else if (args.equals("status") || args.equals("")) {
+        } else if (args.equals("state") || args.equals("")) {
         	sendStatus();
         } else {
             send("Unkown argument \"" + args + "\" for command \"" + cmd + "\"");
