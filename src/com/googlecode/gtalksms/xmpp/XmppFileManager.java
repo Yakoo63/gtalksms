@@ -115,11 +115,14 @@ public class XmppFileManager implements FileTransferListener {
             int currentCycle = 0; 
             while (!transfer.isDone()) {
                 if (transfer.getStatus() == Status.in_progress) {
+                    percents = ((int) (transfer.getProgress() * 10000)) / 100.0;
                     // Maybe we could decouple this from the debugLog setting
                     // But for now it's OK so
                     if (mSettings.debugLog) {
-                        percents = ((int) (transfer.getProgress() * 10000)) / 100.0;
                         send(R.string.chat_file_transfer_file, saveTo.getName(), percents + "%");
+                    }
+                    if (percents == 0.0) {
+                        currentCycle++;
                     }
                 } else if (transfer.getStatus() == Status.error) {
                     send(returnAndLogError(transfer));
