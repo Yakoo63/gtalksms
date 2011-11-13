@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.jivesoftware.smack.Connection;
@@ -19,6 +20,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.GroupChatInvitation;
 import org.jivesoftware.smackx.PrivateDataManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
@@ -729,7 +731,7 @@ public class XmppManager {
      * 
      * @param message
      * @param to - the receiving JID - if null the default notification address will be used
-     * @return true, if we were connected and the message was handeld over to the connection - otherwise false
+     * @return true, if we were connected and the message was handled over to the connection - otherwise false
      */
     public boolean send(XmppMsg message, String to) {
         if (to == null) {
@@ -742,10 +744,10 @@ public class XmppManager {
 
         // to is null, so send to the default, which is the notifiedAddress
         if (to == null) {
-            msg = new Message(sSettings.notifiedAddress, Message.Type.chat);
+            msg = new Message();
         } else {
             msg = new Message(to);
-            // check if to is an known MUC JID
+            // check if "to" is an known MUC JID
             muc = sXmppMuc.getRoomViaRoomName(to);
         }
 
@@ -779,7 +781,18 @@ public class XmppManager {
                 // TODO find out what happens if the receiver is unknown
                 // for example when we try to send here to an MUC address
                 // because the MUC got lost in the database somehow
-                sConnection.sendPacket(msg);
+            	Iterator<Presence> presences = sConnection.getRoster().getPresences(sSettings.notifiedAddress);            	
+            	while( presences.hasNext() ) {
+            		Presence p = presences.next();
+            		String toPresence = p.getFrom();
+            		String toResource = StringUtils.parseResource(toPresence);
+            		if (toResource != null && 
+            				!toResource.equals("")
+            				&& (false || !toResource.startsWith("android"))) {
+            			msg.setTo(to);
+                        sConnection.sendPacket(msg);            			
+            		}
+            	}
             } else {
                 try {
                     muc.sendMessage(msg);

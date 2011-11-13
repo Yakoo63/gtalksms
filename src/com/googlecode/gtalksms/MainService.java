@@ -215,7 +215,11 @@ public class MainService extends Service {
             String message = intent.getStringExtra("message");
             boolean roomExists = XmppMuc.getInstance(this).roomExists(number);
 
-            Log.i(MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists);
+            Log.i(MainService.ACTION_SMS_RECEIVED 
+            		+ ": number=" + number 
+            		+ " message=" + message 
+            		+ " roomExists=" + roomExists 
+            		+ "notifySame=" + sSettingsMgr.notifySmsInSameConversation);
             
             // The user wants to be notified in the same conversation window,
             // which just means that we do not notify a MUC but the default
@@ -224,6 +228,7 @@ public class MainService extends Service {
                 XmppMsg msg = new XmppMsg();
                 msg.appendBold(getString(R.string.chat_sms_from, name));
                 msg.append(message);
+                Log.i("Sending message form " + number + " via chat");
                 sXmppMgr.send(msg, null);
                 if (sCommands.containsKey("sms")) {
                     ((SmsCmd) sCommands.get("sms")).setLastRecipient(number);
@@ -243,6 +248,7 @@ public class MainService extends Service {
                     msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
+                    Log.i("Sending message form " + number + " via MUC");
                     sXmppMgr.send(msg, null);
                 }
             }

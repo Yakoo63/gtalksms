@@ -57,7 +57,9 @@ public class XmppLocalS5BProxyManager {
         if (info != null) {
             // There is an active Wifi connection
             String ip = Tools.ipIntToString(info.getIpAddress());
-            addresses.add(ip);
+            // Sometimes "0.0.0.0" gets returned
+            if (!ip.equals("0.0.0.0"))
+            	addresses.add(ip);
 
         } 
         // set an ip in case there is a Wifi Connection

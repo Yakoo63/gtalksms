@@ -16,5 +16,5 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/jzlib-1.07.jar" sourcepath="lib/jzlib-1.0.7.zip"/>
 	<classpathentry kind="lib" path="lib/admob-sdk-android.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
