@@ -215,6 +215,9 @@
     <string name="chat_help_camera_xmpp">- %1$s or %2$s: prend une photo, l\'enregistre et l\'envoie via la connexion XMPP.</string>
     <string name="chat_help_camera_list">- %1$s or %2$s: liste l\'ensemble des appareils photo du téléphone.</string>
     <string name="chat_help_camera_set">- %1$s or %2$s: permet de choisir l\'appareil photo par défaut.</string>
+    <string name="chat_help_wifi_on">- %1$s or %2$s: démarre le WiFi.</string>
+    <string name="chat_help_wifi_off">- %1$s or %2$s: éteint le WiFi.</string>
+    <string name="chat_help_wifi_state">- %1$s or %2$s: donne l\'état du WiFi.</string>
     <string name="chat_call_unknown">Inconnu</string>
     <string name="chat_call_incoming">Entrant</string>
     <string name="chat_call_outgoing">Sortant</string>
