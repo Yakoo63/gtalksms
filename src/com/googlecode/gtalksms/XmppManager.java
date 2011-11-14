@@ -774,25 +774,26 @@ public class XmppManager {
             msg.setType(Message.Type.groupchat);
         }
         
-        // TODO find out why connection seems to be sometimes null
-        // see Issue 192 for an example
+
         if (isConnected()) {
-            if (muc == null) {
-                // TODO find out what happens if the receiver is unknown
-                // for example when we try to send here to an MUC address
-                // because the MUC got lost in the database somehow
-            	Iterator<Presence> presences = sConnection.getRoster().getPresences(sSettings.notifiedAddress);            	
-            	while( presences.hasNext() ) {
-            		Presence p = presences.next();
-            		String toPresence = p.getFrom();
-            		String toResource = StringUtils.parseResource(toPresence);
-            		if (toResource != null && 
-            				!toResource.equals("")
-            				&& (false || !toResource.startsWith("android"))) {
-            			msg.setTo(to);
-                        sConnection.sendPacket(msg);            			
-            		}
-            	}
+            // Message has no destination information
+            // Send to all known resources 
+            if (muc == null && to == null) {
+                Iterator<Presence> presences = sConnection.getRoster().getPresences(sSettings.notifiedAddress);
+                while (presences.hasNext()) {
+                    Presence p = presences.next();
+                    String toPresence = p.getFrom();
+                    String toResource = StringUtils.parseResource(toPresence);
+                    if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
+                        msg.setTo(toPresence);
+                        sConnection.sendPacket(msg);
+                    }
+                }
+            // Message has a known destination information
+            // And we have set the to-address before
+            } else if (muc == null) {
+                sConnection.sendPacket(msg);
+            // Message is for a known MUC
             } else {
                 try {
                     muc.sendMessage(msg);
