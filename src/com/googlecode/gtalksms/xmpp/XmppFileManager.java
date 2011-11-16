@@ -25,6 +25,9 @@ import com.googlecode.gtalksms.tools.Tools;
 public class XmppFileManager implements FileTransferListener {
     private static final int MAX_CYCLES = 30;
     private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+    private static final String APP_DIR = Tools.APP_NAME;
+    
+    private static XmppFileManager xmppFileManager;
     
     private SettingsManager mSettings;
     private XMPPConnection mConnection;
@@ -33,11 +36,7 @@ public class XmppFileManager implements FileTransferListener {
     private File mExternalFilesDir;
     private File mLandingDir;
     private Context mCtx;
-    
-    private static XmppFileManager xmppFileManager;
-    
-    private static final String gtalksmsDir = Tools.APP_NAME;
-    
+            
     private XmppFileManager(Context context) {
         mSettings = SettingsManager.getSettingsManager(context);
         mCtx = context;
@@ -46,7 +45,7 @@ public class XmppFileManager implements FileTransferListener {
         } else {
             mExternalFilesDir = Environment.getExternalStorageDirectory();
         }
-        mLandingDir = new File(mExternalFilesDir, gtalksmsDir);
+        mLandingDir = new File(mExternalFilesDir, APP_DIR);
         if (!mLandingDir.exists()) {
             mLandingDir.mkdirs();
         }

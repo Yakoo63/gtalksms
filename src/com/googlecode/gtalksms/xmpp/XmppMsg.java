@@ -18,22 +18,22 @@ public class XmppMsg implements Parcelable {
     public final static String FontBegin = "##FONT_BEGIN##";
     
     // TODO to be initialized by SettingsMgr
-    private static final XmppFont DefaultFont = new XmppFont();
-    private XmppFont _mainFont;
-    private StringBuilder _message = new StringBuilder();
-    private ArrayList<XmppFont> _fonts = new ArrayList<XmppFont>();
+    private static final XmppFont DEFAULT_FONT = new XmppFont();
+    private XmppFont mMainFont;
+    private StringBuilder mMessage = new StringBuilder();
+    private ArrayList<XmppFont> mFonts = new ArrayList<XmppFont>();
     
     public XmppMsg() {
-        _mainFont = DefaultFont;
+        mMainFont = DEFAULT_FONT;
     }
     
     public XmppMsg(String msg) {
-        _mainFont = DefaultFont;
-        _message.append(msg);
+        mMainFont = DEFAULT_FONT;
+        mMessage.append(msg);
     }
 
     public XmppMsg(XmppFont font) {
-        _mainFont = font;
+        mMainFont = font;
     }
 
     public static String makeBold(String in) {
@@ -45,12 +45,12 @@ public class XmppMsg implements Parcelable {
     }
     
     public void setFont(XmppFont font) {
-        _message.append(FontBegin);
-        _fonts.add(font);
+        mMessage.append(FontBegin);
+        mFonts.add(font);
     }
 
     public void append(String msg) {
-        _message.append(msg);
+        mMessage.append(msg);
     }
     
     public void append(int value) {
@@ -58,7 +58,7 @@ public class XmppMsg implements Parcelable {
     }
 
     public void appendLine(String msg) {
-        _message.append(msg);
+        mMessage.append(msg);
         newLine();
     }
     
@@ -67,39 +67,39 @@ public class XmppMsg implements Parcelable {
     }
 
     public void insertLineBegin(String msg) {
-        _message.insert(0, msg + Tools.LineSep);
+        mMessage.insert(0, msg + Tools.LineSep);
     }
     
     public void appendBold(String msg) {
-        _message.append(makeBold(msg));
+        mMessage.append(makeBold(msg));
     }
     
     public void appendBoldLine(String msg) {
-        _message.append(makeBold(msg));
+        mMessage.append(makeBold(msg));
         newLine();
     }
     
     public void appendItalic(String msg) {
-        _message.append(makeItalic(msg));
+        mMessage.append(makeItalic(msg));
     }
     
     public void appendItalicLine(String msg) {
-        _message.append(makeItalic(msg));
+        mMessage.append(makeItalic(msg));
         newLine();
     }
     
     public void newLine() {
-        _message.append(Tools.LineSep);
+        mMessage.append(Tools.LineSep);
     }    
     
     public XmppMsg append(XmppMsg input) {
-        _message.append(input._message);
-        _fonts.addAll(input._fonts);
+        mMessage.append(input.mMessage);
+        mFonts.addAll(input.mFonts);
         return this;
     }
     
     public String generateTxt() {
-        String message = removeLastNewline(_message.toString());
+        String message = removeLastNewline(mMessage.toString());
         return message
                     .replaceAll(FontBegin, "")
                     .replaceAll(BoldBegin, "")
@@ -109,7 +109,7 @@ public class XmppMsg implements Parcelable {
     }
 
     public String generateFmtTxt() {
-        String message = removeLastNewline(_message.toString());
+        String message = removeLastNewline(mMessage.toString());
         return message
                     .replaceAll(FontBegin, "")
                     .replaceAll(BoldBegin, " *")
@@ -120,13 +120,13 @@ public class XmppMsg implements Parcelable {
     
     public XHTMLText generateXHTMLText() {
         int pos;
-        String message = _message.toString();
+        String message = mMessage.toString();
         message = removeLastNewline(message);
         StringBuilder m = new StringBuilder(message); 
-        ArrayList<XmppFont> fonts = new ArrayList<XmppFont>(_fonts);
+        ArrayList<XmppFont> fonts = new ArrayList<XmppFont>(mFonts);
         
         XHTMLText x = new XHTMLText(null, null);
-        x.appendOpenParagraphTag(_mainFont.toString()); // open a paragraph with default font - which is may be null - clients will fall back to their default font
+        x.appendOpenParagraphTag(mMainFont.toString()); // open a paragraph with default font - which is may be null - clients will fall back to their default font
         x.appendOpenSpanTag("");  // needed because we close span on fontbegin
         while((pos = getTagPos(m)) != -1) {
             procesTagAt(pos, x, m, fonts);

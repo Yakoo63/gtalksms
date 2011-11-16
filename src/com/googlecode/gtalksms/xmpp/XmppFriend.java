@@ -11,20 +11,20 @@ public class XmppFriend {
     public static final int FFC = 4;
     public static final int OFFLINE = 5;
     
-    public String id;
-    public String name;
-    public String status;
-    public int state;
+    public String mId;
+    public String mName;
+    public String mStatus;
+    public int mState;
 
     public XmppFriend(String userID, String username, String retrieveStatus, int retrieveState) {
-        id = userID;
-        name = username;
-        status = retrieveStatus;
-        state = retrieveState;
+        mId = userID;
+        mName = username;
+        mStatus = retrieveStatus;
+        mState = retrieveState;
     }
     
     public static String stateToString(int state) {
-        switch(state) {
+        switch (state) {
         case ONLINE:
             return "Online";
         case AWAY:
@@ -37,9 +37,9 @@ public class XmppFriend {
             return "Free for chat";
         case OFFLINE:
             return "Offline";
-         default:
-             GoogleAnalyticsHelper.trackAndLogError("XMPP Friend state unknown: " + state);
-             return "unkown";
+        default:
+            GoogleAnalyticsHelper.trackAndLogError("XMPP Friend state unknown: " + state);
+            return "unkown";
         }
     }
 }

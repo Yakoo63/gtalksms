@@ -20,18 +20,19 @@ public class XmppStatus {
     private static final String STATEFILE_NAME = "xmppStatus";
     
     private static XmppStatus sXmppStatus;
-    private static File sStatefile;
-    private static KeyValueHelper sKeyValueHelper;
+    
+    private File mStatefile;
+    private KeyValueHelper mKeyValueHelper;
     
     
     private XmppStatus(Context ctx) {
         File filesDir = ctx.getFilesDir();
-        sStatefile = new File(filesDir, STATEFILE_NAME);
-        sKeyValueHelper = KeyValueHelper.getKeyValueHelper(ctx);
+        mStatefile = new File(filesDir, STATEFILE_NAME);
+        mKeyValueHelper = KeyValueHelper.getKeyValueHelper(ctx);
         // Delete the old statefile
         // TODO remove this check with a future release
-        if (sStatefile.isFile()) {
-            sStatefile.delete();
+        if (mStatefile.isFile()) {
+            mStatefile.delete();
         }
     }
     
@@ -50,7 +51,7 @@ public class XmppStatus {
      */
     public int getLastKnowState() {
         int res = XmppManager.DISCONNECTED;
-        String value = sKeyValueHelper.getValue(KeyValueHelper.KEY_XMPP_STATUS);
+        String value = mKeyValueHelper.getValue(KeyValueHelper.KEY_XMPP_STATUS);
         if (value != null) {
             try {
                 res = Integer.parseInt(value);
@@ -68,6 +69,6 @@ public class XmppStatus {
      */
     public void setState(int status) {
         String value = Integer.toString(status);
-        sKeyValueHelper.addKey(KeyValueHelper.KEY_XMPP_STATUS, value);
+        mKeyValueHelper.addKey(KeyValueHelper.KEY_XMPP_STATUS, value);
     }
 }

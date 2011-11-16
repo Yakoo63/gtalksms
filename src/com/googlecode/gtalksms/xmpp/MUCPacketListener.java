@@ -18,14 +18,14 @@ import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 class MUCPacketListener implements PacketListener {
-	private String number;
-	private String name; // the name of GTalkSMS in this room
-	private Date lastDate;
-	private MultiUserChat muc;
-	private String roomName;
-	private SettingsManager settings;
-	private Context ctx;
-	private int mode;
+	private String mNumber;
+	private String mName; // the name of GTalkSMS in this room
+	private Date mLastDate;
+	private MultiUserChat mMuc;
+	private String mRoomName;
+	private SettingsManager mSettings;
+	private Context mCtx;
+	private int mMode;
 	
 	/**
 	 * Creates a new MUCPacketListener
@@ -38,16 +38,16 @@ class MUCPacketListener implements PacketListener {
 	 * @param ctx
 	 */
 	public MUCPacketListener(String number, MultiUserChat muc, String name, int mode, Context ctx) {
-		this.name = name;
-		this.number = number;
-		this.lastDate = new Date(0);
-		this.muc = muc;
-		this.roomName = muc.getRoom();
-		this.settings = SettingsManager.getSettingsManager(ctx);
-		this.mode = mode;
-		this.ctx = ctx;
+		this.mName = name;
+		this.mNumber = number;
+		this.mLastDate = new Date(0);
+		this.mMuc = muc;
+		this.mRoomName = muc.getRoom();
+		this.mSettings = SettingsManager.getSettingsManager(ctx);
+		this.mMode = mode;
+		this.mCtx = ctx;
         
-		Log.initialize(settings);
+		Log.initialize(mSettings);
 	}
 
 	@Override
@@ -62,14 +62,14 @@ class MUCPacketListener implements PacketListener {
 		// messages from the room JID itself, are matched here, because they have no 
 		// resource part these are normally status messages about the room we send them 
 		// to the notification address
-		if (from.equals(roomName)) {
+		if (from.equals(mRoomName)) {
 			Intent intent = new Intent(MainService.ACTION_SEND);
-			intent.putExtra("message", name + ": " + message.getBody());
+			intent.putExtra("message", mName + ": " + message.getBody());
 			// fromMuc sounds right at first, but it servers no purpose here atm			
 			// intent.putExtra("fromMuc", true);
-			ctx.startService(intent);
-		} else if (mode == XmppMuc.MODE_SMS) {
-	        if (!fromBareResource.equals(name)) {
+			mCtx.startService(intent);
+		} else if (mMode == XmppMuc.MODE_SMS) {
+	        if (!fromBareResource.equals(mName)) {
 				if (message.getBody() != null) {
     				DelayInformation inf = (DelayInformation) message.getExtension("x", "jabber:x:delay");
     				Date sentDate;
@@ -79,23 +79,23 @@ class MUCPacketListener implements PacketListener {
     					sentDate = new Date();
     				}
     
-    				if (sentDate.compareTo(lastDate) > 0) {
+    				if (sentDate.compareTo(mLastDate) > 0) {
     					Intent intent = new Intent(MainService.ACTION_COMMAND);
-    					intent.setClass(ctx, MainService.class);
+    					intent.setClass(mCtx, MainService.class);
     
-    					intent.putExtra("from", roomName);
+    					intent.putExtra("from", mRoomName);
     					intent.putExtra("cmd", "sms");
     					intent.putExtra("fromMuc", true);
     					// if there are more than 2 users in the
     					// room, we include also a tag in the response of the sms message
-    					if (muc.getOccupantsCount() > 2) { 
-    						intent.putExtra("args", number + ":" + fromBareResource + ": " + message.getBody());
+    					if (mMuc.getOccupantsCount() > 2) { 
+    						intent.putExtra("args", mNumber + ":" + fromBareResource + ": " + message.getBody());
     					} else {
-    						intent.putExtra("args", number + ":" + message.getBody());
+    						intent.putExtra("args", mNumber + ":" + message.getBody());
     					}
     
-						ctx.startService(intent);
-    					lastDate = sentDate;
+						mCtx.startService(intent);
+    					mLastDate = sentDate;
     				} else {
     					// this seems to be caused by the history replay of MUC rooms
     					// which is now disabled, lets get some metrics and decide later if we 
@@ -109,19 +109,19 @@ class MUCPacketListener implements PacketListener {
 	        } else {
 	            Log.i("MUCPacketListener: Received message which equals our room nick. message=" + message.getBody());
 	        }
-		} else if (mode == XmppMuc.MODE_SHELL) {
-		    if (!fromBareResource.equals(name)) {
+		} else if (mMode == XmppMuc.MODE_SHELL) {
+		    if (!fromBareResource.equals(mName)) {
 	            Intent intent = new Intent(MainService.ACTION_COMMAND);
-                intent.setClass(ctx, MainService.class);
+                intent.setClass(mCtx, MainService.class);
     
                 intent.putExtra("args", message.getBody());
                 intent.putExtra("cmd", "cmd");
-                intent.putExtra("from", number);
+                intent.putExtra("from", mNumber);
                 // Must not be set for Shell because everything in a shell session
                 // should be returned to the according MUC
                 // intent.putExtra("fromMuc", true);
                 
-                ctx.startService(intent);
+                mCtx.startService(intent);
             }
         }
     }

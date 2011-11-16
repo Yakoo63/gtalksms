@@ -12,6 +12,8 @@ import android.content.SharedPreferences.Editor;
 import com.googlecode.gtalksms.SettingsManager;
 
 public class XmppAccountManager {
+    // some servers need the username to be a full JID
+    // define them here (currently only Google services)
     private static final String[] USERNAME_IS_FULL_JID = new String[] {"gmail.com", "googlemail.com"};                                
     
     /**

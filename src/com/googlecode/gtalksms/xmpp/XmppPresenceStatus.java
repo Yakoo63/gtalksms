@@ -10,15 +10,16 @@ import android.content.Context;
 
 public class XmppPresenceStatus {
     
-    private static XMPPConnection sConnection;
-    private static XmppBuddies sXmppBuddies;
+
     private static XmppPresenceStatus sXmppPresenceStatus;
     
+    private XMPPConnection mConnection;
+    private XmppBuddies mXmppBuddies;
     private String mBatteryPercentage;
     private String mPowerSource;
     
     private XmppPresenceStatus(Context ctx) {
-        sXmppBuddies = XmppBuddies.getInstance(ctx);
+        mXmppBuddies = XmppBuddies.getInstance(ctx);
     }
     
     public static XmppPresenceStatus getInstance(Context ctx) {
@@ -31,7 +32,7 @@ public class XmppPresenceStatus {
     public void registerListener(XmppManager xmppMgr) {
         XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
             public void newConnection(XMPPConnection connection) {
-                sConnection = connection;
+                mConnection = connection;
                 setStatus(true);
             }
         };
@@ -73,12 +74,12 @@ public class XmppPresenceStatus {
      * @return true if the presence was set
      */
     private boolean setStatus(boolean force) {
-        if ((sXmppBuddies.isNotificationAddressAvailable() || force) 
-                && (sConnection != null && sConnection.isAuthenticated())) {
+        if ((mXmppBuddies.isNotificationAddressAvailable() || force) 
+                && (mConnection != null && mConnection.isAuthenticated())) {
             Presence presence = new Presence(Presence.Type.available);
             presence.setStatus(composePresenceStatus());
             presence.setPriority(24);
-            sConnection.sendPacket(presence);
+            mConnection.sendPacket(presence);
             return true;
         } else {
             return false;

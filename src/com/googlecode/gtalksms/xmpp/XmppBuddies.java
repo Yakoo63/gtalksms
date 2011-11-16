@@ -115,10 +115,10 @@ public class XmppBuddies implements RosterListener {
         
         for (XmppFriend xmppFriend : list) {
             Intent intent = new Intent(MainService.ACTION_XMPP_PRESENCE_CHANGED);
-            intent.putExtra("userid", xmppFriend.id);
-            intent.putExtra("name", xmppFriend.name == null ? xmppFriend.id : xmppFriend.name);
-            intent.putExtra("status", xmppFriend.status);
-            intent.putExtra("state", xmppFriend.state);
+            intent.putExtra("userid", xmppFriend.mId);
+            intent.putExtra("name", xmppFriend.mName == null ? xmppFriend.mId : xmppFriend.mName);
+            intent.putExtra("status", xmppFriend.mStatus);
+            intent.putExtra("state", xmppFriend.mState);
             sContext.sendBroadcast(intent);
         }
     }

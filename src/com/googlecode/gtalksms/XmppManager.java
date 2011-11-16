@@ -96,40 +96,40 @@ public class XmppManager {
     // We are waiting for a valid data connection
     public static final int WAITING_FOR_NETWORK = 6;
     
-    // Indicates the current state of the service (disconnected/connecting/connected)
-    private static int _status = DISCONNECTED;
-    
-    private static List<XmppConnectionChangeListener> connectionChangeListeners;
-    private static XMPPConnection sConnection = null;
     private static XmppManager sXmppManager = null;
-    private static PacketListener sPacketListener = null;
-    
-    private static PacketListener sPresencePacketListener = null;
-    
-    private static ConnectionListener sConnectionListener = null;    
-    private static XmppMuc sXmppMuc;
-    private static XmppBuddies sXmppBuddies;
-    private static XmppFileManager sXmppFileMgr;
-    private static ClientOfflineMessages sClientOfflineMessages;
-    private static XmppStatus sXmppStatus;
-    private static XmppPresenceStatus sXmppPresenceStatus;
-    
     private static int sReusedConnectionCount = 0;
     private static int sNewConnectionCount = 0;
+    
+    // Indicates the current state of the service (disconnected/connecting/connected)
+    private int mStatus = DISCONNECTED;
+    
+    private List<XmppConnectionChangeListener> mConnectionChangeListeners;
+    private XMPPConnection mConnection = null;
+    private PacketListener mPacketListener = null;
+    
+    private PacketListener mPresencePacketListener = null;
+    
+    private ConnectionListener mConnectionListener = null;    
+    private XmppMuc mXmppMuc;
+    private XmppBuddies mXmppBuddies;
+    private XmppFileManager mXmppFileMgr;
+    private ClientOfflineMessages mClientOfflineMessages;
+    private XmppStatus mXmppStatus;
+    private XmppPresenceStatus mXmppPresenceStatus;    
         
     // Our current retry attempt, plus a runnable and handler to implement retry
-    private static int sCurrentRetryCount = 0;
-    private static Runnable sReconnectRunnable = new Runnable() {
+    private int mCurrentRetryCount = 0;
+    private Runnable mReconnectRunnable = new Runnable() {
         public void run() {
             Log.i("attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
-            Tools.startSvcIntent(sContext, MainService.ACTION_CONNECT);
+            Tools.startSvcIntent(mContext, MainService.ACTION_CONNECT);
         }
     };
 
-    private static Handler sReconnectHandler = new Handler();
+    private Handler mReconnectHandler = new Handler();
 
-    private static  SettingsManager sSettings;
-    private static Context sContext;
+    private SettingsManager mSettings;
+    private Context mContext;
     
     /**
      * Constructor for an XmppManager instance, connection is optional. It 
@@ -141,22 +141,22 @@ public class XmppManager {
      * @param connection - optional
      */
     private XmppManager(Context context, XMPPConnection connection) {
-        connectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
-        sSettings = SettingsManager.getSettingsManager(context);
-        Log.initialize(sSettings);
-        sContext = context;
+        mConnectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
+        mSettings = SettingsManager.getSettingsManager(context);
+        Log.initialize(mSettings);
+        mContext = context;
         configure(ProviderManager.getInstance());
-        sXmppBuddies = XmppBuddies.getInstance(context);
-        sXmppFileMgr = XmppFileManager.getInstance(context);
-        sXmppMuc = XmppMuc.getInstance(context);
-        sClientOfflineMessages = ClientOfflineMessages.getInstance(context);
-        sXmppStatus = XmppStatus.getInstance(context);
-        sXmppPresenceStatus = XmppPresenceStatus.getInstance(context);
-        sXmppBuddies.registerListener(this);
-        sXmppFileMgr.registerListener(this);
-        sXmppMuc.registerListener(this);
-        sClientOfflineMessages.registerListener(this);
-        sXmppPresenceStatus.registerListener(this);
+        mXmppBuddies = XmppBuddies.getInstance(context);
+        mXmppFileMgr = XmppFileManager.getInstance(context);
+        mXmppMuc = XmppMuc.getInstance(context);
+        mClientOfflineMessages = ClientOfflineMessages.getInstance(context);
+        mXmppStatus = XmppStatus.getInstance(context);
+        mXmppPresenceStatus = XmppPresenceStatus.getInstance(context);
+        mXmppBuddies.registerListener(this);
+        mXmppFileMgr.registerListener(this);
+        mXmppMuc.registerListener(this);
+        mClientOfflineMessages.registerListener(this);
+        mXmppPresenceStatus.registerListener(this);
         XmppLocalS5BProxyManager.getInstance(context).registerListener(this);
         sReusedConnectionCount = 0;
         sNewConnectionCount = 0;
@@ -170,7 +170,7 @@ public class XmppManager {
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
         // connection can be null, it is created on demand
-        sConnection = connection;
+        mConnection = connection;
     }
     
     /**
@@ -202,15 +202,15 @@ public class XmppManager {
         } else {
             // remove all possible references to the old connection
             // note that this will note change sStatus
-            cleanupConnection();
+            sXmppManager.cleanupConnection();
             // init XmppManager with the new connection
             // setting up all packetListeners etc.
-            onConnectionEstablished(connection);
+            sXmppManager.onConnectionEstablished(connection);
         }
         return sXmppManager;
     }
     
-    private static void start(int initialState) {
+    private void start(int initialState) {
         switch (initialState) {
             case CONNECTED:
                 initConnection();
@@ -228,7 +228,7 @@ public class XmppManager {
      * calls cleanupConnection and 
      * sets _status to DISCONNECTED
      */
-    private static void stop() {
+    private void stop() {
         updateStatus(DISCONNECTING);
         cleanupConnection();
         updateStatus(DISCONNECTED);
@@ -241,29 +241,29 @@ public class XmppManager {
      * is still connected and removes packetListeners and 
      * Callbacks for the reconnectHandler
      */
-    private static void cleanupConnection() {
-        sReconnectHandler.removeCallbacks(sReconnectRunnable);
+    private void cleanupConnection() {
+        mReconnectHandler.removeCallbacks(mReconnectRunnable);
 
-        if (sConnection != null) {
-            if (sConnection.isConnected()) {
-                xmppDisconnect(sConnection);
+        if (mConnection != null) {
+            if (mConnection.isConnected()) {
+                xmppDisconnect(mConnection);
             }
             // xmppDisconnect may has set _connection = null, so we have to double check
-            if (sConnection != null) {
-                if (sPacketListener != null) {
-                    sConnection.removePacketListener(sPacketListener);
+            if (mConnection != null) {
+                if (mPacketListener != null) {
+                    mConnection.removePacketListener(mPacketListener);
                 }
-                if (sConnectionListener != null) {
-                    sConnection.removeConnectionListener(sConnectionListener);
+                if (mConnectionListener != null) {
+                    mConnection.removeConnectionListener(mConnectionListener);
                 }
-                if (sPresencePacketListener != null) {
-                    sConnection.removePacketListener(sPresencePacketListener);
+                if (mPresencePacketListener != null) {
+                    mConnection.removePacketListener(mPresencePacketListener);
                 }
             }
         }
-        sPacketListener = null; 
-        sConnectionListener = null;
-        sPresencePacketListener = null;
+        mPacketListener = null; 
+        mConnectionListener = null;
+        mPresencePacketListener = null;
     }
     
     /** 
@@ -336,7 +336,7 @@ public class XmppManager {
         // the state actually changes and update everything accordingly.
     }
 
-    private static void xmppDisconnect(XMPPConnection connection) {
+    private void xmppDisconnect(XMPPConnection connection) {
         // In some cases the 'disconnect' may hang - see
         // http://code.google.com/p/gtalksms/issues/detail?id=12 for an
         // example.  We worm around this by leveraging the fact that we 
@@ -386,7 +386,7 @@ public class XmppManager {
         // we don't have the time, so prepare for a new connection
         if (t.isAlive()) {
             Log.i(t.getName() + " was still alive: connection will be set to null");
-            sConnection = null;
+            mConnection = null;
         }
     }
 
@@ -401,13 +401,13 @@ public class XmppManager {
      * @param old_state
      * @param new_state
      */
-    public static void broadcastStatus(Context ctx, int old_state, int new_state) {  
+    public void broadcastStatus(Context ctx, int old_state, int new_state) {  
         Intent intent = new Intent(MainService.ACTION_XMPP_CONNECTION_CHANGED);                      
         intent.putExtra("old_state", old_state);
         intent.putExtra("new_state", new_state);
-        if (new_state == CONNECTED && sConnection != null) {
-            intent.putExtra("TLS", sConnection.isUsingTLS());
-            intent.putExtra("Compression", sConnection.isUsingCompression());
+        if (new_state == CONNECTED && mConnection != null) {
+            intent.putExtra("TLS", mConnection.isUsingTLS());
+            intent.putExtra("Compression", mConnection.isUsingCompression());
         }
         ctx.sendBroadcast(intent);
     }
@@ -418,33 +418,33 @@ public class XmppManager {
      * 
      * @param status
      */
-    private static void updateStatus(int status) {
-        if (status != _status) {
+    private void updateStatus(int status) {
+        if (status != mStatus) {
             // ensure _status is set before broadcast, just in-case
             // a receiver happens to wind up querying the state on
             // delivery.
-            int old = _status;
-            _status = status;     
-            sXmppStatus.setState(status);
+            int old = mStatus;
+            mStatus = status;     
+            mXmppStatus.setState(status);
             Log.i("broadcasting state transition from " + statusAsString(old) + " to " + statusAsString(status) + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
-            broadcastStatus(sContext, old, status);
+            broadcastStatus(mContext, old, status);
         }
     }
 
-    private static void maybeStartReconnect() {
+    private void maybeStartReconnect() {
             int timeout;
             updateStatus(WAITING_TO_CONNECT);
             cleanupConnection();
-            sCurrentRetryCount += 1;
-            if (sCurrentRetryCount < 20) {
+            mCurrentRetryCount += 1;
+            if (mCurrentRetryCount < 20) {
                 // a simple linear-backoff strategy.
-                timeout = 5000 * sCurrentRetryCount;
+                timeout = 5000 * mCurrentRetryCount;
             } else {
                 // every 5 min
                 timeout = 1000 * 60 * 5;
             }
-            Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + sCurrentRetryCount);
-            sReconnectHandler.postDelayed(sReconnectRunnable, timeout);
+            Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + mCurrentRetryCount);
+            mReconnectHandler.postDelayed(mReconnectRunnable, timeout);
     }
     
 
@@ -458,14 +458,14 @@ public class XmppManager {
      * Calls maybeStartReconnect() if something went wrong
      * 
      */
-    private static void initConnection() {
+    private void initConnection() {
         XMPPConnection connection;
 
         // assert we are only ever called from one thread
         String currentThreadName = Thread.currentThread().getName();
         assert (!currentThreadName.equals(MainService.SERVICE_THREAD_NAME));
         
-        NetworkInfo active = ((ConnectivityManager)sContext.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        NetworkInfo active = ((ConnectivityManager)mContext.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (active == null || !active.isAvailable()) {
             Log.e("initConnection: connection request, but no network available");
             // we don't destroy the service here - our network receiver will notify us when
@@ -480,11 +480,11 @@ public class XmppManager {
         // create a new connection if the connection is obsolete or if the
         // old connection is still active
         if (SettingsManager.connectionSettingsObsolete 
-                || sConnection == null 
-                || sConnection.isConnected() ) {
+                || mConnection == null 
+                || mConnection.isConnected() ) {
             
             try {
-                connection = createNewConnection(sSettings);
+                connection = createNewConnection(mSettings);
             } catch (XMPPException e) {
                 // connection failure
                 Log.e("Exception creating new XMPP Connection", e);
@@ -499,7 +499,7 @@ public class XmppManager {
             sNewConnectionCount++;
         } else {
             // reuse the old connection settings
-            connection = sConnection;
+            connection = mConnection;
             // we reuse the xmpp connection so only connect() is needed
             if (!connectAndAuth(connection)) {
                 // connection failure
@@ -511,9 +511,9 @@ public class XmppManager {
         onConnectionEstablished(connection);
     }
     
-    private static void onConnectionEstablished(XMPPConnection connection) {
-        sConnection = connection;               
-        sConnectionListener = new ConnectionListener() {
+    private void onConnectionEstablished(XMPPConnection connection) {
+        mConnection = connection;               
+        mConnectionListener = new ConnectionListener() {
             @Override
             public void connectionClosed() {
                 // connection was closed by the foreign host
@@ -549,30 +549,30 @@ public class XmppManager {
                 throw new IllegalStateException("Reconnection Manager is running");
             }
         };
-        sConnection.addConnectionListener(sConnectionListener);            
+        mConnection.addConnectionListener(mConnectionListener);            
 
         try {
-            informListeners(sConnection);
+            informListeners(mConnection);
 
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-            sPacketListener = new ChatPacketListener(sConnection, sContext);
-            sConnection.addPacketListener(sPacketListener, filter);
+            mPacketListener = new ChatPacketListener(mConnection, mContext);
+            mConnection.addPacketListener(mPacketListener, filter);
 
             filter = new PacketTypeFilter(Presence.class);
-            sPresencePacketListener = new PresencePacketListener(sConnection, sSettings);
-            sConnection.addPacketListener(sPresencePacketListener, filter);
+            mPresencePacketListener = new PresencePacketListener(mConnection, mSettings);
+            mConnection.addPacketListener(mPresencePacketListener, filter);
 
             try {
-                sConnection.getRoster().addRosterListener(sXmppBuddies);
-                sConnection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
-                sXmppBuddies.retrieveFriendList();
+                mConnection.getRoster().addRosterListener(mXmppBuddies);
+                mConnection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
+                mXmppBuddies.retrieveFriendList();
             } catch (Exception ex) {
                 GoogleAnalyticsHelper.trackAndLogError("Failed to setup XMPP friend list roster.", ex);
             }
 
             // It is important that we query the server for offline messages
             // BEFORE we send the first presence stanza
-            XmppOfflineMessages.handleOfflineMessages(sConnection, sSettings.notifiedAddress, sContext);
+            XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.notifiedAddress, mContext);
         } catch (Exception e) {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
@@ -581,22 +581,22 @@ public class XmppManager {
             return;
         } 
         
-        Log.i("connection established with parameters: con=" + sConnection.isConnected() + 
-                " auth=" + sConnection.isAuthenticated() + 
-                " enc=" + sConnection.isUsingTLS() + 
-                " comp=" + sConnection.isUsingCompression());
+        Log.i("connection established with parameters: con=" + mConnection.isConnected() + 
+                " auth=" + mConnection.isAuthenticated() + 
+                " enc=" + mConnection.isUsingTLS() + 
+                " comp=" + mConnection.isUsingCompression());
         
         // Send welcome message
-        if (sSettings.notifyApplicationConnection) {
-            Tools.send((sContext.getString(R.string.chat_welcome, Tools.getVersionName(sContext))), null, sContext);
+        if (mSettings.notifyApplicationConnection) {
+            Tools.send((mContext.getString(R.string.chat_welcome, Tools.getVersionName(mContext))), null, mContext);
         }
         
-        sCurrentRetryCount = 0;        
+        mCurrentRetryCount = 0;        
         updateStatus(CONNECTED);
     }
     
-    private static void informListeners(XMPPConnection connection) {
-        for (XmppConnectionChangeListener listener : connectionChangeListeners) {
+    private void informListeners(XMPPConnection connection) {
+        for (XmppConnectionChangeListener listener : mConnectionChangeListeners) {
             listener.newConnection(connection);
         }
     }
@@ -608,7 +608,7 @@ public class XmppManager {
      * @param connection
      * @return true if we are connected and authenticated, false otherwise
      */
-    private static boolean connectAndAuth(XMPPConnection connection) {
+    private boolean connectAndAuth(XMPPConnection connection) {
         try {
             connection.connect();
         } catch (Exception e) {
@@ -618,7 +618,7 @@ public class XmppManager {
             // see also issue 133 - http://code.google.com/p/gtalksms/issues/detail?id=133
             if (e.getMessage() != null && e.getMessage().startsWith("Connection failed. No response from server")) {
                 Log.w("xmpp connection in an unusable state, marking it as obsolete", e);
-                sConnection = null;
+                mConnection = null;
             }
             if (e instanceof XMPPException) {
                 XMPPException xmppEx = (XMPPException) e;
@@ -644,7 +644,7 @@ public class XmppManager {
         serviceDiscoMgr.addFeature("bug-fix-gtalksms");
         
         try {
-            connection.login(sSettings.login, sSettings.password, Tools.APP_NAME);
+            connection.login(mSettings.login, mSettings.password, Tools.APP_NAME);
         } catch (Exception e) {
             xmppDisconnect(connection);
             Log.e("xmpp login failed: " + e.getMessage());
@@ -713,16 +713,16 @@ public class XmppManager {
     }
 
     /** returns the current connection state */
-    public static int getConnectionStatus() {
-        return _status;
+    public int getConnectionStatus() {
+        return mStatus;
     }
     
-    public static boolean getTLSStatus() {
-        return sConnection == null ? false : sConnection.isUsingTLS();
+    public boolean getTLSStatus() {
+        return mConnection == null ? false : mConnection.isUsingTLS();
     }
     
-    public static boolean getCompressionStatus() {
-    	return sConnection == null ? false : sConnection.isUsingCompression();
+    public boolean getCompressionStatus() {
+    	return mConnection == null ? false : mConnection.isUsingCompression();
     }
     
     /**
@@ -748,10 +748,10 @@ public class XmppManager {
         } else {
             msg = new Message(to);
             // check if "to" is an known MUC JID
-            muc = sXmppMuc.getRoomViaRoomName(to);
+            muc = mXmppMuc.getRoomViaRoomName(to);
         }
 
-        if (sSettings.formatResponses) {
+        if (mSettings.formatResponses) {
             msg.setBody(message.generateFmtTxt());
         } else {
             msg.setBody(message.generateTxt());
@@ -762,7 +762,7 @@ public class XmppManager {
         // - we know that the recipient is able to read XHTML-IM
         // - we are disconnected and therefore send the message later
         if ((to == null) || 
-                (sConnection != null && (XHTMLManager.isServiceEnabled(sConnection, to) || !sConnection.isConnected()))) {
+                (mConnection != null && (XHTMLManager.isServiceEnabled(mConnection, to) || !mConnection.isConnected()))) {
             String xhtmlBody = message.generateXHTMLText().toString();
             XHTMLManager.addBody(msg, xhtmlBody);
         }
@@ -779,20 +779,20 @@ public class XmppManager {
             // Message has no destination information
             // Send to all known resources 
             if (muc == null && to == null) {
-                Iterator<Presence> presences = sConnection.getRoster().getPresences(sSettings.notifiedAddress);
+                Iterator<Presence> presences = mConnection.getRoster().getPresences(mSettings.notifiedAddress);
                 while (presences.hasNext()) {
                     Presence p = presences.next();
                     String toPresence = p.getFrom();
                     String toResource = StringUtils.parseResource(toPresence);
                     if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
                         msg.setTo(toPresence);
-                        sConnection.sendPacket(msg);
+                        mConnection.sendPacket(msg);
                     }
                 }
             // Message has a known destination information
             // And we have set the to-address before
             } else if (muc == null) {
-                sConnection.sendPacket(msg);
+                mConnection.sendPacket(msg);
             // Message is for a known MUC
             } else {
                 try {
@@ -804,19 +804,19 @@ public class XmppManager {
             return true;
         } else {
             Log.d("Adding message: \"" + message.toShortString() + "\" to offline queue, because we are not connected. Status=" + statusString());
-            return sClientOfflineMessages.addOfflineMessage(msg);
+            return mClientOfflineMessages.addOfflineMessage(msg);
         }
     }
     
     public boolean isConnected() {
-        boolean res = (sConnection != null 
-                && sConnection.isConnected() 
-                && _status == CONNECTED);
+        boolean res = (mConnection != null 
+                && mConnection.isConnected() 
+                && mStatus == CONNECTED);
         return res;
     }
     
     public void registerConnectionChangeListener(XmppConnectionChangeListener listener) {
-        connectionChangeListeners.add(listener);
+        mConnectionChangeListeners.add(listener);
     }
     
     public static int getNewConnectionCount() {
@@ -924,7 +924,7 @@ public class XmppManager {
         return res;                        
     }
     
-    public static String statusString() {
-        return statusAsString(_status);
+    public String statusString() {
+        return statusAsString(mStatus);
     }
 }

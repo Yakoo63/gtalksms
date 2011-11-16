@@ -290,7 +290,7 @@ public class MainService extends Service {
         } else if(!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {            
             GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
         }
-        Log.i("handled action '" + action + "' - state now: " + XmppManager.statusString());
+        Log.i("handled action '" + action + "' - state now: " + sXmppMgr.statusString());
         
         // stop the service if we are disconnected (but stopping the service
         // doesn't mean the process is terminated - onStart can still happen.)
@@ -304,7 +304,7 @@ public class MainService extends Service {
     }
 
     public int getConnectionStatus() {
-        return sXmppMgr == null ? XmppManager.DISCONNECTED : XmppManager.getConnectionStatus();
+        return sXmppMgr == null ? XmppManager.DISCONNECTED : sXmppMgr.getConnectionStatus();
     }
     
     public Map<String, CommandHandlerBase> getCommands() {
@@ -317,12 +317,12 @@ public class MainService extends Service {
     
     public boolean getTLSStatus() {
         // null check necessary
-        return sXmppMgr == null ? false : XmppManager.getTLSStatus();
+        return sXmppMgr == null ? false : sXmppMgr.getTLSStatus();
     }
     
     public boolean getCompressionStatus() {
         // null check necessary
-    	return sXmppMgr == null ? false : XmppManager.getCompressionStatus();   	    
+    	return sXmppMgr == null ? false : sXmppMgr.getCompressionStatus();   	    
     }         
     
     public static GoogleAnalyticsHelper getAnalyticsHelper() {
@@ -381,7 +381,7 @@ public class MainService extends Service {
         // but only calls the service's onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             int lastStatus = XmppStatus.getInstance(this).getLastKnowState();
-            int currentStatus = XmppManager.getConnectionStatus();
+            int currentStatus = (sXmppMgr == null) ? XmppManager.DISCONNECTED : sXmppMgr.getConnectionStatus();
             if (lastStatus !=  currentStatus && lastStatus != XmppManager.DISCONNECTING) {
                 Log.i("onCreate(): issuing connect intent because we are on gingerbread (or higher). " 
                         + "lastStatus is " + lastStatus
@@ -413,7 +413,7 @@ public class MainService extends Service {
         if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
             // A request to broadcast our current status even if _xmpp is null.
             int state = getConnectionStatus();
-            XmppManager.broadcastStatus(this, state, state);
+            sXmppMgr.broadcastStatus(this, state, state);
         // A real action request
         } else {
             // check if the user has done his part

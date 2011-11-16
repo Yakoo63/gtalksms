@@ -39,32 +39,33 @@ public class XmppMuc {
 	private static final int ROOM_START_TAG_LENGTH = ROOM_START_TAG.length();
 	private static final int REPLAY_TIMEOUT = 500;
 
-    private static Map<String, MultiUserChat> _rooms = new HashMap<String, MultiUserChat>();
-    private static Set<Integer> _roomNumbers = new HashSet<Integer>();
-    private static Context ctx;
-    private static SettingsManager _settings;
-    private static XMPPConnection _connection;
-    private static Random _rndGen = new Random();
-    private static MUCHelper _mucHelper;
-    private static DiscussionHistory discussionHistory;    
-    private static XmppMuc xmppMuc;
+    private static XmppMuc sXmppMuc;
+	
+    private Map<String, MultiUserChat> mRooms = new HashMap<String, MultiUserChat>();
+    private Set<Integer> mRoomNumbers = new HashSet<Integer>();
+    private Context mCtx;
+    private SettingsManager mSettings;
+    private XMPPConnection mConnection;
+    private Random mRndGen = new Random();
+    private MUCHelper mMucHelper;
+    private DiscussionHistory mDiscussionHistory;    
     
     private XmppMuc(Context context) {
-        ctx = context;
-        _settings = SettingsManager.getSettingsManager(context);
-        _mucHelper = MUCHelper.getMUCHelper(context);
-        discussionHistory = new DiscussionHistory();
+        mCtx = context;
+        mSettings = SettingsManager.getSettingsManager(context);
+        mMucHelper = MUCHelper.getMUCHelper(context);
+        mDiscussionHistory = new DiscussionHistory();
         // this should disable history replay on MUC rooms
-        discussionHistory.setMaxChars(0);        
+        mDiscussionHistory.setMaxChars(0);        
     }
     
     public void registerListener(XmppManager xmppMgr) {
         XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
             public void newConnection(XMPPConnection connection) {
-                _connection = connection;
+                mConnection = connection;
                 // clear the roomNumbers and room ArrayList as we have a new connection
-                _roomNumbers.clear();
-                _rooms.clear();
+                mRoomNumbers.clear();
+                mRooms.clear();
                 rejoinRooms();
             }            
         };
@@ -72,10 +73,10 @@ public class XmppMuc {
     }
     
     public static XmppMuc getInstance(Context ctx) {
-        if (xmppMuc == null) {
-            xmppMuc = new XmppMuc(ctx);
+        if (sXmppMuc == null) {
+            sXmppMuc = new XmppMuc(ctx);
         }
-        return xmppMuc;
+        return sXmppMuc;
     }
     
     /**
@@ -125,23 +126,23 @@ public class XmppMuc {
      * if the user (or someone else) writes to this room, a SMS is send to the number
      * 
      * @param number
-     * @param name
+     * @param mName
      * @return true if successful, otherwise false
      * @throws XMPPException 
      */
 	public MultiUserChat inviteRoom(String number, String contact, int mode)
 			throws XMPPException {
 		MultiUserChat muc;
-		if (!_rooms.containsKey(number)) {
+		if (!mRooms.containsKey(number)) {
 			muc = createRoom(number, contact, mode);
-			_rooms.put(number, muc);
+			mRooms.put(number, muc);
 
 		} else {
-			muc = _rooms.get(number);
+			muc = mRooms.get(number);
 			// TODO: test if occupants contains also the sender (in case we
 			// invite other people)
 			if (muc != null && muc.getOccupantsCount() < 2) {
-				muc.invite(_settings.notifiedAddress, "SMS conversation with "
+				muc.invite(mSettings.notifiedAddress, "SMS conversation with "
 						+ contact);
 			}
 		}
@@ -156,7 +157,7 @@ public class XmppMuc {
      * @return true if the room exists and gtalksms is in it, otherwise false
      */
     public boolean roomExists(String number) {
-    	return _rooms.containsKey(number);
+    	return mRooms.containsKey(number);
     }    
     
     /**
@@ -170,7 +171,7 @@ public class XmppMuc {
      * @return the room or null
      */
     public MultiUserChat getRoomViaRoomName(String roomname) {
-        Collection<MultiUserChat> mucSet = _rooms.values();
+        Collection<MultiUserChat> mucSet = mRooms.values();
         for(MultiUserChat muc : mucSet) {
             if(muc.getRoom().equals(roomname)) {
                 return muc;
@@ -200,19 +201,19 @@ public class XmppMuc {
         final String subjectInviteStr;
 
         do {
-            randomInt = _rndGen.nextInt();
-        } while (_roomNumbers.contains(randomInt));
+            randomInt = mRndGen.nextInt();
+        } while (mRoomNumbers.contains(randomInt));
 
         
         // TODO localize
         switch (mode) {
             case MODE_SMS:
-                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + _settings.login.replaceAll("@", "_") + "@" + _settings.mucServer;
+                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + mSettings.login.replaceAll("@", "_") + "@" + mSettings.mucServer;
                 subjectInviteStr =  "SMS conversation with " + getRoomString(number, name);
                 break;
 
             case MODE_SHELL:
-                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + _settings.login.replaceAll("@", "_") + "@" + _settings.mucServer;
+                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + mSettings.login.replaceAll("@", "_") + "@" + mSettings.mucServer;
                 subjectInviteStr =  "New Android Terminal " + getRoomString(number, name);
                 break;
 
@@ -224,7 +225,7 @@ public class XmppMuc {
         
         // See issue 136
         try {
-            multiUserChat = new MultiUserChat(_connection, roomJID);
+            multiUserChat = new MultiUserChat(mConnection, roomJID);
             multiUserChat.create(name);
         } catch (Exception e) {  
             throw new XMPPException("MUC creation failed", e);
@@ -239,18 +240,18 @@ public class XmppMuc {
 
             try {
                 List<String> owners = new ArrayList<String>();
-				if (_settings.useDifferentAccount) {
-					owners.add(_settings.login);
-					owners.add(_settings.notifiedAddress);
+				if (mSettings.useDifferentAccount) {
+					owners.add(mSettings.login);
+					owners.add(mSettings.notifiedAddress);
 				} else {
-					owners.add(_settings.login);
+					owners.add(mSettings.login);
 				}
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
-                GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + _settings.mucServer
+                GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + mSettings.mucServer
                         + ". Falling back to room passwords", ex);
                 submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
-                submitForm.setAnswer("muc#roomconfig_roomsecret", _settings.roomPassword);
+                submitForm.setAnswer("muc#roomconfig_roomsecret", mSettings.roomPassword);
                 passwordMode = true;
             }
 
@@ -262,18 +263,18 @@ public class XmppMuc {
             multiUserChat.changeSubject(subjectInviteStr);
         } catch (XMPPException e1) {
             GoogleAnalyticsHelper.trackAndLogWarning("Unable to send conference room configuration form.", e1);
-            send(ctx.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
+            send(mCtx.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
             // then we also should not send an invite as the room will be locked
             throw e1;
         }
 
-        multiUserChat.invite(_settings.notifiedAddress, subjectInviteStr);
+        multiUserChat.invite(mSettings.notifiedAddress, subjectInviteStr);
         registerRoom(multiUserChat, number, name, randomInt, mode);
         return multiUserChat;
     }
     
     private void rejoinRooms() {
-    	String[][] mucDB = _mucHelper.getAllMUC();
+    	String[][] mucDB = mMucHelper.getAllMUC();
     	if (mucDB == null)
     		return;
     		
@@ -282,19 +283,19 @@ public class XmppMuc {
     		// if info is not null, the room exists on the server
     		// so lets check if we can reuse it
 			if (info != null) {
-				MultiUserChat muc = new MultiUserChat(_connection, mucDB[i][0]);
-				String name = ContactsManager.getContactName(ctx,
+				MultiUserChat muc = new MultiUserChat(mConnection, mucDB[i][0]);
+				String name = ContactsManager.getContactName(mCtx,
 						mucDB[i][1]);
 				try {
 					if (info.isPasswordProtected()) {
-						muc.join(name, _settings.roomPassword, discussionHistory, REPLAY_TIMEOUT);
+						muc.join(name, mSettings.roomPassword, mDiscussionHistory, REPLAY_TIMEOUT);
 					} else {
-						muc.join(name, null, discussionHistory, REPLAY_TIMEOUT);
+						muc.join(name, null, mDiscussionHistory, REPLAY_TIMEOUT);
 						// check here if we are still owner of these room, in case somebody has taken over ownership
 						// sadly this (getOwners()) throws sometimes a 403 on my openfire server
 						try {
 						if (!affilateCheck(muc.getOwners())) {
-							if (_settings.debugLog) 
+							if (mSettings.debugLog) 
 								Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of affilateCheck failed");
 							leaveRoom(muc);
 							continue;
@@ -303,7 +304,7 @@ public class XmppMuc {
 						// is still under our control
                         } catch (XMPPException e) {
                             if (!(info.isMembersOnly() || info.isPasswordProtected())) {
-                                if (_settings.debugLog)
+                                if (mSettings.debugLog)
                                     Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of membersOnly=" 
                                             + info.isMembersOnly() + " passwordProteced=" + info.isPasswordProtected());
                                 leaveRoom(muc);
@@ -313,18 +314,18 @@ public class XmppMuc {
 					}
 					// looks like there is no one in the room
 					if (info.getOccupantsCount() > 0) {
-						if (_settings.debugLog)
+						if (mSettings.debugLog)
 							Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
 						leaveRoom(muc);
 						continue;
 					}
 				} catch (XMPPException e) {
-					if (_settings.debugLog) {
+					if (mSettings.debugLog) {
 						Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
 					}
 					// TODO decide in which cases it would be the best to remove the room from the db, because of a persistent error
 					// and in which cases the error will not be permanent
-					if (_connection.isAuthenticated()) {
+					if (mConnection.isAuthenticated()) {
 						leaveRoom(muc);
 						continue;
 					} else {
@@ -343,15 +344,15 @@ public class XmppMuc {
      * @param muc
      */
     private void leaveRoom(MultiUserChat muc) {
-		_mucHelper.deleteMUC(muc.getRoom());
+		mMucHelper.deleteMUC(muc.getRoom());
 		if (muc.isJoined())
 			muc.leave();
 
-		if (_rooms.size() > 0) {
+		if (mRooms.size() > 0) {
 			Integer i = getRoomInt(muc.getRoom());
-			String number = _mucHelper.getNumber(muc.getRoom());
-			_roomNumbers.remove(i);
-			_rooms.remove(number);
+			String number = mMucHelper.getNumber(muc.getRoom());
+			mRoomNumbers.remove(i);
+			mRooms.remove(number);
 		}
     }
     
@@ -365,11 +366,11 @@ public class XmppMuc {
     }
     
     private void registerRoom(MultiUserChat muc, String number, String name, Integer randomInt, int mode) {
-        MUCPacketListener chatListener = new MUCPacketListener(number, muc, name, mode, ctx);
+        MUCPacketListener chatListener = new MUCPacketListener(number, muc, name, mode, mCtx);
         muc.addMessageListener(chatListener);
-        _roomNumbers.add(randomInt);
-        _rooms.put(number, muc);
-        _mucHelper.addMUC(muc.getRoom(), number);
+        mRoomNumbers.add(randomInt);
+        mRooms.put(number, muc);
+        mMucHelper.addMUC(muc.getRoom(), number);
     }
     
     /**
@@ -382,7 +383,7 @@ public class XmppMuc {
     private RoomInfo getRoomInfo(String room) {
     	RoomInfo info;
     	try {
-    		info = MultiUserChat.getRoomInfo(_connection, room);
+    		info = MultiUserChat.getRoomInfo(mConnection, room);
     	} catch (XMPPException e) {
     		return null;
     	}
@@ -400,7 +401,7 @@ public class XmppMuc {
     	for (Affiliate a : affCol) {
     		jids.add(a.getJid());
     	}
-    	return jids.contains(_settings.login);    	
+    	return jids.contains(mSettings.login);    	
     }
     /**
      * Extracts the room random integer from the room JID
@@ -424,11 +425,7 @@ public class XmppMuc {
         return contact + " (" + number + ")";
     }
     
-    private static void send(String msg) {
-        Tools.send(msg, null, ctx);
-    }
-    
-//    private static void send(XmppMsg msg) {
-//        Tools.send(msg, null, ctx);
-//    }
+    private void send(String msg) {
+        Tools.send(msg, null, mCtx);
+    }    
 }
