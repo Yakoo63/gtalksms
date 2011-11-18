@@ -401,13 +401,15 @@ public class XmppManager {
      * @param old_state
      * @param new_state
      */
-    public void broadcastStatus(Context ctx, int old_state, int new_state) {  
+    public static void broadcastStatus(Context ctx, int old_state, int new_state) {  
         Intent intent = new Intent(MainService.ACTION_XMPP_CONNECTION_CHANGED);                      
         intent.putExtra("old_state", old_state);
         intent.putExtra("new_state", new_state);
-        if (new_state == CONNECTED && mConnection != null) {
-            intent.putExtra("TLS", mConnection.isUsingTLS());
-            intent.putExtra("Compression", mConnection.isUsingCompression());
+        if (new_state == CONNECTED 
+                && sXmppManager != null
+                && sXmppManager.mConnection != null) {
+            intent.putExtra("TLS", sXmppManager.mConnection.isUsingTLS());
+            intent.putExtra("Compression", sXmppManager.mConnection.isUsingCompression());
         }
         ctx.sendBroadcast(intent);
     }

@@ -36,6 +36,7 @@ import com.googlecode.gtalksms.cmd.FileCmd;
 import com.googlecode.gtalksms.cmd.GeoCmd;
 import com.googlecode.gtalksms.cmd.HelpCmd;
 import com.googlecode.gtalksms.cmd.KeyboardCmd;
+import com.googlecode.gtalksms.cmd.RebootCmd;
 import com.googlecode.gtalksms.cmd.RingCmd;
 import com.googlecode.gtalksms.cmd.ScreenShotCmd;
 import com.googlecode.gtalksms.cmd.SettingsCmd;
@@ -413,7 +414,7 @@ public class MainService extends Service {
         if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
             // A request to broadcast our current status even if _xmpp is null.
             int state = getConnectionStatus();
-            sXmppMgr.broadcastStatus(this, state, state);
+            XmppManager.broadcastStatus(this, state, state);
         // A real action request
         } else {
             // check if the user has done his part
@@ -670,6 +671,7 @@ public class MainService extends Service {
             registerCommand(new SettingsCmd(this));
             registerCommand(new BluetoothCmd(this));
             registerCommand(new WifiCmd(this));
+            registerCommand(new RebootCmd(this));
             // used for debugging
             registerCommand(new SystemCmd(this));
             // help command needs to be registered as last
