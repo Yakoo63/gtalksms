@@ -1,7 +1,10 @@
 package com.googlecode.gtalksms.cmd;
 
+import java.util.List;
+
 import android.content.Context;
 import android.net.DhcpInfo;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
@@ -30,10 +33,66 @@ public class WifiCmd extends CommandHandlerBase {
         	disableWifi();
         } else if (args.equals("state") || args.equals("")) {
         	sendStatus();
+        } else if (args.equals("list")) {
+        	listNetworks();
+        } else if (args.startsWith("enable")) {
+        	enableNetwork(args);
+        } else if (args.startsWith("disable")) {
+        	disableNetwork(args);
         } else {
             send("Unkown argument \"" + args + "\" for command \"" + cmd + "\"");
         }
     }
+    private void listNetworks() {
+    	XmppMsg msg = new XmppMsg();
+    	List<WifiConfiguration> networks = sWifiManager.getConfiguredNetworks();
+    	for (WifiConfiguration w : networks) {
+    		msg.appendBold("ID: ");
+    		msg.append(w.networkId);
+    		msg.appendBold(" Name: ");
+    		msg.append(w.SSID);
+    		msg.appendBold(" Status: ");
+    		String status;
+    		switch(w.status) {
+			case WifiConfiguration.Status.CURRENT:
+				status = "Current connected network";
+				break;
+			case WifiConfiguration.Status.ENABLED:
+				status = "Enabled";
+				break;
+			case WifiConfiguration.Status.DISABLED:
+				status = "Disabled";
+				break;
+			default:
+				status = "Unkown";
+				break;
+    		}
+    		msg.append(status);
+    		msg.newLine();
+    	}
+    	send(msg);
+    }
+    
+    private void enableNetwork(String args) {
+    	String[] a = args.split(":");
+    	if (a.length == 2) {
+    		int id = Integer.parseInt(a[2]);
+    		sWifiManager.enableNetwork(id, false);
+    	} else {
+    		send("Error enabling network");
+    	}
+    }
+    
+    private void disableNetwork(String args) {
+    	String[] a = args.split(":");
+    	if (a.length == 2) {
+    		int id = Integer.parseInt(a[2]);
+    		sWifiManager.disableNetwork(id);
+    	} else {
+    		send("Error disabling network");
+    	}
+    }
+    
     private void enableWifi() {
     	send("Enabling Wifi");
     	boolean ret = sWifiManager.setWifiEnabled(true);

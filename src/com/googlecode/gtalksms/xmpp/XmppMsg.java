@@ -11,13 +11,12 @@ import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMsg implements Parcelable {
-    public final static String BoldBegin = "##BOLD_BEGIN##";
-    public final static String BoldEnd = "##BOLD_END##";
-    public final static String ItalicBegin = "##ITALIC_BEGIN##";
-    public final static String ItalicEnd = "##ITALIC_END##";
-    public final static String FontBegin = "##FONT_BEGIN##";
+    public final static String BOLD_BEGIN = "##BOLD_BEGIN##";
+    public final static String BOLD_END = "##BOLD_END##";
+    public final static String ITALIC_BEGIN = "##ITALIC_BEGIN##";
+    public final static String ITALIC_END = "##ITALIC_END##";
+    public final static String FONT_BEGIN = "##FONT_BEGIN##";
     
-    // TODO to be initialized by SettingsMgr
     private static final XmppFont DEFAULT_FONT = new XmppFont();
     private XmppFont mMainFont;
     private StringBuilder mMessage = new StringBuilder();
@@ -37,15 +36,15 @@ public class XmppMsg implements Parcelable {
     }
 
     public static String makeBold(String in) {
-        return BoldBegin + in + BoldEnd;
+        return BOLD_BEGIN + in + BOLD_END;
     }
 
     public static String makeItalic(String in) {
-        return ItalicBegin + in + ItalicEnd;
+        return ITALIC_BEGIN + in + ITALIC_END;
     }
     
     public void setFont(XmppFont font) {
-        mMessage.append(FontBegin);
+        mMessage.append(FONT_BEGIN);
         mFonts.add(font);
     }
 
@@ -101,21 +100,21 @@ public class XmppMsg implements Parcelable {
     public String generateTxt() {
         String message = removeLastNewline(mMessage.toString());
         return message
-                    .replaceAll(FontBegin, "")
-                    .replaceAll(BoldBegin, "")
-                    .replaceAll(BoldEnd, "")
-                    .replaceAll(ItalicBegin, "")
-                    .replaceAll(ItalicEnd, "");
+                    .replaceAll(FONT_BEGIN, "")
+                    .replaceAll(BOLD_BEGIN, "")
+                    .replaceAll(BOLD_END, "")
+                    .replaceAll(ITALIC_BEGIN, "")
+                    .replaceAll(ITALIC_END, "");
     }
 
     public String generateFmtTxt() {
         String message = removeLastNewline(mMessage.toString());
         return message
-                    .replaceAll(FontBegin, "")
-                    .replaceAll(BoldBegin, " *")
-                    .replaceAll(BoldEnd, "* ")
-                    .replaceAll(ItalicBegin, " _")
-                    .replaceAll(ItalicEnd, "_ ");
+                    .replaceAll(FONT_BEGIN, "")
+                    .replaceAll(BOLD_BEGIN, " *")
+                    .replaceAll(BOLD_END, "* ")
+                    .replaceAll(ITALIC_BEGIN, " _")
+                    .replaceAll(ITALIC_END, "_ ");
     }
     
     public XHTMLText generateXHTMLText() {
@@ -126,7 +125,7 @@ public class XmppMsg implements Parcelable {
         ArrayList<XmppFont> fonts = new ArrayList<XmppFont>(mFonts);
         
         XHTMLText x = new XHTMLText(null, null);
-        x.appendOpenParagraphTag(mMainFont.toString()); // open a paragraph with default font - which is may be null - clients will fall back to their default font
+        x.appendOpenParagraphTag(mMainFont.toString()); // open a paragraph with default font. When null, clients will fall back to their default font
         x.appendOpenSpanTag("");  // needed because we close span on fontbegin
         while((pos = getTagPos(m)) != -1) {
             procesTagAt(pos, x, m, fonts);
@@ -159,11 +158,11 @@ public class XmppMsg implements Parcelable {
      */
     private static int getTagPos(StringBuilder msg) {
         int newline = msg.indexOf("\n");
-        int boldbeg = msg.indexOf(BoldBegin);
-        int boldend = msg.indexOf(BoldEnd);
-        int italbeg = msg.indexOf(ItalicBegin);
-        int italend = msg.indexOf(ItalicEnd);
-        int fontbeg = msg.indexOf(FontBegin);  //there is no font end tag, so just treat every fontbegin as the end of the previous font
+        int boldbeg = msg.indexOf(BOLD_BEGIN);
+        int boldend = msg.indexOf(BOLD_END);
+        int italbeg = msg.indexOf(ITALIC_BEGIN);
+        int italend = msg.indexOf(ITALIC_END);
+        int fontbeg = msg.indexOf(FONT_BEGIN);  //there is no font end tag, so just treat every fontbegin as the end of the previous font
         
         //if all int's are -1 we found no tag
         if(-1 == newline && -1 == boldbeg && -1 == boldend && -1 == italbeg && -1 == italend && -1 == fontbeg) {
@@ -178,25 +177,25 @@ public class XmppMsg implements Parcelable {
         msg.delete(0, i);
         x.append(s);
         if (msg.indexOf("\n") == 0) {                   // newline
-            x.appendBrTag();                                // smack appends "<br>" where the XEP-71 postulates "<br/>" 
-            msg.delete(0, "\n".length());                   // we fix this in XmppManager
-        } else if (msg.indexOf(BoldBegin) == 0) {       // bold
+            x.appendBrTag();
+            msg.delete(0, "\n".length());
+        } else if (msg.indexOf(BOLD_BEGIN) == 0) {       // bold
             x.appendOpenSpanTag("font-weight:bold");  
 //            x.appendOpenStrongTag();
-            msg.delete(0, BoldBegin.length());
-        } else if (msg.indexOf(BoldEnd) == 0) {
+            msg.delete(0, BOLD_BEGIN.length());
+        } else if (msg.indexOf(BOLD_END) == 0) {
             x.appendCloseSpanTag();
 //            x.appendCloseStrongTag();
-            msg.delete(0, BoldEnd.length());
-        } else if (msg.indexOf(ItalicBegin) == 0) {     // italic
+            msg.delete(0, BOLD_END.length());
+        } else if (msg.indexOf(ITALIC_BEGIN) == 0) {     // italic
 //            x.appendOpenSpanTag("font-style:italic");
             x.appendOpenEmTag();
-            msg.delete(0, ItalicBegin.length());
-        } else if (msg.indexOf(ItalicEnd) == 0) {
+            msg.delete(0, ITALIC_BEGIN.length());
+        } else if (msg.indexOf(ITALIC_END) == 0) {
 //            x.appendCloseSpanTag();
             x.appendCloseEmTag();
-            msg.delete(0, ItalicEnd.length());
-        } else if (msg.indexOf(FontBegin) == 0) {       // font
+            msg.delete(0, ITALIC_END.length());
+        } else if (msg.indexOf(FONT_BEGIN) == 0) {       // font
             x.appendCloseSpanTag();
             if (fonts.size() > 0) {
                 XmppFont font = fonts.remove(0);
@@ -205,7 +204,7 @@ public class XmppMsg implements Parcelable {
                 GoogleAnalyticsHelper.trackAndLogError("XmppMsg.generateXhtml: Font tags doesn't match");
                 x.appendOpenSpanTag("font:null");   
             }
-            msg.delete(0, FontBegin.length());
+            msg.delete(0, FONT_BEGIN.length());
         }
     }
     
