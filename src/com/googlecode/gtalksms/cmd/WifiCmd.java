@@ -27,18 +27,20 @@ public class WifiCmd extends CommandHandlerBase {
     }
 
     protected void execute(String cmd, String args) {
-        if (args.equals("on")) {
+        String[] sArgs = splitArgs(args);
+        
+        if (sArgs[0].equals("on")) {
         	enableWifi();
-        } else if (args.equals("off")) {
+        } else if (sArgs[0].equals("off")) {
         	disableWifi();
-        } else if (args.equals("state") || args.equals("")) {
+        } else if (sArgs[0].equals("state") || args.equals("")) {
         	sendStatus();
-        } else if (args.equals("list")) {
+        } else if (sArgs[0].equals("list")) {
         	listNetworks();
-        } else if (args.startsWith("enable")) {
-        	enableNetwork(args);
-        } else if (args.startsWith("disable")) {
-        	disableNetwork(args);
+        } else if (sArgs[0].equals("enable")) {
+        	enableNetwork(sArgs);
+        } else if (sArgs[0].equals("disable")) {
+        	disableNetwork(sArgs);
         } else {
             send("Unkown argument \"" + args + "\" for command \"" + cmd + "\"");
         }
@@ -73,21 +75,27 @@ public class WifiCmd extends CommandHandlerBase {
     	send(msg);
     }
     
-    private void enableNetwork(String args) {
-    	String[] a = args.split(":");
-    	if (a.length == 2) {
-    		int id = Integer.parseInt(a[2]);
-    		sWifiManager.enableNetwork(id, false);
+    private void enableNetwork(String[] args) {
+    	if (args.length == 2) {
+    		int id = Integer.parseInt(args[1]);
+    		if (sWifiManager.enableNetwork(id, false)) {
+    		    send("Successfully enabled network with ID " + id);
+    		} else {
+    		    send("Could not enable network with ID" + id);
+    		}
     	} else {
     		send("Error enabling network");
     	}
     }
     
-    private void disableNetwork(String args) {
-    	String[] a = args.split(":");
-    	if (a.length == 2) {
-    		int id = Integer.parseInt(a[2]);
-    		sWifiManager.disableNetwork(id);
+    private void disableNetwork(String[] args) {
+    	if (args.length == 2) {
+    		int id = Integer.parseInt(args[1]);
+    		if (sWifiManager.disableNetwork(id)) {
+    		    send("Successfully disabled network with ID " + id);
+    		} else {
+    		    send("Could not disable network with ID " + id);
+    		}
     	} else {
     		send("Error disabling network");
     	}
@@ -210,6 +218,10 @@ public class WifiCmd extends CommandHandlerBase {
                 getString(R.string.chat_help_wifi_on, makeBold("\"wifi:on\""), makeBold("\"wlan:on\"")),
                 getString(R.string.chat_help_wifi_off, makeBold("\"wifi:off\""), makeBold("\"wlan:off\"")),
                 getString(R.string.chat_help_wifi_state, makeBold("\"wifi:state\""), makeBold("\"wlan:state\"")),
+                getString(R.string.chat_help_wifi_list, makeBold("\"wifi:list\""), makeBold("\"wlan:list\"")),
+                getString(R.string.chat_help_wifi_enable, makeBold("\"wifi:enable:<ID>\""), makeBold("\"wlan:enable:<ID>\"")),
+                getString(R.string.chat_help_wifi_disable, makeBold("\"wifi:disable:<ID>\""), makeBold("\"wlan:disable:<ID>\"")),
+
         };
         return s;
     }

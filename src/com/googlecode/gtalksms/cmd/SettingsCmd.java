@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.SettingsManager;
 
 public class SettingsCmd extends CommandHandlerBase {
     
@@ -15,8 +14,7 @@ public class SettingsCmd extends CommandHandlerBase {
 
     @Override
     public void execute(Command c) {
-    	SettingsManager smgr = getSettingsManager();
-    	Map<String, ?> settings = smgr.getAllSharedPreferences();
+    	Map<String, ?> settings = sSettingsMgr.getAllSharedPreferences();
     	String key = c.get1();
     	
     	if(key.equals("")) {

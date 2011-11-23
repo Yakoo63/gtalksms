@@ -89,7 +89,19 @@ public class XmppMsg implements Parcelable {
     
     public void newLine() {
         mMessage.append(Tools.LineSep);
-    }    
+    }
+    
+    /**
+     * Adds the Strings in the given Arrary to the XmppMsg
+     * One String per line
+     * 
+     * @param s
+     */
+    public final void addStringArray(String[] s) {
+        for(String line : s) {
+            this.appendLine(line);
+        }
+    }
     
     public XmppMsg append(XmppMsg input) {
         mMessage.append(input.mMessage);

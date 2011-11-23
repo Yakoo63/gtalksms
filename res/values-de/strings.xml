@@ -215,9 +215,12 @@
     <string name="chat_help_camera_xmpp">- %1$s oder %2$s: Macht ein Foto und sendet es via XMPP.</string>
     <string name="chat_help_camera_list">- %1$s oder %2$s: Listet alle Kameras des Smartphones auf.</string>
     <string name="chat_help_camera_set">- %1$s oder %2$s: Standardkamera für Fotos festlegen.</string>
-    <string name="chat_help_wifi_on">- %1$s or %2$s: Aktiviert WLAN.</string>
-    <string name="chat_help_wifi_off">- %1$s or %2$s: Deaktiviert WLAN.</string>
-    <string name="chat_help_wifi_state">- %1$s or %2$s: Zeigt den aktuellen WLAN Status an.</string>   
+    <string name="chat_help_wifi_on">- %1$s oder %2$s: Aktiviert WLAN.</string>
+    <string name="chat_help_wifi_off">- %1$s oder %2$s: Deaktiviert WLAN.</string>
+    <string name="chat_help_wifi_state">- %1$s oder %2$s: Zeigt den aktuellen WLAN Status an.</string>
+    <string name="chat_help_wifi_list">- %1$s oder %2$s: Zeigt alle konfigurierten WLAN Netzwerke an</string>
+    <string name="chat_help_wifi_enable">- %1$s oder %2$s: Aktiviert das WLAN mit der ID</string>
+    <string name="chat_help_wifi_disable">- %1$s oder %2$s: Deaktiviert das WLAN mit der ID</string>    
     <string name="chat_call_unknown">Unbekannt</string>
     <string name="chat_call_incoming">Eingehender Anruf</string>
     <string name="chat_call_outgoing">Ausgehender Anruf</string>

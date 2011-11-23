@@ -218,6 +218,9 @@
     <string name="chat_help_wifi_on">- %1$s or %2$s: turn on the WiFi adapter.</string>
     <string name="chat_help_wifi_off">- %1$s or %2$s: turn off the WiFi adapter.</string>
     <string name="chat_help_wifi_state">- %1$s or %2$s: give the current state of the Wifi adapter.</string>
+    <string name="chat_help_wifi_list">- %1$s or %2$s: list all configured networks</string>
+    <string name="chat_help_wifi_enable">- %1$s or %2$s: enable network with the given id</string>
+    <string name="chat_help_wifi_disable">- %1$s or %2$s: disable network with the given id</string>        
     <string name="chat_call_unknown">Unknown</string>
     <string name="chat_call_incoming">Incoming</string>
     <string name="chat_call_outgoing">Outgoing</string>

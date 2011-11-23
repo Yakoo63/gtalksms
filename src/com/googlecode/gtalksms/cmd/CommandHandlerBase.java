@@ -171,14 +171,19 @@ public abstract class CommandHandlerBase {
      * The Arguments are split by ":"
      * 
      * @param args
-     * @return
+     * @return args split in an array or an array only containing the empty string
      */
     protected String[] splitArgs(String args) {
         StringTokenizer strtok = new StringTokenizer(args, ":");
         int tokenCount = strtok.countTokens();
-        String[] res = new String[tokenCount];
-        for(int i = 0; i < tokenCount; i++)
-            res[i] = strtok.nextToken();
+        String[] res;
+        if (tokenCount != 0) {
+            res = new String[tokenCount];
+            for (int i = 0; i < tokenCount; i++)
+                res[i] = strtok.nextToken();
+        } else {
+            res = new String[] { "" };
+        }
         return res;
     }
     
@@ -194,20 +199,7 @@ public abstract class CommandHandlerBase {
         }
         res = res.substring(0, res.length() - 1);
         return res;
-    }
-    
-    /**
-     * Adds the Strings in the given Arrary to the XmppMsg
-     * One String per line
-     * 
-     * @param msg
-     * @param s
-     */
-    protected final static void addStringArraytoXmppMsg(XmppMsg msg, String[] s) {
-        for(String line : s) {
-            msg.appendLine(line);
-        }
-    }
+    }    
     
     /**
      * Sends the help messages from the current command
@@ -221,15 +213,8 @@ public abstract class CommandHandlerBase {
             return;
         
         XmppMsg msg = new XmppMsg();
-        addStringArraytoXmppMsg(msg, help);
+        msg.addStringArray(help);
         send(msg);
-    }
-    
-    protected SettingsManager getSettingsManager() {
-    	if (sSettingsMgr == null) {
-    		throw new IllegalStateException("Command.sSettingsMgr is not set.");
-    	}
-    	return sSettingsMgr;
     }
     
     /**
