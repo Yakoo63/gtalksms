@@ -795,12 +795,12 @@ public class XmppManager {
                     if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
                     	toList.add(toPresence);
                     }
-                    if (toList.size() > 0) {
-                    	try {
-							MultipleRecipientManager.send(mConnection, msg, toList, null, null);
-						} catch (XMPPException e) {
-							return false;
-						}
+                }
+                if (toList.size() > 0) {
+                    try {
+                        MultipleRecipientManager.send(mConnection, msg, toList, null, null);
+                    } catch (XMPPException e) {
+                        return false;
                     }
                 }
             // Message has a known destination information
