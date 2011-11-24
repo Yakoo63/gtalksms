@@ -1,3 +1,7 @@
+Upcoming
+* Make use of XEP-0033 if possible
+* Fixed Issue 43
+
 3.3
 * Improved file transfers by adding an local XMPP S5B proxy
 * Added support for tablet (Honeycomb) devices

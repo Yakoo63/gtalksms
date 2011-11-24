@@ -2,6 +2,7 @@ package com.googlecode.gtalksms;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.jivesoftware.smack.Connection;
@@ -22,6 +23,7 @@ import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.GroupChatInvitation;
+import org.jivesoftware.smackx.MultipleRecipientManager;
 import org.jivesoftware.smackx.PrivateDataManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
@@ -782,13 +784,23 @@ public class XmppManager {
             // Send to all known resources 
             if (muc == null && to == null) {
                 Iterator<Presence> presences = mConnection.getRoster().getPresences(mSettings.notifiedAddress);
+                List<String> toList = new LinkedList<String>();
                 while (presences.hasNext()) {
                     Presence p = presences.next();
                     String toPresence = p.getFrom();
                     String toResource = StringUtils.parseResource(toPresence);
+                    // Don't send messages to gtalk Android devices
+                    // It would be nice if there was a better way to detect 
+                    // an Android gTalk XMPP client, but currently there is none
                     if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
-                        msg.setTo(toPresence);
-                        mConnection.sendPacket(msg);
+                    	toList.add(toPresence);
+                    }
+                    if (toList.size() > 0) {
+                    	try {
+							MultipleRecipientManager.send(mConnection, msg, toList, null, null);
+						} catch (XMPPException e) {
+							return false;
+						}
                     }
                 }
             // Message has a known destination information
