@@ -161,7 +161,7 @@ public class MainService extends Service {
         if (Thread.currentThread().getId() != mHandlerThreadId) {
             throw new IllegalThreadStateException();
         }
-        // We need to handle xmpp state changes which happened "externally" - eg,
+        // We need to handle XMPP state changes which happened "externally" - eg,
         // due to a connection error, or running out of retries, or a retry
         // handler actually succeeding etc.
         int initialState = getConnectionStatus(); 

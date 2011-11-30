@@ -113,7 +113,7 @@ public class SmsCmd extends CommandHandlerBase {
             }
         } else if (command.equals("reply")) {
             if (args.length() == 0) {
-                displayLastRecipient();
+                displayLastRecipient(true);
             } else if (mLastRecipient == null) {
                 send(R.string.chat_error_no_recipient);
             } else {
@@ -209,13 +209,15 @@ public class SmsCmd extends CommandHandlerBase {
      * and calls displayLastRecipient()
      * 
      * @param phoneNumber
+     * @param silentAndUpdate If true, don't sent a message to the user and don't update the KV-DB
      */
     public synchronized void setLastRecipientNow(String phoneNumber, boolean silentAndUpdate) {
+        mAnswerTo = null;
         if (mLastRecipient == null || !phoneNumber.equals(mLastRecipient)) {
             mLastRecipient = phoneNumber;
             mLastRecipientName = ContactsManager.getContactName(sContext, phoneNumber);
             if (!silentAndUpdate) { 
-            	displayLastRecipient();
+            	displayLastRecipient(false);
             	mKeyValueHelper.addKey(KeyValueHelper.KEY_LAST_RECIPIENT, phoneNumber);
             }
         }
@@ -550,7 +552,7 @@ public class SmsCmd extends CommandHandlerBase {
         }
     }
     
-    private void displayLastRecipient() {
+    private void displayLastRecipient(boolean useAnswerTo) {
         if (mLastRecipient == null) {
             send(R.string.chat_error_no_recipient);
         } else {
@@ -558,7 +560,12 @@ public class SmsCmd extends CommandHandlerBase {
             if (Phone.isCellPhoneNumber(mLastRecipient) && contact.compareTo(mLastRecipient) != 0) {
                 contact += " (" + mLastRecipient + ")";
             }
-            send(R.string.chat_reply_contact, contact);
+            String msg = getString(R.string.chat_reply_contact, contact);
+            if (useAnswerTo) {
+                send(msg);
+            } else {
+                send(msg, null);
+            }
         }
     }
 
