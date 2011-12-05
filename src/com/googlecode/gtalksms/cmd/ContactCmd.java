@@ -25,9 +25,9 @@ public class ContactCmd extends CommandHandlerBase {
             if (contacts.size() > 1) {
                 send(R.string.chat_contact_found, contacts.size(), searchedText);
             }
-
+            
+            XmppMsg strContact = new XmppMsg();
             for (Contact contact : contacts) {
-                XmppMsg strContact = new XmppMsg();
                 strContact.appendBoldLine(contact.name);
 
                 // strContact.append(Tools.LineSep + "Id : " + contact.id);
@@ -62,8 +62,8 @@ public class ContactCmd extends CommandHandlerBase {
                         strContact.appendLine((address.label != null ? address.label + " - " : "") + address.address);
                     }
                 }
-                send(strContact);
             }
+            send(strContact);
         } else {
             send(R.string.chat_no_match_for, searchedText);
         }
