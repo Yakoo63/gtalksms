@@ -21,12 +21,12 @@ public class ContactCmd extends CommandHandlerBase {
         ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, searchedText);
 
         if (contacts.size() > 0) {
+            XmppMsg strContact = new XmppMsg();
 
             if (contacts.size() > 1) {
-                send(R.string.chat_contact_found, contacts.size(), searchedText);
+                strContact.appendLine(getString(R.string.chat_contact_found, contacts.size(), searchedText));
             }
             
-            XmppMsg strContact = new XmppMsg();
             for (Contact contact : contacts) {
                 strContact.appendBoldLine(contact.name);
 
