@@ -30,8 +30,8 @@
                 android:numeric="integer"
                 android:defaultValue="1"
                 android:inputType="number"
-                android:title="TODO stopOnPower Delay"
-                android:summary="In Minutes" 
+                android:title="@string/pref_app_stop_on_power_disconnected_delay"
+                android:summary="@string/pref_app_stop_on_power_disconnected_delay_help" 
                 android:dependency="stopOnPowerDisconnected"/>              
               <CheckBoxPreference
                 android:defaultValue="false"
