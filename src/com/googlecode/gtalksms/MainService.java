@@ -115,7 +115,8 @@ public class MainService extends Service {
     
     private static Context sUiContext;
     
-    private static volatile Handler sToastHandler = new Handler();  
+    private static volatile Handler sToastHandler = new Handler();
+    private static Handler sDelayedDisconnectHandler;
     
     // some stuff for the async service implementation - borrowed heavily from
     // the standard IntentService, but that class doesn't offer fine enough
@@ -365,11 +366,13 @@ public class MainService extends Service {
         Log.initialize(sSettingsMgr);
         Tools.setLocale(sSettingsMgr, this);
         
+        // Start a new thread for the service
         HandlerThread thread = new HandlerThread(SERVICE_THREAD_NAME);
         thread.start();
         mHandlerThreadId = thread.getId();
         sServiceLooper = thread.getLooper();
         sServiceHandler = new ServiceHandler(sServiceLooper);
+        sDelayedDisconnectHandler = new Handler(sServiceLooper);
         
         sUiContext = this;
         
@@ -757,5 +760,13 @@ public class MainService extends Service {
         stopForeground(true);
         stopCommands();
         cleanupCommands();
+    }
+    
+    protected static Looper getServiceLooper() {
+        return sServiceLooper;
+    }
+    
+    public static Handler getDelayedDisconnectHandler() {
+        return sDelayedDisconnectHandler;
     }
 }

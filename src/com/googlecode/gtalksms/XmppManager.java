@@ -128,7 +128,7 @@ public class XmppManager {
         }
     };
 
-    private Handler mReconnectHandler = new Handler();
+    private Handler mReconnectHandler;
 
     private SettingsManager mSettings;
     private Context mContext;
@@ -143,6 +143,8 @@ public class XmppManager {
      * @param connection - optional
      */
     private XmppManager(Context context, XMPPConnection connection) {
+        mReconnectHandler = new Handler(MainService.getServiceLooper());
+        
         mConnectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
         mSettings = SettingsManager.getSettingsManager(context);
         Log.initialize(mSettings);
@@ -940,5 +942,5 @@ public class XmppManager {
     
     public String statusString() {
         return statusAsString(mStatus);
-    }
+    }    
 }
