@@ -192,6 +192,8 @@ public class CameraCmd extends CommandHandlerBase {
     public synchronized void cleanUp() {
         if (camera != null) {
             try {
+                camera.stopPreview();
+                camera.setPreviewCallback(null);
                 camera.unlock();
                 camera.release();
             } catch (Exception e) {

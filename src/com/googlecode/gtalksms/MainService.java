@@ -206,7 +206,7 @@ public class MainService extends Service {
             sWl.acquire();
             String message = intent.getStringExtra("message");
             if (message != null) {
-                onCommandReceived(message, intent.getStringExtra("from"));
+                handleCommandFromXMPP(message, intent.getStringExtra("from"));
             }
             sWl.release();
         } else if (action.equals(ACTION_SMS_RECEIVED)) {
@@ -537,9 +537,10 @@ public class MainService extends Service {
         sXmppMgr = XmppManager.getInstance(this);
     }
     
-    private void executeCommand(String cmd, String args, String answerTo) {
+    private void executeCommand(String cmd, String args, String answerTo) {        
         assert(cmd != null);
         if (sCommands.containsKey(cmd)) {
+            Log.d("MainService executing command: \"" + cmd + ":" + Tools.shortenMessage(args) + "\"");
             try {
                 sCommands.get(cmd).execute(cmd, args == null ? "" : args, answerTo);
             } catch (Exception e) {
@@ -622,8 +623,7 @@ public class MainService extends Service {
      * 
      * @param commandLine
      */
-    private void onCommandReceived(String commandLine, String from) {
-        Log.d("onCommandReceived(): \"" + Tools.shortenMessage(commandLine) + "\"");
+    private void handleCommandFromXMPP(String commandLine, String from) {
         String command;
         String args;
         
