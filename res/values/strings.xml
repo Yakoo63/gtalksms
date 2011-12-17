@@ -212,6 +212,8 @@
     <string name="chat_help_sc">- %1$s or %2$s: take a screenshot and store it in the picture directory.</string>
     <string name="chat_help_sc_email">- %1$s or %2$s: take a screenshot, store it and send it by email.</string>
     <string name="chat_help_sc_xmpp">- %1$s or %2$s: take a screenshot, store it and send it through xmpp connection.</string>
+    <string name="chat_help_flash_on">- %1$s or %2$s: turn flashlight on.</string>
+    <string name="chat_help_flash_off">- %1$s or %2$s: turn flashlight off.</string>
     <string name="chat_help_camera">- %1$s or %2$s: take a photo and store it in the picture directory.</string>
     <string name="chat_help_camera_email">- %1$s or %2$s: take a photo, store it and send it by email.</string>
     <string name="chat_help_camera_xmpp">- %1$s or %2$s: take a photo, store it and send it through xmpp connection.</string>
