@@ -5,6 +5,7 @@ import java.io.File;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.media.AudioManager;
 import android.os.Build;
@@ -30,14 +31,14 @@ public class CameraCmd extends CommandHandlerBase {
 
     private static AudioManager audioManager;
     private static WindowManager windowManager;
-    private static Camera camera = null;
+    private static Camera sCamera = null;
     private static File repository;
     private static String emailReceiving;
     private static int streamVolume;
     private static int cameraId = 0;
     
     public CameraCmd(MainService mainService) {
-        super(mainService, new String[] {"camera", "photo"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, new String[] {"camera", "photo", "flash", "light"}, CommandHandlerBase.TYPE_SYSTEM);
         File path;
         
         windowManager = (WindowManager) sMainService.getSystemService(Context.WINDOW_SERVICE);
@@ -76,6 +77,13 @@ public class CameraCmd extends CommandHandlerBase {
                 setCamera(splitedArgs[1]);
             }           
         } 
+        else if (cmd.equals("flash") || cmd.equals("light")) {
+            if (args.equals("") || splitedArgs[0].equals("on")) {
+                setLight(true);
+            } else if (splitedArgs[0].equals("off")) {
+                setLight(false);
+            }
+        }
     }
     
     private void setCamera(String arg) {
@@ -149,14 +157,14 @@ public class CameraCmd extends CommandHandlerBase {
         
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-                camera = Camera.open(cameraId);
-                camera.setDisplayOrientation(getCameraOrientation());
+                sCamera = Camera.open(cameraId);
+                sCamera.setDisplayOrientation(getCameraOrientation());
             } else {
-                camera = Camera.open();
+                sCamera = Camera.open();
             }
             SurfaceView view = new SurfaceView(sContext);
-            camera.setPreviewDisplay(view.getHolder());
-            camera.startPreview();
+            sCamera.setPreviewDisplay(view.getHolder());
+            sCamera.startPreview();
             
             switch (pCallbackMethod) {
             case XMPP_CALLBACK:
@@ -181,31 +189,46 @@ public class CameraCmd extends CommandHandlerBase {
                 }
             };
 
-            camera.takePicture(cb, null, pictureCallback);
+            sCamera.takePicture(cb, null, pictureCallback);
         } catch (Exception e) {
             send(R.string.chat_camera_error_picture, e.getLocalizedMessage());
+            cleanUp();
+        }
+    }
+    
+    public void setLight(boolean turnOn) {
+        if (sCamera == null) {
+            sCamera = Camera.open();
+        }
+        Parameters params = sCamera.getParameters();
+        params.setFlashMode(turnOn ? Camera.Parameters.FLASH_MODE_TORCH : Camera.Parameters.FLASH_MODE_OFF);
+        sCamera.setParameters(params);
+        
+        if (!turnOn) {
             cleanUp();
         }
     }
        
     @Override
     public synchronized void cleanUp() {
-        if (camera != null) {
+        if (sCamera != null) {
             try {
-                camera.stopPreview();
-                camera.setPreviewCallback(null);
-                camera.unlock();
-                camera.release();
+                sCamera.stopPreview();
+                sCamera.setPreviewCallback(null);
+                sCamera.unlock();
+                sCamera.release();
             } catch (Exception e) {
                 Log.e(Tools.LOG_TAG, "Failed to release Camera", e);
             }
-            camera = null;
+            sCamera = null;
         }
     }
 
     @Override
     public String[] help() {
         String[] s = { 
+            getString(R.string.chat_help_flash_on, makeBold("\"flash[:on]\""), makeBold("\"light[:on]\"")),
+            getString(R.string.chat_help_flash_off, makeBold("\"flash:off\""), makeBold("\"light:off\"")),
             getString(R.string.chat_help_camera, makeBold("\"camera\""), makeBold("\"photo\"")),
             getString(R.string.chat_help_camera_email, makeBold("\"camera:email\""), makeBold("\"photo:email\"")),
             getString(R.string.chat_help_camera_xmpp, makeBold("\"camera:xmpp\""), makeBold("\"photo:xmpp\"")),
