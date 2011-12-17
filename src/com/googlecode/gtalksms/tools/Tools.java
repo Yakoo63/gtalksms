@@ -223,7 +223,9 @@ public class Tools {
     
     public final static String shortenMessage(String message) {
         String shortendMessage;
-        if (message.length() < shortenTo) {
+        if (message == null) {
+            shortendMessage = "";
+        } else if (message.length() < shortenTo) {
             shortendMessage = message.replace("\n", " ");
         } else {
             shortendMessage = message.substring(0, shortenTo).replace("\n", " ") + "...";
