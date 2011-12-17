@@ -150,7 +150,9 @@
     <string name="chat_error_more_arguments">Command \"%1$s\" needs more arguments</string>
     <string name="chat_reply_contact">Reply contact is %s</string>
     <string name="chat_start_locating">Start locating phone</string>
+    <string name="chat_stop_locating">Stop locating phone</string>
     <string name="chat_start_ringing">Ringing phone</string>
+    <string name="chat_stop_ringing">Phone ring stopped</string>
     <string name="chat_error_ringing">Unable to ring. Check if ringtone is not set to silent and accessible or that the alarm volume is set.</string>
     <string name="chat_stop_actions">Stopping ongoing actions</string>
     <string name="chat_send_sms">Sending SMS to %s</string>

@@ -148,7 +148,9 @@
     <string name="chat_error_more_arguments">La commande \"%1$s\" nécessite plus d\'arguments</string>
     <string name="chat_reply_contact">Le destinataire par défaut est %s</string>
     <string name="chat_start_locating">Démarrage de la localisation du téléphone</string>
+    <string name="chat_stop_locating">Arrêt de la localisation du téléphone</string>
     <string name="chat_start_ringing">Le téléphone sonne</string>
+    <string name="chat_stop_ringing">Arrêt de la sonnerie du téléphone</string>
     <string name="chat_error_ringing">Impossible de faire sonner le téléphone, vérifier les paramètres.</string>
     <string name="chat_stop_actions">Arrêt des actions en cours</string>
     <string name="chat_send_sms">SMS envoyé à %s</string>
@@ -223,7 +225,7 @@
     <string name="chat_help_wifi_list">- %1$s ou %2$s: affiche la liste de réseaux configurés.</string>
     <string name="chat_help_wifi_enable">- %1$s ou %2$s: active le réseau avec l\'ID spécifié.</string>
     <string name="chat_help_wifi_disable">- %1$s ou %2$s: désactive le réseau avec l\'ID spécifié.</string>        
-        <string name="chat_call_unknown">Inconnu</string>
+    <string name="chat_call_unknown">Inconnu</string>
     <string name="chat_call_incoming">Entrant</string>
     <string name="chat_call_outgoing">Sortant</string>
     <string name="chat_call_missed">Manqué</string>

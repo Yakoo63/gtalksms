@@ -32,19 +32,15 @@ public class RingCmd extends CommandHandlerBase {
     @Override
     protected void execute(String cmd, String args) {
         if (cmd.equals("ring")) {
-            Integer volume = Tools.parseInt(args);
-            
-            if (volume == null) {
-                volume = 100;
-            }
-            
-            if (ring(volume)) {
+            if (args.equals("stop")) {
+                send(R.string.chat_stop_ringing);
+                stop();
+            } else if (ring(Tools.parseInt(args, 100))) {
                 send(R.string.chat_start_ringing);
             } else {
                 send(R.string.chat_error_ringing);
             }
-        // command "ringmode" given
-        } else {
+        } else if (cmd.equals("ringmode")) {
             int mode;
             if (args.equals("vibrate")) {
                 sAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
@@ -147,11 +143,13 @@ public class RingCmd extends CommandHandlerBase {
         mMediaPlayer = null;
     }
     
+    @Override
     public void stop() {
         clearMediaPlayer();        
         mVibrator.cancel();
     }
     
+    @Override
     public void cleanUp() {
         clearMediaPlayer();
     }
@@ -159,7 +157,7 @@ public class RingCmd extends CommandHandlerBase {
     @Override
     public String[] help() {
         String[] s = { 
-                getString(R.string.chat_help_ring, makeBold("\"ring\""), makeBold("\"ring:[0-100]\""), makeBold("\"stop\"")),
+                getString(R.string.chat_help_ring, makeBold("\"ring\""), makeBold("\"ring:[0-100]\""), makeBold("\"ring:stop\"")),
                 getString(R.string.chat_help_ringmode, makeBold("\"ringmode:#mode#\""))
                 };
         return s;

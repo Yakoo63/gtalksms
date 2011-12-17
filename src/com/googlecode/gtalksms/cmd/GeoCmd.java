@@ -23,8 +23,13 @@ public class GeoCmd extends CommandHandlerBase {
         if (cmd.equals("geo")) {
             geo(args);
         } else if (cmd.equals("where")) {
-            send(R.string.chat_start_locating);
-            startLocatingPhone();
+            if (args.equals("stop")) {
+                send(R.string.chat_stop_locating);
+                stopLocatingPhone();    
+            } else {
+                send(R.string.chat_start_locating);
+                startLocatingPhone();
+            }
         }  
     }
     
@@ -84,7 +89,7 @@ public class GeoCmd extends CommandHandlerBase {
 
         return null;
     }
-
+    
     /** launches an activity on the url */
     public void launchExternal(String url) {
         Intent popup = new Intent(sContext, GeoPopup.class);
@@ -98,12 +103,12 @@ public class GeoCmd extends CommandHandlerBase {
     public void stop() {
         stopLocatingPhone();
     }
-    
+
     @Override
     public String[] help() {
         String[] s = { 
                 getString(R.string.chat_help_geo, makeBold("\"geo:#address#\"")),
-                getString(R.string.chat_help_where, makeBold("\"where\""), makeBold("\"stop\""))
+                getString(R.string.chat_help_where, makeBold("\"where\""), makeBold("\"where:stop\""))
                 };
         return s;
     }
