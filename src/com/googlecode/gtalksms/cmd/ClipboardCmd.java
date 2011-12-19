@@ -33,7 +33,7 @@ public class ClipboardCmd extends CommandHandlerBase {
                 mOldClipboardMgr.setText(text);
                 cmd.respond(getString(R.string.chat_text_copied));
             } else {
-            	cmd.respond(getString(R.string.chat_clipboard, mOldClipboardMgr.getText()));
+                cmd.respond(getString(R.string.chat_clipboard, mOldClipboardMgr.getText()));
             }
         } catch (Exception ex) {
             Log.w(Tools.LOG_TAG, "Clipboard error", ex);
@@ -47,5 +47,4 @@ public class ClipboardCmd extends CommandHandlerBase {
             };
         return s;
     }
-
 }

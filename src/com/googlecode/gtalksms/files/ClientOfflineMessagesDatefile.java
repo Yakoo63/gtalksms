@@ -73,7 +73,7 @@ public class ClientOfflineMessagesDatefile extends Datefile {
         }
         int typeInt = typeEnumToInt(type);
         DataOutputStream dos = getDataOutputStream(false);
-        dos.writeUTF(to);
+        dos.writeUTF(to == null ? "" : to);
         dos.writeInt(typeInt);
         dos.writeUTF(body);
         dos.close();        
