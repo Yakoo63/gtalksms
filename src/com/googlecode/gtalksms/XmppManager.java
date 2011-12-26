@@ -66,6 +66,7 @@ import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;
 import com.googlecode.gtalksms.xmpp.PresencePacketListener;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
+import com.googlecode.gtalksms.xmpp.XmppEntityCapsCache;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppLocalS5BProxyManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -143,6 +144,10 @@ public class XmppManager {
      * @param connection - optional
      */
     private XmppManager(Context context, XMPPConnection connection) {
+        if (DEBUG) {
+            Connection.DEBUG_ENABLED = true;
+        }
+        
         mReconnectHandler = new Handler(MainService.getServiceLooper());
         
         mConnectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
@@ -166,12 +171,13 @@ public class XmppManager {
         sNewConnectionCount = 0;
         ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
         ServiceDiscoveryManager.setIdentityType("bot"); // http://xmpp.org/registrar/disco-categories.html
-        if (DEBUG) {
-            Connection.DEBUG_ENABLED = true;
-        }
+        XmppEntityCapsCache.enableEntityCapsCache(context);
+        
+        // Smack Settings
         SmackConfiguration.setKeepAliveInterval(1000 * 60 * 12);  // 12 min
         SmackConfiguration.setPacketReplyTimeout(1000 * 20);      // 20 sec
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
+        
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
         // connection can be null, it is created on demand
         mConnection = connection;
