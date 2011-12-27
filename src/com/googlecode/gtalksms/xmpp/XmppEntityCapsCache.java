@@ -10,6 +10,7 @@ import android.content.Context;
 
 public class XmppEntityCapsCache {
     private static final String CACHE_DIR = "EntityCapsCache";
+    private static EntityCapsPersistentCache sCache;
     
     public static void enableEntityCapsCache(Context ctx) {
         File cacheDir = new File(ctx.getFilesDir(), CACHE_DIR);
@@ -18,7 +19,12 @@ public class XmppEntityCapsCache {
             if (!cacheDir.mkdir())
                 throw new IllegalStateException("Can not create entity caps cache dir");
         // Disabled for now
-        EntityCapsPersistentCache cache = new SimpleDirectoryPersistentCache(cacheDir);
-        EntityCapsManager.setPersistentCache(cache);
+        sCache = new SimpleDirectoryPersistentCache(cacheDir);
+        EntityCapsManager.setPersistentCache(sCache);
+    }
+    
+    public static void emptyCache() {
+        if (sCache != null)
+            sCache.emptyCache();
     }
 }

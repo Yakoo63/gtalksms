@@ -48,6 +48,7 @@ import com.googlecode.gtalksms.cmd.WifiCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
+import com.googlecode.gtalksms.receivers.StorageLowReceiver;
 import com.googlecode.gtalksms.tools.DisplayToast;
 import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.CrashedStartCounter;
@@ -96,6 +97,7 @@ public class MainService extends Service {
     private static SettingsManager sSettingsMgr;
     private static XmppManager sXmppMgr;
     private static BroadcastReceiver sXmppConChangedReceiver;
+    private static BroadcastReceiver sStorageLowReceiver;
     private static KeyboardInputMethod sKeyboardInputMethod;
     private static PowerManager sPm;
     private static PowerManager.WakeLock sWl;
@@ -452,6 +454,9 @@ public class MainService extends Service {
             unregisterReceiver(sXmppConChangedReceiver);
             sXmppConChangedReceiver = null;
             
+            unregisterReceiver(sStorageLowReceiver);
+            sStorageLowReceiver = null;
+            
             sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
             sXmppMgr = null;
         }
@@ -533,6 +538,11 @@ public class MainService extends Service {
         };
         IntentFilter intentFilter = new IntentFilter(ACTION_XMPP_CONNECTION_CHANGED);
         registerReceiver(sXmppConChangedReceiver, intentFilter);
+        
+        sStorageLowReceiver = new StorageLowReceiver();
+        intentFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+        registerReceiver(sStorageLowReceiver, intentFilter);
+        
         setupCommands();
         sXmppMgr = XmppManager.getInstance(this);
     }
