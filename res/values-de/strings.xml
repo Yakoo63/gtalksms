@@ -213,7 +213,7 @@
     <string name="chat_help_ls">- %s: Zeigt den Inhalt des Verzeichnisses an.</string>
     <string name="chat_help_sc">- %1$s oder %2$s: Erstellt einen Screenshot und speichert ihn.</string>
     <string name="chat_help_flash_on">- %1$s oder %2$s: Aktiviert das Blitzlicht/Lampe</string>
-    <string name="chat_help_flash_on">- %1$s oder %2$s: Deaktiviert das Blitzlicht/Lampe</string>
+    <string name="chat_help_flash_off">- %1$s oder %2$s: Deaktiviert das Blitzlicht/Lampe</string>
     <string name="chat_help_sc_email">- %1$s oder %2$s: Erstellt einen Screenshot und sendet ihn per E-Mail</string>
     <string name="chat_help_sc_xmpp">- %1$s oder %2$s: Erstellt einen SCreenshot und sendet ihn per XMPP.</string>
     <string name="chat_help_camera">- %1$s oder %2$s: Macht ein Foto und speichert es.</string>
