@@ -1,6 +1,7 @@
 Upcoming
 * Make use of XEP-0033 if possible
-* Fixed Issue 43
+* Fixed issue with gTalk loops (Issue 43) 
+* Added delay before automatic disconnect on A/C (Issue 191)
 
 3.3
 * Improved file transfers by adding an local XMPP S5B proxy
