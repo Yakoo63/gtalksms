@@ -48,7 +48,8 @@ public class XmppMuc {
     private XMPPConnection mConnection;
     private Random mRndGen = new Random();
     private MUCHelper mMucHelper;
-    private DiscussionHistory mDiscussionHistory;    
+    private DiscussionHistory mDiscussionHistory;
+    private String mMucServer;
     
     private XmppMuc(Context context) {
         mCtx = context;
@@ -77,6 +78,10 @@ public class XmppMuc {
             sXmppMuc = new XmppMuc(ctx);
         }
         return sXmppMuc;
+    }
+    
+    public void setMUCServer(String server) {
+        this.mMucServer = server;
     }
     
     /**
@@ -208,12 +213,12 @@ public class XmppMuc {
         // TODO localize
         switch (mode) {
             case MODE_SMS:
-                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + mSettings.login.replaceAll("@", "_") + "@" + mSettings.mucServer;
+                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + mSettings.login.replaceAll("@", "_") + "@" + getMUCServer();
                 subjectInviteStr =  "SMS conversation with " + getRoomString(number, name);
                 break;
 
             case MODE_SHELL:
-                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + mSettings.login.replaceAll("@", "_") + "@" + mSettings.mucServer;
+                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + mSettings.login.replaceAll("@", "_") + "@" + getMUCServer();
                 subjectInviteStr =  "New Android Terminal " + getRoomString(number, name);
                 break;
 
@@ -248,7 +253,7 @@ public class XmppMuc {
 				}
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
-                GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + mSettings.mucServer
+                GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + getMUCServer()
                         + ". Falling back to room passwords", ex);
                 submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
                 submitForm.setAnswer("muc#roomconfig_roomsecret", mSettings.roomPassword);
@@ -271,6 +276,14 @@ public class XmppMuc {
         multiUserChat.invite(mSettings.notifiedAddress, subjectInviteStr);
         registerRoom(multiUserChat, number, name, randomInt, mode);
         return multiUserChat;
+    }
+    
+    private String getMUCServer() {
+        if (mMucServer == null) {
+        return mSettings.mucServer;
+        } else {
+            return mMucServer;
+        }
     }
     
     private void rejoinRooms() {
