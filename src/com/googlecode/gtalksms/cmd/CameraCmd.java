@@ -80,7 +80,7 @@ public class CameraCmd extends CommandHandlerBase {
         else if (cmd.equals("flash") || cmd.equals("light")) {
             if (args.equals("") || splitedArgs[0].equals("on")) {
                 setLight(true);
-            } else if (splitedArgs[0].equals("off")) {
+            } else {
                 setLight(false);
             }
         }
