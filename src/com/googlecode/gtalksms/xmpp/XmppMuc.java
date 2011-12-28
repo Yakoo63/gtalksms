@@ -68,6 +68,15 @@ public class XmppMuc {
                 mRoomNumbers.clear();
                 mRooms.clear();
                 rejoinRooms();
+                
+                
+                try {
+                    mMucServer = XmppTools.disocverMUC(connection);
+                } catch (XMPPException e) {
+                    // This is not fatal, just log a warning
+                    GoogleAnalyticsHelper.trackAndLogWarning("Could not discover local MUC component: ", e);            
+                }
+                
             }            
         };
         xmppMgr.registerConnectionChangeListener(listener);
@@ -78,10 +87,6 @@ public class XmppMuc {
             sXmppMuc = new XmppMuc(ctx);
         }
         return sXmppMuc;
-    }
-    
-    public void setMUCServer(String server) {
-        this.mMucServer = server;
     }
     
     /**

@@ -74,7 +74,6 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 import com.googlecode.gtalksms.xmpp.XmppOfflineMessages;
 import com.googlecode.gtalksms.xmpp.XmppPresenceStatus;
 import com.googlecode.gtalksms.xmpp.XmppStatus;
-import com.googlecode.gtalksms.xmpp.XmppTools;
 
 public class XmppManager {
     
@@ -593,15 +592,7 @@ public class XmppManager {
             maybeStartReconnect();
             return;
         }
-        
-        try {
-            String mucServer = XmppTools.disocverMUC(connection);
-            mXmppMuc.setMUCServer(mucServer);
-        } catch (XMPPException e) {
-            // This is not fatal, just log a warning
-            GoogleAnalyticsHelper.trackAndLogWarning("xmppMgr exception caught", e);            
-        }
-        
+
         Log.i("connection established with parameters: con=" + mConnection.isConnected() + 
                 " auth=" + mConnection.isAuthenticated() + 
                 " enc=" + mConnection.isUsingTLS() + 
