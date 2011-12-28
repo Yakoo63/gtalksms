@@ -92,7 +92,7 @@
     <string name="pref_con_muc_password">Room password</string>
     <string name="pref_con_muc_password_help">Room password for SMS notifications (used only, if making the room private failes for some reason)</string>
     <string name="pref_con_muc_server">MUC Service</string>
-    <string name="pref_con_muc_server_help">Service used for XMPP Groupchat. Leave the default if you don\'t know that this means! The MUC Service will only be used if you XMPP server doesn't provide one.</string>
+    <string name="pref_con_muc_server_help">Service used for XMPP Groupchat. Leave the default if you don\'t know that this means! The MUC Service will only be used if you XMPP server doesn\'t provide one.</string>
     <string name="pref_con_manually_specify_server_settings">Manual server settings</string>
     <string name="pref_con_manually_specify_server_settings_help">Allows you to specify the XMPP Server Settings manually</string>
     <string name="pref_notif">Notification settings</string>
