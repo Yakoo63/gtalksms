@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -71,13 +72,19 @@ public class XmppMuc {
                 
                 
                 try {
-                    mMucServer = XmppTools.disocverMUC(connection);
+                    Collection<String> mucComponents = MultiUserChat.getServiceNames(connection);
+                    // TODO If a server has a IRC MUC component enabled, it will also be returned here
+                    // so it would be nice if a user could disable the automatic MUC component discovery
+                    // if the MUC component returned here is non functional.
+                    if (mucComponents.size() > 0) {
+                        Iterator<String> i = mucComponents.iterator();
+                        mMucServer = i.next();
+                    }
                 } catch (XMPPException e) {
                     // This is not fatal, just log a warning
                     GoogleAnalyticsHelper.trackAndLogWarning("Could not discover local MUC component: ", e);            
                 }
-                
-            }            
+            }
         };
         xmppMgr.registerConnectionChangeListener(listener);
     }
