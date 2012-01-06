@@ -1,15 +1,5 @@
 package com.googlecode.gtalksms.xmpp;
 
-import java.util.Iterator;
-
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
-import org.jivesoftware.smackx.packet.DiscoverInfo;
-import org.jivesoftware.smackx.packet.DiscoverInfo.Feature;
-import org.jivesoftware.smackx.packet.DiscoverItems;
-import org.jivesoftware.smackx.packet.DiscoverItems.Item;
-
 public class XmppTools {
     
     /**

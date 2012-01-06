@@ -107,7 +107,7 @@ public class UseAccountLoginButtonClickListener implements OnClickListener {
                     // show the success view
                     mWizard.initView(Wizard.VIEW_CREATE_SUCCESS);
                 } else {
-                    MainService.displayToast("Could not configure: " + this.e.getLocalizedMessage(), null);
+                    MainService.displayToast("Could not configure: " + this.e.getLocalizedMessage(), null, true);
                 }
             }
 

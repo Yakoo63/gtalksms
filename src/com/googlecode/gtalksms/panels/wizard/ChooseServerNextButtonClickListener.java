@@ -46,7 +46,7 @@ public class ChooseServerNextButtonClickListener implements OnClickListener {
             case R.id.radioManualServer:
                 String servername = mTextServer.getText().toString();
                 if (!XmppTools.isValidServername(servername)) {
-                    MainService.displayToast("\" " + servername + " \" is not a valid servername" , null);
+                    MainService.displayToast("\" " + servername + " \" is not a valid servername" , null, true);
                     return;
                 }
                 mWizard.mChoosenServername = servername;

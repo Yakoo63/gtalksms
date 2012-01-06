@@ -43,6 +43,7 @@ import com.googlecode.gtalksms.cmd.SettingsCmd;
 import com.googlecode.gtalksms.cmd.ShellCmd;
 import com.googlecode.gtalksms.cmd.SmsCmd;
 import com.googlecode.gtalksms.cmd.SystemCmd;
+import com.googlecode.gtalksms.cmd.ToastCmd;
 import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.cmd.WifiCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
@@ -502,22 +503,23 @@ public class MainService extends Service {
     /**
      * Provides a clean way to display toast messages that don't get stuck
      * 
-     * @param text
+     * @param text The Text to show as toast
      * @parm extraInfo can be null
+     * @parm showPrefix show the app name as prefix to the toast message
      * @param ctx
      */
-    public static void displayToast(String text, String extraInfo) {      
-        sToastHandler.post(new DisplayToast(text, extraInfo, sUiContext));
+    public static void displayToast(String text, String extraInfo, boolean showPrefix) {      
+        sToastHandler.post(new DisplayToast(text, extraInfo, sUiContext, showPrefix));
     }
     
     /**
      * Display a string resource i as toast messages
      * 
-     * @param i
+     * @param i The resource ID of the string to show as toast
      * @param extraInfo can be null
      */
     public static void displayToast(int i, String extraInfo) {
-        displayToast(sUiContext.getString(i), extraInfo);
+        displayToast(sUiContext.getString(i), extraInfo, true);
     }
     
     /**
@@ -685,6 +687,7 @@ public class MainService extends Service {
             registerCommand(new BluetoothCmd(this));
             registerCommand(new WifiCmd(this));
             registerCommand(new RebootCmd(this));
+            registerCommand(new ToastCmd(this));
             // used for debugging
             registerCommand(new SystemCmd(this));
             // help command needs to be registered as last

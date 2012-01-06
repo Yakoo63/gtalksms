@@ -68,7 +68,7 @@ public class CreateButtonClickListener implements OnClickListener {
                 if (success) {
                     mWizard.initView(Wizard.VIEW_CREATE_SUCCESS);
                 }
-                MainService.displayToast(mToastMessage, null);
+                MainService.displayToast(mToastMessage, null, true);
             }
 
         }
@@ -80,7 +80,7 @@ public class CreateButtonClickListener implements OnClickListener {
             CreateAccountAsync createAccountAsync = new CreateAccountAsync();
             createAccountAsync.execute(login, psw1);
         } else {
-            MainService.displayToast("The passwords do not match", null);
+            MainService.displayToast("The passwords do not match", null, true);
         }
     }
 
