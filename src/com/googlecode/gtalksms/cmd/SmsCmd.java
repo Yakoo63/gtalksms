@@ -55,7 +55,7 @@ public class SmsCmd extends CommandHandlerBase {
     private SMSHelper mSmsHelper;
           
     public SmsCmd(MainService mainService) {
-        super(mainService, new String[] {"sms", "reply", "findsms", "fs", "markasread", "mar", "chat", "delsms"}, CommandHandlerBase.TYPE_MESSAGE);
+        super(mainService, CommandHandlerBase.TYPE_MESSAGE, new Cmd("sms"), new Cmd("reply"), new Cmd("findsms", "fs"), new Cmd("markasread", "mar"), new Cmd("chat"), new Cmd("delsms"));
         mSmsMmsManager = new SmsMmsManager(sSettingsMgr, sContext);
         mSmsHelper = SMSHelper.getSMSHelper(sContext);
         mAliasHelper = AliasHelper.getAliasHelper(sContext);

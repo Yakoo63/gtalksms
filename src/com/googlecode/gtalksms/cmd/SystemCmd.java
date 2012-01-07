@@ -30,7 +30,7 @@ public class SystemCmd extends CommandHandlerBase {
     private static CrashedStartCounter sNullIntentStartCounter;
     
     public SystemCmd(MainService mainService) {
-        super(mainService, new String[] {"sysinfo"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("sysinfo"));
         if (SystemCmd.mainService == null) {
             Context ctx = sContext;
             activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);

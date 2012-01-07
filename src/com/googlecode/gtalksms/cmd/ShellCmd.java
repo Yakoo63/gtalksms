@@ -20,7 +20,7 @@ public class ShellCmd extends CommandHandlerBase {
     Integer sIndex = 0;
     
     public ShellCmd(MainService mainService) {
-        super(mainService, new String[] {"cmd", "shell"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("cmd"), new Cmd("shell"));
         
         // Create the main shell
         mShells.add(new Shell(0, this, sContext));

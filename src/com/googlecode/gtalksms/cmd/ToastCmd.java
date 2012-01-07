@@ -5,7 +5,7 @@ import com.googlecode.gtalksms.MainService;
 public class ToastCmd extends CommandHandlerBase {
 
     public ToastCmd(MainService mainService) {
-        super(mainService, new String[] {"toast"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("toast"));
         // TODO if your command needs references, init them here
     }
 

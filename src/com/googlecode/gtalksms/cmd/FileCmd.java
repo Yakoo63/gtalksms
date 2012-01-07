@@ -28,7 +28,7 @@ public class FileCmd extends CommandHandlerBase {
     private Exception ex;
     
     public FileCmd(MainService mainService) {
-        super(mainService, new String[] {"send", "ls", "rm"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("send"), new Cmd("ls"), new Cmd("rm"));
         mXmppFileManager = XmppFileManager.getInstance(sContext);
         try {
             landingDir = mXmppFileManager.getLandingDir();

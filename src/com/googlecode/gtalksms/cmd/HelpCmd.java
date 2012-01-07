@@ -26,7 +26,7 @@ public class HelpCmd extends CommandHandlerBase {
     
     
     public HelpCmd(MainService mainService) {
-        super(mainService, new String[] {"?", "help"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("?", "help"));
         
         _msg = new XmppMsg();
         _msgAll = new XmppMsg();
@@ -63,30 +63,31 @@ public class HelpCmd extends CommandHandlerBase {
                 continue;
             
             addLinesToMsg(_msgAll, helpLines);
+            String str = c.getCommandsAsString();
             
             switch (c.mCmdType) {
             case CommandHandlerBase.TYPE_CONTACTS:
-                contactCmds = contactCmds + c.getCommandsAsString() + " ";
+                contactCmds += str;
                 addLinesToMsg(_msgContact, helpLines);
                 break;
             case CommandHandlerBase.TYPE_COPY:
-                copyCmds = copyCmds + c.getCommandsAsString() + " ";
+                copyCmds += str;
                 addLinesToMsg(_msgCopy, helpLines);
                 break;
             case CommandHandlerBase.TYPE_GEO:
-                geoCmds = geoCmds + c.getCommandsAsString() + " ";
+                geoCmds += str;
                 addLinesToMsg(_msgGeo, helpLines);
                 break;
             case CommandHandlerBase.TYPE_MESSAGE:
-                messageCmds = messageCmds + c.getCommandsAsString() + " ";
+                messageCmds += str;
                 addLinesToMsg(_msgMessage, helpLines);
                 break;
             case CommandHandlerBase.TYPE_SYSTEM:
-                systemCmds = systemCmds + c.getCommandsAsString() + " ";
+                systemCmds += str;
                 addLinesToMsg(_msgSystem, helpLines);
                 break;
             case CommandHandlerBase.TYPE_MEDIA:
-                mediaCmds = mediaCmds + c.getCommandsAsString() + " ";
+                mediaCmds += str;
                 addLinesToMsg(_msgMedia, helpLines);
                 break;
             default:

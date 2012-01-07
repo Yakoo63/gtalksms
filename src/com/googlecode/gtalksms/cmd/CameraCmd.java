@@ -38,7 +38,7 @@ public class CameraCmd extends CommandHandlerBase {
     private static int cameraId = 0;
     
     public CameraCmd(MainService mainService) {
-        super(mainService, new String[] {"camera", "photo", "flash", "light"}, CommandHandlerBase.TYPE_MEDIA);
+        super(mainService, CommandHandlerBase.TYPE_MEDIA, new Cmd("camera", "photo"), new Cmd("flash", "light"));
         File path;
         
         windowManager = (WindowManager) sMainService.getSystemService(Context.WINDOW_SERVICE);

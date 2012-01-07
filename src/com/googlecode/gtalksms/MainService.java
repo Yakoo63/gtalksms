@@ -29,6 +29,7 @@ import com.googlecode.gtalksms.cmd.BluetoothCmd;
 import com.googlecode.gtalksms.cmd.CallCmd;
 import com.googlecode.gtalksms.cmd.CameraCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
+import com.googlecode.gtalksms.cmd.Cmd;
 import com.googlecode.gtalksms.cmd.CommandHandlerBase;
 import com.googlecode.gtalksms.cmd.ContactCmd;
 import com.googlecode.gtalksms.cmd.ExitCmd;
@@ -722,9 +723,11 @@ public class MainService extends Service {
     }
     
     private static void registerCommand(CommandHandlerBase cmd) {
-        String[] commands = cmd.getCommands();
-        for (String c : commands) {
-            sCommands.put(c, cmd);
+        for (Cmd c : cmd.getCommands()) {
+            sCommands.put(c.getName(), cmd);
+            for (String a : c.getAlias()) {
+                sCommands.put(a, cmd);
+            }
         }
         sCommandSet.add(cmd);
     } 

@@ -5,7 +5,7 @@ import com.googlecode.gtalksms.MainService;
 public class CommandTemplate extends CommandHandlerBase {
 
     public CommandTemplate(MainService mainService) {
-        super(mainService, new String[] {"command1", "command2"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("cmd1", "cmd1alias"), new Cmd("cms2","cmd2alias"));
         // TODO if your command needs references, init them here
     }
 

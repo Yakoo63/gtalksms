@@ -29,7 +29,7 @@ public class CallCmd extends CommandHandlerBase {
     private ContactsResolver mContactsResolver = null;
         
     public CallCmd(MainService mainService) {
-        super(mainService, new String[] {"calls", "dial", "ignore", "reject"}, CommandHandlerBase.TYPE_CONTACTS);
+        super(mainService, CommandHandlerBase.TYPE_CONTACTS, new Cmd("calls"), new Cmd("dial"), new Cmd("ignore"), new Cmd("reject"));
         _phoneMgr = new PhoneManager(sContext);
         _telephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
         mContactsResolver = ContactsResolver.getInstance(sContext);

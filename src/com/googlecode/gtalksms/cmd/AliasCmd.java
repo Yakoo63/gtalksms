@@ -19,7 +19,7 @@ public class AliasCmd extends CommandHandlerBase {
     private AliasHelper aliasHelper;
 
     public AliasCmd(MainService mainService) {
-        super(mainService, new String[] { "alias" }, CommandHandlerBase.TYPE_CONTACTS);
+        super(mainService, CommandHandlerBase.TYPE_CONTACTS, new Cmd("alias"));
         this.aliasHelper = AliasHelper.getAliasHelper(sContext);
     }
 

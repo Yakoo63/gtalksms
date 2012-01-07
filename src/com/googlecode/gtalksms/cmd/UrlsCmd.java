@@ -8,7 +8,7 @@ import com.googlecode.gtalksms.R;
 
 public class UrlsCmd extends CommandHandlerBase {
     public UrlsCmd(MainService mainService) {
-        super(mainService, new String[] {"http", "https"}, CommandHandlerBase.TYPE_COPY);
+        super(mainService, CommandHandlerBase.TYPE_COPY, new Cmd("http", "https"));
     }
     
     @Override

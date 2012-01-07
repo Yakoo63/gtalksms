@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.cmd;
 
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 import android.content.Context;
@@ -11,7 +12,8 @@ import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.data.contacts.ResolvedContact;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-public abstract class CommandHandlerBase { 
+public abstract class CommandHandlerBase {
+    
     protected static final int TYPE_MESSAGE = 1;
     protected static final int TYPE_CONTACTS = 2;
     protected static final int TYPE_GEO = 3;
@@ -22,17 +24,17 @@ public abstract class CommandHandlerBase {
     protected static SettingsManager sSettingsMgr;
     protected static Context sContext;
     protected static MainService sMainService = null;
-    protected final String[] mCommands;
+    protected final Cmd[] mCommands;
     protected final int mCmdType;
     protected String mAnswerTo;
         
-    CommandHandlerBase(MainService mainService, String[] commands, int cmdType) {
+    CommandHandlerBase(MainService mainService, int cmdType, Object... commands) {
         if (sMainService == null) {
             sMainService = mainService;
             sSettingsMgr = SettingsManager.getSettingsManager(sContext);
             sContext = mainService.getBaseContext();
         }
-        this.mCommands = commands;
+        this.mCommands = Arrays.copyOf(commands, commands.length, Cmd[].class);
         this.mCmdType = cmdType;
         this.mAnswerTo = null;
     }
@@ -68,7 +70,7 @@ public abstract class CommandHandlerBase {
         sMainService.send(message, to);
     }
     
-    public String[] getCommands() {
+    public Cmd[] getCommands() {
         return mCommands;
     }   
     
@@ -195,10 +197,17 @@ public abstract class CommandHandlerBase {
      */
     protected final String getCommandsAsString() {
         String res = "";
-        for(String c : mCommands) {
-            res  = res + c + ", ";
+        for(Cmd c : mCommands) {
+            res += c.getName(); 
+            if (c.getAlias().length > 0) {
+                res += " (";
+                for(String s : c.getAlias()) {
+                    res += s + ", ";
+                }
+                res = res.substring(0, res.length() - 2) + ")";
+            }
+            res += ", ";
         }
-        res = res.substring(0, res.length() - 1);
         return res;
     }    
     

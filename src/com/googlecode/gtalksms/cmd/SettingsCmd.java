@@ -9,7 +9,7 @@ import com.googlecode.gtalksms.MainService;
 public class SettingsCmd extends CommandHandlerBase {
     
     public SettingsCmd(MainService mainService) {
-        super(mainService, new String[] {"settings"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("settings"));
     }
 
     @Override

@@ -26,7 +26,7 @@ public class BatteryCmd extends CommandHandlerBase {
     private static XmppPresenceStatus sXmppPresenceStatus;    
     
     public BatteryCmd(MainService mainService) {
-        super(mainService, new String[] {"battery", "batt"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("battery", "batt"));
         sXmppPresenceStatus = XmppPresenceStatus.getInstance(sContext);
         sLastKnownPowerSource = "NotInitialized";
         setup();
