@@ -369,11 +369,11 @@ public class XmppManager {
                     float start = System.currentTimeMillis();
                     try {
                         con.disconnect();
-                    } catch (Exception e2) {
+                    } catch (Exception e) {
                         // Even if we double check that the connection is still connected
                         // sometimes the connection timeout occurs when the disconnect method
                         // is running, so we just log that here
-                        Log.i("xmpp disconnect failed: " + e2);
+                        Log.i("xmpp disconnect failed: " + e);
                     }
                     float stop = System.currentTimeMillis();
                     float diff = stop - start;
@@ -497,7 +497,7 @@ public class XmppManager {
             
             try {
                 connection = createNewConnection(mSettings);
-            } catch (XMPPException e) {
+            } catch (Exception e) {
                 // connection failure
                 Log.e("Exception creating new XMPP Connection", e);
                 maybeStartReconnect();
@@ -807,7 +807,7 @@ public class XmppManager {
                 if (toList.size() > 0) {
                     try {
                         MultipleRecipientManager.send(mConnection, msg, toList, null, null);
-                    } catch (XMPPException e) {
+                    } catch (Exception e) {
                         return false;
                     }
                 }
@@ -819,7 +819,7 @@ public class XmppManager {
             } else {
                 try {
                     muc.sendMessage(msg);
-                } catch (XMPPException e) {
+                } catch (Exception e) {
                     return false;
                 }
             }
