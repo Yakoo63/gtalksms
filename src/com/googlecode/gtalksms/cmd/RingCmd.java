@@ -24,7 +24,7 @@ public class RingCmd extends CommandHandlerBase {
     private boolean mCanRing;
    
     public RingCmd(MainService mainService) {
-        super(mainService, new String[] {"ring", "ringmode"}, CommandHandlerBase.TYPE_SYSTEM);
+        super(mainService, new String[] {"ring", "ringmode"}, CommandHandlerBase.TYPE_MEDIA);
         sAudioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         mVibrator = (Vibrator) mainService.getSystemService(Context.VIBRATOR_SERVICE);
     }

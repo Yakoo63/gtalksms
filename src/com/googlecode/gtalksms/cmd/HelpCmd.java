@@ -20,6 +20,7 @@ public class HelpCmd extends CommandHandlerBase {
     private static XmppMsg _msgGeo;
     private static XmppMsg _msgSystem;
     private static XmppMsg _msgCopy;
+    private static XmppMsg _msgMedia;
     
     private static XmppMsg _msgCategories = new XmppMsg();
     
@@ -34,12 +35,14 @@ public class HelpCmd extends CommandHandlerBase {
         _msgGeo = new XmppMsg();
         _msgSystem = new XmppMsg();
         _msgCopy = new XmppMsg();
+        _msgMedia = new XmppMsg();
         _msgCategories = new XmppMsg();
         
         String contactCmds = "";
         String messageCmds = "";
         String geoCmds = "";
         String systemCmds = "";
+        String mediaCmds = "";
         String copyCmds = "";
         
         commands = mainService.getCommands();
@@ -62,25 +65,29 @@ public class HelpCmd extends CommandHandlerBase {
             addLinesToMsg(_msgAll, helpLines);
             
             switch (c.mCmdType) {
-            case (CommandHandlerBase.TYPE_CONTACTS):
+            case CommandHandlerBase.TYPE_CONTACTS:
                 contactCmds = contactCmds + c.getCommandsAsString() + " ";
                 addLinesToMsg(_msgContact, helpLines);
                 break;
-            case (CommandHandlerBase.TYPE_COPY):
-                copyCmds = copyCmds + c.getCommandsAsString()  + " ";
+            case CommandHandlerBase.TYPE_COPY:
+                copyCmds = copyCmds + c.getCommandsAsString() + " ";
                 addLinesToMsg(_msgCopy, helpLines);
                 break;
-            case (CommandHandlerBase.TYPE_GEO):
-                geoCmds = geoCmds + c.getCommandsAsString()  + " ";
+            case CommandHandlerBase.TYPE_GEO:
+                geoCmds = geoCmds + c.getCommandsAsString() + " ";
                 addLinesToMsg(_msgGeo, helpLines);
-            break;
-            case (CommandHandlerBase.TYPE_MESSAGE):
-                messageCmds = messageCmds + c.getCommandsAsString()  + " ";
+                break;
+            case CommandHandlerBase.TYPE_MESSAGE:
+                messageCmds = messageCmds + c.getCommandsAsString() + " ";
                 addLinesToMsg(_msgMessage, helpLines);
                 break;
-            case (CommandHandlerBase.TYPE_SYSTEM):
-                systemCmds = systemCmds + c.getCommandsAsString()  + " ";
+            case CommandHandlerBase.TYPE_SYSTEM:
+                systemCmds = systemCmds + c.getCommandsAsString() + " ";
                 addLinesToMsg(_msgSystem, helpLines);
+                break;
+            case CommandHandlerBase.TYPE_MEDIA:
+                mediaCmds = mediaCmds + c.getCommandsAsString() + " ";
+                addLinesToMsg(_msgMedia, helpLines);
                 break;
             default:
                 Log.w(Tools.LOG_TAG, "help command unkown command type");           
@@ -92,14 +99,16 @@ public class HelpCmd extends CommandHandlerBase {
         geoCmds = geoCmds.substring(0, geoCmds.length()- 1);
         systemCmds = systemCmds.substring(0, systemCmds.length() - 1);
         copyCmds = copyCmds.substring(0, copyCmds.length() - 1);
+        mediaCmds = mediaCmds.substring(0, mediaCmds.length() - 1);
         
         // after we have iterated over the command set, we can assemble the category message
         _msgCategories.appendLine(getString(R.string.chat_help_title));
         _msgCategories.appendLine("- " + makeBold("\"help:contacts\"") + ": " + contactCmds);
-        _msgCategories.appendLine("- " + makeBold("\"help:message\"") + ": " + messageCmds);
-        _msgCategories.appendLine("- " + makeBold("\"help:geo\"") + ": " + geoCmds);
-        _msgCategories.appendLine("- " + makeBold("\"help:system\"") + ": " + systemCmds);
         _msgCategories.appendLine("- " + makeBold("\"help:copy\"") + ": " + copyCmds);               
+        _msgCategories.appendLine("- " + makeBold("\"help:geo\"") + ": " + geoCmds);
+        _msgCategories.appendLine("- " + makeBold("\"help:media\"") + ": " + mediaCmds);
+        _msgCategories.appendLine("- " + makeBold("\"help:message\"") + ": " + messageCmds);
+        _msgCategories.appendLine("- " + makeBold("\"help:system\"") + ": " + systemCmds);
     }
 
     @Override
@@ -121,6 +130,8 @@ public class HelpCmd extends CommandHandlerBase {
             send(_msgGeo);
         } else if (args.equals("system")) {
             send(_msgSystem);
+        } else if (args.equals("media")) {
+            send(_msgMedia);
         } else if (args.equals("copy")) {
             send(_msgCopy);
         } else if (args.equals("cat") || args.equals("categories")) {

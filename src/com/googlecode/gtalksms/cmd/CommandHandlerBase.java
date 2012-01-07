@@ -17,6 +17,7 @@ public abstract class CommandHandlerBase {
     protected static final int TYPE_GEO = 3;
     protected static final int TYPE_SYSTEM = 4;
     protected static final int TYPE_COPY = 5;
+    protected static final int TYPE_MEDIA = 6;
     
     protected static SettingsManager sSettingsMgr;
     protected static Context sContext;
