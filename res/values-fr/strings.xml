@@ -34,6 +34,8 @@
     <string name="pref_app_stop_on_wifi_disconnected_help">Arrête GTalkSMS quand le Wifi est déconnecté</string>
     <string name="pref_app_stop_on_power_disconnected">Sur batterie</string>
     <string name="pref_app_stop_on_power_disconnected_help">Arrête GTalkSMS au débranchement du chargeur</string>
+    <string name="pref_app_stop_on_power_disconnected_delay">Durée en min avant arrêt sur batterie</string>
+    <string name="pref_app_stop_on_power_disconnected_delay_help">Durée avant l\'arrêt de l\'application après avoir débranché le téléphone.</string>        
     <string name="pref_app_show_status_icon">Icône de notification de l\'état de connexion</string>
     <string name="pref_app_show_status_icon_help">Cocher pour afficher GTalkSMS dans la barre de notifications</string>
     <string name="pref_app_select_status_icon">Icônes de la barre de notifications</string>
@@ -63,6 +65,8 @@
     <string name="pref_app_framebufferMode_help">Type d\'encodage utilisé par le driver graphique de votre téléphone</string>
     <string name="pref_app_mark_read_on_send">Marquer les SMS comme lus sur une réponse</string>
     <string name="pref_app_mark_read_on_send_help">Marquer automatiquement une conversation comme lue lorsqu\'on répond à la personne</string>
+    <string name="pref_app_start_sms_key">Message SMS pour lancer l\'application</string>
+    <string name="pref_app_start_sms_key_help">Corps du message SMS qui permettra de démarrer l\'application à distance</string>
     <string name="pref_con">Connexion</string>
     <string name="pref_con_notified_address_cat">Adresse de notification</string>
     <string name="pref_con_notified_address">Adresse de notification</string>
@@ -91,8 +95,6 @@
     <string name="pref_con_muc_server_help">Serveur XMPP Groupchat. A modifier en connaissance de cause ! Ce paramètre sera utilisé uniquement si le serveur XMPP n\'en fournit pas déjà un.</string>
     <string name="pref_con_manually_specify_server_settings">Paramètres serveur manuels</string>
     <string name="pref_con_manually_specify_server_settings_help">Permet de configurer manuellement les paramètres de connexion XMPP</string>
-    <string name="pref_app_start_sms_key">Message SMS pour lancer l\'application</string>
-    <string name="pref_app_start_sms_key_help">Corps du message SMS qui permettra de démarrer l\'application à distance</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_application_connection">Connexion de l\'application</string>
     <string name="pref_notif_application_connection_help">Notification pour les connexions au service de messagerie</string>
@@ -118,10 +120,10 @@
     <string name="main_but_preferences">Préférences</string>
     <string name="main_but_send_clipboard">Presse-papier</string>
     <string name="main_but_about">A propos</string>
-    <string name="about_panel">A propos de GTalkSMS</string>
-    <string name="main_panel">GTalkSMS</string>
     <string name="main_but_donate">Donner sur Paypal</string>
     <string name="main_but_market">Enlever pub (Market)</string>
+    <string name="about_panel">A propos de GTalkSMS</string>
+    <string name="main_panel">GTalkSMS</string>
     <string name="preference_panel">Préférences</string>
     <string name="log_panel_acquiring">Acquisition des logs</string>
     <string name="log_panel_collect">Récupère les logs de GTalkSMS et compose un nouveau message. Vous pouvez vous envoyer ce message et le joindre à un bug décrivant votre problème.</string>
