@@ -1,4 +1,4 @@
-Upcoming
+3.4
 * Make use of XEP-0033 if possible
 * Fixed issue with gTalk loops (Issue 43) 
 * Added delay before automatic disconnect on A/C (Issue 191)
