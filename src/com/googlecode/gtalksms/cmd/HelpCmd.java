@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -21,6 +22,7 @@ public class HelpCmd extends CommandHandlerBase {
     private static XmppMsg _msgSystem;
     private static XmppMsg _msgCopy;
     private static XmppMsg _msgMedia;
+    private static XmppMsg _msgInternal; // Dev or Expert users
     
     private static XmppMsg _msgCategories = new XmppMsg();
     
@@ -37,14 +39,16 @@ public class HelpCmd extends CommandHandlerBase {
         _msgCopy = new XmppMsg();
         _msgMedia = new XmppMsg();
         _msgCategories = new XmppMsg();
-        
+        _msgInternal = new XmppMsg();
+            
         String contactCmds = "";
         String messageCmds = "";
         String geoCmds = "";
         String systemCmds = "";
         String mediaCmds = "";
         String copyCmds = "";
-        
+        String internalCmds = "";
+            
         commands = mainService.getCommands();
         Set<CommandHandlerBase> commandSet = mainService.getCommandSet();
         
@@ -59,11 +63,17 @@ public class HelpCmd extends CommandHandlerBase {
         
         for (CommandHandlerBase c : commandSet) {
             String[] helpLines = c.help();
-            if (helpLines == null)  // do nothing if the command provides no help
+            String str = c.getCommandsAsString();
+            
+            // do nothing if the command provides no help
+            if (helpLines == null)  { 
+                if(c.mCmdType == CommandHandlerBase.TYPE_INTERNAL) {
+                    internalCmds += str;
+                }
                 continue;
+            }
             
             addLinesToMsg(_msgAll, helpLines);
-            String str = c.getCommandsAsString();
             
             switch (c.mCmdType) {
             case CommandHandlerBase.TYPE_CONTACTS:
@@ -95,12 +105,15 @@ public class HelpCmd extends CommandHandlerBase {
             }
         }
         
-        contactCmds = contactCmds.substring(0, contactCmds.length() - 1);
-        messageCmds = messageCmds.substring(0, messageCmds.length() - 1);
-        geoCmds = geoCmds.substring(0, geoCmds.length()- 1);
-        systemCmds = systemCmds.substring(0, systemCmds.length() - 1);
-        copyCmds = copyCmds.substring(0, copyCmds.length() - 1);
-        mediaCmds = mediaCmds.substring(0, mediaCmds.length() - 1);
+        contactCmds = StringFmt.delLastChar(contactCmds, 2);
+        messageCmds = StringFmt.delLastChar(messageCmds, 2);
+        geoCmds = StringFmt.delLastChar(geoCmds, 2);
+        systemCmds = StringFmt.delLastChar(systemCmds, 2);
+        copyCmds = StringFmt.delLastChar(copyCmds, 2);
+        mediaCmds = StringFmt.delLastChar(mediaCmds, 2);
+        internalCmds = StringFmt.delLastChar(internalCmds, 2);
+        
+        _msgInternal.appendLine(makeBold("Internal commands") + ": " + internalCmds);
         
         // after we have iterated over the command set, we can assemble the category message
         _msgCategories.appendLine(getString(R.string.chat_help_title));
@@ -135,6 +148,8 @@ public class HelpCmd extends CommandHandlerBase {
             send(_msgMedia);
         } else if (args.equals("copy")) {
             send(_msgCopy);
+        } else if (args.equals("internal")) {
+            send(_msgInternal);
         } else if (args.equals("cat") || args.equals("categories")) {
             send(_msgCategories);
         } else {

@@ -8,6 +8,18 @@ import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
 
 public class StringFmt {
+
+    public static String delLastChar(String s) {
+        return delLastChar(s, 1);
+    }
+    
+    public static String delLastChar(String s, int nb) {
+        try {
+            return s.substring(0, s.length() - nb);
+        } catch (Exception e) {
+            return "";
+        }
+    }
     
     public static String encodeSQL(String s) {
         return s.replaceAll("'", "''");
