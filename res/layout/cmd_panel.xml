@@ -7,8 +7,27 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
     
+    
+    <com.admob.android.ads.AdView
+        android:id="@+id/AdView" 
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:backgroundColor="#000000"
+        app:primaryTextColor="#FFFFFF"
+        app:secondaryTextColor="#CCCCCC"
+        app:keywords="@string/main_but_donate"/>
+    
+    <TextView
+        android:id="@+id/TextView" 
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent"
+        android:textSize="20sp"
+        android:gravity="center"
+        />
+    
     <ListView 
-         android:id="@+id/listView"
+         android:id="@+id/ListView"
          android:layout_height="fill_parent"
          android:layout_width="fill_parent" 
          android:layout_weight=".9" />

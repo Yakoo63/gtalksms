@@ -46,7 +46,7 @@ import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFriend;
 
-public class MainScreen extends Activity implements InterstitialAdListener{
+public class MainScreen extends Activity implements InterstitialAdListener {
 
     /** AdMob Interstitial Ad */
     private InterstitialAd mInterstitialAd;
@@ -199,7 +199,9 @@ public class MainScreen extends Activity implements InterstitialAdListener{
         createView();
         
         if (!Tools.isDonateAppInstalled(this)) {
-            if (mInterstitialAd == null) mInterstitialAd = new InterstitialAd(Event.APP_START, this);
+            if (mInterstitialAd == null) {
+                mInterstitialAd = new InterstitialAd(Event.APP_START, this);
+            }
             mInterstitialAd.requestAd(this);
         }
     }

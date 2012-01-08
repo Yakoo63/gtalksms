@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="or">&#xA0;or&#xA0;</string>
-    <string name="cmd_manager">Command manager (Beta)</string>
+    <string name="cmd_manager">Command manager</string>
+    <string name="cmd_manager_error_not_connected">Service must be started before access to this panel!</string>
     <string name="wizard">Setup wizard</string>
     <string name="wizard_welcome_text">Welcome to the GTalkSMS setup wizard.\nPlease enter your XMPP (Jabber) or GTalk Address (username@googlemail.com) below. This Address will be able to control your android phone via Jabber/GTalk and will be notified about new events on your phone.</string>
     <string name="wizard_create_text">Choose your login and your password</string>

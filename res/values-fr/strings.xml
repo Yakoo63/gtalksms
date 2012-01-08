@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="or">&#xA0;ou&#xA0;</string>
+    <string name="cmd_manager">Gérer les commandes</string>
+    <string name="cmd_manager_error_not_connected">Il faut être connecté pour accéder au panneau de configuration des commandes !</string>
     <string name="wizard">Assistant de configuration</string>
     <string name="wizard_welcome_text">Bienvenue dans l\'assistant de configuration de GTalkSMS.\nEntrez votre identifiant XMPP (Jabber) ou GTalk (username@gmail.com) ci-dessous. Cette adresse vous permettra de contrôler votre téléphone Android via Jabber/GTalk et sera notifiée des nouvelles notifications.</string>
     <string name="wizard_create_text">Choisissez votre identifiant et votre mot de passe.</string>
