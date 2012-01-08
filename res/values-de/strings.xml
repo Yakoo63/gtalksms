@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="wizard">Einstellungs Assistent (Beta)</string>
+    <string name="wizard">Einstellungs Assistent</string>
     <string name="wizard_welcome_text">Willkommen. Dieser Assistent hilft dir GTalkSMS zu konfigurieren.\nBitte gib deine XMPP (Jabber) oder GTalk Addresse (benutzername@googlemail.com) ein. Über diese Adresse lässt sich GTalkSMS fernsteuern und Statusmeldungen wie zB. neue SMS werden an die Adresse geschickt.</string>
     <string name="wizard_create_text">Den gewünschten Benutzernamen und Passwort eingeben</string>
     <string name="wizard_delete_button">Löschen</string>
