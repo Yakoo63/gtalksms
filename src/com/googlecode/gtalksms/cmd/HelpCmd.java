@@ -34,7 +34,7 @@ public class HelpCmd extends CommandHandlerBase {
     }
     
     public HelpCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("?", "help"));
+        super(mainService, CommandHandlerBase.TYPE_INTERNAL, new Cmd("?", "help"));
         
         _msg = new XmppMsg();
         _msgAll = new XmppMsg();
@@ -73,7 +73,7 @@ public class HelpCmd extends CommandHandlerBase {
             
             // do nothing if the command provides no help
             if (helpLines == null)  { 
-                if(c.mCmdType == CommandHandlerBase.TYPE_INTERNAL) {
+                if (c.mCmdType == CommandHandlerBase.TYPE_INTERNAL) {
                     internalCmds += str;
                 }
                 continue;

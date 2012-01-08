@@ -178,7 +178,6 @@
     <string name="chat_help_help_all">Affiche toute l\'aide.</string>
     <string name="chat_help_help_categories">Affiche les catégories d\'aide.</string>
     <string name="chat_help_stop">Stoppe l\'application sur le téléphone.</string>
-    <string name="chat_help_dial">Compose le numéro du contact spécifié.</string>
     <string name="chat_help_sms_reply">Envoye un SMS au dernier destinataire entrant ou sortant.</string>
     <string name="chat_help_sms_show_all">Affiche les SMS de tous les contacts.</string>
     <string name="chat_help_sms_show_unread">Affiche les SMS non lus de tous les contacts.</string>
@@ -190,12 +189,16 @@
     <string name="chat_help_mark_as_read">Marque comme lu les SMS du dernier destinataire ou du contact spécifié.</string>
     <string name="chat_help_battery">Affiche l\'état de la batterie.</string>
     <string name="chat_help_calls">Affiche l\'historique d\'appels.</string>
+    <string name="chat_help_dial">Compose le numéro du contact spécifié.</string>
+    <string name="chat_help_ignore">Ignore l\'appel entrant.</string>
+    <string name="chat_help_reject">Rejète l\'appel entrant.</string>
     <string name="chat_help_contact">Affiche les informations des contacts spécifiés.</string>
     <string name="chat_help_geo">Ouvri Google Map, Google Navigation ou Google Street View pour l\'adresse spécifiée.</string>
     <string name="chat_help_where">Envoie en continue des liens Google Map pour localiser le téléphone jusqu\'à l\'envoie de la commande stop.</string>
     <string name="chat_help_ring">Fait sonner le téléphone jusqu\'à l\'envoie de la commande stop. Volume entre 0 et 100, 0 pour faire vibrer le téléphone.</string>
     <string name="chat_help_copy">Copie le texte dans le presse-papier du téléphone ou récupérer celui du téléphone si vide.</string>
     <string name="chat_help_cmd">Exécute une commande shell avec les droits super administrateur si possible.</string>
+    <string name="chat_help_shell">Ouvre une nouvelle fenêtre de chat en tant que shell.</string>
     <string name="chat_help_write">Ecrit le texte comme un clavier virtuel dans les autres applications (Ne pas oublier d\'activer le clavier GTalkSMS dans les paramètres d\'Android).</string>
     <string name="chat_help_urls">Envoie des liens pour les ouvrir dans le navigateur du téléphone.</string>
     <string name="chat_help_ringmode">Modifie le type de sonnerie avec mode=(normal|silent|vibrate). Affiche le type courant de sonnerie s\'il n\'y a aucun paramètre.</string>    

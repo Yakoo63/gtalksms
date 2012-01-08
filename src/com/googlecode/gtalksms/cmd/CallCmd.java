@@ -154,5 +154,7 @@ public class CallCmd extends CommandHandlerBase {
     protected void initializeSubCommands() {
         mCommandMap.get("calls").setHelp(R.string.chat_help_calls, "#count#");
         mCommandMap.get("dial").setHelp(R.string.chat_help_dial, "#contact#");
+        mCommandMap.get("reject").setHelp(R.string.chat_help_reject, null);
+        mCommandMap.get("ignore").setHelp(R.string.chat_help_ignore, null);
     }
 }

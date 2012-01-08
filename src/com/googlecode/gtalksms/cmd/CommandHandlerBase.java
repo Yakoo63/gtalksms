@@ -16,13 +16,13 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public abstract class CommandHandlerBase {
     
-    protected static final int TYPE_MESSAGE = 1;
-    protected static final int TYPE_CONTACTS = 2;
-    protected static final int TYPE_GEO = 3;
-    protected static final int TYPE_SYSTEM = 4;
-    protected static final int TYPE_COPY = 5;
-    protected static final int TYPE_MEDIA = 6;
-    protected static final int TYPE_INTERNAL = 7;
+    public static final int TYPE_MESSAGE = 1;
+    public static final int TYPE_CONTACTS = 2;
+    public static final int TYPE_GEO = 3;
+    public static final int TYPE_SYSTEM = 4;
+    public static final int TYPE_COPY = 5;
+    public static final int TYPE_MEDIA = 6;
+    public static final int TYPE_INTERNAL = 7;
     
     protected static SettingsManager sSettingsMgr;
     protected static Context sContext;
@@ -51,7 +51,11 @@ public abstract class CommandHandlerBase {
 
     protected String getString(int id, Object... args) {
         return sContext.getString(id, args);
-    }   
+    }
+    
+    public int getType() {
+        return mCmdType;
+    }
     
     /**
      * Nice send() wrapper that includes
