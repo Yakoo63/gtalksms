@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.panels;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,10 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
@@ -50,15 +54,28 @@ public class CmdManager extends Activity {
         setContentView(R.layout.cmd_panel);
      //   LinearLayout layout = (LinearLayout) findViewById(R.id.mainLayout);
         mListView = (ListView)findViewById(R.id.listView);
-    
+        mListView.setOnItemClickListener( new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cmd cmd = (Cmd)parent.getItemAtPosition(position);
+                boolean isActive = !cmd.isActive();
+                
+                cmd.setActive(isActive);
+                ImageView imageView = (ImageView) view.findViewById(R.id.State);
+                imageView.setImageResource(isActive ? R.drawable.buddy_available : R.drawable.buddy_offline);
+            }
+        });
     }
     
     public void refresh() {
         if (mMainService != null) {
             List<Cmd> cmds = new ArrayList<Cmd>();
             for (CommandHandlerBase cmdBase : mMainService.getCommandSet()) {
-                for (Cmd cmd : cmdBase.getCommands()) {
-                    cmds.add(cmd);
+                if (cmdBase.getType() != CommandHandlerBase.TYPE_INTERNAL) {
+                    for (Cmd cmd : cmdBase.getCommands()) {
+                        cmds.add(cmd);
+                    }
                 }
             }
             

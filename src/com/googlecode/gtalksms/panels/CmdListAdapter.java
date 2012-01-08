@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.googlecode.gtalksms.R;
@@ -34,6 +35,10 @@ public class CmdListAdapter extends ArrayAdapter<Cmd> {
         }
         
         Cmd cmd = getItem(position);
+        
+        ImageView imageView = (ImageView) row.findViewById(R.id.State);
+        imageView.setImageResource(cmd.isActive() ? R.drawable.buddy_available : R.drawable.buddy_offline);
+        
         TextView textView = (TextView) row.findViewById(R.id.Name);
         textView.setText(cmd.getName());
         

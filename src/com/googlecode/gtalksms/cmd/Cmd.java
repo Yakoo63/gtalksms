@@ -37,6 +37,7 @@ public class Cmd {
     
     private String mName;
     private int mResHelp;
+    private boolean mIsActive;
     private String mHelpArgs;
     private String [] mAlias;
     private ArrayList<SubCmd> mSubCmds;
@@ -46,6 +47,16 @@ public class Cmd {
         mName = name;
         mAlias = Arrays.copyOf(alias, alias.length, String[].class);
         mSubCmds = new ArrayList<SubCmd>();
+    }
+
+    public boolean isActive() {
+        // TODO initialize with real value
+        return mIsActive;
+    }
+
+    public void setActive(boolean val) {
+        // TODO save the real value
+        mIsActive = val;
     }
     
     public void AddSubCmd(String name, int resHelp, String args, Object... alias) {
