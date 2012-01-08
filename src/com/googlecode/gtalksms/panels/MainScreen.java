@@ -370,6 +370,8 @@ public class MainScreen extends Activity implements InterstitialAdListener{
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         int prefs_id;
+        Intent intent;
+        
         switch (item.getItemId()) {
             case R.id.connection_settings:
                 prefs_id = R.xml.prefs_connection;
@@ -381,13 +383,17 @@ public class MainScreen extends Activity implements InterstitialAdListener{
                 prefs_id = R.xml.prefs_application;
                 break;
             case R.id.wizard:
-                Intent intent = new Intent(MainScreen.this, Wizard.class);
+                intent = new Intent(MainScreen.this, Wizard.class);
+                startActivity(intent);
+                return true;
+            case R.id.cmd_manager:
+                intent = new Intent(MainScreen.this, CmdManager.class);
                 startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-        Intent intent = new Intent(MainScreen.this, Preferences.class);
+        intent = new Intent(MainScreen.this, Preferences.class);
         intent.putExtra("panel", prefs_id);
         startActivity(intent);
         return true;

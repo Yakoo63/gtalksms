@@ -3,6 +3,8 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/wizard"
           android:title="@string/wizard" />  
+    <item android:id="@+id/cmd_manager"
+          android:title="@string/cmd_manager" />  
     <item android:id="@+id/connection_settings"
           android:icon="@drawable/ic_menu_preferences"
           android:title="@string/pref_con" />
