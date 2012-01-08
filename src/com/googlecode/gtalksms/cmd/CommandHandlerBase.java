@@ -114,7 +114,7 @@ public abstract class CommandHandlerBase {
     
     public void execute(Command userCommand) {
     	/*
-    	 * Default implementation is to fall back to old behavoir with
+    	 * Default implementation is to fall back to old behavior with
     	 * _answerTo variable and Xmpp awareness in sub classes.
     	 * <p>
     	 * Make abstract when execute(String, String) is gone, but for now default to it for
@@ -140,7 +140,7 @@ public abstract class CommandHandlerBase {
         
     /**
      * Stop all ongoing actions caused by a command
-     * gets called in mainService when "stop" command recieved
+     * gets called in mainService when "stop" command received
      */
     public void stop() {}
     
@@ -220,8 +220,9 @@ public abstract class CommandHandlerBase {
      */
     protected final void sendHelp() {
         String[] help = help();
-        if (help == null)
+        if (help == null) {
             return;
+        }
         
         XmppMsg msg = new XmppMsg();
         msg.addStringArray(help);

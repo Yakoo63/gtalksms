@@ -29,10 +29,10 @@ public class SettingsCmd extends CommandHandlerBase {
     	else if(settings.containsKey(key)) {
     		String newval = c.get2();
     		if(!"".equals(newval)) {
-    			String before = ""+settings.get(key);
+    			String before = "" + settings.get(key);
     			//TODO: smgr.setParameter(key, newval);
-    			c.respond("Setting preferences is not currently supported; " + "Tried setting: " 
-    			        + key + " to " + newval + " (previous value: " + before + ")");
+    			c.respond("Setting preferences is not currently supported; "
+    			        + "Tried setting: " + key + " to " + newval + " (previous value: " + before + ")");
     		} else {
     			c.respond(key + "=" + settings.get(key));
     		}
