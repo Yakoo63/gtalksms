@@ -151,14 +151,6 @@ public class BatteryCmd extends CommandHandlerBase {
         }
     }
 
-    @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_battery, makeBold("\"battery\""), makeBold("\"batt\"")) 
-                };
-        return s;
-    }
-    
     private static String intToRange(int in) {
     	int lowerBound = (in / 5) * STEP;
     	if (lowerBound != 100) {
@@ -167,5 +159,10 @@ public class BatteryCmd extends CommandHandlerBase {
     	} else {
     		return Integer.toString(lowerBound);
     	}
+    }
+
+    @Override
+    protected void initializeSubCommands() {
+        mCommandMap.get("battery").setHelp(R.string.chat_help_battery, null); 
     }
 }

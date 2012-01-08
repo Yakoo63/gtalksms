@@ -68,12 +68,9 @@ public class ContactCmd extends CommandHandlerBase {
             send(R.string.chat_no_match_for, searchedText);
         }
     }
-    
+
     @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_contact, makeBold("\"contact:#contact#\""))
-                };
-        return s;
+    protected void initializeSubCommands() {
+        mCommandMap.get("contact").setHelp(R.string.chat_help_contact, "#contact#");        
     }
 }

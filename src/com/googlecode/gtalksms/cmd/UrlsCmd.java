@@ -18,12 +18,9 @@ public class UrlsCmd extends CommandHandlerBase {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         sContext.startActivity(intent);
     }
-    
+
     @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_urls, makeBold("\"http\""))
-                };
-        return s;
+    protected void initializeSubCommands() {
+        mCommandMap.get("http").setHelp(R.string.chat_help_urls, "#url#");   
     }
 }

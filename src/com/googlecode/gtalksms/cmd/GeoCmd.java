@@ -105,11 +105,8 @@ public class GeoCmd extends CommandHandlerBase {
     }
 
     @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_geo, makeBold("\"geo:#address#\"")),
-                getString(R.string.chat_help_where, makeBold("\"where\""), makeBold("\"where:stop\""))
-                };
-        return s;
+    protected void initializeSubCommands() {
+        mCommandMap.get("geo").setHelp(R.string.chat_help_geo, "#address#");   
+        mCommandMap.get("where").setHelp(R.string.chat_help_where, "[stop]");   
     }
 }

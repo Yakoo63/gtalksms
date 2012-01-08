@@ -23,6 +23,15 @@ public class AliasCmd extends CommandHandlerBase {
         this.aliasHelper = AliasHelper.getAliasHelper(sContext);
     }
 
+    protected void initializeSubCommands() {
+        Cmd alias = mCommandMap.get("alias");
+        alias.setHelp(R.string.chat_help_alias_general, "subCommand:argument");
+        
+        alias.AddSubCmd("add", R.string.chat_help_alias_add, "#aliasname#:#contact#");
+        alias.AddSubCmd("show",R.string.chat_help_alias_show, "#aliasname#");
+        alias.AddSubCmd("del",R.string.chat_help_alias_del, "#aliasname#");
+    }
+    
     @Override
     protected void execute(String cmd, String args) {
         if (args.equals("")) {
@@ -104,16 +113,4 @@ public class AliasCmd extends CommandHandlerBase {
             }
         }
     }
-
-    @Override
-    public String[] help() {
-        String[] s = {
-                getString(R.string.chat_help_alias_general, makeBold("\"alias:subCommand:argument")),
-                getString(R.string.chat_help_alias_add, makeBold("\"alias:add:#aliasname#:#contact#")),
-                getString(R.string.chat_help_alias_show, makeBold("\"alias:show:#aliasname#\"")),
-                getString(R.string.chat_help_alias_del, makeBold("\"alias:del:#aliasname#\""))
-        };
-        return s;
-    }
-
 }

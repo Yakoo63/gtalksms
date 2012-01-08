@@ -41,8 +41,6 @@ public class RebootCmd extends CommandHandlerBase {
     }
     
     @Override
-    public String[] help() {
-        return null;
+    protected void initializeSubCommands() {
     }
-
 }

@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.cmd;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,6 +27,11 @@ public class HelpCmd extends CommandHandlerBase {
     
     private static XmppMsg _msgCategories = new XmppMsg();
     
+    private String format(int resHelp, Object... objects ) {
+        String [] keys = Arrays.copyOf(objects, objects.length, String[].class);
+        
+        return "- " + StringFmt.join(keys, getString(R.string.or), true) + ": " + getString(resHelp);
+    }
     
     public HelpCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("?", "help"));
@@ -53,9 +59,9 @@ public class HelpCmd extends CommandHandlerBase {
         Set<CommandHandlerBase> commandSet = mainService.getCommandSet();
         
         _msg.appendLine(getString(R.string.chat_help_title));
-        _msg.appendLine(getString(R.string.chat_help_help, makeBold("\"?\""), makeBold("\"help\"")));
-        _msg.appendLine(getString(R.string.chat_help_help_all, makeBold("\"help:all\"")));
-        _msg.appendLine(getString(R.string.chat_help_help_categories, makeBold("\"help:categories\""), makeBold("\"help:cat\"") ));
+        _msg.appendLine(format(R.string.chat_help_help, "\"help\""));
+        _msg.appendLine(format(R.string.chat_help_help_all, "\"help:all\""));
+        _msg.appendLine(format(R.string.chat_help_help_categories, "\"help:categories\"", "\"help:cat\""));
                      
         _msgAll.append(_msg); // attach the header to the full help message
         
@@ -157,11 +163,6 @@ public class HelpCmd extends CommandHandlerBase {
         }
     }
     
-    @Override
-    public String[] help() {
-        return null;
-    }
-    
     /**
      * Adds lines to the XmppMsg, one per line
      * does nothing if lines is null
@@ -173,5 +174,9 @@ public class HelpCmd extends CommandHandlerBase {
         if (lines == null) return;
         for (String line : lines) 
             msg.appendLine(line);
+    }
+
+    @Override
+    protected void initializeSubCommands() {
     }
 }

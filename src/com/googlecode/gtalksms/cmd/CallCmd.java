@@ -113,15 +113,6 @@ public class CallCmd extends CommandHandlerBase {
         }
     }
 
-    @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_calls, makeBold("\"calls:#count#\"")),
-                getString(R.string.chat_help_dial, makeBold("\"dial:#contact#\"")) 
-                };
-        return s;
-    }
-    
     /**
      * Rejects an incoming call
      * 
@@ -157,5 +148,11 @@ public class CallCmd extends CommandHandlerBase {
             throw new IllegalStateException(e);
         }
         return telephonyService;
+    }
+
+    @Override
+    protected void initializeSubCommands() {
+        mCommandMap.get("calls").setHelp(R.string.chat_help_calls, "#count#");
+        mCommandMap.get("dial").setHelp(R.string.chat_help_dial, "#contact#");
     }
 }

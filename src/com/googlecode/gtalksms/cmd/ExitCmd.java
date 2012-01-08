@@ -14,13 +14,9 @@ public class ExitCmd extends CommandHandlerBase {
     protected void execute(String cmd, String args) {
        sMainService.stopSelf();
     }
-    
-    @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_stop, makeBold("\"exit\""))
-            };
-        return s;
-    }
 
+    @Override
+    protected void initializeSubCommands() {
+        mCommandMap.get("exit").setHelp(R.string.chat_help_stop, null);   
+    }
 }

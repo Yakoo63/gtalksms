@@ -1,5 +1,10 @@
 package com.googlecode.gtalksms.tools;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.googlecode.gtalksms.xmpp.XmppMsg;
+
 import android.text.SpannableStringBuilder;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
@@ -10,10 +15,26 @@ import android.text.style.URLSpan;
 public class StringFmt {
 
     public static String join(String[] list, String sep) {
+        return join(Arrays.asList(list), sep);
+    }
+    
+    public static String join(String[] list, String sep, boolean bold) {
+        return join(Arrays.asList(list), sep, bold);
+    }
+    
+    public static String makeBold(String msg) {
+        return XmppMsg.makeBold(msg);
+    }
+
+    public static String join(List<String> list, String sep) {
+        return join(list, sep, false);
+    }
+    
+    public static String join(List<String> list, String sep, boolean bold) {
         String res = "";
         
         for (String s : list) {
-            res += s + sep;
+            res += (bold ? makeBold(s) : s) + sep;
         }
         
         return delLastChar(res, sep.length());

@@ -72,8 +72,7 @@ public class SystemCmd extends CommandHandlerBase {
     }
 
     @Override
-    public String[] help() {
-        return null;
+    protected void initializeSubCommands() {
     }
     
     private static String getMyImportance() {

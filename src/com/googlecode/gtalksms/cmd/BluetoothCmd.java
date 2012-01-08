@@ -82,15 +82,12 @@ public class BluetoothCmd extends CommandHandlerBase {
         }
         return res;
     }   
-    
-    @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_bt_on, makeBold("\"bluetooth:on\""), makeBold("\"bt:on\"")),
-                getString(R.string.chat_help_bt_off, makeBold("\"bluetooth:off\""), makeBold("\"bt:off\"")),
-                getString(R.string.chat_help_bt_state, makeBold("\"bluetooth:state\""), makeBold("\"bt:state\"")),
-        };
-        return s;
-    }
 
+    @Override
+    protected void initializeSubCommands() {
+        Cmd bt = mCommandMap.get("bluetooth");
+        bt.AddSubCmd("on", R.string.chat_help_bt_on, null);
+        bt.AddSubCmd("off",R.string.chat_help_bt_off, null);
+        bt.AddSubCmd("state",R.string.chat_help_bt_state, null);
+    }
 }

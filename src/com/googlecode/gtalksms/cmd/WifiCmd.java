@@ -213,16 +213,13 @@ public class WifiCmd extends CommandHandlerBase {
     }
     
     @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_wifi_on, makeBold("\"wifi:on\""), makeBold("\"wlan:on\"")),
-                getString(R.string.chat_help_wifi_off, makeBold("\"wifi:off\""), makeBold("\"wlan:off\"")),
-                getString(R.string.chat_help_wifi_state, makeBold("\"wifi:state\""), makeBold("\"wlan:state\"")),
-                getString(R.string.chat_help_wifi_list, makeBold("\"wifi:list\""), makeBold("\"wlan:list\"")),
-                getString(R.string.chat_help_wifi_enable, makeBold("\"wifi:enable:<ID>\""), makeBold("\"wlan:enable:<ID>\"")),
-                getString(R.string.chat_help_wifi_disable, makeBold("\"wifi:disable:<ID>\""), makeBold("\"wlan:disable:<ID>\"")),
-
-        };
-        return s;
+    protected void initializeSubCommands() {
+        Cmd wifi = mCommandMap.get("wifi");
+        wifi.AddSubCmd("on", R.string.chat_help_wifi_on, null);   
+        wifi.AddSubCmd("off", R.string.chat_help_wifi_off, null);   
+        wifi.AddSubCmd("state", R.string.chat_help_wifi_state, null);   
+        wifi.AddSubCmd("list", R.string.chat_help_wifi_list, null);   
+        wifi.AddSubCmd("enable", R.string.chat_help_wifi_enable, "#id#");   
+        wifi.AddSubCmd("disable", R.string.chat_help_wifi_disable, "#id#");   
     }
 }

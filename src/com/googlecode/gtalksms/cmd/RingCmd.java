@@ -24,7 +24,7 @@ public class RingCmd extends CommandHandlerBase {
     private boolean mCanRing;
    
     public RingCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_MEDIA, new Cmd("ring", "ringmode"));
+        super(mainService, CommandHandlerBase.TYPE_MEDIA, new Cmd("ring"), new Cmd("ringmode"));
         sAudioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         mVibrator = (Vibrator) mainService.getSystemService(Context.VIBRATOR_SERVICE);
     }
@@ -153,14 +153,10 @@ public class RingCmd extends CommandHandlerBase {
     public void cleanUp() {
         clearMediaPlayer();
     }
-    
-    @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_ring, makeBold("\"ring\""), makeBold("\"ring:[0-100]\""), makeBold("\"ring:stop\"")),
-                getString(R.string.chat_help_ringmode, makeBold("\"ringmode:#mode#\""))
-                };
-        return s;
-    }
 
+    @Override
+    protected void initializeSubCommands() {
+        mCommandMap.get("ring").setHelp(R.string.chat_help_ring, "|[0-100]|stop");   
+        mCommandMap.get("ringmode").setHelp(R.string.chat_help_ringmode, "#mode#");   
+    }
 }

@@ -16,9 +16,6 @@ public class ToastCmd extends CommandHandlerBase {
     }
     
     @Override
-    public String[] help() {
-        // TODO add help
-        return null;
+    protected void initializeSubCommands() {
     }
-
 }

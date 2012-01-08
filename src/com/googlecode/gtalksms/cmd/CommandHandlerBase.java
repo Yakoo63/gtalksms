@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms.cmd;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import android.content.Context;
@@ -9,6 +10,7 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.cmd.Cmd.SubCmd;
 import com.googlecode.gtalksms.data.contacts.ResolvedContact;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -25,7 +27,7 @@ public abstract class CommandHandlerBase {
     protected static SettingsManager sSettingsMgr;
     protected static Context sContext;
     protected static MainService sMainService = null;
-    protected final Cmd[] mCommands;
+    protected final HashMap<String,Cmd> mCommandMap;
     protected final int mCmdType;
     protected String mAnswerTo;
         
@@ -34,10 +36,17 @@ public abstract class CommandHandlerBase {
             sMainService = mainService;
             sSettingsMgr = SettingsManager.getSettingsManager(sContext);
             sContext = mainService.getBaseContext();
+            Cmd.setContext(sContext);
         }
-        this.mCommands = Arrays.copyOf(commands, commands.length, Cmd[].class);
-        this.mCmdType = cmdType;
-        this.mAnswerTo = null;
+        mCommandMap = new HashMap<String, Cmd>();
+        for (Object o : commands) {
+            Cmd c = (Cmd)o;
+            mCommandMap.put(c.getName(), c);
+        }
+        mCmdType = cmdType;
+        mAnswerTo = null;
+        
+        initializeSubCommands();
     }
 
     protected String getString(int id, Object... args) {
@@ -72,7 +81,7 @@ public abstract class CommandHandlerBase {
     }
     
     public Cmd[] getCommands() {
-        return mCommands;
+        return mCommandMap.values().toArray(new Cmd[mCommandMap.values().size()]);
     }   
     
     /**
@@ -164,7 +173,28 @@ public abstract class CommandHandlerBase {
      * 
      * @return Help String array, null if there is no help available
      */
-    public abstract String[] help();
+    public String[] help() {
+        ArrayList<String> res = new ArrayList<String>();
+        
+        for (Cmd c : mCommandMap.values()) {
+            if (c.getHelp() != null) {
+                res.add(c.getHelp());
+            }
+            for (SubCmd sc : c.getSubCmds()) {
+                if (sc.getHelp() != null) {
+                    res.add(sc.getHelp());
+                }
+            }
+        }
+        
+        if (res.size() > 0) {
+            return res.toArray(new String[res.size()]);
+        } else {
+            return null;
+        }            
+    }
+    
+    protected abstract void initializeSubCommands();
     
     protected String makeBold(String msg) {
         return XmppMsg.makeBold(msg);
@@ -198,7 +228,7 @@ public abstract class CommandHandlerBase {
      */
     protected final String getCommandsAsString() {
         String res = "";
-        for(Cmd c : mCommands) {
+        for(Cmd c : mCommandMap.values()) {
             res += c.getName(); 
             if (c.getAlias().length > 0) {
                 res += " (";

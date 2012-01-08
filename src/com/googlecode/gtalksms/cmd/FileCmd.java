@@ -234,11 +234,9 @@ public class FileCmd extends CommandHandlerBase {
     }
     
     @Override
-    public String[] help() {
-        String[] s = { 
-            getString(R.string.chat_help_send, makeBold("\"send:#file#\"")),
-            getString(R.string.chat_help_ls, makeBold("\"ls:#path#\"")),
-        };
-        return s;
+    protected void initializeSubCommands() {
+        mCommandMap.get("send").setHelp(R.string.chat_help_send, "#file#");   
+        mCommandMap.get("ls").setHelp(R.string.chat_help_ls, "#path#");   
     }
+
 }

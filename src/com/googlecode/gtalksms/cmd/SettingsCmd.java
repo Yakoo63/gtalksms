@@ -42,7 +42,6 @@ public class SettingsCmd extends CommandHandlerBase {
     }
     
     @Override
-    public String[] help() {
-        return null;
+    protected void initializeSubCommands() {
     }
 }

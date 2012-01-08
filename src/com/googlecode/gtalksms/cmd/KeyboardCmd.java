@@ -19,10 +19,7 @@ public class KeyboardCmd extends CommandHandlerBase {
     }
     
     @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_write, makeBold("\"write:#text#\""), makeBold("\"w:#text#\""))
-                };
-        return s;
+    protected void initializeSubCommands() {
+        mCommandMap.get("write").setHelp(R.string.chat_help_write, "#text#");   
     }
 }

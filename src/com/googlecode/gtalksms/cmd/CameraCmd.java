@@ -225,16 +225,15 @@ public class CameraCmd extends CommandHandlerBase {
     }
 
     @Override
-    public String[] help() {
-        String[] s = { 
-            getString(R.string.chat_help_flash_on, makeBold("\"flash[:on]\""), makeBold("\"light[:on]\"")),
-            getString(R.string.chat_help_flash_off, makeBold("\"flash:off\""), makeBold("\"light:off\"")),
-            getString(R.string.chat_help_camera, makeBold("\"camera\""), makeBold("\"photo\"")),
-            getString(R.string.chat_help_camera_email, makeBold("\"camera:email\""), makeBold("\"photo:email\"")),
-            getString(R.string.chat_help_camera_xmpp, makeBold("\"camera:xmpp\""), makeBold("\"photo:xmpp\"")),
-            getString(R.string.chat_help_camera_list, makeBold("\"camera:list\""), makeBold("\"photo:list\"")),
-            getString(R.string.chat_help_camera_set, makeBold("\"camera:set:#number#\""), makeBold("\"photo:set:#number#\"")),
-        };
-        return s;
+    protected void initializeSubCommands() {
+        Cmd cam = mCommandMap.get("camera");
+        cam.setHelp(R.string.chat_help_camera, null);
+        cam.AddSubCmd("email", R.string.chat_help_camera_email, null);
+        cam.AddSubCmd("xmpp", R.string.chat_help_camera_xmpp, null);
+        cam.AddSubCmd("list", R.string.chat_help_camera_list, null);
+        cam.AddSubCmd("set", R.string.chat_help_camera_set, "#number#");
+        Cmd flash = mCommandMap.get("flash");
+        flash.AddSubCmd("on", R.string.chat_help_flash_on, null);
+        flash.AddSubCmd("off", R.string.chat_help_flash_off, null);
     }
 }

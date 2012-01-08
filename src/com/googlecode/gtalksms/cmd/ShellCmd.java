@@ -80,4 +80,11 @@ public class ShellCmd extends CommandHandlerBase {
             };
         return s;
     }
+    
+
+    @Override
+    protected void initializeSubCommands() {
+        mCommandMap.get("cmd").setHelp(R.string.chat_help_cmd, "#command#");   
+        mCommandMap.get("shell").setHelp(R.string.chat_help_shell, null);   
+    }
 }

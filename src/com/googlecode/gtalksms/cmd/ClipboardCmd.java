@@ -40,11 +40,9 @@ public class ClipboardCmd extends CommandHandlerBase {
             send(R.string.chat_error_clipboard);
         }
     }
-    
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_copy, makeBold("\"copy:#text#\""))
-            };
-        return s;
+
+    @Override
+    protected void initializeSubCommands() {
+        mCommandMap.get("clipboard").setHelp(R.string.chat_help_copy, "#text#");              
     }
 }
