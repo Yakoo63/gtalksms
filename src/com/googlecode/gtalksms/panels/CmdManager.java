@@ -1,6 +1,5 @@
 package com.googlecode.gtalksms.panels;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,16 +16,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
-import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.cmd.Cmd;
 import com.googlecode.gtalksms.cmd.CommandHandlerBase;
 
 public class CmdManager extends Activity {
     
-    private SettingsManager mSettingsMgr;
     private ListView mListView;
     private MainService mMainService;
     
@@ -48,11 +44,8 @@ public class CmdManager extends Activity {
         Intent intent = new Intent(MainService.ACTION_CONNECT);
         bindService(intent, _mainServiceConnection, Context.BIND_AUTO_CREATE);
 
-        mSettingsMgr = SettingsManager.getSettingsManager(this);
-        Log.initialize(mSettingsMgr);
-        
         setContentView(R.layout.cmd_panel);
-     //   LinearLayout layout = (LinearLayout) findViewById(R.id.mainLayout);
+
         mListView = (ListView)findViewById(R.id.listView);
         mListView.setOnItemClickListener( new OnItemClickListener() {
 
@@ -79,7 +72,7 @@ public class CmdManager extends Activity {
                 }
             }
             
-            CmdListAdapter adapter = new CmdListAdapter(this, R.layout.cmd_item, cmds.toArray(new Cmd[cmds.size()]), mSettingsMgr);
+            CmdListAdapter adapter = new CmdListAdapter(this, R.layout.cmd_item, cmds.toArray(new Cmd[cmds.size()]));
             mListView.setAdapter(adapter);
             mListView.setVisibility(View.VISIBLE);
         } else {

@@ -560,7 +560,13 @@ public class MainService extends Service {
         if (sCommands.containsKey(cmd)) {
             Log.d("MainService executing command: \"" + cmd + ":" + Tools.shortenMessage(args) + "\"");
             try {
-                sCommands.get(cmd).execute(cmd, args == null ? "" : args, answerTo);
+                CommandHandlerBase exec = sCommands.get(cmd);
+                Cmd execCmd = exec.getCommand(cmd);
+                if (execCmd != null && execCmd.isActive()) {
+                    exec.execute(cmd, args == null ? "" : args, answerTo);
+                } else {
+                    send(getString(R.string.chat_command_disabled), answerTo);
+                }
             } catch (Exception e) {
                 String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
                 Log.e("executeCommand: " + error, e);

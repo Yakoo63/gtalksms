@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.googlecode.gtalksms.R;
-import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.cmd.Cmd;
 import com.googlecode.gtalksms.tools.StringFmt;
   
@@ -17,13 +16,11 @@ public class CmdListAdapter extends ArrayAdapter<Cmd> {
     
     LayoutInflater mInflater;
     Cmd[] mCommands;
-    SettingsManager mSettingsMgr;
     
-    public CmdListAdapter(Activity activity, int textViewResourceId, Cmd[] list, SettingsManager settingsMgr) {
+    public CmdListAdapter(Activity activity, int textViewResourceId, Cmd[] list) {
         super(activity, textViewResourceId, list);
         mInflater = activity.getLayoutInflater();
         mCommands = list;
-        mSettingsMgr = settingsMgr;
     }
 
     @Override

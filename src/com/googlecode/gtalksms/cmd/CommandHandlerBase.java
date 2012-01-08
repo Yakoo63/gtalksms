@@ -83,9 +83,27 @@ public abstract class CommandHandlerBase {
     protected void send(XmppMsg message, String to) {
         sMainService.send(message, to);
     }
-    
+
     public Cmd[] getCommands() {
         return mCommandMap.values().toArray(new Cmd[mCommandMap.values().size()]);
+    }   
+    
+    public Cmd getCommand(String name) {
+        Cmd cmd = mCommandMap.get(name);
+        
+        if (cmd != null) {
+            return cmd;
+        } else {
+            for (Cmd c : mCommandMap.values()) {
+                for (String a : c.getAlias()) {
+                    if (a.equals(name)) {
+                        return c;
+                    }
+                }
+            }
+        }
+        
+        return null;
     }   
     
     /**

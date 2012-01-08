@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.StringFmt;
@@ -37,7 +38,6 @@ public class Cmd {
     
     private String mName;
     private int mResHelp;
-    private boolean mIsActive;
     private String mHelpArgs;
     private String [] mAlias;
     private ArrayList<SubCmd> mSubCmds;
@@ -50,13 +50,11 @@ public class Cmd {
     }
 
     public boolean isActive() {
-        // TODO initialize with real value
-        return mIsActive;
+        return PreferenceManager.getDefaultSharedPreferences(sContext).getBoolean("cmd_" + mName, true);
     }
 
     public void setActive(boolean val) {
-        // TODO save the real value
-        mIsActive = val;
+        PreferenceManager.getDefaultSharedPreferences(sContext).edit().putBoolean("cmd_" + mName, val).commit();
     }
     
     public void AddSubCmd(String name, int resHelp, String args, Object... alias) {
