@@ -9,6 +9,16 @@ import android.text.style.URLSpan;
 
 public class StringFmt {
 
+    public static String join(String[] list, String sep) {
+        String res = "";
+        
+        for (String s : list) {
+            res += s + sep;
+        }
+        
+        return delLastChar(res, sep.length());
+    }
+
     public static String delLastChar(String s) {
         return delLastChar(s, 1);
     }
