@@ -41,6 +41,9 @@ public class CmdListAdapter extends ArrayAdapter<Cmd> {
         textView = (TextView) row.findViewById(R.id.Alias);
         textView.setText(alias + " "); // Adding space because italic text is truncated...
         
+        textView = (TextView) row.findViewById(R.id.Help);
+        textView.setText(cmd.getHelpSummary() + " "); // Adding space because italic text is truncated...
+        
         return row;
     }
 }

@@ -36,7 +36,8 @@ public class Cmd {
     }
     
     private String mName;
-    private String mHelp;
+    private int mResHelp;
+    private String mHelpArgs;
     private String [] mAlias;
     private ArrayList<SubCmd> mSubCmds;
     private static Context sContext;
@@ -94,7 +95,8 @@ public class Cmd {
     }
     
     public void setHelp(int resHelp, String args) {
-        mHelp = buildHelp(null, mName, mAlias, resHelp, args);
+        mResHelp = resHelp;
+        mHelpArgs = args;
     }
     
     public String getName() {
@@ -102,7 +104,11 @@ public class Cmd {
     }
     
     public String getHelp() {
-        return mHelp;
+        return buildHelp(null, mName, mAlias, mResHelp, mHelpArgs);
+    }
+    
+    public String getHelpSummary() {
+        return mResHelp <= 0 ? "" : getString(mResHelp);
     }
     
     public String[] getAlias() {
