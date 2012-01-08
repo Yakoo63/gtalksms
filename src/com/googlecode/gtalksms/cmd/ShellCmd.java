@@ -72,15 +72,6 @@ public class ShellCmd extends CommandHandlerBase {
             }
         }
     }
-  
-    @Override
-    public String[] help() {
-        String[] s = { 
-                getString(R.string.chat_help_cmd, makeBold("\"cmd:#command#\""))
-            };
-        return s;
-    }
-    
 
     @Override
     protected void initializeSubCommands() {

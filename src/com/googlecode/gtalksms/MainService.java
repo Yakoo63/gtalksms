@@ -510,8 +510,8 @@ public class MainService extends Service {
      * 
      * @param text
      *            The Text to show as toast
-     * @parm extraInfo can be null
-     * @parm showPrefix show the app name as prefix to the toast message
+     * @param extraInfo can be null
+     * @param showPrefix show the app name as prefix to the toast message
      * @param ctx
      */
     public static void displayToast(String text, String extraInfo, boolean showPrefix) {

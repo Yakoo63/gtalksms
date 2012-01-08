@@ -25,11 +25,6 @@ public class CommandTemplate extends CommandHandlerBase {
     private void somethingUsefull() {
           return;
     }
-    
-    @Override
-    public String[] help() {
-        return null;
-    }
 
     @Override
     protected void initializeSubCommands() {
