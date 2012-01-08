@@ -30,6 +30,9 @@
         <activity android:name="com.googlecode.gtalksms.panels.wizard.Wizard"
                   android:label="@string/wizard">
         </activity>
+        <activity android:name="com.googlecode.gtalksms.panels.CmdManager"
+                  android:label="@string/cmd_manager">
+        </activity>
         <activity android:name="com.googlecode.gtalksms.panels.Preferences"
                   android:label="@string/preference_panel">
         </activity>
