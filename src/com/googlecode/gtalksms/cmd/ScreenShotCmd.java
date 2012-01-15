@@ -156,7 +156,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
             i.putExtra("from", mAnswerTo);
             i.putExtra("cmd", "send");
             i.putExtra("args", picture.getAbsolutePath());
-            sContext.startService(i);
+            MainService.sendToServiceHandler(i);
         } catch (Exception e) {
             send(R.string.chat_sc_error, e);
         }

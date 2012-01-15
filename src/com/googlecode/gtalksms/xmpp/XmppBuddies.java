@@ -216,7 +216,7 @@ public class XmppBuddies implements RosterListener {
             intent.setClass(sContext, MainService.class);
             intent.putExtra("cmd", "batt");
             intent.putExtra("args", "silent");
-            sContext.startService(intent);
+            MainService.sendToServiceHandler(intent);
         }       
     }
     

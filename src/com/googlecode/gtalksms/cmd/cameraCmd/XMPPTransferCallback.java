@@ -20,7 +20,7 @@ public class XMPPTransferCallback extends ExtentedPictureCallback {
         i.putExtra("from", recipient);
         i.putExtra("cmd", "send");
         i.putExtra("args", picture.getAbsolutePath());
-        ctx.startService(i);
+        MainService.sendToServiceHandler(i);
         return true;
     }
 }

@@ -438,10 +438,7 @@ public class MainService extends Service {
             }
 
             // redirect the intent to the service handler thread
-            Message msg = sServiceHandler.obtainMessage();
-            msg.arg1 = startId;
-            msg.obj = intent;
-            sServiceHandler.sendMessage(msg);
+            sendToServiceHandler(startId, intent);
         }
         return START_STICKY;
     }
@@ -803,5 +800,18 @@ public class MainService extends Service {
 
     public static Handler getDelayedDisconnectHandler() {
         return sDelayedDisconnectHandler;
+    }
+    
+    public static void sendToServiceHandler(int i, Intent intent) {
+    	if (sServiceHandler != null) {
+            Message msg = sServiceHandler.obtainMessage();
+            msg.arg1 = i;
+            msg.obj = intent;
+            sServiceHandler.sendMessage(msg);
+    	}
+    }
+    
+    public static void sendToServiceHandler(Intent intent) {
+    	sendToServiceHandler(0, intent);
     }
 }

@@ -61,7 +61,7 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         if (action.equals(MainService.ACTION_WIDGET_ACTION)) {
-            Tools.startSvcIntent(context, MainService.ACTION_TOGGLE);
+            MainService.sendToServiceHandler(new Intent(MainService.ACTION_TOGGLE));
         } else if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
             int state = intent.getIntExtra("new_state", 0);
             // Update all AppWidget with current status

@@ -67,7 +67,7 @@ class MUCPacketListener implements PacketListener {
 			intent.putExtra("message", mName + ": " + message.getBody());
 			// fromMuc sounds right at first, but it servers no purpose here atm			
 			// intent.putExtra("fromMuc", true);
-			mCtx.startService(intent);
+			MainService.sendToServiceHandler(intent);
 		} else if (mMode == XmppMuc.MODE_SMS) {
 	        if (!fromBareResource.equals(mName)) {
 				if (message.getBody() != null) {
@@ -93,8 +93,8 @@ class MUCPacketListener implements PacketListener {
     					} else {
     						intent.putExtra("args", mNumber + ":" + message.getBody());
     					}
-    
-						mCtx.startService(intent);
+    					
+    					MainService.sendToServiceHandler(0, intent);
     					mLastDate = sentDate;
     				} else {
     					// this seems to be caused by the history replay of MUC rooms
@@ -121,7 +121,7 @@ class MUCPacketListener implements PacketListener {
                 // should be returned to the according MUC
                 // intent.putExtra("fromMuc", true);
                 
-                mCtx.startService(intent);
+				MainService.sendToServiceHandler(intent);
             }
         }
     }

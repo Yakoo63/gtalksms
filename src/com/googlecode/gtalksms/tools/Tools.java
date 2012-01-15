@@ -258,7 +258,7 @@ public class Tools {
             intent.putExtra("to", to);
         }
         intent.putExtra("xmppMsg", msg);
-        ctx.startService(intent);
+        MainService.sendToServiceHandler(intent);
     }
     
     /**
@@ -303,7 +303,7 @@ public class Tools {
         final Intent i = new Intent(MainService.ACTION_XMPP_MESSAGE_RECEIVED, null, ctx, MainService.class);
         i.putExtra("message", message);
         i.putExtra("from", from);
-        ctx.startService(i);
+        MainService.sendToServiceHandler(i);
     }
     
     /**
