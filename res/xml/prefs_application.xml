@@ -78,6 +78,26 @@
             android:entryValues="@array/list_framebufferMode_entryValues" 
             android:title="@string/pref_app_framebufferMode" 
             android:summary="@string/pref_app_framebufferMode_help" />
+       <PreferenceScreen android:title="@string/pref_app_public_intents">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="publicIntentsEnabled"
+                android:title="@string/pref_app_public_intents_enabled"
+                android:summary="@string/pref_app_public_intents_enabled_help"/>
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="publicIntentTokenRequired"
+                android:dependency="publicIntentsEnabled"
+                android:title="@string/pref_app_public_intents_token_required"
+                android:summary="@string/pref_app_public_intents_token_required_help"/>
+            <EditTextPreference
+            	android:key="publicIntentToken"
+            	android:defaultValue="secret"
+            	android:inputType="text"
+            	android:dependency="publicIntentTokenRequired"
+            	android:title="@string/pref_app_public_intents_token"
+            	android:summary="@string/pref_app_public_intents_token_help"/>
+        </PreferenceScreen>
         <PreferenceScreen android:title="@string/pref_app_advanced">
             <CheckBoxPreference 
                 android:key="debugLog" 

@@ -109,6 +109,11 @@ public class SettingsManager {
     public boolean stopOnWifiDisconnected;
     public int stopOnPowerDelay;
     
+    // public intents settings
+    public boolean publicIntentsEnabled;
+    public boolean publicIntentTokenRequired;
+    public String publicIntentToken;
+    
     private static SettingsManager sSettingsManager = null;
     
     private SharedPreferences mSharedPreferences;
@@ -260,5 +265,10 @@ public class SettingsManager {
             stopOnPowerDisconnected = mSharedPreferences.getBoolean("stopOnPowerDisconnected", false);
             stopOnWifiDisconnected = mSharedPreferences.getBoolean("stopOnWifiDisconnected", false);
             stopOnPowerDelay = mSharedPreferences.getInt("stopOnPowerDelay", 1);
+            
+            // pulic intent settings
+            publicIntentsEnabled = mSharedPreferences.getBoolean("publicIntentEnabled", false); // TODO
+            publicIntentTokenRequired = mSharedPreferences.getBoolean("publicIntentTokenRequired", false);          
+            publicIntentToken = mSharedPreferences.getString("publicIntentToken", "secret");
 	}
 }

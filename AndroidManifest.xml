@@ -40,7 +40,7 @@
                   android:label="@string/about_panel">
         </activity>
         <activity android:name="com.googlecode.gtalksms.panels.LogCollector"/>
-        <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService">
+        <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService" android:exported="false">
             <intent-filter>
                 <action android:name="com.googlecode.gtalksms.action.CONNECT" />
                 <action android:name="com.googlecode.gtalksms.action.TOGGLE" />

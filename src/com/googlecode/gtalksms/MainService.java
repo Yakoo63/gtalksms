@@ -50,6 +50,7 @@ import com.googlecode.gtalksms.cmd.WifiCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainScreen;
 import com.googlecode.gtalksms.panels.Preferences;
+import com.googlecode.gtalksms.receivers.PublicIntentReceiver;
 import com.googlecode.gtalksms.receivers.StorageLowReceiver;
 import com.googlecode.gtalksms.tools.CrashedStartCounter;
 import com.googlecode.gtalksms.tools.DisplayToast;
@@ -399,6 +400,7 @@ public class MainService extends Service {
                 CrashedStartCounter.getInstance(this).count();
             }
         }
+        PublicIntentReceiver.getReceiver(this).onServiceStart();
     }
 
     @Override
@@ -447,6 +449,7 @@ public class MainService extends Service {
     @Override
     public void onDestroy() {
         Log.i("MainService onDestroy(): IsRunning is set to false");
+        PublicIntentReceiver.getReceiver(this).onServiceStop();
         IsRunning = false;
         // If the _xmppManager is non-null, then our service was "started" (as
         // opposed to simply "created" - so tell the user it has stopped.

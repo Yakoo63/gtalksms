@@ -70,6 +70,13 @@
     <string name="pref_app_mark_read_on_send_help">Automatically mark a conversation as being read when you reply to the person</string>
     <string name="pref_app_start_sms_key">Magic SMS message</string>
     <string name="pref_app_start_sms_key_help">Magic SMS message body to start GTalkSMS</string>
+    <string name="pref_app_public_intents">Public Intent Options</string>
+    <string name="pref_app_public_intents_enabled">Public Intents</string>
+    <string name="pref_app_public_intents_enabled_help">Enable public Intents</string>
+    <string name="pref_app_public_intents_token_required">Public Intent Token</string>
+    <string name="pref_app_public_intents_token_required_help">Enabled security token (recommended)</string>
+    <string name="pref_app_public_intents_token">Intent Token</string>
+    <string name="pref_app_public_intents_token_help">The "token" Intent extra</string>
     <string name="pref_con">Connection settings</string>
     <string name="pref_con_notified_address_cat">Address to notify</string>
     <string name="pref_con_notified_address">Address to notify</string>
