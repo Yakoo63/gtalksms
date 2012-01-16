@@ -808,6 +808,10 @@ public class MainService extends Service {
             msg.arg1 = i;
             msg.obj = intent;
             sServiceHandler.sendMessage(msg);
+    	} else {
+    		Log.w("sendToServiceHandler() called with " 
+    				+ intent.getAction() 
+    				+ " when service handler is null");
     	}
     }
     
