@@ -49,6 +49,11 @@
                 <action android:name="com.googlecode.gtalksms.action.COMMAND" />
             </intent-filter>
         </service>
+        <receiver android:name="com.googlecode.gtalksms.receivers.PublicIntentReceiver">
+        	<intent-filter>
+        	    <action android:name="com.googlecode.gtalksms.action.CONNECT" />
+        	</intent-filter>    
+        </receiver>
         <receiver android:name="com.googlecode.gtalksms.WidgetProvider" >
 		    <intent-filter>
 		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -58,7 +63,7 @@
             <meta-data android:name="android.appwidget.provider"
                        android:resource="@xml/appwidget_info" />
         </receiver>
-        <service android:enabled="true" android:name="com.googlecode.gtalksms.LocationService" />
+        <service android:enabled="true" android:name="com.googlecode.gtalksms.LocationService" android:exported="false" />
         <receiver android:name="com.googlecode.gtalksms.receivers.BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

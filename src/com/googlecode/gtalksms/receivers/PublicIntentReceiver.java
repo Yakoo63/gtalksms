@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.receivers;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 
@@ -17,7 +18,8 @@ public class PublicIntentReceiver extends BroadcastReceiver {
 	
 	static {
 		sIntentFilter = new IntentFilter();
-		sIntentFilter.addAction(MainService.ACTION_CONNECT);
+		// ACTION_CONNECT is received by filter within the Apps Manifest
+		// sIntentFilter.addAction(MainService.ACTION_CONNECT);
 		sIntentFilter.addAction(MainService.ACTION_COMMAND);
 		sIntentFilter.addAction(MainService.ACTION_SEND);
 		sIntentFilter.addAction(MainService.ACTION_TOGGLE);
@@ -45,12 +47,16 @@ public class PublicIntentReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		if (sPublicIntentReceiver == null)
+			sPublicIntentReceiver = new PublicIntentReceiver(context);
+		
 		String token = intent.getStringExtra("token");
 		if (mSettings.publicIntentsEnabled) {
 			if (mSettings.publicIntentTokenRequired) {
 				if (token == null 
 						|| !mSettings.publicIntentToken.equals(token)) {
 					// token required but no token set or it doesn't macht
+					Log.w("Public intent without correct security token received");
 					return;
 				}
 			}					
