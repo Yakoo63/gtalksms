@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="or">&#xA0;oder&#xA0;</string>
+    <string name="cmd_manager">Kommando Manager</string>
+    <string name="cmd_manager_error_not_connected">Der Service muss aktiv sein um dieses Panel zu verwenden!</string>
     <string name="wizard">Einstellungs Assistent</string>
     <string name="wizard_welcome_text">Willkommen. Dieser Assistent hilft dir GTalkSMS zu konfigurieren.\nBitte gib deine XMPP (Jabber) oder GTalk Addresse (benutzername@googlemail.com) ein. Über diese Adresse lässt sich GTalkSMS fernsteuern und Statusmeldungen wie zB. neue SMS werden an die Adresse geschickt.</string>
     <string name="wizard_create_text">Den gewünschten Benutzernamen und Passwort eingeben</string>
@@ -180,7 +182,6 @@
     <string name="chat_help_help_all">zeigt die vollständige Hilfe an.</string>
     <string name="chat_help_help_categories">zeigt einzelnen Befehlskategorien an.</string>
     <string name="chat_help_stop">Beendet GTalkSMS auf den Telefon</string>
-    <string name="chat_help_dial">Ruft den angegebenen Kontakt an.</string>
     <string name="chat_help_sms_reply">Sendet eine SMS an den Kontakt der letzten emfangenen SMS</string>
     <string name="chat_help_sms_show_all">Zeigt die letzten SMS Nachrichten von allen Kontakten an.</string>
     <string name="chat_help_sms_show_unread">Zeigt ungelesene SMS Nachrichten von allen Kontakten an.</string>
@@ -192,6 +193,9 @@
     <string name="chat_help_mark_as_read">Markiert die Nachricht des angegebenen oder des letzten Kontaktes als gelesen.</string>
     <string name="chat_help_battery">Zeigt den Akkuladezustand in Prozent an.</string>
     <string name="chat_help_calls">Zeigt die Anrufeliste an. Optional kann die Anzal der Einträge angegeben werden</string>
+    <string name="chat_help_dial">Ruft den angegebenen Kontakt an.</string>
+    <string name="chat_help_ignore">Ingoriert den eingehenden Anruf.</string>
+    <string name="chat_help_reject">Weist den eingehenden Anruf ab.</string>
     <string name="chat_help_contact">Liefert Informationen über den angegebenen Kontakt.</string>
     <string name="chat_help_geo">Öffnet Googe Maps oder Navigation mit der angegebenen Adresse.</string>
     <string name="chat_help_where">Sendet die aktuelle Position des Telefons solange bis stop gesendet wird.</string>
@@ -235,6 +239,7 @@
     <string name="chat_call_outgoing">Ausgehender Anruf</string>
     <string name="chat_call_missed">Verpasster Anruf</string>
     <string name="chat_call_duration"> Anrufdauer: </string>
+    <string name="chat_command_disabled">Dieser Befehl ist deaktiviert</string>
     <string name="chat_welcome">Willkommen bei GTalkSMS %s. \&quot;?\&quot; für Hilfe.</string>
     <string name="chat_is_calling">%s ruft an.</string>
     <string name="chat_call_hidden">[verborgene Telefonnummer]</string>
