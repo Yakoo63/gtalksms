@@ -73,9 +73,6 @@ public class XmppMuc {
                 
                 try {
                     Collection<String> mucComponents = MultiUserChat.getServiceNames(connection);
-                    // TODO If a server has a IRC MUC component enabled, it will also be returned here
-                    // so it would be nice if a user could disable the automatic MUC component discovery
-                    // if the MUC component returned here is non functional.
                     if (mucComponents.size() > 0) {
                         Iterator<String> i = mucComponents.iterator();
                         mMucServer = i.next();
@@ -291,8 +288,8 @@ public class XmppMuc {
     }
     
     private String getMUCServer() {
-        if (mMucServer == null) {
-        return mSettings.mucServer;
+        if (mMucServer == null || mSettings.forceMucServer) {
+            return mSettings.mucServer;
         } else {
             return mMucServer;
         }

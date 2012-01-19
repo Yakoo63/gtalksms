@@ -48,6 +48,7 @@ public class SettingsManager {
     public boolean useDifferentAccount;
     public String roomPassword;
     public String mucServer;
+    public boolean forceMucServer;
     public boolean useCompression;
     public String xmppSecurityMode;
     public int xmppSecurityModeInt;
@@ -235,6 +236,7 @@ public class SettingsManager {
             }
             
             roomPassword = mSharedPreferences.getString("roomPassword", "gtalksms");
+            forceMucServer = mSharedPreferences.getBoolean("forceMucServer", false);
             mucServer = mSharedPreferences.getString("mucServer", "conference.jwchat.org");
             String notificationIncomingSmsType = mSharedPreferences.getString("notificationIncomingSmsType", "same");
             
