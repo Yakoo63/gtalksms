@@ -32,7 +32,7 @@ public class ClipboardCmd extends CommandHandlerBase {
             if (text.length() > 0) {
                 mOldClipboardMgr.setText(text);
                 cmd.respond(getString(R.string.chat_text_copied));
-            } else {
+            } else if (mOldClipboardMgr.getText().length() > 0) {
                 cmd.respond(getString(R.string.chat_clipboard, mOldClipboardMgr.getText()));
             }
         } catch (Exception ex) {
