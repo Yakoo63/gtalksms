@@ -3,10 +3,10 @@ package com.googlecode.gtalksms.xmpp;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 
+import android.content.Context;
+
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
-
-import android.content.Context;
 
 public class XmppPresenceStatus {
     
@@ -73,7 +73,7 @@ public class XmppPresenceStatus {
      * @param force - don't check if the notification address is online
      * @return true if the presence was set
      */
-    private boolean setStatus(boolean force) {
+     public boolean setStatus(boolean force) {
         if ((mXmppBuddies.isNotificationAddressAvailable() || force) 
                 && (mConnection != null && mConnection.isAuthenticated())) {
             Presence presence = new Presence(Presence.Type.available);

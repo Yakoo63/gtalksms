@@ -603,8 +603,10 @@ public class XmppManager {
             Tools.send((mContext.getString(R.string.chat_welcome, Tools.getVersionName(mContext))), null, mContext);
         }
         
-        mCurrentRetryCount = 0;        
+        mCurrentRetryCount = 0;
         updateStatus(CONNECTED);
+        
+        mXmppPresenceStatus.setStatus(true);
     }
     
     private void informListeners(XMPPConnection connection) {
@@ -719,7 +721,7 @@ public class XmppManager {
         // disable the built-in ReconnectionManager
         // since we handle this
         conf.setReconnectionAllowed(false);
-        conf.setSendPresence(false);
+        conf.setSendPresence(true);
         
         return new XMPPConnection(conf);     
     }
