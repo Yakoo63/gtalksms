@@ -30,7 +30,7 @@ public class SystemCmd extends CommandHandlerBase {
     private static CrashedStartCounter sNullIntentStartCounter;
     
     public SystemCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_INTERNAL, new Cmd("sysinfo"));
+        super(mainService, CommandHandlerBase.TYPE_INTERNAL, new Cmd("sysinfo"), new Cmd("telinfo"));
         if (SystemCmd.mainService == null) {
             Context ctx = sContext;
             activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
@@ -44,30 +44,32 @@ public class SystemCmd extends CommandHandlerBase {
     @Override
     protected void execute(String cmd, String args) {
         XmppMsg res = new XmppMsg(); 
-        ActivityManager.MemoryInfo memInfoSystem = new ActivityManager.MemoryInfo();
-        activityManager.getMemoryInfo(memInfoSystem);
-        MemoryInfo[] memInfoProc = activityManager.getProcessMemoryInfo(myPidArray);
-
-        appendMemInfo(res, memInfoProc[0]);
-        res.newLine();
-        appendSystemMemInfo(res, memInfoSystem);
-        res.newLine();
-        appendImportance(res);
-        res.newLine();
-        appendDataConnectionStatus(res);
-        res.newLine();
-        appendXMPPConnectionData(res);
-        res.newLine();
-        appendSystemUptimeData(res);
-        res.newLine();
-        appendMonkeyTest(res);
-        res.newLine();
-        appendPreferences(res);
-        res.newLine();
-        appendTelephonStatus(res);
-        res.newLine();
-        appendNullIntentStartCounter(res);
-        
+        if (cmd.equals("sysinfo")) {
+            ActivityManager.MemoryInfo memInfoSystem = new ActivityManager.MemoryInfo();
+            activityManager.getMemoryInfo(memInfoSystem);
+            MemoryInfo[] memInfoProc = activityManager.getProcessMemoryInfo(myPidArray);
+            appendMemInfo(res, memInfoProc[0]);
+            res.newLine();
+            appendSystemMemInfo(res, memInfoSystem);
+            res.newLine();
+            appendImportance(res);
+            res.newLine();
+            appendDataConnectionStatus(res);
+            res.newLine();
+            appendXMPPConnectionData(res);
+            res.newLine();
+            appendSystemUptimeData(res);
+            res.newLine();
+            appendMonkeyTest(res);
+            res.newLine();
+            appendPreferences(res);
+            res.newLine();
+            appendTelephonStatus(res);
+            res.newLine();
+            appendNullIntentStartCounter(res);
+        } else if (cmd.equals("telinfo")) {
+            appendTelephonStatus(res);
+        }
         send(res);
     }
 
@@ -232,7 +234,10 @@ public class SystemCmd extends CommandHandlerBase {
         msg.appendLine("Subscriber ID: " + telephonyManager.getSubscriberId());
         msg.appendLine("Voice Mail Alpha Tag: " + telephonyManager.getVoiceMailAlphaTag());
         msg.appendLine("Voice Mail Number: " + telephonyManager.getVoiceMailNumber());
-    }
+        msg.appendLine("Current operator: " + telephonyManager.getNetworkOperatorName());
+        msg.appendLine("Sim operator: " + telephonyManager.getSimOperatorName());
+        msg.appendLine("Roaming activated: " + telephonyManager.isNetworkRoaming());
+     }
     
     private static void appendNullIntentStartCounter(XmppMsg msg) {
         msg.appendBoldLine("Null Intents Starts");
