@@ -114,6 +114,7 @@
     <string name="chat_help_sc_email">Erstellt einen Screenshot und sendet ihn per E-Mail</string>
     <string name="chat_help_sc_xmpp">Erstellt einen SCreenshot und sendet ihn per XMPP.</string>
     <string name="chat_help_send">Sendet die Datei via XMPP. Entweder einen absoluten Pfad zur Datei angeben, anonsten wird das letzte aufgelistete Verzeichnis vorangestellt.</string>
+    <string name="chat_help_shell">Öffnet einen neuen MUC Chat mit einer Shell Session</string>
     <string name="chat_help_sms_chat">eröffnet neuen Chat mit dem Kontatk und schick eine entsprechende Einladung.</string>
     <string name="chat_help_sms_reply">Sendet eine SMS an den Kontakt der letzten emfangenen SMS</string>
     <string name="chat_help_sms_send">Sende eine SMS an den angegebenen Kontakt mit den Inahlt &lt;message&gt;.</string>
@@ -223,6 +224,13 @@
     <string name="pref_app_locale_help">Sprachumgebung der Anwendung festlegen</string>
     <string name="pref_app_mark_read_on_send">SMS automatisch als gelesen markieren</string>
     <string name="pref_app_mark_read_on_send_help">Markiert alle Nachrichten eines Kontaktes automatisch als gelesen, sobald man eine Nachricht an diesen sendet.</string>
+    <string name="pref_app_public_intents">Open Intent Optionen</string>
+    <string name="pref_app_public_intents_enabled">Open Intents</string>
+    <string name="pref_app_public_intents_enabled_help">Aktiviere Open Intents</string>
+    <string name="pref_app_public_intents_token">Intent Token</string>
+    <string name="pref_app_public_intents_token_help">Die Zeichenfolge des Sicherheitstoken</string>
+    <string name="pref_app_public_intents_token_required">Open Intent Token</string>
+    <string name="pref_app_public_intents_token_required_help">Erlaube nur open Intents mit Sicherheitstoken (empfohlen)</string>
     <string name="pref_app_ringtone">Klingelton</string>
     <string name="pref_app_ringtone_help">Klingelton der durch den \"ring\" Befehl abgespielt wird</string>
     <string name="pref_app_select_status_icon">Benachrichtigungsleiste Symbole</string>

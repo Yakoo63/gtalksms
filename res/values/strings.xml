@@ -228,7 +228,7 @@
     <string name="pref_app_public_intents_enabled">Public Intents</string>
     <string name="pref_app_public_intents_enabled_help">Enable public Intents</string>
     <string name="pref_app_public_intents_token">Intent Token</string>
-    <string name="pref_app_public_intents_token_help">The "token" Intent extra</string>
+    <string name="pref_app_public_intents_token_help">The String that the Intent has to carry as \"token\" String</string>
     <string name="pref_app_public_intents_token_required">Public Intent Token</string>
     <string name="pref_app_public_intents_token_required_help">Enabled security token (recommended)</string>
     <string name="pref_app_ringtone">Ring with</string>
