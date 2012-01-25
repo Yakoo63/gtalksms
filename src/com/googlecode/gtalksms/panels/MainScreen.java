@@ -82,8 +82,10 @@ public class MainScreen extends Activity implements InterstitialAdListener {
                 statusImg.setImageResource(R.drawable.led_red);
                 break;
             case XmppManager.CONNECTING:
+                statusImg.setImageResource(R.drawable.led_orange_con);
+                break;
             case XmppManager.DISCONNECTING:
-                statusImg.setImageResource(R.drawable.led_orange);
+                statusImg.setImageResource(R.drawable.led_orange_discon);
                 break;
             case XmppManager.WAITING_TO_CONNECT:
                 statusImg.setImageResource(R.drawable.led_orange_timewait);
