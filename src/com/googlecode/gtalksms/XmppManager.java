@@ -175,7 +175,7 @@ public class XmppManager {
         
         // Smack Settings
         SmackConfiguration.setKeepAliveInterval(1000 * 60 * 12);  // 12 min
-        SmackConfiguration.setPacketReplyTimeout(1000 * 20);      // 20 sec
+        SmackConfiguration.setPacketReplyTimeout(1000 * 40);      // 40 sec
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
