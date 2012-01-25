@@ -50,13 +50,14 @@
             </intent-filter>
         </service>
         <receiver android:name="com.googlecode.gtalksms.receivers.PublicIntentReceiver">
-        	<intent-filter>
-        	    <action android:name="com.googlecode.gtalksms.action.CONNECT" />
-        	</intent-filter>    
+            <intent-filter>
+                <action android:name="com.googlecode.gtalksms.action.CONNECT" />
+                <action android:name="com.googlecode.gtalksms.action.TOGGLE" />
+            </intent-filter>    
         </receiver>
         <receiver android:name="com.googlecode.gtalksms.WidgetProvider" >
-		    <intent-filter>
-		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.googlecode.gtalksms.action.XMPP.CONNECTION_CHANGED"/>
                 <action android:name="com.googlecode.gtalksms.action.widget.ACTION" />
             </intent-filter>            

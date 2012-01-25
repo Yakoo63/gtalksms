@@ -269,7 +269,7 @@ public class SettingsManager {
             stopOnPowerDelay = mSharedPreferences.getInt("stopOnPowerDelay", 1);
             
             // pulic intent settings
-            publicIntentsEnabled = mSharedPreferences.getBoolean("publicIntentEnabled", false); // TODO
+            publicIntentsEnabled = mSharedPreferences.getBoolean("publicIntentsEnabled", false); // TODO
             publicIntentTokenRequired = mSharedPreferences.getBoolean("publicIntentTokenRequired", false);          
             publicIntentToken = mSharedPreferences.getString("publicIntentToken", "secret");
 	}
