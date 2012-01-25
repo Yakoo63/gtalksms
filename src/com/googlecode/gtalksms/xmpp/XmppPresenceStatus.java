@@ -73,7 +73,7 @@ public class XmppPresenceStatus {
      * @param force - don't check if the notification address is online
      * @return true if the presence was set
      */
-     public boolean setStatus(boolean force) {
+     private boolean setStatus(boolean force) {
         if ((mXmppBuddies.isNotificationAddressAvailable() || force) 
                 && (mConnection != null && mConnection.isAuthenticated())) {
             Presence presence = new Presence(Presence.Type.available);

@@ -210,7 +210,10 @@ public class XmppManager {
         if (sXmppManager == null) {
             sXmppManager = new XmppManager(ctx, connection);
         } else {
-            // remove all possible references to the old connection
+            // This case is only for the wizard, which hands over a connection
+            // therefore we cleanup every possible connection and simply 
+            // call onConnectionEstablished()
+            // Start with removing all possible references to the old connection
             // note that this will note change sStatus
             sXmppManager.cleanupConnection();
             // init XmppManager with the new connection
@@ -258,7 +261,7 @@ public class XmppManager {
             if (mConnection.isConnected()) {
                 xmppDisconnect(mConnection);
             }
-            // xmppDisconnect may has set _connection = null, so we have to double check
+            // xmppDisconnect may has set mConnection to null, so we have to double check
             if (mConnection != null) {
                 if (mPacketListener != null) {
                     mConnection.removePacketListener(mPacketListener);
@@ -486,7 +489,7 @@ public class XmppManager {
             return;
         }
         
-        // everything is ready for a connection attemp
+        // everything is ready for a connection attempt
         updateStatus(CONNECTING);
 
         // create a new connection if the connection is obsolete or if the
@@ -605,8 +608,6 @@ public class XmppManager {
         
         mCurrentRetryCount = 0;
         updateStatus(CONNECTED);
-        
-        mXmppPresenceStatus.setStatus(true);
     }
     
     private void informListeners(XMPPConnection connection) {
@@ -721,7 +722,7 @@ public class XmppManager {
         // disable the built-in ReconnectionManager
         // since we handle this
         conf.setReconnectionAllowed(false);
-        conf.setSendPresence(true);
+        conf.setSendPresence(false);
         
         return new XMPPConnection(conf);     
     }
