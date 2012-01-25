@@ -199,6 +199,7 @@
     <string name="main_service_disconnecting">Disconnecting...</string>
     <string name="main_service_waiting">Waiting...</string>
     <string name="main_service_waiting_to_connect">Waiting to connect...</string>
+    <string name="main_toast_pref_not_set">Preferences not set. Please set a valid notification Address</string>
     <string name="or">&#xA0;or&#xA0;</string>
     <string name="preference_panel">Preferences</string>
     <string name="pref_app">Application settings</string>

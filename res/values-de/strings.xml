@@ -199,6 +199,7 @@
     <string name="main_service_disconnecting">Trenne...</string>
     <string name="main_service_waiting">Wartend...</string>
     <string name="main_service_waiting_to_connect">Warte auf Verbindung...</string>
+    <string name="main_toast_pref_not_set">Bitte Konfiguration vornehmen</string>
     <string name="or">&#xA0;oder&#xA0;</string>
     <string name="preference_panel">Anwendungsoptionen</string>
     <string name="pref_app">GTalkSMS Einstellungen</string>

@@ -430,6 +430,7 @@ public class MainService extends Service {
             // check if the user has done his part
             if (sSettingsMgr.notifiedAddress == null || sSettingsMgr.notifiedAddress.equals("") || sSettingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
                 Log.w("Preferences not set! Showing preferences page.");
+                displayToast(R.string.main_toast_pref_not_set, null);
                 Intent settingsActivity = new Intent(this, Preferences.class);
                 settingsActivity.putExtra("panel", R.xml.prefs_connection);
                 settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
