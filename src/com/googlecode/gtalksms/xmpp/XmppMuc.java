@@ -244,7 +244,7 @@ public class XmppMuc {
         } catch (Exception e) {  
             throw new XMPPException("MUC creation failed", e);
         }
-        
+
         try {
             // Since this is a private room, make the room not public and set
             // user as owner of the room.
@@ -254,18 +254,27 @@ public class XmppMuc {
 
             try {
                 List<String> owners = new ArrayList<String>();
-				if (mSettings.useDifferentAccount) {
-					owners.add(mSettings.login);
-					owners.add(mSettings.notifiedAddress);
-				} else {
-					owners.add(mSettings.login);
-				}
+                if (mSettings.useDifferentAccount) {
+                    owners.add(mSettings.login);
+                    owners.add(mSettings.notifiedAddress);
+                } else {
+                    owners.add(mSettings.login);
+                }
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
+                // Password protected MUC fallback code begins here
                 GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + getMUCServer()
                         + ". Falling back to room passwords", ex);
-                submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
-                submitForm.setAnswer("muc#roomconfig_roomsecret", mSettings.roomPassword);
+                // Seee http://xmpp.org/registrar/formtypes.html#http:--jabber.org-protocol-mucroomconfig
+                try {
+                    submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
+                    submitForm.setAnswer("muc#roomconfig_roomsecret", mSettings.roomPassword);
+                } catch (IllegalArgumentException iae) {
+                    // If a server doesn't provide even password protected MUC, the setAnswer
+                    // call will result in an IllegalARgumentException, which we wrap into an XMPPException
+                    // See also Issue 247 http://code.google.com/p/gtalksms/issues/detail?id=247
+                    throw new XMPPException(iae);
+                }
                 passwordMode = true;
             }
 

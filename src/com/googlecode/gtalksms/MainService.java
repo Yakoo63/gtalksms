@@ -255,7 +255,7 @@ public class MainService extends Service {
                     msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
                     msg.appendBold(getString(R.string.chat_sms_from, name));
                     msg.append(message);
-                    Log.i("Sending message form " + number + " via MUC");
+                    Log.w("Sending message from " + number + " via MUC failed, message will be send as chat message");
                     sXmppMgr.send(msg, null);
                 }
             }
