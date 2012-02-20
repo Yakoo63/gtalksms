@@ -802,21 +802,34 @@ public class MainService extends Service {
     public static Handler getDelayedDisconnectHandler() {
         return sDelayedDisconnectHandler;
     }
-    
-    public static void sendToServiceHandler(int i, Intent intent) {
+
+    /**
+     * 
+     * @param i
+     * @param intent
+     * @return
+     */
+    public static boolean sendToServiceHandler(int i, Intent intent) {
     	if (sServiceHandler != null) {
             Message msg = sServiceHandler.obtainMessage();
             msg.arg1 = i;
             msg.obj = intent;
             sServiceHandler.sendMessage(msg);
+            return true;
     	} else {
     		Log.w("sendToServiceHandler() called with " 
     				+ intent.getAction() 
     				+ " when service handler is null");
+    		return false;
     	}
     }
-    
-    public static void sendToServiceHandler(Intent intent) {
-    	sendToServiceHandler(0, intent);
+
+    /**
+     * 
+     * @param intent
+     * @return
+     */
+    public static boolean sendToServiceHandler(Intent intent) {
+    	return sendToServiceHandler(0, intent);
     }
 }

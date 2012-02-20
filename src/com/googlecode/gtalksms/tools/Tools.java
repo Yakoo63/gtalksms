@@ -239,9 +239,10 @@ public class Tools {
      * @param msg
      * @param to destination jid, can be null
      * @param ctx
+     * @return
      */
-    public static void send(String msg, String to, Context ctx) {
-        send(new XmppMsg(msg), to, ctx);
+    public static boolean send(String msg, String to, Context ctx) {
+        return send(new XmppMsg(msg), to, ctx);
     }
     
     /**
@@ -250,15 +251,16 @@ public class Tools {
      * @param msg
      * @param to destination jid, can be null
      * @param ctx
+     * @return
      */
-    public static void send(XmppMsg msg, String to, Context ctx) {
+    public static boolean send(XmppMsg msg, String to, Context ctx) {
         Intent intent = new Intent(MainService.ACTION_SEND);
         intent.setClass(ctx, MainService.class);
         if (to != null) {
             intent.putExtra("to", to);
         }
         intent.putExtra("xmppMsg", msg);
-        MainService.sendToServiceHandler(intent);
+        return MainService.sendToServiceHandler(intent);
     }
     
     /**
