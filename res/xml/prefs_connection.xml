@@ -73,7 +73,7 @@
             android:inputType="textUri" />
         <CheckBoxPreference 
             android:key="forceMucServer" 
-            android:defaultValue="false" 
+            android:defaultValue="true" 
             android:summary="@string/pref_con_muc_force" 
             android:title="@string/pref_con_muc_force_help" />
         <CheckBoxPreference 
