@@ -42,7 +42,7 @@
     <string name="chat_del_sms_error">SMS Nachrichten(n) konnte(n) nicht gelöscht werden.</string>
     <string name="chat_del_sms_from">Lösche SMS Nachrichten von %s.</string>
     <string name="chat_del_sms_nb">%d SMS Nachricht(n) gelöscht.</string>
-    <string name="chat_del_sms_syntax">Syntax :\ndelsms:contact:[contact]\ndelsms:sent\ndelsms:all</string>
+    <string name="chat_del_sms_syntax">Syntax :\ndelsms:contact:[contact]\ndelsms:number:[number]\ndelsms:sent\ndelsms:last\ndelsms:lastin\ndelsms:lastout\ndelsms:all</string>
     <string name="chat_dial">Wähle %s</string>
     <string name="chat_emails">E-Mail</string>
     <string name="chat_error">Fehler: %s</string>

@@ -205,6 +205,10 @@ public class SmsMmsManager {
         return result;
     }
     
+    public int deleteSmsByNumber(String smsNumber) {
+        return deleteThreads("content://sms/inbox", "address = '" + smsNumber + "'");
+    }
+    
     private int deleteThreads(String url, String where) {
         int result = 0;
 

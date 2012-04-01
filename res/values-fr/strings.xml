@@ -42,7 +42,7 @@
     <string name="chat_del_sms_error">Erreur lors de la suppression des SMS.</string>
     <string name="chat_del_sms_from">Supprime les SMS de %s.</string>
     <string name="chat_del_sms_nb">%d SMS supprimés.</string>
-    <string name="chat_del_sms_syntax">La syntaxe de la commande est :\ndelsms:contact:[contact]\ndelsms:sent\ndelsms:all</string>
+    <string name="chat_del_sms_syntax">La syntaxe de la commande est :\ndelsms:contact:[contact]\ndelsms:number:[number]\ndelsms:sent\ndelsms:last\ndelsms:lastin\ndelsms:lastout\ndelsms:all</string>
     <string name="chat_dial">%s a été composé</string>
     <string name="chat_emails">Emails</string>
     <string name="chat_error">Erreur : %s</string>

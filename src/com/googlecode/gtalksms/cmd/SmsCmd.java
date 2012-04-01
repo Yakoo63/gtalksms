@@ -225,7 +225,7 @@ public class SmsCmd extends CommandHandlerBase {
             if (number == null) {
                 number = 1;
             }
-
+            
             if (cmd.equals("last")) { 
                 nbDeleted = mSmsMmsManager.deleteLastSms(number);
             } else if (cmd.equals("lastin")) { 
@@ -250,6 +250,12 @@ public class SmsCmd extends CommandHandlerBase {
                 send(R.string.chat_del_sms_from, contact.name);
                 nbDeleted = mSmsMmsManager.deleteSmsByContact(contact.rawIds);
             } else {
+                send(R.string.chat_no_match_for, search);
+            }
+        } else if (cmd.equals("number") && search != null) {
+            send(R.string.chat_del_sms_from, search);
+            nbDeleted = mSmsMmsManager.deleteSmsByNumber(search);
+            if (nbDeleted <= 0) {
                 send(R.string.chat_no_match_for, search);
             }
         } else {
