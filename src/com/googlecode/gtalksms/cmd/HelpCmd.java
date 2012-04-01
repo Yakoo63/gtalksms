@@ -1,6 +1,5 @@
 package com.googlecode.gtalksms.cmd;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,8 +27,10 @@ public class HelpCmd extends CommandHandlerBase {
     private static XmppMsg _msgCategories = new XmppMsg();
     
     private String format(int resHelp, Object... objects ) {
-        String [] keys = Arrays.copyOf(objects, objects.length, String[].class);
-        
+        String [] keys = new String[objects.length];
+        for (int i = 0 ; i < objects.length ; ++i) {
+            keys[i] = objects[i].toString();  
+        }
         return "- " + StringFmt.join(keys, getString(R.string.or), true) + ": " + getString(resHelp);
     }
     

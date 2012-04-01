@@ -18,7 +18,10 @@ public class Cmd {
         
         SubCmd(String name, Cmd baseCmd, int resHelp, String args, Object... alias) {
             mName = name;
-            mAlias = Arrays.copyOf(alias, alias.length, String[].class);
+            mAlias = new String[alias.length];
+            for (int i = 0 ; i < alias.length ; ++i) {
+                mAlias[i] = alias[i].toString();  
+            }
             
             mHelp = buildHelp(baseCmd, mName, mAlias, resHelp, args);
         }
@@ -45,7 +48,10 @@ public class Cmd {
     
     Cmd(String name, Object... alias) {
         mName = name;
-        mAlias = Arrays.copyOf(alias, alias.length, String[].class);
+        mAlias = new String[alias.length];
+        for (int i = 0 ; i < alias.length ; ++i) {
+            mAlias[i] = alias[i].toString();  
+        }
         mSubCmds = new ArrayList<SubCmd>();
     }
 
