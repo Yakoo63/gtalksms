@@ -42,7 +42,7 @@
     <string name="chat_del_sms_error">Can\'t delete SMS.</string>
     <string name="chat_del_sms_from">Deleting SMS from %s.</string>
     <string name="chat_del_sms_nb">%d SMS deleted.</string>
-    <string name="chat_del_sms_syntax">Syntax is:\ndelsms:contact:[contact]\ndelsms:sent\ndelsms:last\ndelsms:lastin\ndelsms:lastout\ndelsms:all</string>
+    <string name="chat_del_sms_syntax">Syntax is:\ndelsms:contact:[contact]\ndelsms:number:[number]\ndelsms:sent\ndelsms:last\ndelsms:lastin\ndelsms:lastout\ndelsms:all</string>
     <string name="chat_dial">Dial %s</string>
     <string name="chat_emails">Emails</string>
     <string name="chat_error">Error: %s</string>
