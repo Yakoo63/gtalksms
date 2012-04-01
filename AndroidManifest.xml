@@ -2,8 +2,8 @@
 <manifest 
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms" 
-    android:versionName="3.4.1" 
-    android:versionCode="56">
+    android:versionName="3.5" 
+    android:versionCode="57">
     <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="12"/>
     <uses-feature android:required="false" android:name="android.hardware.camera"></uses-feature>
     <uses-feature android:required="false" android:name="android.hardware.camera.autofocus"></uses-feature>
@@ -133,7 +133,7 @@
         <meta-data 
             android:value="a14e5a583244738" 
             android:name="ADMOB_PUBLISHER_ID" />
-        <!-- use a separate publisher id here to aid in tracking intersitial statistics -->
+        <!-- use a separate publisher id here to aid in tracking interstitial statistics -->
         <meta-data 
             android:value="a14e5a583244738" 
             android:name="ADMOB_INTERSTITIAL_PUBLISHER_ID" />
