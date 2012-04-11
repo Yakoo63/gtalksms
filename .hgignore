@@ -10,3 +10,8 @@ syntax: regexp
 syntax: regexp
 ^reports$
 .DS_Store
+
+syntax: regexp
+^proguard-project\.txt$
+syntax: regexp
+^ant\.properties$
