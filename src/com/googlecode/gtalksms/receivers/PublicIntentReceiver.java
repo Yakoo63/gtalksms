@@ -13,7 +13,8 @@ public class PublicIntentReceiver extends BroadcastReceiver {
     private static PublicIntentReceiver sPublicIntentReceiver;
     private static IntentFilter sIntentFilter;
 
-    private static SettingsManager sSettings;
+    private SettingsManager mSettings;
+    private boolean mReceiverRegistered;
     private Context mContext;
 
     static {
@@ -34,8 +35,9 @@ public class PublicIntentReceiver extends BroadcastReceiver {
     }
 
     private PublicIntentReceiver(Context context) {
-        sSettings = SettingsManager.getSettingsManager(context);
+        mSettings = SettingsManager.getSettingsManager(context);
         this.mContext = context;
+        this.mReceiverRegistered = false;
     }
 
     public static PublicIntentReceiver getReceiver(Context ctx) {
@@ -47,10 +49,14 @@ public class PublicIntentReceiver extends BroadcastReceiver {
 
     public void onServiceStart() {
         mContext.registerReceiver(this, sIntentFilter);
+        mReceiverRegistered = true;
     }
 
     public void onServiceStop() {
-        mContext.unregisterReceiver(this);
+    	if (mReceiverRegistered) {
+    		mContext.unregisterReceiver(this);
+    		mReceiverRegistered = false;
+    	}
     }
 
     @Override
@@ -62,9 +68,9 @@ public class PublicIntentReceiver extends BroadcastReceiver {
             sPublicIntentReceiver = new PublicIntentReceiver(context);
 
         String token = intent.getStringExtra("token");
-        if (sSettings.publicIntentsEnabled) {
-            if (sSettings.publicIntentTokenRequired) {
-                if (token == null || !sSettings.publicIntentToken.equals(token)) {
+        if (mSettings.publicIntentsEnabled) {
+            if (mSettings.publicIntentTokenRequired) {
+                if (token == null || !mSettings.publicIntentToken.equals(token)) {
                     // token required but no token set or it doesn't match
                     Log.w("Public intent without correct security token received");
                     return;
