@@ -12,10 +12,9 @@ import android.content.IntentFilter;
 public class PublicIntentReceiver extends BroadcastReceiver {
     private static PublicIntentReceiver sPublicIntentReceiver;
     private static IntentFilter sIntentFilter;
-
+    private static Context sContext;
+    
     private SettingsManager mSettings;
-    private boolean mReceiverRegistered;
-    private Context mContext;
 
     static {
         sIntentFilter = new IntentFilter();
@@ -36,26 +35,25 @@ public class PublicIntentReceiver extends BroadcastReceiver {
 
     private PublicIntentReceiver(Context context) {
         mSettings = SettingsManager.getSettingsManager(context);
-        this.mContext = context;
-        this.mReceiverRegistered = false;
+        sContext = context;
+    }
+    
+    public static void initReceiver(Context ctx) {
+    	getReceiver(ctx);
     }
 
     public static PublicIntentReceiver getReceiver(Context ctx) {
-        if (sPublicIntentReceiver == null)
+        if (sPublicIntentReceiver == null) {
             sPublicIntentReceiver = new PublicIntentReceiver(ctx);
-
+            ctx.registerReceiver(sPublicIntentReceiver, sIntentFilter);
+        }
         return sPublicIntentReceiver;
     }
 
-    public void onServiceStart() {
-        mContext.registerReceiver(this, sIntentFilter);
-        mReceiverRegistered = true;
-    }
-
-    public void onServiceStop() {
-    	if (mReceiverRegistered) {
-    		mContext.unregisterReceiver(this);
-    		mReceiverRegistered = false;
+    public static void onServiceStop() {
+    	if (sPublicIntentReceiver != null) {
+    		sContext.unregisterReceiver(sPublicIntentReceiver);
+    		sPublicIntentReceiver = null;
     	}
     }
 

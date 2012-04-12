@@ -400,7 +400,8 @@ public class MainService extends Service {
                 CrashedStartCounter.getInstance(this).count();
             }
         }
-        PublicIntentReceiver.getReceiver(this).onServiceStart();
+        
+        PublicIntentReceiver.initReceiver(this);
     }
 
     @Override
@@ -447,7 +448,7 @@ public class MainService extends Service {
     @Override
     public void onDestroy() {
         Log.i("MainService onDestroy(): IsRunning is set to false");
-        PublicIntentReceiver.getReceiver(this).onServiceStop();
+        PublicIntentReceiver.onServiceStop();
         IsRunning = false;
         // If the _xmppManager is non-null, then our service was "started" (as
         // opposed to simply "created" - so tell the user it has stopped.
