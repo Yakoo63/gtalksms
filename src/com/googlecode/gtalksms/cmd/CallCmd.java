@@ -49,13 +49,13 @@ public class CallCmd extends CommandHandlerBase {
     
     @Override
     protected void execute(String cmd, String args) {
-        if (cmd.equals("dial")) {
+        if (isMatchingCmd("dial", cmd)) {
             dial(args);
-        } else if (cmd.equals("calls")) {
+        } else if (isMatchingCmd("calls", cmd)) {
             readCallLogs(args);
-        } else if (cmd.equals("ignore")) {
+        } else if (isMatchingCmd("ignore", cmd)) {
             ignoreIncomingCall();
-        } else if (cmd.equals("reject")) {
+        } else if (isMatchingCmd("reject", cmd)) {
             rejectIncomingCall();
         }
     }

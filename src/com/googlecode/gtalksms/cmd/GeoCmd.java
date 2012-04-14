@@ -20,9 +20,9 @@ public class GeoCmd extends CommandHandlerBase {
     
     @Override
     protected void execute(String cmd, String args) {
-        if (cmd.equals("geo")) {
+        if (isMatchingCmd("geo", cmd)) {
             geo(args);
-        } else if (cmd.equals("where")) {
+        } else if (isMatchingCmd("where", cmd)) {
             if (args.equals("stop")) {
                 send(R.string.chat_stop_locating);
                 stopLocatingPhone();    

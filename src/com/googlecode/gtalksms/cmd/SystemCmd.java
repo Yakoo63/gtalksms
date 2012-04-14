@@ -44,7 +44,7 @@ public class SystemCmd extends CommandHandlerBase {
     @Override
     protected void execute(String cmd, String args) {
         XmppMsg res = new XmppMsg(); 
-        if (cmd.equals("sysinfo")) {
+        if (isMatchingCmd("sysinfo", cmd)) {
             ActivityManager.MemoryInfo memInfoSystem = new ActivityManager.MemoryInfo();
             activityManager.getMemoryInfo(memInfoSystem);
             MemoryInfo[] memInfoProc = activityManager.getProcessMemoryInfo(myPidArray);
@@ -67,7 +67,7 @@ public class SystemCmd extends CommandHandlerBase {
             appendTelephonStatus(res);
             res.newLine();
             appendNullIntentStartCounter(res);
-        } else if (cmd.equals("telinfo")) {
+        } else if (isMatchingCmd("telinfo", cmd)) {
             appendTelephonStatus(res);
         }
         send(res);

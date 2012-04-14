@@ -31,7 +31,7 @@ public class RingCmd extends CommandHandlerBase {
     
     @Override
     protected void execute(String cmd, String args) {
-        if (cmd.equals("ring")) {
+        if (isMatchingCmd("ring", cmd)) {
             if (args.equals("stop")) {
                 send(R.string.chat_stop_ringing);
                 stop();
@@ -40,7 +40,7 @@ public class RingCmd extends CommandHandlerBase {
             } else {
                 send(R.string.chat_error_ringing);
             }
-        } else if (cmd.equals("ringmode")) {
+        } else if (isMatchingCmd("ringmode", cmd)) {
             int mode;
             if (args.equals("vibrate")) {
                 sAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);

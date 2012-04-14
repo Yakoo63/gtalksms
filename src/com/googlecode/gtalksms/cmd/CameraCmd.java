@@ -64,7 +64,7 @@ public class CameraCmd extends CommandHandlerBase {
     @Override
     protected void execute(String cmd, String args) {
         String[] splitedArgs = splitArgs(args);
-        if (cmd.equals("camera") || cmd.equals("photo")) {
+        if (isMatchingCmd("camera", cmd)) {
             if (args.equals("") || splitedArgs[0].equals("")) {
                 takePicture(VOID_CALLBACK);
             } else if (splitedArgs[0].equals("email")) {
@@ -77,7 +77,7 @@ public class CameraCmd extends CommandHandlerBase {
                 setCamera(splitedArgs[1]);
             }           
         } 
-        else if (cmd.equals("flash") || cmd.equals("light")) {
+        else if (isMatchingCmd("flash", cmd)) {
             if (args.equals("") || splitedArgs[0].equals("on")) {
                 setLight(true);
             } else {
