@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
@@ -109,7 +110,21 @@ public abstract class CommandHandlerBase {
     public boolean isMatchingCmd(String cmdName, String input) {
         Cmd cmd = getCommand(input);        
         return cmd != null && cmd.getName().equals(cmdName);
-    } 
+    }
+    
+    protected void executeNewCmd(String cmd) {
+        executeNewCmd(cmd, null);
+    }
+    
+    protected void executeNewCmd(String cmd, String args) {
+        Intent i = new Intent(MainService.ACTION_COMMAND);
+        i.putExtra("cmd", cmd);
+        if (args != null) {
+            i.putExtra("args", args);
+        }
+        i.setClassName("com.googlecode.gtalksms", "com.googlecode.gtalksms.MainService");
+        sMainService.startService(i);
+    }
     
     /**
      * Executes the given command

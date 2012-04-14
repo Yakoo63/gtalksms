@@ -154,7 +154,7 @@ public class SmsCmd extends CommandHandlerBase {
             }
         } else if (isMatchingCmd("reply", command)) {
             if (args.length() == 0) {
-                send("syntax error");
+                executeNewCmd("recipient");
             } else if (RecipientCmd.getLastRecipientNumber() ==   null) {
                 send(R.string.chat_error_no_recipient);
             } else {
