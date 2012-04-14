@@ -635,7 +635,13 @@ public class SmsCmd extends CommandHandlerBase {
         Cmd sms = mCommandMap.get("sms");
         sms.setHelp(R.string.chat_help_sms_show_all, null);
         sms.AddSubCmd("unread", R.string.chat_help_sms_show_unread, null);
- 
+        sms.AddSubCmd("#contact#", R.string.chat_help_sms_show_contact, null);
+        sms.AddSubCmd("#contact#:#message#", R.string.chat_help_sms_send, null);
+               
+        Cmd fs = mCommandMap.get("findsms");
+        fs.AddSubCmd("#message#", R.string.chat_help_find_sms_all, null);
+        fs.AddSubCmd("#contact#:#message#", R.string.chat_help_find_sms, null);
+        
         Cmd del = mCommandMap.get("delsms");
         del.AddSubCmd("all", R.string.chat_help_del_sms_all, null);
         del.AddSubCmd("sent", R.string.chat_help_del_sms_sent, null);
@@ -645,19 +651,5 @@ public class SmsCmd extends CommandHandlerBase {
         mCommandMap.get("reply").setHelp(R.string.chat_help_sms_reply, "#message#");   
         mCommandMap.get("chat").setHelp(R.string.chat_help_sms_chat, "#contact#");   
         mCommandMap.get("markasread").setHelp(R.string.chat_help_mark_as_read, "#contact#");
-        
-        // TODO manage other kinds
     }
-    
-//    @Override
-//    public String[] help() {
-//        String[] s = { 
-//                getString(R.string.chat_help_sms_show_contact, makeBold("\"sms:#contact#\"")),
-//                getString(R.string.chat_help_sms_send, makeBold("\"sms:#contact#:#message#\"")),
-//
-//                getString(R.string.chat_help_find_sms_all, makeBold("\"findsms:#message#\""), makeBold("\"fs:#message#\"")),
-//                getString(R.string.chat_help_find_sms, makeBold("\"findsms:#contact#:#message#\""), makeBold("\"fs:#contact#:#message#\"")),
-//           };
-//        return s;
-//    }
 }
