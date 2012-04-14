@@ -10,14 +10,15 @@ public class SetLastRecipientRunnable implements Runnable {
     
     private RecipientCmd mRecipientCmd;
     private SettingsManager mSettings;
-    private boolean outdated;  // avoiding atomic boolean, because there is only one setter
-    private String number;
+    private boolean mIsOutdated;  // avoiding atomic boolean, because there is only one setter
+    private String mNumber;
     private static final int sleepTimeMs = sleepTime * 1000;
     
     public SetLastRecipientRunnable(RecipientCmd recpientCmd, String number, SettingsManager settings) {
-        this.mRecipientCmd = recpientCmd;
-        this.number = number;
-        this.outdated = false;
+        mRecipientCmd = recpientCmd;
+        mSettings = settings;
+        mNumber = number;
+        mIsOutdated = false;
     }
     
     @Override
@@ -27,16 +28,16 @@ public class SetLastRecipientRunnable implements Runnable {
         } catch (InterruptedException e) {
             /* Ignore - we don't send interrupts to this thread */
         }
-        if (!outdated)
-            mRecipientCmd.setLastRecipientNow(number, mSettings.dontDisplayRecipient);
-
+        if (!mIsOutdated) {
+            mRecipientCmd.setLastRecipientNow(mNumber, mSettings.dontDisplayRecipient);
+        }
     }
     
     public void setOutdated() {
-        outdated = true;
+        mIsOutdated = true;
     }
     
     public boolean isOutdated() {
-        return outdated;
+        return mIsOutdated;
     }
 }
