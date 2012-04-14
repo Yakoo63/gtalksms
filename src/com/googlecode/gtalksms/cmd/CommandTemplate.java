@@ -32,5 +32,4 @@ public class CommandTemplate extends CommandHandlerBase {
         cmd.setHelp(0, null);
         cmd.AddSubCmd("subCmd", 0, null);
     }
-
 }

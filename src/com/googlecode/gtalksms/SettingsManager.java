@@ -115,6 +115,9 @@ public class SettingsManager {
     public boolean publicIntentTokenRequired;
     public String publicIntentToken;
     
+    // recipient command settings
+    public boolean dontDisplayRecipient;
+    
     private static SettingsManager sSettingsManager = null;
     
     private SharedPreferences mSharedPreferences;
@@ -269,8 +272,11 @@ public class SettingsManager {
             stopOnPowerDelay = mSharedPreferences.getInt("stopOnPowerDelay", 1);
             
             // pulic intent settings
-            publicIntentsEnabled = mSharedPreferences.getBoolean("publicIntentsEnabled", false); // TODO
-            publicIntentTokenRequired = mSharedPreferences.getBoolean("publicIntentTokenRequired", false);          
+            publicIntentsEnabled = mSharedPreferences.getBoolean("publicIntentsEnabled", false);
+            publicIntentTokenRequired = mSharedPreferences.getBoolean("publicIntentTokenRequired", false);
             publicIntentToken = mSharedPreferences.getString("publicIntentToken", "secret");
+            
+            // reply command settings
+            dontDisplayRecipient = false; // TODO
 	}
 }

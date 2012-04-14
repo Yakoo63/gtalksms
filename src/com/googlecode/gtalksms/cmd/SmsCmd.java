@@ -19,14 +19,12 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.smsCmd.DeliveredIntentReceiver;
 import com.googlecode.gtalksms.cmd.smsCmd.SentIntentReceiver;
-import com.googlecode.gtalksms.cmd.smsCmd.SetLastRecipientRunnable;
 import com.googlecode.gtalksms.cmd.smsCmd.Sms;
 import com.googlecode.gtalksms.cmd.smsCmd.SmsMmsManager;
 import com.googlecode.gtalksms.data.contacts.Contact;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsResolver;
 import com.googlecode.gtalksms.data.contacts.ResolvedContact;
-import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.databases.AliasHelper;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
 import com.googlecode.gtalksms.databases.SMSHelper;
@@ -43,9 +41,6 @@ public class SmsCmd extends CommandHandlerBase {
 
     private ContactsResolver mContactsResolver;
     private SmsMmsManager mSmsMmsManager;
-    private String mLastRecipient = null;
-    private String mLastRecipientName = null;    
-    private SetLastRecipientRunnable mSetLastrecipientRunnable;    
     
     // synchronizedMap because the worker thread and the intent receivers work with this map
     private static Map<Integer, Sms> mSmsMap; 
@@ -55,7 +50,7 @@ public class SmsCmd extends CommandHandlerBase {
     private SMSHelper mSmsHelper;
           
     public SmsCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_MESSAGE, new Cmd("sms"), new Cmd("reply"), new Cmd("findsms", "fs"), new Cmd("markasread", "mar"), new Cmd("chat"), new Cmd("delsms"));
+        super(mainService, CommandHandlerBase.TYPE_MESSAGE, new Cmd("sms"), new Cmd("findsms", "fs"), new Cmd("markasread", "mar"), new Cmd("chat"), new Cmd("delsms"));
         mSmsMmsManager = new SmsMmsManager(sSettingsMgr, sContext);
         mSmsHelper = SMSHelper.getSMSHelper(sContext);
         mAliasHelper = AliasHelper.getAliasHelper(sContext);
@@ -63,7 +58,6 @@ public class SmsCmd extends CommandHandlerBase {
         mContactsResolver = ContactsResolver.getInstance(sContext);
         
         restoreSmsInformation();
-        restoreLastRecipient();
         setup();
     }
 
@@ -111,17 +105,6 @@ public class SmsCmd extends CommandHandlerBase {
             } else {
                 readLastSMS();
             }
-        } else if (command.equals("reply")) {
-            if (args.length() == 0) {
-                displayLastRecipient(true);
-            } else if (mLastRecipient == null) {
-                send(R.string.chat_error_no_recipient);
-            } else {
-            	if (sSettingsMgr.markSmsReadOnReply) {
-            		mSmsMmsManager.markAsRead(mLastRecipient);
-            	}
-                sendSMS(args, mLastRecipient);
-            }
         } else if (command.equals("findsms") || command.equals("fs")) {
             int separatorPos = args.indexOf(":");
             contactInformation = null;
@@ -137,17 +120,17 @@ public class SmsCmd extends CommandHandlerBase {
         } else if (command.equals("markasread") || command.equals("mar")) {
             if (args.length() > 0) {
                 markSmsAsRead(args);
-            } else if (mLastRecipient == null) {
+            } else if (RecipientCmd.getLastRecipientNumber() == null) {
                 send(R.string.chat_error_no_recipient);
             } else {
-                markSmsAsReadByNumber(mLastRecipient, mLastRecipientName);
+                markSmsAsReadByNumber(RecipientCmd.getLastRecipientNumber(), RecipientCmd.getLastRecipientName());
             }
         } else if (command.equals("chat")) {
         	if (args.length() > 0) {
                 inviteRoom(args);
-        	} else if (mLastRecipient != null) {
+        	} else if (RecipientCmd.getLastRecipientNumber() != null) {
         	    try {
-					XmppMuc.getInstance(sContext).inviteRoom(mLastRecipient, mLastRecipientName, XmppMuc.MODE_SMS);
+					XmppMuc.getInstance(sContext).inviteRoom(RecipientCmd.getLastRecipientNumber(), RecipientCmd.getLastRecipientName(), XmppMuc.MODE_SMS);
 				} catch (XMPPException e) {
 					// Creation of chat with last recipient failed
 				    send(R.string.chat_error, e.getLocalizedMessage());
@@ -169,36 +152,16 @@ public class SmsCmd extends CommandHandlerBase {
                 }
                 deleteSMS(subCommand, search);
             }
-        }
-    }
-
-    public void setLastRecipient(String phoneNumber) {
-        SetLastRecipientRunnable slrRunnable = new SetLastRecipientRunnable(this, phoneNumber);
-        if (mSetLastrecipientRunnable != null) {
-            mSetLastrecipientRunnable.setOutdated();
-        }
-        mSetLastrecipientRunnable = slrRunnable;
-        Thread t = new Thread(slrRunnable);
-        t.setDaemon(true);
-        t.start();
-    }
-    
-    /**
-     * Sets the last Recipient/Reply contact
-     * if the contact has changed
-     * and calls displayLastRecipient()
-     * 
-     * @param phoneNumber
-     * @param silentAndUpdate If true, don't sent a message to the user and don't update the KV-DB
-     */
-    public synchronized void setLastRecipientNow(String phoneNumber, boolean silentAndUpdate) {
-        mAnswerTo = null;
-        if (mLastRecipient == null || !phoneNumber.equals(mLastRecipient)) {
-            mLastRecipient = phoneNumber;
-            mLastRecipientName = ContactsManager.getContactName(sContext, phoneNumber);
-            if (!silentAndUpdate) { 
-            	displayLastRecipient(false);
-            	mKeyValueHelper.addKey(KeyValueHelper.KEY_LAST_RECIPIENT, phoneNumber);
+        } else if (command.equals("reply")) {
+            if (args.length() == 0) {
+                send("syntax error");
+            } else if (RecipientCmd.getLastRecipientNumber() ==   null) {
+                send(R.string.chat_error_no_recipient);
+            } else {
+                if (sSettingsMgr.markSmsReadOnReply) {
+                    mSmsMmsManager.markAsRead(RecipientCmd.getLastRecipientNumber());
+                }
+                sendSMS(args, RecipientCmd.getLastRecipientNumber());
             }
         }
     }
@@ -537,23 +500,6 @@ public class SmsCmd extends CommandHandlerBase {
             send(R.string.chat_no_sms);
         }
     }
-    
-    private void displayLastRecipient(boolean useAnswerTo) {
-        if (mLastRecipient == null) {
-            send(R.string.chat_error_no_recipient);
-        } else {
-            String contact = ContactsManager.getContactName(sContext, mLastRecipient);
-            if (Phone.isCellPhoneNumber(mLastRecipient) && contact.compareTo(mLastRecipient) != 0) {
-                contact += " (" + mLastRecipient + ")";
-            }
-            String msg = getString(R.string.chat_reply_contact, contact);
-            if (useAnswerTo) {
-                send(msg);
-            } else {
-                send(msg, null);
-            }
-        }
-    }
 
     /** 
      * Sends a sms to the specified phone number with a custom receiver name
@@ -595,7 +541,7 @@ public class SmsCmd extends CommandHandlerBase {
         }
 
         smsManager.sendMultipartTextMessage(phoneNumber, null, messages, SentPenIntents, DelPenIntents);
-        setLastRecipient(phoneNumber);
+        RecipientCmd.setLastRecipient(phoneNumber);
         mSmsMmsManager.addSmsToSentBox(message, phoneNumber);
     }
     
@@ -625,16 +571,6 @@ public class SmsCmd extends CommandHandlerBase {
             DelPenIntents.add(deliveredPenIntent);
         }
         return DelPenIntents;
-    }
-    
-    /**
-     * restores the lastRecipient from the database if possible
-     */
-    private void restoreLastRecipient() {
-    	String phoneNumber = mKeyValueHelper.getValue(KeyValueHelper.KEY_LAST_RECIPIENT);
-    	if (phoneNumber != null) {
-    		setLastRecipientNow(phoneNumber, true);
-    	}
     }
     
     /**

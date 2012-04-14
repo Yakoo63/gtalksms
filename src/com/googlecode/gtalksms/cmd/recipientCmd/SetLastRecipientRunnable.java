@@ -1,18 +1,21 @@
-package com.googlecode.gtalksms.cmd.smsCmd;
+package com.googlecode.gtalksms.cmd.recipientCmd;
 
-import com.googlecode.gtalksms.cmd.SmsCmd;
+import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.cmd.RecipientCmd;
+
 
 public class SetLastRecipientRunnable implements Runnable {
 
     public static final int sleepTime = 10;
     
-    private SmsCmd smsCmd;
+    private RecipientCmd mRecipientCmd;
+    private SettingsManager mSettings;
     private boolean outdated;  // avoiding atomic boolean, because there is only one setter
     private String number;
     private static final int sleepTimeMs = sleepTime * 1000;
     
-    public SetLastRecipientRunnable(SmsCmd smsCmd, String number) {
-        this.smsCmd = smsCmd;
+    public SetLastRecipientRunnable(RecipientCmd recpientCmd, String number, SettingsManager settings) {
+        this.mRecipientCmd = recpientCmd;
         this.number = number;
         this.outdated = false;
     }
@@ -25,7 +28,7 @@ public class SetLastRecipientRunnable implements Runnable {
             /* Ignore - we don't send interrupts to this thread */
         }
         if (!outdated)
-            smsCmd.setLastRecipientNow(number, false);
+            mRecipientCmd.setLastRecipientNow(number, mSettings.dontDisplayRecipient);
 
     }
     
@@ -36,6 +39,4 @@ public class SetLastRecipientRunnable implements Runnable {
     public boolean isOutdated() {
         return outdated;
     }
-    
-
 }

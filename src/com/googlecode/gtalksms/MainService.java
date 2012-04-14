@@ -38,6 +38,7 @@ import com.googlecode.gtalksms.cmd.GeoCmd;
 import com.googlecode.gtalksms.cmd.HelpCmd;
 import com.googlecode.gtalksms.cmd.KeyboardCmd;
 import com.googlecode.gtalksms.cmd.RebootCmd;
+import com.googlecode.gtalksms.cmd.RecipientCmd;
 import com.googlecode.gtalksms.cmd.RingCmd;
 import com.googlecode.gtalksms.cmd.ScreenShotCmd;
 import com.googlecode.gtalksms.cmd.SettingsCmd;
@@ -237,9 +238,7 @@ public class MainService extends Service {
                 msg.append(message);
                 Log.i("Sending message form " + number + " via chat");
                 sXmppMgr.send(msg, null);
-                if (sCommands.containsKey("sms")) {
-                    ((SmsCmd) sCommands.get("sms")).setLastRecipient(number);
-                }
+                RecipientCmd.setLastRecipient(number);
             }
             // Forward the incoming SMS message to an MUC
             // either because the user want's all notifications in MUCs or
@@ -699,6 +698,7 @@ public class MainService extends Service {
                 BluetoothCmd.class,
                 WifiCmd.class,
                 RebootCmd.class,
+                RecipientCmd.class,
                 // used for debugging
                 SystemCmd.class,
                 // help command needs to be registered as last

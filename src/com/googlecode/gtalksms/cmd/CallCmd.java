@@ -92,19 +92,41 @@ public class CallCmd extends CommandHandlerBase {
     
     /** dial the specified contact */
     private void dial(String contactInformation) {
-        ResolvedContact resolvedContact = mContactsResolver.resolveContact(contactInformation, ContactsResolver.TYPE_ALL);
-        if (resolvedContact == null) {
-            send(R.string.chat_no_match_for, contactInformation);
-        } else if (resolvedContact.isDistinct()) {
-            send(R.string.chat_dial, resolvedContact.getName() + " (" + resolvedContact.getNumber() + ")");
-            if (!_phoneMgr.Dial(resolvedContact.getNumber())) {
-                send(R.string.chat_error_dial);
+        if (contactInformation.equals("")) {
+            String lastRecipient = RecipientCmd.getLastRecipientNumber();
+            String lastRecipientName = RecipientCmd.getLastRecipientName();
+            if (lastRecipient != null) {
+                doDial(lastRecipientName, lastRecipient);
+            } else {
+                // TODO l18n
+                send("error: last recipient not set");
             }
-        } else if (!resolvedContact.isDistinct()) {
-            askForMoreDetails(resolvedContact.getCandidates());
+        } else {
+            ResolvedContact resolvedContact = mContactsResolver.resolveContact(
+                    contactInformation, ContactsResolver.TYPE_ALL);
+            if (resolvedContact == null) {
+                send(R.string.chat_no_match_for, contactInformation);
+            } else if (resolvedContact.isDistinct()) {
+                doDial(resolvedContact.getName(), resolvedContact.getNumber());
+            } else if (!resolvedContact.isDistinct()) {
+                askForMoreDetails(resolvedContact.getCandidates());
+            }
         }
     }
-    
+
+    private void doDial(String name, String number) {
+        if (number != null) {
+            send(R.string.chat_dial, name + " (" + number + ")");
+        } else {
+            send(R.string.chat_dial, name);
+        }
+
+        // check if the dial is successful
+        if (!_phoneMgr.Dial(number)) {
+            send(R.string.chat_error_dial);
+        }
+    }
+
     @Override
     public void cleanUp() {
         if (_phoneListener != null) {

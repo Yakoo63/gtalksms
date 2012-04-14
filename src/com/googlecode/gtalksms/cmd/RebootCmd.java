@@ -7,7 +7,7 @@ import android.os.PowerManager;
 import com.googlecode.gtalksms.MainService;
 
 /**
- * Nice idea at first, a reboot could remotly lock a device and "reboot:recovery"
+ * Nice idea at first, a reboot could remotely lock a device and "reboot:recovery"
  * could become handy. But as of
  * https://groups.google.com/forum/#!topic/android-developers/0N8iNqyEufQ
  * this is only supported for system apps etc.

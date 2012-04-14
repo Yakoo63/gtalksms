@@ -38,7 +38,7 @@ public class ContactsResolver {
     
     /**
      * Tries to find the best contact for a given searchPattern/contactInformation
-     * You have to specify a searchType, use TYPE_ALL to get all matching phone
+     * You have to specify a searchType: Use TYPE_ALL to get all matching phone
      * numbers, or TYPE_CELL to get only cell phone numbers.
      * Handles resolving aliasName via aliasHelper transparently.
      * Will return an object of ResolvedContact if there are results.
