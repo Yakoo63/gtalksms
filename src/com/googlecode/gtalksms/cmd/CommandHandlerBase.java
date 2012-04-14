@@ -104,7 +104,12 @@ public abstract class CommandHandlerBase {
         }
         
         return null;
-    }   
+    } 
+    
+    public boolean isMatchingCmd(String cmdName, String input) {
+        Cmd cmd = getCommand(input);        
+        return cmd != null && cmd.getName().equals(cmdName);
+    } 
     
     /**
      * Executes the given command

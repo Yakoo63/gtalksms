@@ -50,7 +50,7 @@ public class SmsCmd extends CommandHandlerBase {
     private SMSHelper mSmsHelper;
           
     public SmsCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_MESSAGE, new Cmd("sms"), new Cmd("findsms", "fs"), new Cmd("markasread", "mar"), new Cmd("chat"), new Cmd("delsms"));
+        super(mainService, CommandHandlerBase.TYPE_MESSAGE, new Cmd("sms", "s"), new Cmd("reply", "r"), new Cmd("findsms", "fs"), new Cmd("markasread", "mar"), new Cmd("chat", "c"), new Cmd("delsms"));
         mSmsMmsManager = new SmsMmsManager(sSettingsMgr, sContext);
         mSmsHelper = SMSHelper.getSMSHelper(sContext);
         mAliasHelper = AliasHelper.getAliasHelper(sContext);
@@ -81,7 +81,7 @@ public class SmsCmd extends CommandHandlerBase {
     @Override
     protected void execute(String command, String args) {
     	String contactInformation;
-        if (command.equals("sms")) {
+        if (isMatchingCmd("sms", command)) {
             int separatorPos = args.indexOf(":");
             contactInformation = null;
             String message = null;
@@ -105,7 +105,7 @@ public class SmsCmd extends CommandHandlerBase {
             } else {
                 readLastSMS();
             }
-        } else if (command.equals("findsms") || command.equals("fs")) {
+        } else if (isMatchingCmd("findsms", command)) {
             int separatorPos = args.indexOf(":");
             contactInformation = null;
             String message = null;
@@ -117,7 +117,7 @@ public class SmsCmd extends CommandHandlerBase {
             } else if (args.length() > 0) {
                 searchSMS(args, null);
             }
-        } else if (command.equals("markasread") || command.equals("mar")) {
+        } else if (isMatchingCmd("markasread", command)) {
             if (args.length() > 0) {
                 markSmsAsRead(args);
             } else if (RecipientCmd.getLastRecipientNumber() == null) {
@@ -136,7 +136,7 @@ public class SmsCmd extends CommandHandlerBase {
 				    send(R.string.chat_error, e.getLocalizedMessage());
 				}
         	}
-        } else if (command.equals("delsms")) {
+        } else if (isMatchingCmd("delsms", command)) {
             if (args.length() == 0) {
                 send(R.string.chat_del_sms_syntax);
             } else {
@@ -152,7 +152,7 @@ public class SmsCmd extends CommandHandlerBase {
                 }
                 deleteSMS(subCommand, search);
             }
-        } else if (command.equals("reply")) {
+        } else if (isMatchingCmd("reply", command)) {
             if (args.length() == 0) {
                 send("syntax error");
             } else if (RecipientCmd.getLastRecipientNumber() ==   null) {
