@@ -53,32 +53,32 @@ public class MUCHelper {
         }
         
     }
-     
-	public String getNumber(String muc) {
-		if (!muc.contains("'")) {
-			String res = MUCDatabase.getNumber(muc);
-			if (res == null) {
-				return "";
-			} else {
-				return res;
-			}
-		} else {
-			return "";
-		}
-	}
-    
+
+    public String getNumber(String muc) {
+        if (!muc.contains("'")) {
+            String res = MUCDatabase.getNumber(muc);
+            if (res == null) {
+                return "";
+            } else {
+                return res;
+            }
+        } else {
+            return "";
+        }
+    }
+
     public String[][] getAllMUC() {
         String[][] res = MUCDatabase.getFullDatabase();
         if (res.length == 0)
             res = null;
         return res;
     }
-    
+
     private void addOrUpdate(String muc, String number) {
-       if(MUCDatabase.containsMUC(muc)) {
-           MUCDatabase.updateMUC(muc, number);
-       } else {
-           MUCDatabase.addMUC(muc, number);
-       }
+        if (MUCDatabase.containsMUC(muc)) {
+            MUCDatabase.updateMUC(muc, number);
+        } else {
+            MUCDatabase.addMUC(muc, number);
+        }
     }
 }

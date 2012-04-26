@@ -21,8 +21,8 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.RoomInfo;
 
 import android.content.Context;
-import android.util.Log;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
@@ -32,13 +32,14 @@ import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMuc {
-	
+
     public static final int MODE_SMS = 1;
     public static final int MODE_SHELL = 2;
-    
-	private static final String ROOM_START_TAG = Tools.APP_NAME + "_";
-	private static final int ROOM_START_TAG_LENGTH = ROOM_START_TAG.length();
-	private static final int REPLAY_TIMEOUT = 500;
+
+    private static final String ROOM_START_TAG = Tools.APP_NAME + "_";
+    private static final int ROOM_START_TAG_LENGTH = ROOM_START_TAG.length();
+    private static final int JOIN_TIMEOUT = 5000;
+    private static final long REJOIN_ROOMS_SLEEP = 1000;
 
     private static XmppMuc sXmppMuc;
 	
@@ -68,9 +69,13 @@ public class XmppMuc {
                 // clear the roomNumbers and room ArrayList as we have a new connection
                 mRoomNumbers.clear();
                 mRooms.clear();
-                rejoinRooms();
-                
-                
+
+                // async rejoin rooms, since there is a delay for every room
+                Runnable rejoinRoomsRunnable = new RejoinRoomsRunnable();
+                Thread t = new Thread(rejoinRoomsRunnable);
+                t.setDaemon(true);
+                t.start();
+
                 try {
                     Collection<String> mucComponents = MultiUserChat.getServiceNames(connection);
                     if (mucComponents.size() > 0) {
@@ -303,90 +308,26 @@ public class XmppMuc {
             return mMucServer;
         }
     }
-    
-    private void rejoinRooms() {
-    	String[][] mucDB = mMucHelper.getAllMUC();
-    	if (mucDB == null)
-    		return;
-    		
-    	for (int i = 0; i < mucDB.length; i++) {
-    		RoomInfo info = getRoomInfo(mucDB[i][0]);
-    		// if info is not null, the room exists on the server
-    		// so lets check if we can reuse it
-			if (info != null) {
-				MultiUserChat muc = new MultiUserChat(mConnection, mucDB[i][0]);
-				String name = ContactsManager.getContactName(mCtx,
-						mucDB[i][1]);
-				try {
-					if (info.isPasswordProtected()) {
-						muc.join(name, mSettings.roomPassword, mDiscussionHistory, REPLAY_TIMEOUT);
-					} else {
-						muc.join(name, null, mDiscussionHistory, REPLAY_TIMEOUT);
-						// check here if we are still owner of these room, in case somebody has taken over ownership
-						// sadly this (getOwners()) throws sometimes a 403 on my openfire server
-						try {
-						if (!affilateCheck(muc.getOwners())) {
-							if (mSettings.debugLog) 
-								Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of affilateCheck failed");
-							leaveRoom(muc);
-							continue;
-						}
-						// catch the 403 that sometimes shows up and fall back to some easier check if the room
-						// is still under our control
-                        } catch (XMPPException e) {
-                            if (!(info.isMembersOnly() || info.isPasswordProtected())) {
-                                if (mSettings.debugLog)
-                                    Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of membersOnly=" 
-                                            + info.isMembersOnly() + " passwordProteced=" + info.isPasswordProtected());
-                                leaveRoom(muc);
-                                continue;
-                            }
-                        }
-					}
-					// looks like there is no one in the room
-					if (info.getOccupantsCount() > 0) {
-						if (mSettings.debugLog)
-							Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
-						leaveRoom(muc);
-						continue;
-					}
-				} catch (XMPPException e) {
-					if (mSettings.debugLog) {
-						Log.i(Tools.LOG_TAG, "rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
-					}
-					// TODO decide in which cases it would be the best to remove the room from the db, because of a persistent error
-					// and in which cases the error will not be permanent
-					if (mConnection.isAuthenticated()) {
-						leaveRoom(muc);
-						continue;
-					} else {
-						break;
-					}
-				}
-				// muc has passed all tests and is fully usable
-				registerRoom(muc, mucDB[i][1], name);
-			}
-    	}
-    }
-    
+
     /**
      * leaves the muc and deletes its record from the db
      * 
      * @param muc
      */
     private void leaveRoom(MultiUserChat muc) {
-		mMucHelper.deleteMUC(muc.getRoom());
-		if (muc.isJoined())
-			muc.leave();
+        mMucHelper.deleteMUC(muc.getRoom());
+        if (muc.isJoined())
+            muc.leave();
 
-		if (mRooms.size() > 0) {
-			Integer i = getRoomInt(muc.getRoom());
-			String number = mMucHelper.getNumber(muc.getRoom());
-			mRoomNumbers.remove(i);
-			mRooms.remove(number);
-		}
+        // Remove the room if mRooms contains it
+        if (mRooms.size() > 0) {
+            Integer i = getRoomInt(muc.getRoom());
+            String number = mMucHelper.getNumber(muc.getRoom());
+            mRoomNumbers.remove(i);
+            mRooms.remove(number);
+        }
     }
-    
+
     private void registerRoom(MultiUserChat muc, String number, String name) {
     	String roomJID = muc.getRoom();
     	Integer randomInt = getRoomInt(roomJID);
@@ -458,5 +399,92 @@ public class XmppMuc {
     
     private void send(String msg) {
         Tools.send(msg, null, mCtx);
-    }    
+    }
+    
+    private class RejoinRoomsRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            rejoinRooms();
+        }
+        
+        private void rejoinRooms() {
+            String[][] mucDB = mMucHelper.getAllMUC();
+            if (mucDB == null)
+                return;
+                
+            for (int i = 0; i < mucDB.length; i++) {
+                if (!mConnection.isAuthenticated())
+                    return;
+
+                RoomInfo info = getRoomInfo(mucDB[i][0]);
+                // if info is not null, the room exists on the server
+                // so lets check if we can reuse it
+                if (info != null) {
+                    MultiUserChat muc = new MultiUserChat(mConnection, mucDB[i][0]);
+                    String name = ContactsManager.getContactName(mCtx,
+                            mucDB[i][1]);
+                    try {
+                        if (info.isPasswordProtected()) {
+                            muc.join(name, mSettings.roomPassword, mDiscussionHistory, JOIN_TIMEOUT);
+                        } else {
+                            muc.join(name, null, mDiscussionHistory, JOIN_TIMEOUT);
+
+                            // Openfire needs some time to collect the owners list
+                            try {
+                                Thread.sleep(REJOIN_ROOMS_SLEEP);
+                            } catch (InterruptedException e1) {
+                                /* Ignore */
+                            }
+                            // check here if we are still owner of these room, in case somebody has taken over ownership
+                            // sadly getOwners() throws sometimes a 403 on my openfire server
+                            try {
+                            if (!affilateCheck(muc.getOwners())) {
+                                if (mSettings.debugLog) 
+                                    Log.i("rejoinRooms: leaving " + muc.getRoom() + " because affilateCheck failed");
+                                leaveRoom(muc);
+                                continue;
+                            }
+
+                            // TODO this shouldn't happen any more
+                            // catch the 403 that sometimes shows up and fall back to some easier check if the room
+                            // is still under our control
+                            } catch (XMPPException e) {
+                                Log.d("rejoinRooms: Exception, falling back", e);
+                                if (!(info.isMembersOnly() || info.isPasswordProtected())) {
+                                    if (mSettings.debugLog)
+                                        Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of membersOnly=" 
+                                                + info.isMembersOnly() + " passwordProtected=" + info.isPasswordProtected());
+                                    leaveRoom(muc);
+                                    continue;
+                                }
+                            }
+                        }
+                        // looks like there is no one in the room
+                        if (info.getOccupantsCount() > 0) {
+                            if (mSettings.debugLog)
+                                Log.i("rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
+                            leaveRoom(muc);
+                            continue;
+                        }
+                    } catch (XMPPException e) {
+                        if (mSettings.debugLog) {
+                            Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
+                        }
+                        // TODO decide in which cases it would be the best to remove the room from the DB, because of a persistent error
+                        // and in which cases the error will not be permanent
+                        if (mConnection.isAuthenticated()) {
+                            leaveRoom(muc);
+                            continue;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    // MUC has passed all tests and is fully usable
+                    registerRoom(muc, mucDB[i][1], name);
+                }
+            }
+        }
+    }
 }
