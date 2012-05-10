@@ -132,6 +132,8 @@
     <string name="chat_help_wifi_on">turn on the WiFi adapter.</string>
     <string name="chat_help_wifi_state">give the current state of the Wifi adapter.</string>
     <string name="chat_help_write">write text as virtual keyboard (don\'t forget to activate keyboard in Android Preferences panel).</string>
+    <string name="chat_help_write_append">append text as virtual keyboard.</string>
+    <string name="chat_help_write_send">write text as virtual keyboard and validate the field.</string>
     <string name="chat_is_calling">%s is calling…</string>
     <string name="chat_log_failed">Failed to get log message</string>
     <string name="chat_log_unavailable">Unavailable</string>

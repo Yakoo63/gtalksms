@@ -132,6 +132,8 @@
     <string name="chat_help_wifi_on">Démarre le WiFi.</string>
     <string name="chat_help_wifi_state">Donne l\'état du WiFi.</string>
     <string name="chat_help_write">Ecrit le texte comme un clavier virtuel dans les autres applications (Ne pas oublier d\'activer le clavier GTalkSMS dans les paramètres d\'Android).</string>
+    <string name="chat_help_write_append">Ajoute le texte comme un clavier virtuel.</string>
+    <string name="chat_help_write_send">Ecrit le texte comme un clavier virtuel et valide le champ.</string>
     <string name="chat_is_calling">Appel de %s…</string>
     <string name="chat_log_failed">Erreur lors de la récupération des logs.</string>
     <string name="chat_log_unavailable">Non disponible</string>
