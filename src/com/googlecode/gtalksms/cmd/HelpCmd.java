@@ -125,7 +125,7 @@ public class HelpCmd extends CommandHandlerBase {
         // after we have iterated over the command set, we can assemble the category message
         _msgCategories.appendLine(getString(R.string.chat_help_title));
         _msgCategories.appendLine("- " + makeBold("\"help:contacts\"") + ": " + contactCmds);
-        _msgCategories.appendLine("- " + makeBold("\"help:copy\"") + ": " + copyCmds);               
+        _msgCategories.appendLine("- " + makeBold("\"help:text\"") + ": " + copyCmds);               
         _msgCategories.appendLine("- " + makeBold("\"help:geo\"") + ": " + geoCmds);
         _msgCategories.appendLine("- " + makeBold("\"help:media\"") + ": " + mediaCmds);
         _msgCategories.appendLine("- " + makeBold("\"help:message\"") + ": " + messageCmds);
@@ -153,7 +153,7 @@ public class HelpCmd extends CommandHandlerBase {
             send(_msgSystem);
         } else if (args.equals("media")) {
             send(_msgMedia);
-        } else if (args.equals("copy")) {
+        } else if (args.equals("text")) {
             send(_msgCopy);
         } else if (args.equals("internal")) {
             send(_msgInternal);
