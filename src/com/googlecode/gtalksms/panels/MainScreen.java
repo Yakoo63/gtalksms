@@ -376,26 +376,22 @@ public class MainScreen extends Activity implements InterstitialAdListener {
         int prefs_id;
         Intent intent;
         
-        switch (item.getItemId()) {
-            case R.id.connection_settings:
-                prefs_id = R.xml.prefs_connection;
-                break;
-            case R.id.notification_settings:
-                prefs_id = R.xml.prefs_notifications;
-                break;
-            case R.id.application_settings:
-                prefs_id = R.xml.prefs_application;
-                break;
-            case R.id.wizard:
-                intent = new Intent(MainScreen.this, Wizard.class);
-                startActivity(intent);
-                return true;
-            case R.id.cmd_manager:
-                intent = new Intent(MainScreen.this, CmdManager.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.connection_settings) {
+            prefs_id = R.xml.prefs_connection;
+        } else if (item.getItemId() == R.id.notification_settings) {
+            prefs_id = R.xml.prefs_notifications;
+        } else if (item.getItemId() == R.id.application_settings) {
+            prefs_id = R.xml.prefs_application;
+        } else if (item.getItemId() == R.id.wizard) {
+            intent = new Intent(MainScreen.this, Wizard.class);
+            startActivity(intent);
+            return true;
+        } else if (item.getItemId() == R.id.cmd_manager) {
+            intent = new Intent(MainScreen.this, CmdManager.class);
+            startActivity(intent);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
         intent = new Intent(MainScreen.this, Preferences.class);
         intent.putExtra("panel", prefs_id);

@@ -20,18 +20,14 @@ public class ChooseMethodNextButtonClickListener implements OnClickListener {
     public void onClick(View v) {
         int checkedButton = mRg.getCheckedRadioButtonId();
         mWizard.mChoosenMethod = checkedButton;
-        switch (checkedButton) {
-            case R.id.radioDifferentAccount:
-                mWizard.initView(Wizard.VIEW_CREATE_CHOOSE_SERVER);
-                break;
-            case R.id.radioSameAccount:
-                mWizard.initView(Wizard.VIEW_SAME_ACCOUNT);
-                break;
-            case R.id.radioExsistingAccount:
-                mWizard.initView(Wizard.VIEW_EXISTING_ACCOUNT);
-                break;
-            default:
-                throw new IllegalStateException();
+        if (checkedButton == R.id.radioDifferentAccount) {
+            mWizard.initView(Wizard.VIEW_CREATE_CHOOSE_SERVER);
+        } else if (checkedButton == R.id.radioSameAccount) {
+            mWizard.initView(Wizard.VIEW_SAME_ACCOUNT);
+        } else if (checkedButton == R.id.radioExsistingAccount) {
+            mWizard.initView(Wizard.VIEW_EXISTING_ACCOUNT);
+        } else {
+            throw new IllegalStateException();
         }
     }
 }

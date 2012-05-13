@@ -53,7 +53,7 @@ public class SettingsManager {
     public String xmppSecurityMode;
     public int xmppSecurityModeInt;
     public boolean manuallySpecifyServerSettings;
-    
+
     public static boolean connectionSettingsObsolete;
     
     // notifications
@@ -168,10 +168,11 @@ public class SettingsManager {
     	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
     		BackupManager.dataChanged(mContext.getPackageName());
     	}
-    	for (String s : xmppConnectionSettings)
+    	for (String s : xmppConnectionSettings) {
     	    if (s.equals(key)) {
     	        connectionSettingsObsolete = true;
     	    }
+    	}
     	if (key.equals("locale")) {
             Tools.setLocale(this, mContext);
     	}

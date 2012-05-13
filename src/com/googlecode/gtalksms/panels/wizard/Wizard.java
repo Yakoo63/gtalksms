@@ -174,16 +174,12 @@ public class Wizard extends Activity {
                 mapWizardButton(R.id.backBut, VIEW_WELCOME);
                 next = (Button) findViewById(R.id.nextBut);
                 rg = (RadioGroup) findViewById(R.id.radioGroupMethod);
-                switch (mChoosenMethod) {
-                    case R.id.radioDifferentAccount:
-                       ((RadioButton) findViewById(R.id.radioDifferentAccount)).setChecked(true);
-                       break;
-                    case R.id.radioExsistingAccount:
-                        ((RadioButton) findViewById(R.id.radioExsistingAccount)).setChecked(true);
-                        break;
-                    case R.id.radioSameAccount:
-                        ((RadioButton) findViewById(R.id.radioSameAccount)).setChecked(true);
-                        break;
+                if (mChoosenMethod == R.id.radioDifferentAccount) {
+                    ((RadioButton) findViewById(R.id.radioDifferentAccount)).setChecked(true);
+                } else if (mChoosenMethod == R.id.radioExsistingAccount) {
+                    ((RadioButton) findViewById(R.id.radioExsistingAccount)).setChecked(true);
+                } else if (mChoosenMethod == R.id.radioSameAccount) {
+                    ((RadioButton) findViewById(R.id.radioSameAccount)).setChecked(true);
                 }
                 next.setOnClickListener(new ChooseMethodNextButtonClickListener(this, rg));
                 break;
@@ -200,20 +196,16 @@ public class Wizard extends Activity {
                 rg = (RadioGroup) findViewById(R.id.radioGroupServer);
                 rg.setOnCheckedChangeListener(new ChooseServerRadioGroupChangeListener(spinner, textServer));
                 next = (Button) findViewById(R.id.nextBut);
-                // restore the old state
-                switch (mChoosenServer) {
-                    case R.id.radioChooseServer:
-                        ((RadioButton) findViewById(R.id.radioChooseServer)).setChecked(true);
-                        if (mChoosenServerSpinner != 0) {
-                            spinner.setSelection(mChoosenServerSpinner);
-                        }
-                        break;
-                    case R.id.radioManualServer:
-                        ((RadioButton) findViewById(R.id.radioManualServer)).setChecked(true);
-                        if (mChoosenServername != null) {
-                            ((EditText) findViewById(R.id.textServer)).setText(mChoosenServername);
-                        }
-                        break;
+                if (mChoosenServer == R.id.radioChooseServer) {
+                    ((RadioButton) findViewById(R.id.radioChooseServer)).setChecked(true);
+                    if (mChoosenServerSpinner != 0) {
+                        spinner.setSelection(mChoosenServerSpinner);
+                    }
+                } else if (mChoosenServer == R.id.radioManualServer) {
+                    ((RadioButton) findViewById(R.id.radioManualServer)).setChecked(true);
+                    if (mChoosenServername != null) {
+                        ((EditText) findViewById(R.id.textServer)).setText(mChoosenServername);
+                    }
                 }
                 // map the listeneres to the buttons
                 mapWizardButton(R.id.backBut, VIEW_CHOOSE_METHOD);

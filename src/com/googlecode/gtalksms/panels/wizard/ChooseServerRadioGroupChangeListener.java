@@ -19,15 +19,12 @@ public class ChooseServerRadioGroupChangeListener implements OnCheckedChangeList
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-        case R.id.radioChooseServer:
+        if (checkedId == R.id.radioChooseServer) {
             mSpinner.setEnabled(true);
             mTextServer.setEnabled(false);
-            break;
-        case R.id.radioManualServer:
+        } else if (checkedId == R.id.radioManualServer) {
             mTextServer.setEnabled(true);
             mSpinner.setEnabled(false);
-            break;
         }
     }
 

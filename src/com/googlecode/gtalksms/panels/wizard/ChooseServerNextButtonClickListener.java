@@ -35,24 +35,21 @@ public class ChooseServerNextButtonClickListener implements OnClickListener {
     public void onClick(View v) {
         int checkedButton = mRadioGroupServer.getCheckedRadioButtonId();
         mWizard.mChoosenServer = checkedButton;
-        switch (checkedButton) {
-            case R.id.radioChooseServer:
-                mWizard.mChoosenServerSpinner = mPredefinedServer.getSelectedItemPosition();
-                // TODO check that this String cast here works
-                // we set the servername here also, so that we can retrive it 
-                // later when creating the account
-                mWizard.mChoosenServername = (String) mPredefinedServer.getSelectedItem();
-                break;
-            case R.id.radioManualServer:
-                String servername = mTextServer.getText().toString();
-                if (!XmppTools.isValidServername(servername)) {
-                    MainService.displayToast("\" " + servername + " \" is not a valid servername" , null, true);
-                    return;
-                }
-                mWizard.mChoosenServername = servername;
-                break;
-            default:
-                throw new IllegalStateException();
+        if (checkedButton == R.id.radioChooseServer) {
+            mWizard.mChoosenServerSpinner = mPredefinedServer.getSelectedItemPosition();
+            // TODO check that this String cast here works
+            // we set the servername here also, so that we can retrive it 
+            // later when creating the account
+            mWizard.mChoosenServername = (String) mPredefinedServer.getSelectedItem();
+        } else if (checkedButton == R.id.radioManualServer) {
+            String servername = mTextServer.getText().toString();
+            if (!XmppTools.isValidServername(servername)) {
+                MainService.displayToast("\" " + servername + " \" is not a valid servername" , null, true);
+                return;
+            }
+            mWizard.mChoosenServername = servername;
+        } else {
+            throw new IllegalStateException();
         }
         mWizard.initView(Wizard.VIEW_CREATE);
     }

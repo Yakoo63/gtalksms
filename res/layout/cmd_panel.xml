@@ -2,7 +2,6 @@
 <LinearLayout 
     android:id="@+id/mainLayout" 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.googlecode.gtalksms"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
@@ -12,11 +11,7 @@
         android:id="@+id/AdView" 
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        app:backgroundColor="#000000"
-        app:primaryTextColor="#FFFFFF"
-        app:secondaryTextColor="#CCCCCC"
-        app:keywords="@string/main_but_donate"/>
+        android:layout_alignParentBottom="true"/>
     
     <TextView
         android:id="@+id/TextView" 
