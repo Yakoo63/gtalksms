@@ -7,7 +7,7 @@
         android:key="Recipient">
         <EditTextPreference
             android:key="notifiedAddress"
-            android:defaultValue="your.login@gmail.com"
+            android:hint="your.login@jabber.org"
             android:inputType="textEmailAddress"
             android:title="@string/pref_con_notified_address"
             android:summary="@string/pref_con_notified_address_help"/>
@@ -22,7 +22,7 @@
             android:summary="@string/pref_con_use_different_account_help" />
         <EditTextPreference
             android:key="login"
-            android:defaultValue="your.login"
+            android:hint="your.login@jabber.org"
             android:dependency="useDifferentAccount"
             android:title="@string/pref_con_login"
             android:summary="@string/pref_con_login_help"
@@ -33,7 +33,7 @@
             android:summary="@string/pref_con_password_help" android:password="true"/>
         <CheckBoxPreference 
             android:key="manuallySpecifyServerSettings" 
-            android:defaultValue="true" 
+            android:defaultValue="false" 
             android:title="@string/pref_con_manually_specify_server_settings" 
             android:summary="@string/pref_con_manually_specify_server_settings_help"/>
             <PreferenceScreen 
