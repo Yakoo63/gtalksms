@@ -211,7 +211,7 @@ public class XmppBuddies implements RosterListener {
         // TODO Make this a general intent action.NOTIFICATION_ADDRESS_AVAILABLE
         // and handle it for example within XmppPresenceStatus
         // if the notification address is/has become available, update the resource status string
-        if (bareUserId.equals(sSettings.notifiedAddress) && presence.isAvailable()) {
+        if (bareUserId.equals(sSettings.getNotifiedAddress()) && presence.isAvailable()) {
             intent = new Intent(MainService.ACTION_COMMAND);
             intent.setClass(sContext, MainService.class);
             intent.putExtra("cmd", "batt");
@@ -229,34 +229,34 @@ public class XmppBuddies implements RosterListener {
         if (sRoster != null) {
             // getPresence retrieves eventually the status of the notified Address in an internal data structure cache
             // thus avoiding an extra data packet
-            Presence presence = sRoster.getPresence(sSettings.notifiedAddress);
+            Presence presence = sRoster.getPresence(sSettings.getNotifiedAddress());
             return presence.isAvailable();
         }
         return true;
     }
     
     private void checkNotificationAddressRoster() {
-        if (sRoster != null && sSettings.useDifferentAccount) {
-            if (!sRoster.contains(sSettings.notifiedAddress)) {
+        if (sRoster != null && sSettings.getUseDifferentAccount()) {
+            if (!sRoster.contains(sSettings.getNotifiedAddress())) {
                 try {
                     // this sends a new subscription request to the other side
-                    sRoster.createEntry(sSettings.notifiedAddress, sSettings.notifiedAddress, null);
+                    sRoster.createEntry(sSettings.getNotifiedAddress(), sSettings.getNotifiedAddress(), null);
                 } catch (XMPPException e) { /* Ignore */  }
             } else {
-                RosterEntry rosterEntry = sRoster.getEntry(sSettings.notifiedAddress);
+                RosterEntry rosterEntry = sRoster.getEntry(sSettings.getNotifiedAddress());
                 RosterPacket.ItemType type = rosterEntry.getType();
                 switch (type) {
                 case both:
                     break;
                 case from:
-                    requestSubscription(sSettings.notifiedAddress, sConnection);
+                    requestSubscription(sSettings.getNotifiedAddress(), sConnection);
                     break;
                 case to:
-                    grantSubscription(sSettings.notifiedAddress, sConnection);
+                    grantSubscription(sSettings.getNotifiedAddress(), sConnection);
                     break;
                 case none:
-                    grantSubscription(sSettings.notifiedAddress, sConnection);
-                    requestSubscription(sSettings.notifiedAddress, sConnection);
+                    grantSubscription(sSettings.getNotifiedAddress(), sConnection);
+                    requestSubscription(sSettings.getNotifiedAddress(), sConnection);
                     break;
                 default:
                     break;

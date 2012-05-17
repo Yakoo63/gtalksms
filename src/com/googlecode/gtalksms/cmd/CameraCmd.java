@@ -50,7 +50,7 @@ public class CameraCmd extends CommandHandlerBase {
         } else {
             path = new File(Environment.getExternalStorageDirectory(), "DCIM");
         }
-        emailReceiving = settings.notifiedAddress;
+        emailReceiving = settings.getNotifiedAddress();
         try {
             repository = new File(path, Tools.APP_NAME);
             if(!repository.exists()) {

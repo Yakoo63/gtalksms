@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:id="@+id/MainLayout"
+    android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	
+	<LinearLayout 
+        android:layout_height="fill_parent"
+	    android:layout_width="match_parent"
+	    android:id="@+id/fragment_container"
+	    android:layout_weight="9"/>
+    
+	<LinearLayout 
+	    xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/StatusBar"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="3dip"
+        android:layout_marginBottom="3dip"
+        android:layout_marginRight="3dip"
+        android:layout_marginTop="3dip"
+        android:layout_gravity="bottom"
+        android:layout_weight="1">  
+                           
+        <ImageView 
+            android:id="@+id/StatusImage" 
+            android:layout_width="40dip" 
+            android:src="@drawable/led_red" 
+            android:scaleType="centerCrop" 
+            android:layout_height="40dip" />                                    
+        <ImageView 
+            android:id="@+id/TLSsecured" 
+            android:layout_width="40dip" 
+            android:src="@drawable/padlock"
+            android:scaleType="centerInside" 
+            android:layout_height="40dip" 
+            android:gravity="center_vertical" 
+            android:visibility="invisible" />
+        <ImageView 
+            android:id="@+id/compression" 
+            android:layout_width="60dip" 
+            android:src="@drawable/zlib"
+            android:scaleType="centerInside" 
+            android:layout_height="40dip" 
+            android:gravity="center_vertical" 
+            android:visibility="invisible" />
+        <TextView 
+            android:text="Get AdFree\nVersion" 
+            android:id="@+id/MarketLink"
+            android:textStyle="bold" 
+            android:gravity="center"
+            android:textColor="#FF0000"
+            android:layout_height="60dip" 
+            android:layout_gravity="right"
+            android:layout_width="wrap_content" />
+       </LinearLayout>
+</LinearLayout>

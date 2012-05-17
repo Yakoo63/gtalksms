@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.net.Uri;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
@@ -50,12 +51,8 @@ public class Tools {
 
         try {
             PackageInfo pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            String donated = "";
-            
-            if(isDonateAppInstalled(context)) {
-                donated = "Full ";
-            }
-            return donated + "v" + pinfo.versionName + "\n@ Yakoo";
+           
+            return "v" + pinfo.versionName;
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {
             return "";
         }
@@ -306,6 +303,12 @@ public class Tools {
         i.putExtra("message", message);
         i.putExtra("from", from);
         MainService.sendToServiceHandler(i);
+    }
+    
+    public final static void openLink(Context context, String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
     
     /**

@@ -14,28 +14,21 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
-import com.admob.android.ads.AdView;
-import com.admob.android.ads.InterstitialAd;
-import com.admob.android.ads.InterstitialAdListener;
-import com.admob.android.ads.SimpleAdListener;
-import com.admob.android.ads.InterstitialAd.Event;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.Cmd;
 import com.googlecode.gtalksms.cmd.CommandHandlerBase;
-import com.googlecode.gtalksms.tools.Tools;
 
-public class CmdManager extends Activity implements InterstitialAdListener {
+public class CmdManager extends Activity  {
     
     private ListView mListView;
     private TextView mTextView;
     private MainService mMainService;
-    private InterstitialAd mInterstitialAd;
     
     private ServiceConnection _mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -54,21 +47,6 @@ public class CmdManager extends Activity implements InterstitialAdListener {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.cmd_panel);
-
-        boolean isDonate = Tools.isDonateAppInstalled(getBaseContext());
-        if (!isDonate) {
-            if (mInterstitialAd == null) {
-                mInterstitialAd = new InterstitialAd(Event.APP_START, this);
-            }
-            mInterstitialAd.requestAd(this);
-            
-            if (mInterstitialAd.isReady()) {
-                mInterstitialAd.show(this);
-            }
-            
-            AdView ad = (AdView) findViewById(R.id.AdView);
-            ad.setAdListener(new SimpleAdListener());
-        }
         
         mTextView = (TextView)findViewById(R.id.TextView);
         mTextView.setText(R.string.cmd_manager_error_not_connected);
@@ -126,13 +104,4 @@ public class CmdManager extends Activity implements InterstitialAdListener {
         unbindService(_mainServiceConnection);
     }
 
-    @Override
-    public void onFailedToReceiveInterstitial(InterstitialAd interstitialAd) {}
-
-    @Override
-    public void onReceiveInterstitial(InterstitialAd interstitialAd) {
-        if (interstitialAd == mInterstitialAd) {
-            mInterstitialAd.show(this);
-        }
-    }
 }

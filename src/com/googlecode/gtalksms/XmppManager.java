@@ -562,7 +562,7 @@ public class XmppManager {
 
             // It is important that we query the server for offline messages
             // BEFORE we send the first presence stanza
-            XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.notifiedAddress, mContext);
+            XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.getNotifiedAddress(), mContext);
         } catch (Exception e) {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
@@ -634,7 +634,7 @@ public class XmppManager {
         serviceDiscoMgr.addFeature("bug-fix-gtalksms");
         
         try {
-            connection.login(mSettings.login, mSettings.password, Tools.APP_NAME);
+            connection.login(mSettings.getLogin(), mSettings.getPassword(), Tools.APP_NAME);
         } catch (Exception e) {
             xmppDisconnect(connection);
             Log.e("xmpp login failed: " + e.getMessage());
@@ -769,7 +769,7 @@ public class XmppManager {
             // Message has no destination information
             // Send to all known resources 
             if (muc == null && to == null) {
-                Iterator<Presence> presences = mConnection.getRoster().getPresences(mSettings.notifiedAddress);
+                Iterator<Presence> presences = mConnection.getRoster().getPresences(mSettings.getNotifiedAddress());
                 List<String> toList = new LinkedList<String>();
                 while (presences.hasNext()) {
                     Presence p = presences.next();

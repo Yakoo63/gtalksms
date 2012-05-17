@@ -25,18 +25,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
-import com.admob.android.ads.AdView;
-import com.admob.android.ads.InterstitialAd;
-import com.admob.android.ads.InterstitialAdListener;
-import com.admob.android.ads.SimpleAdListener;
-import com.admob.android.ads.InterstitialAd.Event;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
@@ -46,10 +41,8 @@ import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFriend;
 
-public class MainScreen extends Activity implements InterstitialAdListener {
+public class MainScreen extends Activity  {
 
-    /** AdMob Interstitial Ad */
-    private InterstitialAd mInterstitialAd;
     
     private MainService mMainService;
     private SettingsManager mSettingsMgr;
@@ -200,12 +193,7 @@ public class MainScreen extends Activity implements InterstitialAdListener {
 //        mi.setEnabled(false);
         createView();
         
-        if (!Tools.isDonateAppInstalled(this)) {
-            if (mInterstitialAd == null) {
-                mInterstitialAd = new InterstitialAd(Event.APP_START, this);
-            }
-            mInterstitialAd.requestAd(this);
-        }
+        
     }
 
     /** Called when the activity is first created. */
@@ -216,16 +204,13 @@ public class MainScreen extends Activity implements InterstitialAdListener {
     }
 
     private void createView() {
-    	if (mSettingsMgr.connectOnMainscreenShow) {
+    	if (mSettingsMgr.getConnectOnMainScreenStartup()) {
     	    Tools.startSvcIntent(this, MainService.ACTION_CONNECT);
     	}
     	
     	boolean isDonate = Tools.isDonateAppInstalled(getBaseContext());
     	
-    	// create an Ad object if the donate version is not installed
-    	if (!isDonate && mInterstitialAd == null) {
-    	    mInterstitialAd = new InterstitialAd(Event.APP_START, this);
-    	}
+    	
     	
         Tools.setLocale(mSettingsMgr, this);
         
@@ -250,12 +235,7 @@ public class MainScreen extends Activity implements InterstitialAdListener {
             }
         });
 
-        if (mInterstitialAd != null && mInterstitialAd.isReady()) {
-            mInterstitialAd.show(this);
-        }
-        
-        AdView ad = (AdView) findViewById(R.id.ad);
-        ad.setAdListener(new SimpleAdListener());
+      
         
         Button donateBtn = (Button) findViewById(R.id.Donate);
         donateBtn.setOnClickListener(new OnClickListener() {
@@ -273,14 +253,11 @@ public class MainScreen extends Activity implements InterstitialAdListener {
 
         // Set FREE label for not donate version
         if (isDonate) {
-            ad.setVisibility(View.GONE);
             donateBtn.setVisibility(View.GONE);
             marketBtn.setVisibility(View.GONE);
         } else {
-            ad.setVisibility(View.VISIBLE);
             donateBtn.setVisibility(View.VISIBLE);
             marketBtn.setVisibility(View.VISIBLE);
-            mInterstitialAd.requestAd(this); // request a new ad
         }
 
         Button clipboardBtn = (Button) findViewById(R.id.Clipboard);
@@ -413,12 +390,4 @@ public class MainScreen extends Activity implements InterstitialAdListener {
         return super.onKeyLongPress(keyCode, event);
     }
 
-    public void onFailedToReceiveInterstitial(InterstitialAd interstitialAd) {}
-
-    public void onReceiveInterstitial(InterstitialAd interstitialAd) {
-        if(mSettingsMgr.debugLog) Log.i(Tools.LOG_TAG, "onReceiveInterstitial");
-        if(interstitialAd == mInterstitialAd) {
-            mInterstitialAd.show(this);
-        }
-    }
 }

@@ -161,7 +161,7 @@ public class XmppMuc {
 			// TODO: test if occupants contains also the sender (in case we
 			// invite other people)
 			if (muc != null && muc.getOccupantsCount() < 2) {
-				muc.invite(mSettings.notifiedAddress, "SMS conversation with "
+				muc.invite(mSettings.getNotifiedAddress(), "SMS conversation with "
 						+ contact);
 			}
 		}
@@ -227,12 +227,12 @@ public class XmppMuc {
         // TODO localize
         switch (mode) {
             case MODE_SMS:
-                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + mSettings.login.replaceAll("@", "_") + "@" + getMUCServer();
+                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + mSettings.getLogin().replaceAll("@", "_") + "@" + getMUCServer();
                 subjectInviteStr =  "SMS conversation with " + getRoomString(number, name);
                 break;
 
             case MODE_SHELL:
-                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + mSettings.login.replaceAll("@", "_") + "@" + getMUCServer();
+                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + mSettings.getLogin().replaceAll("@", "_") + "@" + getMUCServer();
                 subjectInviteStr =  "New Android Terminal " + getRoomString(number, name);
                 break;
 
@@ -259,11 +259,11 @@ public class XmppMuc {
 
             try {
                 List<String> owners = new ArrayList<String>();
-                if (mSettings.useDifferentAccount) {
-                    owners.add(mSettings.login);
-                    owners.add(mSettings.notifiedAddress);
+                if (mSettings.getUseDifferentAccount()) {
+                    owners.add(mSettings.getLogin());
+                    owners.add(mSettings.getNotifiedAddress());
                 } else {
-                    owners.add(mSettings.login);
+                    owners.add(mSettings.getLogin());
                 }
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
@@ -296,7 +296,7 @@ public class XmppMuc {
             throw e1;
         }
 
-        multiUserChat.invite(mSettings.notifiedAddress, subjectInviteStr);
+        multiUserChat.invite(mSettings.getNotifiedAddress(), subjectInviteStr);
         registerRoom(multiUserChat, number, name, randomInt, mode);
         return multiUserChat;
     }
@@ -373,7 +373,7 @@ public class XmppMuc {
     	for (Affiliate a : affCol) {
     		jids.add(a.getJid());
     	}
-    	return jids.contains(mSettings.login);    	
+    	return jids.contains(mSettings.getLogin());    	
     }
     /**
      * Extracts the room random integer from the room JID
