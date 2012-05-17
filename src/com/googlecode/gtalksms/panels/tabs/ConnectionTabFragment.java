@@ -14,6 +14,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.tools.Tools;
 
 public class ConnectionTabFragment extends SherlockFragment {
     SettingsManager _settingsMgr;
@@ -34,11 +35,12 @@ public class ConnectionTabFragment extends SherlockFragment {
         
         _editTextLogin.setText(_settingsMgr.getLogin());
         _editTextPassword.setText(_settingsMgr.getPassword());
-        
-       
+        getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
+
         if (_settingsMgr.getConnectOnMainScreenStartup()) {
-             _switchConnection.setActivated(true);
-             MainService.sendToServiceHandler(new Intent(MainService.ACTION_CONNECT));
+             _switchConnection.setChecked(true);
+             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
+             Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
         }
         
         _startStopButton.setOnClickListener(new OnClickListener() {
@@ -47,9 +49,10 @@ public class ConnectionTabFragment extends SherlockFragment {
                 _settingsMgr.setUseDifferentAccount(true);
                 _settingsMgr.setLogin(_editTextLogin.getText().toString());
                 _settingsMgr.setPassword(_editTextPassword.getText().toString());
-                _settingsMgr.setConnectOnMainScreenStartup(_switchConnection.isActivated());
+                _settingsMgr.setConnectOnMainScreenStartup(_switchConnection.isChecked());
                 
-                MainService.sendToServiceHandler(new Intent(MainService.ACTION_CONNECT));
+                getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
+                Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
             }
         });
         

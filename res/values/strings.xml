@@ -204,6 +204,7 @@
     <string name="main_toast_pref_not_set">Preferences not set. Please set a valid notification Address</string>
     <string name="or">&#xA0;or&#xA0;</string>
     <string name="preference_panel">Preferences</string>
+    <string name="pref_all">Preferences</string>
     <string name="pref_app">Application settings</string>
     <string name="pref_app_advanced">Advanced settings</string>
     <string name="pref_app_auto_start_options">Auto-start options</string>

@@ -1,8 +1,12 @@
 package com.googlecode.gtalksms.panels;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,12 +17,17 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
+import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.panels.tabs.BuddiesTabFragment;
 import com.googlecode.gtalksms.panels.tabs.ConnectionTabFragment;
+import com.googlecode.gtalksms.panels.wizard.Wizard;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -48,12 +57,44 @@ public class MainActivity extends SherlockFragmentActivity {
         }
     }
     
-    private AdView _adView;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add("Settings").setIcon(R.drawable.ic_menu_preferences).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        return super.onCreateOptionsMenu(menu);
+    }
     
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getTitle().equals("Settings")) {
+            Intent intent = new Intent(MainActivity.this, Preferences.class);
+            intent.putExtra("panel", R.xml.prefs_all);
+            startActivity(intent);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    private AdView _adView;
+    private MainService mMainService;
+   
+    private ServiceConnection _mainServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mMainService = ((MainService.LocalBinder) service).getService();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mMainService = null;
+        }
+    };
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setSupportProgressBarIndeterminateVisibility(false);
+       
         setContentView(R.layout.tab_container);
         final ActionBar ab = getSupportActionBar();
         
@@ -65,8 +106,6 @@ public class MainActivity extends SherlockFragmentActivity {
         ab.addTab(ab.newTab().setText("Commands").setTabListener(new TabListener(new BuddiesTabFragment()))); // TO UPDATE!!!
         ab.addTab(ab.newTab().setText("About").setTabListener(new TabListener(new BuddiesTabFragment()))); // TO UPDATE!!!
         
-        setTitle(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
-
         TextView marketLink = (TextView) findViewById(R.id.MarketLink);
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.MainLayout);
         
