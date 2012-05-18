@@ -12,32 +12,48 @@
         android:id="@+id/fragment_container" 
         android:layout_weight="9"/>
     
-		<LinearLayout 
-		    xmlns:android="http://schemas.android.com/apk/res/android"
-	        android:id="@+id/StatusBar"
+    
+	<LinearLayout 
+	    xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/StatusBar"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dip"
+        android:layout_gravity="bottom">  
+        
+	    <LinearLayout 
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/AdsLayout"/>
+	    
+	    <LinearLayout 
 	        android:orientation="horizontal"
-	        android:layout_width="fill_parent"
-	        android:layout_height="30dip"
+	        android:id="@+id/LinksBar"
+            android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
 	        android:layout_marginTop="3dip"
 	        android:layout_gravity="bottom">  
-	                           
-            <TextView 
-                android:text="@string/panel_main_adfree_version" 
-                android:id="@+id/MarketLink"
-                android:textStyle="bold"
-                android:textColor="#FF0000"
-                android:layout_gravity="center_vertical"
-                android:layout_height="fill_parent" 
-                android:layout_width="wrap_content" />
-            
-            <TextView 
-                android:text="@string/panel_main_paypal" 
-                android:id="@+id/DonateLink"
-                android:textStyle="bold" 
-                android:gravity="right"
-                android:textColor="#FF0000"
-                android:layout_gravity="center_vertical"
-                android:layout_height="fill_parent"
-                android:layout_width="fill_parent" />
-            </LinearLayout>
+           
+	         <TextView 
+	               android:text="@string/panel_main_adfree_version" 
+	               android:id="@+id/MarketLink"
+	               android:textStyle="bold"
+	               android:gravity="center"
+                   android:textColor="#FF0000"
+                   android:layout_weight="1" 
+                   android:layout_height="fill_parent" 
+                   android:layout_width="fill_parent" />
+	           
+	          <TextView 
+	               android:text="@string/panel_main_paypal" 
+	               android:id="@+id/DonateLink"
+	               android:textStyle="bold" 
+	               android:gravity="center"
+	               android:textColor="#00FF00"
+	               android:layout_weight="1" 
+                   android:layout_height="fill_parent"
+	               android:layout_width="fill_parent" />
+           </LinearLayout>
+     </LinearLayout>
 </LinearLayout>

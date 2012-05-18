@@ -259,12 +259,8 @@ public class XmppMuc {
 
             try {
                 List<String> owners = new ArrayList<String>();
-                if (mSettings.getUseDifferentAccount()) {
-                    owners.add(mSettings.getLogin());
-                    owners.add(mSettings.getNotifiedAddress());
-                } else {
-                    owners.add(mSettings.getLogin());
-                }
+                owners.add(mSettings.getLogin());
+                owners.add(mSettings.getNotifiedAddress());
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
                 // Password protected MUC fallback code begins here

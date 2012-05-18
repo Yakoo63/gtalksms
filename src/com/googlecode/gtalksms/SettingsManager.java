@@ -54,10 +54,6 @@ public class SettingsManager {
     public String getNotifiedAddress() { return _notifiedAddress; }
     public void setNotifiedAddress(String value) { _notifiedAddress = saveStringSetting("notifiedAddress", value); }
 
-    private boolean _useDifferentAccount;
-    public boolean getUseDifferentAccount() { return _useDifferentAccount; }
-    public void setUseDifferentAccount(boolean value) { _useDifferentAccount = saveBooleanSetting("useDifferentAccount", value); }
-
     private boolean _connectOnMainScreenStartup;
     public boolean getConnectOnMainScreenStartup() { return _connectOnMainScreenStartup; }
     public void setConnectOnMainScreenStartup(boolean value) { _connectOnMainScreenStartup = saveBooleanSetting("connectOnMainscreenShow", value); }
@@ -209,13 +205,7 @@ public class SettingsManager {
         serverPort = mSharedPreferences.getInt("serverPort", 0);
         
         _notifiedAddress = mSharedPreferences.getString("notifiedAddress", "");
-       
-        _useDifferentAccount = mSharedPreferences.getBoolean("useDifferentAccount", true);
-        if (_useDifferentAccount) {
-            _login = mSharedPreferences.getString("login", "");
-        } else {
-            _login = _notifiedAddress;
-        }
+        _login = mSharedPreferences.getString("login", "");
         
         manuallySpecifyServerSettings = mSharedPreferences.getBoolean("manuallySpecifyServerSettings", false);
         if (manuallySpecifyServerSettings) {

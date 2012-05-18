@@ -62,14 +62,13 @@ public class ConnectionTabFragment extends SherlockFragment {
         
         mStartStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                // TODO remove this one
-                mSettingsMgr.setUseDifferentAccount(true);
-                
                 mSettingsMgr.setLogin(mEditTextLogin.getText().toString());
                 mSettingsMgr.setNotifiedAddress(mEditNotificationAddress.getText().toString());
                 mSettingsMgr.setPassword(mEditTextPassword.getText().toString());
                 
-                Tools.startSvcIntent(getActivity().getBaseContext(), mCurrentAction);
+                if (!mSettingsMgr.getLogin().isEmpty()) {
+                    Tools.startSvcIntent(getActivity().getBaseContext(), mCurrentAction);
+                }
             }
         });
         return view;

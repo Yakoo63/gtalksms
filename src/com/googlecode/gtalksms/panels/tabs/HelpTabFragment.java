@@ -42,7 +42,9 @@ public class HelpTabFragment extends SherlockFragment {
     private class AboutUrlToStringDownloader extends UrlToStringDownloader {
         protected void onPostExecute(HashMap<URL, String> result) {
             mUrlMap = result;
-            updateConsole();
+            try {
+                updateConsole();
+            } catch (Exception e) {}
         }
     }
 

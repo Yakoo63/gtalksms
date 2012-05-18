@@ -47,6 +47,7 @@
             android:name="com.googlecode.gtalksms.panels.MainActivity"
             android:theme="@style/Theme.Sherlock"
             android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation"
             android:label="@string/app_name">
             
             <intent-filter>

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -89,7 +90,7 @@ public class MainActivity extends SherlockFragmentActivity {
         }
     };;
     
-    private ServiceConnection _mainServiceConnection = new ServiceConnection() {
+    private ServiceConnection mMainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mMainService = ((MainService.LocalBinder) service).getService();
             mMainService.updateBuddies();
@@ -101,6 +102,18 @@ public class MainActivity extends SherlockFragmentActivity {
         }
     };
 
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        LinearLayout statusBar = (LinearLayout) findViewById(R.id.StatusBar);
+        LinearLayout linksBar = (LinearLayout) findViewById(R.id.LinksBar);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            statusBar.setOrientation(LinearLayout.HORIZONTAL);
+            linksBar.setOrientation(LinearLayout.VERTICAL);
+        } else {
+            statusBar.setOrientation(LinearLayout.VERTICAL);
+            linksBar.setOrientation(LinearLayout.HORIZONTAL);
+        }
+    }
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,16 +121,16 @@ public class MainActivity extends SherlockFragmentActivity {
         
         setTitle(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+ 
         setSupportProgressBarIndeterminateVisibility(false);
-       
         setContentView(R.layout.tab_container);
+        
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayShowTitleEnabled(true);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
         mActionBar.addTab(mActionBar.newTab().setText("Connection").setTabListener(new TabListener(mConnectionTabFragment)));
-        mActionBar.addTab(mActionBar.newTab().setText("About").setTabListener(new TabListener(mHelpTabFragment)));
-       
+        mActionBar.addTab(mActionBar.newTab().setText("Help / About").setTabListener(new TabListener(mHelpTabFragment)));
+        
         if (Tools.isDonateAppInstalled(getBaseContext())) {
             findViewById(R.id.StatusBar).setVisibility(View.GONE);
         } else {
@@ -125,8 +138,8 @@ public class MainActivity extends SherlockFragmentActivity {
             mAdView.loadAd(new AdRequest());
             mAdView.setBackgroundColor(Color.TRANSPARENT);
             
-            LinearLayout mainLayout = (LinearLayout) findViewById(R.id.MainLayout);
-            mainLayout.addView(mAdView, 1);
+            LinearLayout adsLayout = (LinearLayout) findViewById(R.id.AdsLayout);
+            adsLayout.addView(mAdView);
 
             TextView marketLink = (TextView) findViewById(R.id.MarketLink);
             marketLink.setOnClickListener(new OnClickListener() {
@@ -148,7 +161,7 @@ public class MainActivity extends SherlockFragmentActivity {
     public void onPause() {
         super.onPause();
         
-        unbindService(_mainServiceConnection);
+        unbindService(mMainServiceConnection);
         unregisterReceiver(mXmppreceiver);
     }
     
@@ -160,7 +173,7 @@ public class MainActivity extends SherlockFragmentActivity {
         intentFilter.addAction(MainService.ACTION_XMPP_CONNECTION_CHANGED);
         registerReceiver(mXmppreceiver, intentFilter);
         Intent intent = new Intent(MainService.ACTION_CONNECT);
-        bindService(intent, _mainServiceConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, mMainServiceConnection, Context.BIND_AUTO_CREATE);
     }
     
     @Override
