@@ -52,7 +52,7 @@
         </activity> -->
         <activity 
             android:name="com.googlecode.gtalksms.panels.MainActivity"
-            android:theme="@android:style/Theme.Holo" 
+            android:theme="@style/Theme.Sherlock"
             android:windowSoftInputMode="adjustPan"
             android:label="string/main_panel">
             
@@ -80,6 +80,7 @@
         <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService" android:exported="false">
             <intent-filter>
                 <action android:name="com.googlecode.gtalksms.action.CONNECT" />
+                <action android:name="com.googlecode.gtalksms.action.DISCONNECT" />
                 <action android:name="com.googlecode.gtalksms.action.TOGGLE" />
                 <action android:name="com.googlecode.gtalksms.action.SEND" />
                 <action android:name="com.googlecode.gtalksms.action.NETWORK_CHANGED" />

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen android:title="@string/pref_all" xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceScreen android:title="@string/pref_con">
+	    <PreferenceCategory android:title="@string/pref_con_notified_address_cat" android:key="Recipient">
+	        <EditTextPreference android:key="notifiedAddress" android:hint="your.login@jabber.org" android:inputType="textEmailAddress" android:title="@string/pref_con_notified_address" android:summary="@string/pref_con_notified_address_help" />
+	    </PreferenceCategory>
+	    <PreferenceCategory android:title="@string/pref_con_cat" android:key="ConnectionSettings">
+	        <SwitchPreference android:key="useDifferentAccount" android:defaultValue="false" android:title="@string/pref_con_use_different_account" android:summary="@string/pref_con_use_different_account_help" />
+	    <!--<EditTextPreference android:key="login" android:hint="your.login@jabber.org" android:dependency="useDifferentAccount" android:title="@string/pref_con_login" android:summary="@string/pref_con_login_help" android:inputType="textEmailAddress" />
+	        <EditTextPreference android:key="password" android:title="@string/pref_con_password" android:summary="@string/pref_con_password_help" android:password="true" />
+	     --><SwitchPreference android:key="manuallySpecifyServerSettings" android:defaultValue="false" android:title="@string/pref_con_manually_specify_server_settings" android:summary="@string/pref_con_manually_specify_server_settings_help" />
+	        <PreferenceScreen android:title="@string/pref_con_server_settings" android:dependency="manuallySpecifyServerSettings">
+	            <EditTextPreference android:key="serverHost" android:defaultValue="talk.google.com" android:title="@string/pref_con_server_host" android:summary="@string/pref_con_server_host_help" android:inputType="textUri" />
+	            <com.googlecode.gtalksms.tools.EditIntegerPreference android:key="serverPort" android:numeric="integer" android:defaultValue="5222" android:title="@string/pref_con_server_port" android:summary="@string/pref_con_server_port_help" android:inputType="number" />
+	            <EditTextPreference android:key="serviceName" android:defaultValue="gmail.com" android:title="@string/pref_con_service_name" android:summary="@string/pref_con_service_name_help" android:inputType="textUri" />
+	        </PreferenceScreen>
+	    </PreferenceCategory>
+	    <PreferenceScreen android:title="@string/pref_app_advanced">
+	        <EditTextPreference android:key="roomPassword" android:defaultValue="gtalksms" android:title="@string/pref_con_muc_password" android:summary="@string/pref_con_muc_password_help" />
+	        <EditTextPreference android:key="mucServer" android:defaultValue="conference.jwchat.org" android:title="@string/pref_con_muc_server" android:summary="@string/pref_con_muc_server_help" android:inputType="textUri" />
+	        <SwitchPreference android:key="forceMucServer" android:defaultValue="true" android:summary="@string/pref_con_muc_force" android:title="@string/pref_con_muc_force_help" />
+	        <SwitchPreference android:key="useCompression" android:defaultValue="false" android:summary="@string/pref_con_use_compression_help" android:title="@string/pref_con_use_compression" />
+	        <ListPreference android:key="xmppSecurityMode" android:entries="@array/list_xmppConnectionSecurity_entries" android:entryValues="@array/list_xmppConnectionSecurity_entryValues" android:title="@string/pref_con_securityMode" android:summary="@string/pref_con_securityMode_help" />
+	    </PreferenceScreen>
+	</PreferenceScreen>
+    <PreferenceScreen android:title="@string/pref_app">
+        <PreferenceScreen android:title="@string/pref_app_auto_start_options">
+            <SwitchPreference android:defaultValue="false" android:key="startAtBoot" android:title="@string/pref_app_start_at_boot" android:summary="@string/pref_app_start_at_boot_help" />
+            <SwitchPreference android:defaultValue="false" android:key="startOnPowerConnected" android:title="@string/pref_app_start_on_power_connected" android:summary="@string/pref_app_start_on_power_connected_help" />
+            <SwitchPreference android:defaultValue="false" android:key="startOnWifiConnected" android:title="@string/pref_app_start_on_wifi_connected" android:summary="@string/pref_app_start_on_wifi_connected_help" />
+        </PreferenceScreen>
+        <PreferenceScreen android:title="@string/pref_app_auto_stop_options">
+            <SwitchPreference android:defaultValue="false" android:key="stopOnPowerDisconnected" android:title="@string/pref_app_stop_on_power_disconnected" android:summary="@string/pref_app_stop_on_power_disconnected_help" />
+            <com.googlecode.gtalksms.tools.EditIntegerPreference android:key="stopOnPowerDelay" android:numeric="integer" android:defaultValue="1" android:inputType="number" android:title="@string/pref_app_stop_on_power_disconnected_delay" android:summary="@string/pref_app_stop_on_power_disconnected_delay_help" android:dependency="stopOnPowerDisconnected" />              
+            <SwitchPreference android:defaultValue="false" android:key="stopOnWifiDisconnected" android:title="@string/pref_app_stop_on_wifi_disconnected" android:summary="@string/pref_app_stop_on_wifi_disconnected_help" />              
+        </PreferenceScreen>
+        <SwitchPreference android:defaultValue="false" android:key="showStatusIcon" android:title="@string/pref_app_show_status_icon" android:summary="@string/pref_app_show_status_icon_help" />
+        <com.googlecode.gtalksms.tools.CustomListPreference android:key="displayIconIndex" android:title="@string/pref_app_select_status_icon" android:dialogTitle="@string/pref_app_select_status_icon" android:summary="@string/pref_app_select_status_icon_help" android:entries="@array/icons_prefix" />    
+        <PreferenceScreen android:title="@string/pref_app_geo_link_app">
+            <SwitchPreference android:defaultValue="true" android:key="useGoogleMapUrl" android:title="@string/pref_app_geo_link_app_gmap" android:summary="@string/pref_app_geo_link_app_gmap_help" />
+            <SwitchPreference android:defaultValue="false" android:key="useOpenStreetMapUrl" android:title="@string/pref_app_geo_link_app_openstreetmap" android:summary="@string/pref_app_geo_link_app_openstreetmap_help" />
+        </PreferenceScreen>
+        <PreferenceScreen android:title="@string/pref_app_public_intents">
+            <SwitchPreference android:defaultValue="false" android:key="publicIntentsEnabled" android:title="@string/pref_app_public_intents_enabled" android:summary="@string/pref_app_public_intents_enabled_help" />
+            <SwitchPreference android:defaultValue="true" android:key="publicIntentTokenRequired" android:dependency="publicIntentsEnabled" android:title="@string/pref_app_public_intents_token_required" android:summary="@string/pref_app_public_intents_token_required_help" />
+            <EditTextPreference android:key="publicIntentToken" android:defaultValue="secret" android:inputType="text" android:dependency="publicIntentTokenRequired" android:title="@string/pref_app_public_intents_token" android:summary="@string/pref_app_public_intents_token_help" />
+        </PreferenceScreen>
+        <PreferenceScreen android:title="@string/pref_app_advanced">
+            <com.googlecode.gtalksms.tools.EditIntegerPreference android:key="smsNumber" android:summary="@string/pref_app_sms_number_help" android:title="@string/pref_app_sms_number" android:defaultValue="5" android:numeric="integer" />
+            <SwitchPreference android:key="debugLog" android:title="@string/pref_app_enable_debug" android:summary="@string/pref_app_enable_debug_help" android:defaultValue="false" />
+            <ListPreference android:key="locale" android:title="@string/pref_app_locale" android:summary="@string/pref_app_locale_help" android:entryValues="@array/list_locale_entryValues" android:entries="@array/list_locale_entries" android:defaultValue="default" />
+            <SwitchPreference android:defaultValue="false" android:key="formatResponses" android:title="@string/pref_app_format_responses" android:summary="@string/pref_app_format_responses_help" />
+            <SwitchPreference android:key="showSentSms" android:defaultValue="false" android:title="@string/pref_app_show_sent_sms" android:summary="@string/pref_app_show_sent_sms_help" />
+            <com.googlecode.gtalksms.tools.EditIntegerPreference android:key="callLogsNumber" android:summary="@string/pref_app_call_logs_number_help" android:defaultValue="10" android:title="@string/pref_app_call_logs_number" android:numeric="integer" />
+            <SwitchPreference android:key="markSmsReadOnReply" android:title="@string/pref_app_mark_read_on_send" android:summary="@string/pref_app_mark_read_on_send_help" android:defaultValue="false" />
+            <SwitchPreference android:key="smsReplySeparate" android:title="@string/pref_notif_sms_separate" android:summary="@string/pref_notif_sms_separate_help" android:defaultValue="false" />
+            <SwitchPreference android:key="connectOnMainscreenShow" android:title="@string/pref_app_connect_mainscreen" android:summary="@string/pref_app_connect_mainscreen_help" android:defaultValue="false" />
+            <EditTextPreference android:key="smsMagicWord" android:defaultValue="GTalkSMS" android:title="@string/pref_app_start_sms_key" android:summary="@string/pref_app_start_sms_key_help" />
+            <RingtonePreference android:key="ringtone" android:title="@string/pref_app_ringtone" android:summary="@string/pref_app_ringtone_help" />
+            <ListPreference android:key="framebufferMode" android:entries="@array/list_framebufferMode_entries" android:entryValues="@array/list_framebufferMode_entryValues" android:title="@string/pref_app_framebufferMode" android:summary="@string/pref_app_framebufferMode_help" />
+        </PreferenceScreen>
+    </PreferenceScreen>
+    <PreferenceScreen android:title="@string/pref_notif">
+	    <SwitchPreference android:key="notifyApplicationConnection" android:title="@string/pref_notif_application_connection" android:summary="@string/pref_notif_application_connection_help" android:defaultValue="false" />
+	    <SwitchPreference android:key="notifyBattery" android:title="@string/pref_notif_battery_state" android:summary="@string/pref_notif_battery_state_help" android:defaultValue="false" />
+	    <ListPreference android:key="batteryNotificationInterval" android:dependency="notifyBattery" android:title="@string/pref_notif_battery_notif_interval" android:summary="@string/pref_notif_battery_notif_interval_help" android:defaultValue="10" android:entries="@array/list_bat_notif_interval" android:entryValues="@array/list_bat_notif_interval" />
+	    <SwitchPreference android:key="notifyBatteryInStatus" android:defaultValue="true" android:title="@string/pref_notif_battery_state_in_status" android:summary="@string/pref_notif_battery_state_in_status_help" />
+	    <SwitchPreference android:key="notifyIncomingCalls" android:defaultValue="true" android:title="@string/pref_notif_incoming_calls" android:summary="@string/pref_notif_incoming_calls_help" />
+	    <ListPreference android:key="notificationIncomingSmsType" android:title="@string/pref_notif_incoming_sms" android:summary="@string/pref_notif_incoming_sms_help" android:entryValues="@array/list_smsNotificationType_entryValues" android:entries="@array/list_smsNotificationType_entries" android:defaultValue="same" />
+	    <SwitchPreference android:key="notifySmsSent" android:defaultValue="true" android:title="@string/pref_notif_sms_sent" android:summary="@string/pref_notif_sms_sent_help" />
+	    <SwitchPreference android:key="notifySmsDelivered" android:defaultValue="false" android:title="@string/pref_notif_sms_delivered" android:summary="@string/pref_notif_sms_delivered_help" />
+	    <SwitchPreference android:key="notifyInMuc" android:title="@string/pref_notif_sms_notifyInMuc" android:summary="@string/pref_notif_sms_notifyInMuc" android:defaultValue="false" />                    
+    </PreferenceScreen>
+</PreferenceScreen>

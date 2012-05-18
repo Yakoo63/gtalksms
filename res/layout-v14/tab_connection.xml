@@ -80,7 +80,7 @@
 	        android:inputType="textPassword" />
 
 	</LinearLayout>
-    <!-- 
+     
     <Switch
         android:id="@+id/switchConnection"
         android:layout_gravity="right"
@@ -89,7 +89,7 @@
         android:text="@string/panel_connection_auto_connect"
         android:layout_marginTop="15dip"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
-     -->
+     
     <View
 		android:layout_width="fill_parent"
 		android:layout_height="0.45dip"

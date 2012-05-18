@@ -67,6 +67,7 @@ public class MainService extends Service {
 
     // The following actions are documented and registered in our manifest
     public final static String ACTION_CONNECT = "com.googlecode.gtalksms.action.CONNECT";
+    public final static String ACTION_DISCONNECT = "com.googlecode.gtalksms.action.DISCONNECT";
     public final static String ACTION_TOGGLE = "com.googlecode.gtalksms.action.TOGGLE";
     public final static String ACTION_SEND = "com.googlecode.gtalksms.action.SEND";
     public final static String ACTION_COMMAND = "com.googlecode.gtalksms.action.COMMAND";
@@ -189,6 +190,8 @@ public class MainService extends Service {
                 // A simple 'connect' request.
                 sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             }
+        } else if (action.equals(ACTION_DISCONNECT)) {
+            sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
         } else if (action.equals(ACTION_TOGGLE)) {
             switch (initialState) {
                 case XmppManager.CONNECTED:

@@ -1,6 +1,5 @@
 package com.googlecode.gtalksms.panels.tabs;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,48 +13,83 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class ConnectionTabFragment extends SherlockFragment {
-    SettingsManager _settingsMgr;
-    EditText _editTextLogin;
-    EditText _editTextPassword;
-    Switch _switchConnection;
-    Button _startStopButton;
+    SettingsManager mSettingsMgr;
+    EditText mEditTextLogin;
+    EditText mEditNotificationAddress;
+    EditText mEditTextPassword;
+    Switch mSwitchConnection;
+    Button mStartStopButton;
+    String mCurrentAction = MainService.ACTION_CONNECT;
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_connection, container, false);
         
-        _settingsMgr = SettingsManager.getSettingsManager(view.getContext());
-        _editTextLogin = (EditText) view.findViewById(R.id.editTextLogin);
-        _editTextPassword = (EditText) view.findViewById(R.id.editTextPassword);
-        _switchConnection = (Switch) view.findViewById(R.id.switchConnection);
-        _startStopButton = (Button)  view.findViewById(R.id.buttonConnect);
+        mSettingsMgr = SettingsManager.getSettingsManager(view.getContext());
+        mEditTextLogin = (EditText) view.findViewById(R.id.editTextLogin);
+        mEditNotificationAddress = (EditText) view.findViewById(R.id.editTextNotificationAddress);
+        mEditTextPassword = (EditText) view.findViewById(R.id.editTextPassword);
         
-        _editTextLogin.setText(_settingsMgr.getLogin());
-        _editTextPassword.setText(_settingsMgr.getPassword());
-        getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
+        mStartStopButton = (Button)  view.findViewById(R.id.buttonConnect);
+     
+        mEditTextLogin.setText(mSettingsMgr.getLogin());
+        mEditNotificationAddress.setText(mSettingsMgr.getNotifiedAddress());
+        mEditTextPassword.setText(mSettingsMgr.getPassword());
 
-        if (_settingsMgr.getConnectOnMainScreenStartup()) {
-             _switchConnection.setChecked(true);
+        if (mSettingsMgr.getConnectOnMainScreenStartup()) {
+             if(mSwitchConnection != null) mSwitchConnection.setChecked(true);
              getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
              Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
         }
         
-        _startStopButton.setOnClickListener(new OnClickListener() {
+        mStartStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                _startStopButton.setText("Connecting...");
-                _settingsMgr.setUseDifferentAccount(true);
-                _settingsMgr.setLogin(_editTextLogin.getText().toString());
-                _settingsMgr.setPassword(_editTextPassword.getText().toString());
-                _settingsMgr.setConnectOnMainScreenStartup(_switchConnection.isChecked());
+                mSettingsMgr.setUseDifferentAccount(true);
+                mSettingsMgr.setLogin(mEditTextLogin.getText().toString());
+                mSettingsMgr.setNotifiedAddress(mEditNotificationAddress.getText().toString());
+                mSettingsMgr.setPassword(mEditTextPassword.getText().toString());
+                if(mSwitchConnection != null) mSettingsMgr.setConnectOnMainScreenStartup(mSwitchConnection.isChecked());
                 
-                getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-                Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
+                Tools.startSvcIntent(getActivity().getBaseContext(), mCurrentAction);
             }
         });
         
         return view;
+    }
+    
+    public void updateStatus(int status) {
+        mStartStopButton.setActivated(true);
+        switch (status) {
+            case XmppManager.CONNECTED:
+                mCurrentAction = MainService.ACTION_DISCONNECT;
+                mStartStopButton.setText(R.string.panel_connection_button_disconnect);
+                break;
+            case XmppManager.DISCONNECTED:
+                mCurrentAction = MainService.ACTION_CONNECT;
+                mStartStopButton.setText(R.string.panel_connection_button_connect);
+                break;
+            case XmppManager.CONNECTING:
+                mStartStopButton.setActivated(false);
+                mStartStopButton.setText(R.string.panel_connection_button_connecting);
+                break;
+            case XmppManager.DISCONNECTING:
+                mStartStopButton.setActivated(false);
+                mStartStopButton.setText(R.string.panel_connection_button_disconnecting);
+                break;
+            case XmppManager.WAITING_TO_CONNECT:
+                mCurrentAction = MainService.ACTION_CONNECT;
+                mStartStopButton.setText(R.string.panel_connection_button_connect);
+                break;
+            case XmppManager.WAITING_FOR_NETWORK:
+                mCurrentAction = MainService.ACTION_CONNECT;
+                mStartStopButton.setText(R.string.panel_connection_button_connect);
+                break;
+            default:
+                throw new IllegalStateException();
+        }
     }
 }
