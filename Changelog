@@ -1,5 +1,6 @@
 Incoming version
 * Command "wappend" & "wsend" to add text as a virtual keyboard and validate the field
+* New UI with Holo theme
 
 3.5
 * Command manager to enable/disable commands

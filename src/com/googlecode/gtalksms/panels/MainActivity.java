@@ -118,22 +118,27 @@ public class MainActivity extends SherlockFragmentActivity {
         mActionBar.addTab(mActionBar.newTab().setText("Connection").setTabListener(new TabListener(mConnectionTabFragment)));
         mActionBar.addTab(mActionBar.newTab().setText("About").setTabListener(new TabListener(mHelpTabFragment)));
        
-        TextView marketLink = (TextView) findViewById(R.id.MarketLink);
-        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.MainLayout);
-        
         if (Tools.isDonateAppInstalled(getBaseContext())) {
-            marketLink.setVisibility(View.GONE);
+            findViewById(R.id.StatusBar).setVisibility(View.GONE);
         } else {
             mAdView = new AdView(this, AdSize.BANNER, "a14e5a583244738");
             mAdView.loadAd(new AdRequest());
             mAdView.setBackgroundColor(Color.TRANSPARENT);
+            
+            LinearLayout mainLayout = (LinearLayout) findViewById(R.id.MainLayout);
             mainLayout.addView(mAdView, 1);
 
-            //        openLink("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted");
-            
+            TextView marketLink = (TextView) findViewById(R.id.MarketLink);
             marketLink.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
                     Tools.openLink(MainActivity.this, "market://details?id=com.googlecode.gtalksmsdonate");
+                }
+            });
+            
+            TextView donateLink = (TextView) findViewById(R.id.DonateLink);
+            donateLink.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    Tools.openLink(MainActivity.this, "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted");
                 }
             });
         }
