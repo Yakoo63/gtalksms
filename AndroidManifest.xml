@@ -43,13 +43,6 @@
         android:restoreAnyVersion="true" 
         android:backupAgent="com.googlecode.gtalksms.tools.MyBackupAgent"
         android:allowBackup="true">
-      <!--   <activity android:name="com.googlecode.gtalksms.panels.MainScreen"
-                  android:label="@string/main_panel">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity> -->
         <activity 
             android:name="com.googlecode.gtalksms.panels.MainActivity"
             android:theme="@style/Theme.Sherlock"
@@ -63,12 +56,6 @@
         </activity>
         <activity android:name="com.googlecode.gtalksms.panels.GeoPopup"
                   android:label="@string/main_panel">
-        </activity>
-        <activity android:name="com.googlecode.gtalksms.panels.wizard.Wizard"
-                  android:label="@string/wizard">
-        </activity>
-        <activity android:name="com.googlecode.gtalksms.panels.CmdManager"
-                  android:label="@string/cmd_manager">
         </activity>
         <activity android:name="com.googlecode.gtalksms.panels.Preferences"
                   android:label="@string/preference_panel">

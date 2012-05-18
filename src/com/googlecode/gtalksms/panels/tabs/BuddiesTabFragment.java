@@ -35,9 +35,12 @@ public class BuddiesTabFragment extends SherlockFragment {
         @SuppressWarnings("unchecked")
         public boolean onItemLongClick(AdapterView<?> a, View v, int position, long id) {
             HashMap<String, String> map = (HashMap<String, String>) mBuddiesListView.getItemAtPosition(position);
-            XmppBuddies.getInstance(getActivity().getBaseContext()).removeFriend(map.get("userid"));
-            mFriends.remove(position);
-            updateBuddiesList();
+            
+            // TODO make a separated thread
+            if (XmppBuddies.getInstance(getActivity().getBaseContext()).removeFriend(map.get("userid")) == true ) {
+                mFriends.remove(position);
+                updateBuddiesList();
+            }
             return true;
         }
     };

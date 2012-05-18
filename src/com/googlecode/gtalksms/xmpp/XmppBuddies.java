@@ -56,7 +56,7 @@ public class XmppBuddies implements RosterListener {
 
     public void addFriend(String userID) {
         if (sRoster != null) {
-            if (sRoster.contains(userID)) {
+            if (!sRoster.contains(userID)) {
                 try {
                     sRoster.createEntry(userID, StringUtils.parseBareAddress(userID), null);
                     retrieveFriendList();

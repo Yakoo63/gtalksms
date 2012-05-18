@@ -324,7 +324,7 @@ public class MainService extends Service {
     }
 
     public Set<CommandHandlerBase> getCommandSet() {
-        return sCommandSet;
+        return new HashSet<CommandHandlerBase>(sCommandSet);
     }
 
     public boolean getTLSStatus() {

@@ -31,7 +31,9 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.panels.tabs.BuddiesTabFragment;
+import com.googlecode.gtalksms.panels.tabs.CommandsTabFragment;
 import com.googlecode.gtalksms.panels.tabs.ConnectionTabFragment;
+import com.googlecode.gtalksms.panels.tabs.HelpTabFragment;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFriend;
@@ -67,6 +69,8 @@ public class MainActivity extends SherlockFragmentActivity {
     private ActionBar mActionBar;
     private ConnectionTabFragment mConnectionTabFragment = new ConnectionTabFragment();
     private BuddiesTabFragment mBuddiesTabFragment = new BuddiesTabFragment();
+    private CommandsTabFragment mCommandsTabFragment = new CommandsTabFragment();
+    private HelpTabFragment mHelpTabFragment = new HelpTabFragment();
      
     private BroadcastReceiver mXmppreceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -88,8 +92,8 @@ public class MainActivity extends SherlockFragmentActivity {
     private ServiceConnection _mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mMainService = ((MainService.LocalBinder) service).getService();
-            updateStatus(mMainService.getConnectionStatus());
             mMainService.updateBuddies();
+            updateStatus(mMainService.getConnectionStatus());
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -108,14 +112,11 @@ public class MainActivity extends SherlockFragmentActivity {
        
         setContentView(R.layout.tab_container);
         mActionBar = getSupportActionBar();
-        
         mActionBar.setDisplayShowTitleEnabled(true);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         mActionBar.addTab(mActionBar.newTab().setText("Connection").setTabListener(new TabListener(mConnectionTabFragment)));
-        mActionBar.addTab(mActionBar.newTab().setText("Buddies").setTabListener(new TabListener(mBuddiesTabFragment)));
-        mActionBar.addTab(mActionBar.newTab().setText("Commands").setTabListener(new TabListener(new BuddiesTabFragment()))); // TO UPDATE!!!
-        mActionBar.addTab(mActionBar.newTab().setText("About").setTabListener(new TabListener(new BuddiesTabFragment()))); // TO UPDATE!!!
+        mActionBar.addTab(mActionBar.newTab().setText("About").setTabListener(new TabListener(mHelpTabFragment)));
        
         TextView marketLink = (TextView) findViewById(R.id.MarketLink);
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.MainLayout);
@@ -128,6 +129,8 @@ public class MainActivity extends SherlockFragmentActivity {
             mAdView.setBackgroundColor(Color.TRANSPARENT);
             mainLayout.addView(mAdView, 1);
 
+            //        openLink("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted");
+            
             marketLink.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
                     Tools.openLink(MainActivity.this, "market://details?id=com.googlecode.gtalksmsdonate");
@@ -205,5 +208,30 @@ public class MainActivity extends SherlockFragmentActivity {
             default:
                 throw new IllegalStateException();
         }
+        
+        if (status == XmppManager.CONNECTED) {
+            mCommandsTabFragment.updateCommands(mMainService.getCommandSet());
+            mActionBar.addTab(mActionBar.newTab().setText("Buddies").setTabListener(new TabListener(mBuddiesTabFragment)), 1);
+            mActionBar.addTab(mActionBar.newTab().setText("Commands").setTabListener(new TabListener(mCommandsTabFragment)), 2);
+        } else {
+            if (removeTab("Buddies") || removeTab("Commands")) {
+                mActionBar.setSelectedNavigationItem(0);
+            }
+        }
+    }
+    
+    private boolean removeTab(String name) {
+        boolean result = false;
+        for (int i = 0 ; i < mActionBar.getTabCount() ; ++i) {
+            if (mActionBar.getTabAt(i).getText().equals(name)) {
+                if (mActionBar.getSelectedNavigationIndex() == i) {
+                    result = true;
+                }
+                
+                mActionBar.removeTabAt(i);
+                i--;
+            }
+        }
+        return result;
     }
 }
