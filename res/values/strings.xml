@@ -2,7 +2,7 @@
 <resources>
     <string name="panel_connection_notif">Account:</string>
     <string name="panel_connection_notif_hint">notification@jabber.org</string>
-    <string name="panel_connection_notif_help">This address will be used to interact with GTalkSMS.</string>
+    <string name="panel_connection_notif_help">This address will be used to interact with GTalkSMS from your computer.</string>
     <string name="panel_connection_login">Login:</string>
     <string name="panel_connection_login_hint">login@jabber.org</string>
     <string name="panel_connection_password">Password:</string>
@@ -11,6 +11,7 @@
     <string name="panel_connection_button_connecting">Connecting..</string>
     <string name="panel_connection_button_disconnect">Disconnect</string>
     <string name="panel_connection_button_disconnecting">Disconnecting&#8230;</string>
+    <string name="panel_connection_button_waiting">Waiting&#8230;</string>
     <string name="panel_connection_button">Connect</string>
     <string name="about_authors">Authors</string>
     <string name="about_change_log">Change Log</string>

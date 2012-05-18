@@ -49,8 +49,7 @@ import com.googlecode.gtalksms.cmd.ToastCmd;
 import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.cmd.WifiCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
-import com.googlecode.gtalksms.panels.MainScreen;
-import com.googlecode.gtalksms.panels.Preferences;
+import com.googlecode.gtalksms.panels.MainActivity;
 import com.googlecode.gtalksms.receivers.PublicIntentReceiver;
 import com.googlecode.gtalksms.receivers.StorageLowReceiver;
 import com.googlecode.gtalksms.tools.CrashedStartCounter;
@@ -92,6 +91,7 @@ public class MainService extends Service {
     public static final int STATUS_ICON_GREEN = 0;
     public static final int STATUS_ICON_ORANGE = 1;
     public static final int STATUS_ICON_RED = 2;
+    public static final int STATUS_ICON_BLUE = 3;
 
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
@@ -385,7 +385,7 @@ public class MainService extends Service {
 
         sUiContext = this;
 
-        sContentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
+        sContentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
 
         Log.i("onCreate(): service thread created - IsRunning is set to true");
         IsRunning = true;
@@ -431,15 +431,15 @@ public class MainService extends Service {
             // A real action request
         } else {
             // check if the user has done his part
-            if (sSettingsMgr.getNotifiedAddress() == null || sSettingsMgr.getNotifiedAddress().equals("") || sSettingsMgr.getNotifiedAddress().equals("your.login@gmail.com")) {
-                Log.w("Preferences not set! Showing preferences page.");
-                displayToast(R.string.main_toast_pref_not_set, null);
-                Intent settingsActivity = new Intent(this, Preferences.class);
-                settingsActivity.putExtra("panel", R.xml.prefs_connection);
-                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(settingsActivity);
-                return START_STICKY;
-            }
+//            if (sSettingsMgr.getNotifiedAddress() == null || sSettingsMgr.getNotifiedAddress().equals("") || sSettingsMgr.getNotifiedAddress().equals("your.login@gmail.com")) {
+//                Log.w("Preferences not set! Showing preferences page.");
+//                displayToast(R.string.main_toast_pref_not_set, null);
+//                Intent settingsActivity = new Intent(this, Preferences.class);
+//                settingsActivity.putExtra("panel", R.xml.prefs_connection);
+//                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(settingsActivity);
+//                return START_STICKY;
+//            }
 
             // redirect the intent to the service handler thread
             sendToServiceHandler(startId, intent);
@@ -596,6 +596,9 @@ public class MainService extends Service {
                 case STATUS_ICON_RED:
                     res = R.drawable.class.getField("status_red_" + index).getInt(null);
                     break;
+                case STATUS_ICON_BLUE:
+                    res = R.drawable.class.getField("status_blue_" + index).getInt(null);
+                    break;
             }
         } catch (Exception e) {
         }
@@ -629,7 +632,7 @@ public class MainService extends Service {
                 case XmppManager.WAITING_FOR_NETWORK:
                     String msgNotif = getString(R.string.main_service_waiting);
                     msg = getString(R.string.main_service_waiting_to_connect);
-                    notification = new Notification(getImageStatus(STATUS_ICON_ORANGE), msgNotif, System.currentTimeMillis());
+                    notification = new Notification(getImageStatus(STATUS_ICON_BLUE), msgNotif, System.currentTimeMillis());
                     break;
                 default:
                     throw new IllegalStateException("onConnectionSTatusChanged: Unkown status int");

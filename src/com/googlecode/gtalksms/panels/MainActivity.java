@@ -14,7 +14,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -49,7 +48,7 @@ public class MainActivity extends SherlockFragmentActivity {
         public void onTabReselected(Tab tab, FragmentTransaction ft) {
             ft.add(R.id.fragment_container, fragment);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        }
+         }
 
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
             ft.add(R.id.fragment_container, fragment);
@@ -66,7 +65,8 @@ public class MainActivity extends SherlockFragmentActivity {
     private MainService mMainService;
     private ActionBar mActionBar;
     private ConnectionTabFragment mConnectionTabFragment = new ConnectionTabFragment();
-    
+    private BuddiesTabFragment mBuddiesTabFragment = new BuddiesTabFragment();
+     
     private BroadcastReceiver mXmppreceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -91,6 +91,7 @@ public class MainActivity extends SherlockFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
         setTitle(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setSupportProgressBarIndeterminateVisibility(false);
@@ -102,10 +103,10 @@ public class MainActivity extends SherlockFragmentActivity {
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         mActionBar.addTab(mActionBar.newTab().setText("Connection").setTabListener(new TabListener(mConnectionTabFragment)));
-        mActionBar.addTab(mActionBar.newTab().setText("Buddies").setTabListener(new TabListener(new BuddiesTabFragment())));
+        mActionBar.addTab(mActionBar.newTab().setText("Buddies").setTabListener(new TabListener(mBuddiesTabFragment)));
         mActionBar.addTab(mActionBar.newTab().setText("Commands").setTabListener(new TabListener(new BuddiesTabFragment()))); // TO UPDATE!!!
         mActionBar.addTab(mActionBar.newTab().setText("About").setTabListener(new TabListener(new BuddiesTabFragment()))); // TO UPDATE!!!
-        
+       
         TextView marketLink = (TextView) findViewById(R.id.MarketLink);
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.MainLayout);
         
@@ -183,16 +184,11 @@ public class MainActivity extends SherlockFragmentActivity {
                 mActionBar.setIcon(R.drawable.icon_red);
                 break;
             case XmppManager.CONNECTING:
-                setSupportProgressBarIndeterminateVisibility(true);
-                mActionBar.setIcon(R.drawable.icon_orange);
-                break;
             case XmppManager.DISCONNECTING:
                 setSupportProgressBarIndeterminateVisibility(true);
                 mActionBar.setIcon(R.drawable.icon_orange);
                 break;
             case XmppManager.WAITING_TO_CONNECT:
-                mActionBar.setIcon(R.drawable.icon_blue);
-                break;
             case XmppManager.WAITING_FOR_NETWORK:
                 mActionBar.setIcon(R.drawable.icon_blue);
                 break;

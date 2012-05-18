@@ -54,7 +54,7 @@
             android:name="com.googlecode.gtalksms.panels.MainActivity"
             android:theme="@style/Theme.Sherlock"
             android:windowSoftInputMode="adjustPan"
-            android:label="string/main_panel">
+            android:label="@string/main_panel">
             
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -9,7 +9,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dip" >
+        android:layout_marginTop="10dip" >
         
         <TextView
             android:layout_width="100dip"
@@ -37,7 +37,7 @@
         android:layout_height="0.45dip"
         android:background="@android:color/darker_gray"
         android:layout_marginTop="15dip"
-        android:layout_marginBottom="15dip" />
+        android:layout_marginBottom="10dip" />
     
     <LinearLayout 
         android:orientation="horizontal"
@@ -64,7 +64,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dip" >
+        android:layout_marginTop="10dip" >
     
 	    <TextView
 	        android:layout_width="100dip"
@@ -80,22 +80,15 @@
 	        android:inputType="textPassword" />
 
 	</LinearLayout>
-    <!-- 
-    <Switch
-        android:id="@+id/switchConnection"
-        android:layout_gravity="right"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/panel_connection_auto_connect"
-        android:layout_marginTop="15dip"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
-     -->
+	
+    <include layout="@layout/tab_connection_auto_connect_switch" />
+    
     <View
 		android:layout_width="fill_parent"
 		android:layout_height="0.45dip"
 		android:background="@android:color/darker_gray"
 		android:layout_marginTop="15dip"
-        android:layout_marginBottom="10dip" />
+        android:layout_marginBottom="5dip" />
     
     <Button
         style="@android:style/Widget.Holo.Button.Borderless"
