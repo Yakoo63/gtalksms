@@ -34,6 +34,7 @@ import com.googlecode.gtalksms.panels.tabs.BuddiesTabFragment;
 import com.googlecode.gtalksms.panels.tabs.ConnectionTabFragment;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.xmpp.XmppFriend;
 
 public class MainActivity extends SherlockFragmentActivity {
     
@@ -70,7 +71,15 @@ public class MainActivity extends SherlockFragmentActivity {
     private BroadcastReceiver mXmppreceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
+            if (action.equals(MainService.ACTION_XMPP_PRESENCE_CHANGED)) {
+                int stateInt = intent.getIntExtra("state", XmppFriend.OFFLINE);
+                String userId = intent.getStringExtra("userid");
+                String userFullId = intent.getStringExtra("fullid");
+                String name = intent.getStringExtra("name");
+                String status = intent.getStringExtra("status");
+
+                mBuddiesTabFragment.updateBuddy(userId, userFullId, name, status, stateInt);
+            } else if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
                 updateStatus(intent.getIntExtra("new_state", 0));
             }
         }
@@ -80,6 +89,7 @@ public class MainActivity extends SherlockFragmentActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mMainService = ((MainService.LocalBinder) service).getService();
             updateStatus(mMainService.getConnectionStatus());
+            mMainService.updateBuddies();
         }
 
         public void onServiceDisconnected(ComponentName className) {

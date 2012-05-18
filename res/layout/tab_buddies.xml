@@ -5,9 +5,36 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
     
+    <LinearLayout 
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip" >
+        
+        <EditText
+            android:id="@+id/editTextBuddyName"
+            android:hint="@string/panel_buddies_add_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:layout_weight="9" />
+        
+        <Button
+	        style="@android:style/Widget.Holo.Button.Borderless"
+	        android:id="@+id/buttonBuddyAdd"
+	        android:layout_width="50dip"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="right"
+	        android:text=""
+	        android:drawableLeft="@drawable/buddy_add"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
+    
     <ListView 
         android:id="@+id/ListViewBuddies" 
         android:layout_width="fill_parent" 
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent"
+        android:layout_marginTop="10dip" />
               
 </LinearLayout>

@@ -54,23 +54,51 @@ public class XmppBuddies implements RosterListener {
         return sXmppBuddies;
     }
 
-//    public void addFriend(String userID) {
-//        Roster roster = null;
-//        String nickname = null;
-//
-//        nickname = StringUtils.parseBareAddress(userID);
-//
-//        roster = _connection.getRoster();
-//        if (!roster.contains(userID)) {
-//            try {
-//                roster.createEntry(userID, nickname, null);
-//            } catch (XMPPException e) {
-//                System.err.println("Error in adding friend");
-//            }
-//        }
-//
-//        return;
-//    }
+    public void addFriend(String userID) {
+        if (sRoster != null) {
+            if (sRoster.contains(userID)) {
+                try {
+                    sRoster.createEntry(userID, StringUtils.parseBareAddress(userID), null);
+                    retrieveFriendList();
+                } catch (XMPPException e) {
+                    System.err.println("Error in adding friend " + e.getMessage());
+                }
+            } else {
+                RosterEntry rosterEntry = sRoster.getEntry(userID);
+                RosterPacket.ItemType type = rosterEntry.getType();
+                switch (type) {
+                    case from:
+                        requestSubscription(userID, sConnection);
+                        break;
+                    case to:
+                        grantSubscription(userID, sConnection);
+                        break;
+                    case none:
+                        grantSubscription(userID, sConnection);
+                        requestSubscription(userID, sConnection);
+                        break;
+                    case both:
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+    
+    public boolean removeFriend(String userID) {
+        if (sConnection != null && sConnection.isConnected()) {
+            Roster roster = sConnection.getRoster();
+            if (roster.contains(userID)) {
+                try {
+                    roster.removeEntry(roster.getEntry(userID));
+                    return true;
+                } catch (XMPPException e) {
+                    System.err.println("Error in removing friend " + e.getMessage());
+                }
+            }
+        }
+        return false;
+    }
     
     /**
      * retrieves the current xmpp rooster
@@ -236,34 +264,7 @@ public class XmppBuddies implements RosterListener {
     }
     
     private void checkNotificationAddressRoster() {
-        if (sRoster != null && sSettings.getUseDifferentAccount()) {
-            if (!sRoster.contains(sSettings.getNotifiedAddress())) {
-                try {
-                    // this sends a new subscription request to the other side
-                    sRoster.createEntry(sSettings.getNotifiedAddress(), sSettings.getNotifiedAddress(), null);
-                } catch (XMPPException e) { /* Ignore */  }
-            } else {
-                RosterEntry rosterEntry = sRoster.getEntry(sSettings.getNotifiedAddress());
-                RosterPacket.ItemType type = rosterEntry.getType();
-                switch (type) {
-                case both:
-                    break;
-                case from:
-                    requestSubscription(sSettings.getNotifiedAddress(), sConnection);
-                    break;
-                case to:
-                    grantSubscription(sSettings.getNotifiedAddress(), sConnection);
-                    break;
-                case none:
-                    grantSubscription(sSettings.getNotifiedAddress(), sConnection);
-                    requestSubscription(sSettings.getNotifiedAddress(), sConnection);
-                    break;
-                default:
-                    break;
-                }
-                
-            }
-        }
+        addFriend(sSettings.getNotifiedAddress());
     }
     
     /**

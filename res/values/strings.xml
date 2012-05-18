@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="panel_buddies_add_hint">buddy@jabber.org</string>
+    <string name="panel_buddies_add_button">Add</string>
     <string name="panel_connection_notif">Account:</string>
     <string name="panel_connection_notif_hint">notification@jabber.org</string>
     <string name="panel_connection_notif_help">This address will be used to interact with GTalkSMS from your computer.</string>

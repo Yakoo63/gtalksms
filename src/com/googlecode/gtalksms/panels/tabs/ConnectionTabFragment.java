@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -53,13 +54,20 @@ public class ConnectionTabFragment extends SherlockFragment {
              Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
         }
         
+        mSwitchConnection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSettingsMgr.setConnectOnMainScreenStartup(mSwitchConnection.isChecked());
+            }
+        });
+        
         mStartStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                // TODO remove this one
                 mSettingsMgr.setUseDifferentAccount(true);
+                
                 mSettingsMgr.setLogin(mEditTextLogin.getText().toString());
                 mSettingsMgr.setNotifiedAddress(mEditNotificationAddress.getText().toString());
                 mSettingsMgr.setPassword(mEditTextPassword.getText().toString());
-                mSettingsMgr.setConnectOnMainScreenStartup(mSwitchConnection.isChecked());
                 
                 Tools.startSvcIntent(getActivity().getBaseContext(), mCurrentAction);
             }
@@ -95,13 +103,11 @@ public class ConnectionTabFragment extends SherlockFragment {
         
         if(mCurrentAction.equals(MainService.ACTION_CONNECT)) {
             mStartStopButton.setEnabled(true);
-            mSwitchConnection.setEnabled(true);
             mEditTextLogin.setEnabled(true);
             mEditNotificationAddress.setEnabled(true);
             mEditTextPassword.setEnabled(true);
         } else {
             mStartStopButton.setEnabled(mCurrentAction.equals(MainService.ACTION_DISCONNECT));
-            mSwitchConnection.setEnabled(false);
             mEditTextLogin.setEnabled(false);
             mEditNotificationAddress.setEnabled(false);
             mEditTextPassword.setEnabled(false);

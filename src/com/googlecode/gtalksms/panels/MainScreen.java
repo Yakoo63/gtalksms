@@ -189,11 +189,7 @@ public class MainScreen extends Activity  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSettingsMgr = SettingsManager.getSettingsManager(this);
-//        MenuItem mi = (MenuItem) findViewById(R.id.wizard);
-//        mi.setEnabled(false);
-        createView();
-        
-        
+        createView();  
     }
 
     /** Called when the activity is first created. */
@@ -209,8 +205,6 @@ public class MainScreen extends Activity  {
     	}
     	
     	boolean isDonate = Tools.isDonateAppInstalled(getBaseContext());
-    	
-    	
     	
         Tools.setLocale(mSettingsMgr, this);
         
@@ -234,8 +228,6 @@ public class MainScreen extends Activity  {
                 startActivity(new Intent(getBaseContext(), About.class));
             }
         });
-
-      
         
         Button donateBtn = (Button) findViewById(R.id.Donate);
         donateBtn.setOnClickListener(new OnClickListener() {

@@ -2,6 +2,7 @@ package com.googlecode.gtalksms.widgets;
 
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 
 public class SwitchCheckBoxCompat {
@@ -26,7 +27,15 @@ public class SwitchCheckBoxCompat {
         } else {
             mCheckBox.setEnabled(isEnabled);
         }
-    }     
+    }
+    
+    public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
+        if (mIsSwitchSupported) {
+            mSwitch.setOnCheckedChangeListener(listener);
+        } else {
+            mCheckBox.setOnCheckedChangeListener(listener);
+        }
+    }  
     
     public void setChecked(boolean isChecked) {
         if (mIsSwitchSupported) {

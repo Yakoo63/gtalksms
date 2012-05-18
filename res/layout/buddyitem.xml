@@ -3,15 +3,16 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="5dip"
     >
  
     <ImageView
         android:id="@+id/buddyState"
-        android:layout_width="50px"
-        android:layout_height="50px"
+        android:layout_width="50dip"
+        android:layout_height="50dip"
         android:scaleType="centerInside"
         android:layout_gravity="center_vertical"
-        android:padding="5px"
+        android:padding="5dip"
         />
  
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,20 +20,21 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:paddingLeft="10px"
+        android:paddingLeft="10dip"
         android:layout_weight="1"
         >
  
         <TextView android:id="@+id/buddyName"
              android:layout_width="fill_parent"
              android:layout_height="fill_parent"
-             android:textSize="16px"
+             android:textSize="16dip"
              android:textStyle="bold"
              />
  
         <TextView android:id="@+id/buddyStatus"
              android:layout_width="fill_parent"
              android:layout_height="fill_parent"
+             android:layout_marginBottom="5dip"
              />
  
     </LinearLayout>
