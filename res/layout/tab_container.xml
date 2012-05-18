@@ -22,7 +22,7 @@
         android:layout_gravity="bottom">  
                            
         <TextView 
-            android:text="Get AdFree Version" 
+            android:text="@string/panel_main_adfree_version" 
             android:id="@+id/MarketLink"
             android:textStyle="bold" 
             android:gravity="center"

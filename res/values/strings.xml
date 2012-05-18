@@ -15,6 +15,7 @@
     <string name="panel_connection_button_disconnecting">Disconnecting&#8230;</string>
     <string name="panel_connection_button_waiting">Waiting&#8230;</string>
     <string name="panel_connection_button">Connect</string>
+    <string name="panel_main_adfree_version">Get AdFree Version</string>
     <string name="about_authors">Authors</string>
     <string name="about_change_log">Change Log</string>
     <string name="about_donors">Donors</string>
@@ -201,6 +202,13 @@
     <string name="chat_welcome">Welcome to GTalkSMS %s. Send \"?\" for getting help.</string>
     <string name="log_panel_acquiring">Acquiring log</string>
     <string name="log_panel_collect">This will collect the GTalkSMS log and create a message for you to send. You will be presented with an editable message - you should send the message to yourself, then attach it to a GTalkSMS issue describing your problem.</string>
+    <string name="main_service_connected">Connected</string>
+    <string name="main_service_connecting">Connecting...</string>
+    <string name="main_service_disconnected">Disconnected</string>
+    <string name="main_service_disconnecting">Disconnecting...</string>
+    <string name="main_service_waiting">Waiting...</string>
+    <string name="main_service_waiting_to_connect">Waiting to connect...</string>
+    <string name="main_toast_pref_not_set">Preferences not set. Please set a valid notification Address</string>
     <string name="or">&#xA0;or&#xA0;</string>
     <string name="preference_panel">Preferences</string>
     <string name="pref_all">Preferences</string>
