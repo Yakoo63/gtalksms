@@ -171,9 +171,11 @@ public class BuddiesTabFragment extends SherlockFragment {
                 return object1.get("userid").compareTo(object2.get("userid"));
             }});
         
-        mBuddiesListView.setAdapter(new SimpleAdapter(
-                getSherlockActivity().getBaseContext(), mFriends, R.layout.buddyitem, 
-                new String[] { "state", "name", "status" }, 
-                new int[] { R.id.buddyState, R.id.buddyName, R.id.buddyStatus }));
+        if (mBuddiesListView != null) {
+            mBuddiesListView.setAdapter(new SimpleAdapter(
+                    getSherlockActivity().getBaseContext(), mFriends, R.layout.buddyitem, 
+                    new String[] { "state", "name", "status" }, 
+                    new int[] { R.id.buddyState, R.id.buddyName, R.id.buddyStatus }));
+        }
     }
 }

@@ -71,45 +71,51 @@ public class ConnectionTabFragment extends SherlockFragment {
                 }
             }
         });
+
         return view;
     }
     
     public void updateStatus(int status) {
         mCurrentStatus = status;
-        mCurrentAction = MainService.ACTION_DISCONNECT;
-        
-        switch (status) {
-            case XmppManager.CONNECTED:
-                mStartStopButton.setText(R.string.panel_connection_button_disconnect);
-                break;
-            case XmppManager.DISCONNECTED:
-                mCurrentAction = MainService.ACTION_CONNECT;
-                mStartStopButton.setText(R.string.panel_connection_button_connect);
-                break;
-            case XmppManager.CONNECTING:
-                mStartStopButton.setText(R.string.panel_connection_button_connecting);
-                break;
-            case XmppManager.DISCONNECTING:
-                mStartStopButton.setText(R.string.panel_connection_button_disconnecting);
-                break;
-            case XmppManager.WAITING_TO_CONNECT:
-            case XmppManager.WAITING_FOR_NETWORK:
-                mStartStopButton.setText(R.string.panel_connection_button_waiting);
-                break;
-            default:
-                throw new IllegalStateException();
+        if (status == XmppManager.DISCONNECTED) {
+            mCurrentAction = MainService.ACTION_CONNECT;
+        } else {
+            mCurrentAction = MainService.ACTION_DISCONNECT;
         }
         
-        if(mCurrentAction.equals(MainService.ACTION_CONNECT)) {
-            mStartStopButton.setEnabled(true);
-            mEditTextLogin.setEnabled(true);
-            mEditNotificationAddress.setEnabled(true);
-            mEditTextPassword.setEnabled(true);
-        } else {
-            mStartStopButton.setEnabled(mCurrentAction.equals(MainService.ACTION_DISCONNECT));
-            mEditTextLogin.setEnabled(false);
-            mEditNotificationAddress.setEnabled(false);
-            mEditTextPassword.setEnabled(false);
+        if (mStartStopButton != null) {
+            switch (status) {
+                case XmppManager.CONNECTED:
+                    mStartStopButton.setText(R.string.panel_connection_button_disconnect);
+                    break;
+                case XmppManager.DISCONNECTED:
+                    mStartStopButton.setText(R.string.panel_connection_button_connect);
+                    break;
+                case XmppManager.CONNECTING:
+                    mStartStopButton.setText(R.string.panel_connection_button_connecting);
+                    break;
+                case XmppManager.DISCONNECTING:
+                    mStartStopButton.setText(R.string.panel_connection_button_disconnecting);
+                    break;
+                case XmppManager.WAITING_TO_CONNECT:
+                case XmppManager.WAITING_FOR_NETWORK:
+                    mStartStopButton.setText(R.string.panel_connection_button_waiting);
+                    break;
+                default:
+                    throw new IllegalStateException();
+            }
+            
+            if(mCurrentAction.equals(MainService.ACTION_CONNECT)) {
+                mStartStopButton.setEnabled(true);
+                mEditTextLogin.setEnabled(true);
+                mEditNotificationAddress.setEnabled(true);
+                mEditTextPassword.setEnabled(true);
+            } else {
+                mStartStopButton.setEnabled(mCurrentAction.equals(MainService.ACTION_DISCONNECT));
+                mEditTextLogin.setEnabled(false);
+                mEditNotificationAddress.setEnabled(false);
+                mEditTextPassword.setEnabled(false);
+            }
         }
     }
 }
