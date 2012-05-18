@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms.panels;
 
+import java.util.ArrayList;
+
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,7 +13,11 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,38 +47,53 @@ import com.googlecode.gtalksms.xmpp.XmppFriend;
 
 public class MainActivity extends SherlockFragmentActivity {
     
-    class TabListener implements ActionBar.TabListener {
+    public class TabListener implements ActionBar.TabListener {
+        private ViewPager mPager;
+        private int mIndex;
 
-        private SherlockFragment fragment;
-
-        public TabListener(SherlockFragment fragment) {
-            this.fragment = fragment;
+        public TabListener(ViewPager pager, int index) {
+            mPager = pager;
+            mIndex = index;
         }
-
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
-            ft.add(R.id.fragment_container, fragment);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-         }
 
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            ft.add(R.id.fragment_container, fragment);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            mPager.setCurrentItem(mIndex);
         }
 
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-            ft.remove(fragment);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        public void onTabReselected(Tab tab, FragmentTransaction ft) {}
+        public void onTabUnselected(Tab tab, FragmentTransaction ft) {}
+    }
+    
+    public static class TabAdapter extends FragmentPagerAdapter {
+        ActionBar mActionBar;
+        ArrayList<SherlockFragment> mFragments;
+        
+        public TabAdapter(FragmentManager fm, ActionBar bar, ArrayList<SherlockFragment> fragments) {
+            super(fm);
+            mActionBar = bar;
+            mFragments = fragments;
+        }
+
+        @Override
+        public int getCount() {
+            return mActionBar.getTabCount();
+        }
+
+        @Override
+        public android.support.v4.app.Fragment getItem(int position) {
+            return mFragments.get(position);
         }
     }
-
-    private AdView mAdView;
+    
     private MainService mMainService;
     private ActionBar mActionBar;
+    private ViewPager mPager;
     private ConnectionTabFragment mConnectionTabFragment = new ConnectionTabFragment();
     private BuddiesTabFragment mBuddiesTabFragment = new BuddiesTabFragment();
     private CommandsTabFragment mCommandsTabFragment = new CommandsTabFragment();
     private HelpTabFragment mHelpTabFragment = new HelpTabFragment();
-     
+    private ArrayList<SherlockFragment> mFragments = new ArrayList<SherlockFragment>();
+    
     private BroadcastReceiver mXmppreceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -128,18 +149,20 @@ public class MainActivity extends SherlockFragmentActivity {
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayShowTitleEnabled(true);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.addTab(mActionBar.newTab().setText("Connection").setTabListener(new TabListener(mConnectionTabFragment)));
-        mActionBar.addTab(mActionBar.newTab().setText("Help / About").setTabListener(new TabListener(mHelpTabFragment)));
+        mPager = (ViewPager)findViewById(R.id.fragment_container);
+        
+        mActionBar.addTab(mActionBar.newTab().setText("Connection").setTabListener(new TabListener(mPager, 0)));
+        mActionBar.addTab(mActionBar.newTab().setText("Help / About").setTabListener(new TabListener(mPager, 1)));
         
         if (Tools.isDonateAppInstalled(getBaseContext())) {
             findViewById(R.id.StatusBar).setVisibility(View.GONE);
         } else {
-            mAdView = new AdView(this, AdSize.BANNER, "a14e5a583244738");
-            mAdView.loadAd(new AdRequest());
-            mAdView.setBackgroundColor(Color.TRANSPARENT);
+            AdView adView = new AdView(this, AdSize.BANNER, "a14e5a583244738");
+            adView.loadAd(new AdRequest());
+            adView.setBackgroundColor(Color.TRANSPARENT);
             
             LinearLayout adsLayout = (LinearLayout) findViewById(R.id.AdsLayout);
-            adsLayout.addView(mAdView);
+            adsLayout.addView(adView);
 
             TextView marketLink = (TextView) findViewById(R.id.MarketLink);
             marketLink.setOnClickListener(new OnClickListener() {
@@ -155,8 +178,23 @@ public class MainActivity extends SherlockFragmentActivity {
                 }
             });
         }
+        
+        mFragments.add(mConnectionTabFragment);
+        mFragments.add(mHelpTabFragment);
+        mFragments.add(mBuddiesTabFragment);
+        mFragments.add(mCommandsTabFragment);
+        
+        mPager.setAdapter(new TabAdapter(getSupportFragmentManager(), mActionBar, mFragments));
+       
+        mPager.setOnPageChangeListener(new OnPageChangeListener() {
+            public void onPageScrollStateChanged(int arg0) {}
+            public void onPageScrolled(int arg0, float arg1, int arg2) {}
+            public void onPageSelected(int index) {
+                mActionBar.getTabAt(index).select();
+            }
+        }); 
     }
-    
+       
     @Override
     public void onPause() {
         super.onPause();
@@ -229,11 +267,14 @@ public class MainActivity extends SherlockFragmentActivity {
         
         if (status == XmppManager.CONNECTED) {
             mCommandsTabFragment.updateCommands(mMainService.getCommandSet());
-            mActionBar.addTab(mActionBar.newTab().setText("Buddies").setTabListener(new TabListener(mBuddiesTabFragment)), 1);
-            mActionBar.addTab(mActionBar.newTab().setText("Commands").setTabListener(new TabListener(mCommandsTabFragment)), 2);
+            mActionBar.addTab(mActionBar.newTab().setText("Buddies").setTabListener(new TabListener(mPager, 2)));
+            mActionBar.addTab(mActionBar.newTab().setText("Commands").setTabListener(new TabListener(mPager, 3)));
         } else {
-            if (removeTab("Buddies") || removeTab("Commands")) {
+            boolean b1 = removeTab("Buddies");
+            boolean b2 = removeTab("Commands");
+            if (b1 || b2) {
                 mActionBar.setSelectedNavigationItem(0);
+                mPager.setCurrentItem(0);
             }
         }
     }
