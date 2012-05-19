@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -166,7 +165,6 @@ public class MainActivity extends SherlockFragmentActivity {
         } else {
             AdView adView = new AdView(this, AdSize.BANNER, "a14e5a583244738");
             adView.loadAd(new AdRequest());
-            adView.setBackgroundColor(Color.TRANSPARENT);
             
             LinearLayout adsLayout = (LinearLayout) findViewById(R.id.AdsLayout);
             adsLayout.addView(adView);
