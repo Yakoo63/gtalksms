@@ -272,17 +272,16 @@ public class MainActivity extends SherlockFragmentActivity {
                 throw new IllegalStateException();
         }
         
+        boolean b1 = removeTab("Buddies");
+        boolean b2 = removeTab("Commands");
+        
         if (status == XmppManager.CONNECTED) {
             mCommandsTabFragment.updateCommands(mMainService.getCommandSet());
             mActionBar.addTab(mActionBar.newTab().setText("Buddies").setTabListener(new TabListener(mPager, 2)));
             mActionBar.addTab(mActionBar.newTab().setText("Commands").setTabListener(new TabListener(mPager, 3)));
-        } else {
-            boolean b1 = removeTab("Buddies");
-            boolean b2 = removeTab("Commands");
-            if (b1 || b2) {
-                mActionBar.setSelectedNavigationItem(0);
-                mPager.setCurrentItem(0);
-            }
+        } else if (b1 || b2) {
+            mActionBar.setSelectedNavigationItem(0);
+            mPager.setCurrentItem(0);
         }
     }
     
