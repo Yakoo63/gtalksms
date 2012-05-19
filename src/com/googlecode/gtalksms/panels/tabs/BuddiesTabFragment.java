@@ -1,6 +1,8 @@
 package com.googlecode.gtalksms.panels.tabs;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -125,6 +127,11 @@ public class BuddiesTabFragment extends SherlockFragment {
         
         mBuddiesListView.setOnItemClickListener(mOnBuddySelected);
         mBuddiesListView.setAdapter(mCurrentBuddyAdapter = new BuddyAdapter(getSherlockActivity(), R.layout.tab_buddies_item, mAdapterArray));
+        mCurrentBuddyAdapter.sort(new Comparator<Buddy>(){
+            public int compare(Buddy b1, Buddy b2) {
+                return b1.getName().compareToIgnoreCase(b2.getName());
+            } 
+        });
         
         return view;
     }
