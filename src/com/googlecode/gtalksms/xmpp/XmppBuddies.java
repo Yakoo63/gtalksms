@@ -100,6 +100,17 @@ public class XmppBuddies implements RosterListener {
         return false;
     }
     
+    public boolean renameFriend(String userID, String name) {
+        if (sConnection != null && sConnection.isConnected()) {
+            Roster roster = sConnection.getRoster();
+            if (roster.contains(userID)) {
+                RosterEntry entry  = roster.getEntry(userID);
+                entry.setName(name);
+            }
+        }
+        return false;
+    }
+    
     /**
      * retrieves the current xmpp rooster
      * and sends a broadcast ACTION_XMPP_PRESENCE_CHANGED
