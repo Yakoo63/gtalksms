@@ -1,6 +1,5 @@
 package com.googlecode.gtalksms.panels.tabs;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,6 +10,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -279,6 +279,9 @@ public class BuddiesTabFragment extends SherlockFragment {
                     mAdapterArray.remove(buddy);
                     updateBuddiesList();
                     
+                    ImageView button = (ImageView)v;
+                    button.performHapticFeedback( HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
+
                     new Thread(new Runnable() { public void run() {
                         XmppBuddies.getInstance(getActivity().getBaseContext()).removeFriend(buddy.getUserId());
                     }}).start();
