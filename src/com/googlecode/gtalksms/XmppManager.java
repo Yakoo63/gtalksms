@@ -467,38 +467,19 @@ public class XmppManager {
         // everything is ready for a connection attempt
         updateStatus(CONNECTING);
 
-        // create a new connection if the connection is obsolete or if the
-        // old connection is still active
-        if (SettingsManager.connectionSettingsObsolete 
-                || mConnection == null 
-                || mConnection.isConnected() ) {
-            
-            try {
-                connection = createNewConnection(mSettings);
-            } catch (Exception e) {
-                // connection failure
-                Log.e("Exception creating new XMPP Connection", e);
-                maybeStartReconnect();
-                return;
-            }
-            SettingsManager.connectionSettingsObsolete = false;
-            if (!connectAndAuth(connection)) {
-                // connection failure
-                return;
-            }                  
-            sNewConnectionCount++;
-        } else {
-            // reuse the old connection settings
-            connection = mConnection;
-            // we reuse the xmpp connection so only connect() is needed
-            if (!connectAndAuth(connection)) {
-                // connection failure
-                return;
-            }
-            sReusedConnectionCount++;
+        try {
+            connection = createNewConnection(mSettings);
+        } catch (Exception e) {
+            // connection failure
+            Log.e("Exception creating new XMPP Connection", e);
+            maybeStartReconnect();
+            return;
         }
-        // this code is only executed if we have an connection established
-        onConnectionEstablished(connection);
+        SettingsManager.connectionSettingsObsolete = false;
+        
+        if (connectAndAuth(connection)) {
+            onConnectionEstablished(connection);
+        }
     }
     
     private void onConnectionEstablished(XMPPConnection connection) {
