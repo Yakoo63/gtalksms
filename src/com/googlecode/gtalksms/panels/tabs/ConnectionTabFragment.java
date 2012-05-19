@@ -50,7 +50,7 @@ public class ConnectionTabFragment extends SherlockFragment {
         mEditTextPassword.setText(mSettingsMgr.getPassword());
         mSwitchConnection.setChecked(mSettingsMgr.getConnectOnMainScreenStartup());
         
-        if (mSettingsMgr.getConnectOnMainScreenStartup()) {
+        if (mSwitchConnection.isChecked()) {
              Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
         }
         

@@ -68,9 +68,9 @@ public class MainActivity extends SherlockFragmentActivity {
         ActionBar mActionBar;
         ArrayList<SherlockFragment> mFragments;
         
-        public TabAdapter(FragmentManager fm, ActionBar bar, ArrayList<SherlockFragment> fragments) {
+        public TabAdapter(FragmentManager fm, ActionBar actionBar, ArrayList<SherlockFragment> fragments) {
             super(fm);
-            mActionBar = bar;
+            mActionBar = actionBar;
             mFragments = fragments;
         }
 
@@ -81,6 +81,13 @@ public class MainActivity extends SherlockFragmentActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
+            if (position >= mFragments.size()) {
+                return mFragments.get(mFragments.size() - 1);
+            } 
+            if (position < 0) {
+                return mFragments.get(0);
+            }
+            
             return mFragments.get(position);
         }
     }

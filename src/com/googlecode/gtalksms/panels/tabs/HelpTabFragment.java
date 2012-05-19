@@ -68,7 +68,7 @@ public class HelpTabFragment extends SherlockFragment {
         mTextViewConsole.setText("");
         mTextViewConsole.append(StringFmt.Fmt(getString(R.string.about_website) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
         mTextViewConsole.append(getString(R.string.about_website_help));
-        mTextViewConsole.append(StringFmt.Url("\thttp://code.google.com/p/gtalksms\n"));
+        mTextViewConsole.append(StringFmt.Url("\thttp://code.google.com/p/GTalkSMS\n", "http://code.google.com/p/gtalksms"));
         
         mTextViewConsole.append(getString(R.string.about_rate_help));
         mTextViewConsole.append(StringFmt.Url(getString(R.string.about_rate), "market://details?id=com.googlecode.gtalksms"));
