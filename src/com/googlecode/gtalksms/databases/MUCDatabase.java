@@ -12,7 +12,7 @@ import android.database.Cursor;
  *
  */
 public class MUCDatabase extends Database {
-	
+    
     public MUCDatabase(Context ctx) {
         super(ctx); 
     }

@@ -16,7 +16,7 @@ public class BatteryCmd extends CommandHandlerBase {
     private static final String PSRC_AC = "AC";
     private static final String PSRC_BATT = "Battery";
     private static final String PSRC_UNKOWN = "Unknown";
-	
+    
     private static boolean sReceiverRegistered = false; 
     private static BroadcastReceiver sBatInfoReceiver = null;
     private static int sLastKnownPercentage = -1; // flag so the BroadcastReceiver can set the percentage
@@ -76,29 +76,29 @@ public class BatteryCmd extends CommandHandlerBase {
      * 
      * @param force - always send the battery information via an XMPP message
      */
-	private void sendBatteryInfos(boolean force) {
-		if (force || mustNotifyUser()) {
-			send(R.string.chat_battery_level, sLastKnownPercentage);
-			updateBatteryInformation();
-		}
-		if (sSettingsMgr.notifyBatteryInStatus &&
-		// set only if something has changed
-				batteryInformationChanged()) {
-			// send detailed information when on AC or USB
-			if (sLastKnownPowerSource.equals(PSRC_AC) || sLastKnownPowerSource.equals(PSRC_USB)) {
-				sXmppPresenceStatus.setPowerInfo(sLastKnownPercentage + "%", sLastKnownPowerSource);
-			} else {
-				String lastRange = intToRange(sLastSendPercentage);
-				String newRange = intToRange(sLastKnownPercentage);
-				if (!sLastKnownPowerSource.equals(sLastSendPowersource)
-						|| !lastRange.equals(newRange)) {
-					sXmppPresenceStatus.setPowerInfo(newRange + "%", sLastKnownPowerSource);
-				}
-			}
-			updateBatteryInformation();
-		}
+    private void sendBatteryInfos(boolean force) {
+        if (force || mustNotifyUser()) {
+            send(R.string.chat_battery_level, sLastKnownPercentage);
+            updateBatteryInformation();
+        }
+        if (sSettingsMgr.notifyBatteryInStatus &&
+        // set only if something has changed
+                batteryInformationChanged()) {
+            // send detailed information when on AC or USB
+            if (sLastKnownPowerSource.equals(PSRC_AC) || sLastKnownPowerSource.equals(PSRC_USB)) {
+                sXmppPresenceStatus.setPowerInfo(sLastKnownPercentage + "%", sLastKnownPowerSource);
+            } else {
+                String lastRange = intToRange(sLastSendPercentage);
+                String newRange = intToRange(sLastKnownPercentage);
+                if (!sLastKnownPowerSource.equals(sLastSendPowersource)
+                        || !lastRange.equals(newRange)) {
+                    sXmppPresenceStatus.setPowerInfo(newRange + "%", sLastKnownPowerSource);
+                }
+            }
+            updateBatteryInformation();
+        }
 
-	}
+    }
     
     /**
      * Checks if the preconditions for an automatic notification about the
@@ -106,26 +106,26 @@ public class BatteryCmd extends CommandHandlerBase {
      * 
      * @return
      */
-	private boolean mustNotifyUser() {
-		if (sSettingsMgr.notifyBattery
-				&& batteryInformationChanged()
-				&& sLastKnownPercentage
-						% sSettingsMgr.batteryNotificationIntervalInt == 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    private boolean mustNotifyUser() {
+        if (sSettingsMgr.notifyBattery
+                && batteryInformationChanged()
+                && sLastKnownPercentage
+                        % sSettingsMgr.batteryNotificationIntervalInt == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     
     private void updateBatteryInformation() {
         sLastSendPercentage = sLastKnownPercentage;
         sLastSendPowersource = sLastKnownPowerSource;
     }
     
-	private boolean batteryInformationChanged() {
-		return sLastKnownPercentage != sLastSendPercentage
-				|| !sLastKnownPowerSource.equals(sLastSendPowersource);
-	}
+    private boolean batteryInformationChanged() {
+        return sLastKnownPercentage != sLastSendPercentage
+                || !sLastKnownPowerSource.equals(sLastSendPowersource);
+    }
     
     private void notifyAndSave(int level, String powerSource) {
         sLastKnownPowerSource = powerSource;
@@ -152,13 +152,13 @@ public class BatteryCmd extends CommandHandlerBase {
     }
 
     private static String intToRange(int in) {
-    	int lowerBound = (in / 5) * STEP;
-    	if (lowerBound != 100) {
-    	int upperBound = lowerBound + STEP;
-    		return lowerBound + "-" + upperBound;
-    	} else {
-    		return Integer.toString(lowerBound);
-    	}
+        int lowerBound = (in / 5) * STEP;
+        if (lowerBound != 100) {
+        int upperBound = lowerBound + STEP;
+            return lowerBound + "-" + upperBound;
+        } else {
+            return Integer.toString(lowerBound);
+        }
     }
 
     @Override

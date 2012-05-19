@@ -134,12 +134,12 @@ public class LocationService extends Service {
         
         // try to enable the GPS
         if (!getGPSStatus()) {
-			try {
-				setGPSStatus(true);
-			} catch (Exception e) {
-				send("Could not enable GPS: " + e);
-			}
-		}
+            try {
+                setGPSStatus(true);
+            } catch (Exception e) {
+                send("Could not enable GPS: " + e);
+            }
+        }
         
         _locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
@@ -185,11 +185,11 @@ public class LocationService extends Service {
     }
     
     private void send(String message) {
-    	Tools.send(message, answerTo, this);
+        Tools.send(message, answerTo, this);
     }
     
     private void send(XmppMsg msg) {
-    	Tools.send(msg, answerTo, this);
+        Tools.send(msg, answerTo, this);
     }
 
     /** 

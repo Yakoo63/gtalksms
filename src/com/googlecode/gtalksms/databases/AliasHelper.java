@@ -30,10 +30,10 @@ public class AliasHelper {
     }
     
     public static AliasHelper getAliasHelper(Context ctx) {
-    	if (aliasHelper == null) {
-    		aliasHelper = new AliasHelper(ctx);
-    	}
-    	return aliasHelper;
+        if (aliasHelper == null) {
+            aliasHelper = new AliasHelper(ctx);
+        }
+        return aliasHelper;
     }
     
     /**

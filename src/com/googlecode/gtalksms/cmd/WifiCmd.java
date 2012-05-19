@@ -16,13 +16,13 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 public class WifiCmd extends CommandHandlerBase {
     
     private static final int RSSI_LEVEL = 5;
-	
-	private static WifiManager sWifiManager;
+    
+    private static WifiManager sWifiManager;
 
     public WifiCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("wifi", "wlan"));
         if (sWifiManager == null) {
-        	sWifiManager = (WifiManager) mainService.getSystemService(Context.WIFI_SERVICE);
+            sWifiManager = (WifiManager) mainService.getSystemService(Context.WIFI_SERVICE);
         }
     }
 
@@ -30,95 +30,95 @@ public class WifiCmd extends CommandHandlerBase {
         String[] sArgs = splitArgs(args);
         
         if (sArgs[0].equals("on")) {
-        	enableWifi();
+            enableWifi();
         } else if (sArgs[0].equals("off")) {
-        	disableWifi();
+            disableWifi();
         } else if (sArgs[0].equals("state") || args.equals("")) {
-        	sendStatus();
+            sendStatus();
         } else if (sArgs[0].equals("list")) {
-        	listNetworks();
+            listNetworks();
         } else if (sArgs[0].equals("enable")) {
-        	enableNetwork(sArgs);
+            enableNetwork(sArgs);
         } else if (sArgs[0].equals("disable")) {
-        	disableNetwork(sArgs);
+            disableNetwork(sArgs);
         } else {
             send("Unkown argument \"" + args + "\" for command \"" + cmd + "\"");
         }
     }
     private void listNetworks() {
-    	XmppMsg msg = new XmppMsg();
-    	List<WifiConfiguration> networks = sWifiManager.getConfiguredNetworks();
-    	for (WifiConfiguration w : networks) {
-    		msg.appendBold("ID: ");
-    		msg.append(w.networkId);
-    		msg.appendBold(" Name: ");
-    		msg.append(w.SSID);
-    		msg.appendBold(" Status: ");
-    		String status;
-    		switch(w.status) {
-			case WifiConfiguration.Status.CURRENT:
-				status = "Current connected network";
-				break;
-			case WifiConfiguration.Status.ENABLED:
-				status = "Enabled";
-				break;
-			case WifiConfiguration.Status.DISABLED:
-				status = "Disabled";
-				break;
-			default:
-				status = "Unkown";
-				break;
-    		}
-    		msg.append(status);
-    		msg.newLine();
-    	}
-    	send(msg);
+        XmppMsg msg = new XmppMsg();
+        List<WifiConfiguration> networks = sWifiManager.getConfiguredNetworks();
+        for (WifiConfiguration w : networks) {
+            msg.appendBold("ID: ");
+            msg.append(w.networkId);
+            msg.appendBold(" Name: ");
+            msg.append(w.SSID);
+            msg.appendBold(" Status: ");
+            String status;
+            switch(w.status) {
+            case WifiConfiguration.Status.CURRENT:
+                status = "Current connected network";
+                break;
+            case WifiConfiguration.Status.ENABLED:
+                status = "Enabled";
+                break;
+            case WifiConfiguration.Status.DISABLED:
+                status = "Disabled";
+                break;
+            default:
+                status = "Unkown";
+                break;
+            }
+            msg.append(status);
+            msg.newLine();
+        }
+        send(msg);
     }
     
     private void enableNetwork(String[] args) {
-    	if (args.length == 2) {
-    		int id = Integer.parseInt(args[1]);
-    		if (sWifiManager.enableNetwork(id, false)) {
-    		    send("Successfully enabled network with ID " + id);
-    		} else {
-    		    send("Could not enable network with ID" + id);
-    		}
-    	} else {
-    		send("Error enabling network");
-    	}
+        if (args.length == 2) {
+            int id = Integer.parseInt(args[1]);
+            if (sWifiManager.enableNetwork(id, false)) {
+                send("Successfully enabled network with ID " + id);
+            } else {
+                send("Could not enable network with ID" + id);
+            }
+        } else {
+            send("Error enabling network");
+        }
     }
     
     private void disableNetwork(String[] args) {
-    	if (args.length == 2) {
-    		int id = Integer.parseInt(args[1]);
-    		if (sWifiManager.disableNetwork(id)) {
-    		    send("Successfully disabled network with ID " + id);
-    		} else {
-    		    send("Could not disable network with ID " + id);
-    		}
-    	} else {
-    		send("Error disabling network");
-    	}
+        if (args.length == 2) {
+            int id = Integer.parseInt(args[1]);
+            if (sWifiManager.disableNetwork(id)) {
+                send("Successfully disabled network with ID " + id);
+            } else {
+                send("Could not disable network with ID " + id);
+            }
+        } else {
+            send("Error disabling network");
+        }
     }
     
     private void enableWifi() {
-    	send("Enabling Wifi");
-    	boolean ret = sWifiManager.setWifiEnabled(true);
-    	if (ret) {
-    		send("Enabled Wifi");
-    	} else {
-    		send("Could not enable Wifi");
-    	}
+        send("Enabling Wifi");
+        boolean ret = sWifiManager.setWifiEnabled(true);
+        if (ret) {
+            send("Enabled Wifi");
+        } else {
+            send("Could not enable Wifi");
+        }
     }
     
     private void disableWifi() {
-    	send("Disabling Wifi");
-    	boolean ret = sWifiManager.setWifiEnabled(false);
-    	if (ret) {
-    		send("Disabled Wifi");
-    	} else {
-    		send("Could not disable Wifi");
-    	}
+        send("Disabling Wifi");
+        boolean ret = sWifiManager.setWifiEnabled(false);
+        if (ret) {
+            send("Disabled Wifi");
+        } else {
+            send("Could not disable Wifi");
+        }
     }
     
     public void sendStatus() {
@@ -127,29 +127,29 @@ public class WifiCmd extends CommandHandlerBase {
     
     private static XmppMsg getStatus() {
         XmppMsg res = new XmppMsg();
-    	int status = sWifiManager.getWifiState();
-    	String statusStr;
-    	switch (status) {
-    	case WifiManager.WIFI_STATE_DISABLED:
-    		statusStr = "disabled";
-    		break;
-    	case WifiManager.WIFI_STATE_DISABLING:
-    		statusStr = "disabling";
-    		break;
-    	case WifiManager.WIFI_STATE_ENABLED:
-    		statusStr = "enabled";
-    		break;
-    	case WifiManager.WIFI_STATE_ENABLING:
-    		statusStr = "enabling";
-    		break;
-    	default:
-    		statusStr = "unkown";
-    		break;
-    	}    	
-    	res.append("Wifi state is ");
-    	res.appendBold(statusStr);
-    	res.newLine();
-    	
+        int status = sWifiManager.getWifiState();
+        String statusStr;
+        switch (status) {
+        case WifiManager.WIFI_STATE_DISABLED:
+            statusStr = "disabled";
+            break;
+        case WifiManager.WIFI_STATE_DISABLING:
+            statusStr = "disabling";
+            break;
+        case WifiManager.WIFI_STATE_ENABLED:
+            statusStr = "enabled";
+            break;
+        case WifiManager.WIFI_STATE_ENABLING:
+            statusStr = "enabling";
+            break;
+        default:
+            statusStr = "unkown";
+            break;
+        }        
+        res.append("Wifi state is ");
+        res.appendBold(statusStr);
+        res.newLine();
+        
         boolean supplicant_alive = sWifiManager.pingSupplicant();
         String supplicant_status;
         if (supplicant_alive) {
@@ -157,44 +157,44 @@ public class WifiCmd extends CommandHandlerBase {
         } else {
             supplicant_status = "WPA Supplicant is NOT responding";
         }
-    	res.appendLine(supplicant_status);
-    	
-    	WifiInfo info = sWifiManager.getConnectionInfo();
-    	if (info != null) {
-    	    res.newLine();
-    	    String bssid = info.getBSSID();
-    	    String ip = Tools.ipIntToString(info.getIpAddress());
-    	    String ssid = info.getSSID();
-    	    int rssi = info.getRssi();
-    	    
-    	    // bssid
-    	    res.appendBold("BSSID: ");
-    	    res.appendLine(bssid);
-    	    // ssid
-    	    res.appendBold("SSID: ");
-    	    res.appendLine(ssid);
-    	    // ip
-    	    res.appendBold("IP: ");
-    	    res.appendLine(ip);
-    	    // link speed
-    	    res.appendBold("Current link speed: ");
-    	    res.append(info.getLinkSpeed());
-    	    res.appendLine(WifiInfo.LINK_SPEED_UNITS);
-    	    // rssi
-    	    res.appendBold("Received signal strength indicator: ");
-    	    res.appendLine(rssi);
-    	    // rssi - level
-    	    res.appendBold("RSSI on a scale from 1 to " + RSSI_LEVEL + ": ");
-    	    res.appendLine(Integer.toString(WifiManager.calculateSignalLevel(rssi, RSSI_LEVEL)));
-    	}
-    	
-    	DhcpInfo dhcpInfo = sWifiManager.getDhcpInfo();
-    	if (dhcpInfo != null) {    	  
-    	    res.newLine();
-    	    res.appendBoldLine("DHCP Info");
-    	    res.appendBold("DNS1: ");
-    	    res.appendLine(Tools.ipIntToString(dhcpInfo.dns1));
-    	    res.appendBold("DNS2: ");
+        res.appendLine(supplicant_status);
+        
+        WifiInfo info = sWifiManager.getConnectionInfo();
+        if (info != null) {
+            res.newLine();
+            String bssid = info.getBSSID();
+            String ip = Tools.ipIntToString(info.getIpAddress());
+            String ssid = info.getSSID();
+            int rssi = info.getRssi();
+            
+            // bssid
+            res.appendBold("BSSID: ");
+            res.appendLine(bssid);
+            // ssid
+            res.appendBold("SSID: ");
+            res.appendLine(ssid);
+            // ip
+            res.appendBold("IP: ");
+            res.appendLine(ip);
+            // link speed
+            res.appendBold("Current link speed: ");
+            res.append(info.getLinkSpeed());
+            res.appendLine(WifiInfo.LINK_SPEED_UNITS);
+            // rssi
+            res.appendBold("Received signal strength indicator: ");
+            res.appendLine(rssi);
+            // rssi - level
+            res.appendBold("RSSI on a scale from 1 to " + RSSI_LEVEL + ": ");
+            res.appendLine(Integer.toString(WifiManager.calculateSignalLevel(rssi, RSSI_LEVEL)));
+        }
+        
+        DhcpInfo dhcpInfo = sWifiManager.getDhcpInfo();
+        if (dhcpInfo != null) {          
+            res.newLine();
+            res.appendBoldLine("DHCP Info");
+            res.appendBold("DNS1: ");
+            res.appendLine(Tools.ipIntToString(dhcpInfo.dns1));
+            res.appendBold("DNS2: ");
             res.appendLine(Tools.ipIntToString(dhcpInfo.dns2));
             res.appendBold("Gateway: ");
             res.appendLine(Tools.ipIntToString(dhcpInfo.gateway));
@@ -207,9 +207,9 @@ public class WifiCmd extends CommandHandlerBase {
             res.appendBold("DHCP Server IP: ");
             res.appendLine(Tools.ipIntToString(dhcpInfo.serverAddress));
             
-    	}
-    	
-    	return res;    	
+        }
+        
+        return res;        
     }
     
     @Override

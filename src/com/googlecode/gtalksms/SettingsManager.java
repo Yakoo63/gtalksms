@@ -136,9 +136,9 @@ public class SettingsManager {
     private OnSharedPreferenceChangeListener mChangeListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-			if (debugLog) {
-				Log.i(Tools.LOG_TAG, "Preferences updated: key=" + key);
-			}
+            if (debugLog) {
+                Log.i(Tools.LOG_TAG, "Preferences updated: key=" + key);
+            }
             importPreferences();
             OnPreferencesUpdated(key);
         }
@@ -182,25 +182,25 @@ public class SettingsManager {
     }
     
     public boolean SharedPreferencesContains(String key) {
-    	return mSharedPreferences.contains(key);
+        return mSharedPreferences.contains(key);
     }
 
     public void OnPreferencesUpdated(String key) {
-    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
-    		BackupManager.dataChanged(mContext.getPackageName());
-    	}
-    	for (String s : xmppConnectionSettings) {
-    	    if (s.equals(key)) {
-    	        connectionSettingsObsolete = true;
-    	    }
-    	}
-    	if (key.equals("locale")) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
+            BackupManager.dataChanged(mContext.getPackageName());
+        }
+        for (String s : xmppConnectionSettings) {
+            if (s.equals(key)) {
+                connectionSettingsObsolete = true;
+            }
+        }
+        if (key.equals("locale")) {
             Tools.setLocale(this, mContext);
-    	}
+        }
     }
     
     /** imports the preferences */
-	private void importPreferences() {	   
+    private void importPreferences() {       
         serverHost = mSharedPreferences.getString("serverHost", "");
         serverPort = mSharedPreferences.getInt("serverPort", 0);
         
@@ -294,5 +294,5 @@ public class SettingsManager {
         
         // reply command settings
         dontDisplayRecipient = false; // TODO
-	}
+    }
 }

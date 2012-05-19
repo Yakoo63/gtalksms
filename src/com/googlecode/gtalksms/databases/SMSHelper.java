@@ -12,7 +12,7 @@ import android.content.Context;
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
  *
  */
-public class SMSHelper {	
+public class SMSHelper {    
     private static SMSHelper smsHelper = null;
     
     /**
@@ -24,10 +24,10 @@ public class SMSHelper {
     }
     
     public static SMSHelper getSMSHelper(Context ctx) {
-    	if (smsHelper == null) {
-    		smsHelper = new SMSHelper(ctx);
-    	}    	
-    	return smsHelper;
+        if (smsHelper == null) {
+            smsHelper = new SMSHelper(ctx);
+        }        
+        return smsHelper;
     }
     
     public boolean addSMS(Sms sms) {
@@ -85,9 +85,9 @@ public class SMSHelper {
                 SMSDatabase.putSentIntent(smsID, sentIntent.toString());
             } else {
                 GoogleAnalyticsHelper.trackAndLogError("SMSHelper.setSentIntent() OutOfBounds: " +
-                		"partNum=" + partNum +
-                		" length=" + sentIntent.length +
-                		" sentIntentSTr= " + sentIntentStr);
+                        "partNum=" + partNum +
+                        " length=" + sentIntent.length +
+                        " sentIntentSTr= " + sentIntentStr);
             }
         } // TODO handle null case
     }

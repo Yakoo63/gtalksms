@@ -817,18 +817,18 @@ public class MainService extends Service {
      * @return
      */
     public static boolean sendToServiceHandler(int i, Intent intent) {
-    	if (sServiceHandler != null) {
+        if (sServiceHandler != null) {
             Message msg = sServiceHandler.obtainMessage();
             msg.arg1 = i;
             msg.obj = intent;
             sServiceHandler.sendMessage(msg);
             return true;
-    	} else {
-    		Log.w("sendToServiceHandler() called with " 
-    				+ intent.getAction() 
-    				+ " when service handler is null");
-    		return false;
-    	}
+        } else {
+            Log.w("sendToServiceHandler() called with " 
+                    + intent.getAction() 
+                    + " when service handler is null");
+            return false;
+        }
     }
 
     /**
@@ -837,6 +837,6 @@ public class MainService extends Service {
      * @return
      */
     public static boolean sendToServiceHandler(Intent intent) {
-    	return sendToServiceHandler(0, intent);
+        return sendToServiceHandler(0, intent);
     }
 }

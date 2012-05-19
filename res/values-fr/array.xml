@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="list_locale_entries">
-		<item>Langue par défaut</item>
-		<item>Français</item>
-		<item>Allemand</item>
-		<item>Anglais</item>
-	</string-array>
+    <string-array name="list_locale_entries">
+        <item>Langue par défaut</item>
+        <item>Français</item>
+        <item>Allemand</item>
+        <item>Anglais</item>
+    </string-array>
     <string-array name="list_smsNotificationType_entries">
         <item>Aucune notification</item>
         <item>Dans des conversations séparées par contact</item>

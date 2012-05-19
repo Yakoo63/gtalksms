@@ -32,10 +32,10 @@ public class Sms implements Comparable<Sms> {
      * @param date
      */
     public Sms(String phoneNumber, String message, Date date, String receiver) {
-    	this.setNumber(phoneNumber);
-    	this.setMessage(message);
-    	this.date = date;
-    	this.receiver = receiver;
+        this.setNumber(phoneNumber);
+        this.setMessage(message);
+        this.date = date;
+        this.receiver = receiver;
     }
     
     /**
@@ -88,17 +88,17 @@ public class Sms implements Comparable<Sms> {
     }
 
     public boolean sentIntentsComplete() {
-    	for (int i = 0; i < sentIntents.length; i++) {
-    		if (sentIntents[i] == false) return false;
-    	}
-    	return true;
+        for (int i = 0; i < sentIntents.length; i++) {
+            if (sentIntents[i] == false) return false;
+        }
+        return true;
     }
     
     public boolean delIntentsComplete() {
-    	for (int i = 0; i < delIntents.length; i++) {
-    		if (delIntents[i] == false) return false;
-    	}
-    	return true;
+        for (int i = 0; i < delIntents.length; i++) {
+            if (delIntents[i] == false) return false;
+        }
+        return true;
     }
 
     @Override

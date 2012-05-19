@@ -290,7 +290,7 @@ public class XmppManager {
                 start(XmppManager.WAITING_TO_CONNECT);
                 break;
             case XmppManager.WAITING_TO_CONNECT:
-            	break;
+                break;
             case XmppManager.WAITING_FOR_NETWORK:
                 cleanupConnection();
                 start(XmppManager.CONNECTED);
@@ -310,7 +310,7 @@ public class XmppManager {
                 break;
             case XmppManager.WAITING_TO_CONNECT:
                 cleanupConnection();
-            	break;
+                break;
             case XmppManager.WAITING_FOR_NETWORK:
                 break;
             default:
@@ -693,7 +693,7 @@ public class XmppManager {
     }
     
     public boolean getCompressionStatus() {
-    	return mConnection == null ? false : mConnection.isUsingCompression();
+        return mConnection == null ? false : mConnection.isUsingCompression();
     }
     
     /**
@@ -760,7 +760,7 @@ public class XmppManager {
                     // It would be nice if there was a better way to detect 
                     // an Android gTalk XMPP client, but currently there is none
                     if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
-                    	toList.add(toPresence);
+                        toList.add(toPresence);
                     }
                 }
                 if (toList.size() > 0) {

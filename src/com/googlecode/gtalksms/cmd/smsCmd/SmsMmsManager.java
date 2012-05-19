@@ -101,19 +101,19 @@ public class SmsMmsManager {
 
         if (c != null) {
             for (boolean hasData = c.moveToFirst(); hasData && (getMax || smsCount < maxSms); hasData = c.moveToNext(), ++smsCount) {
-            	Long rawId = Tools.getLong(c, "person");
-            	String address = Tools.getString(c, "address");
-            	String addressName = ContactsManager.getContactName(_context, address);
-            	
-            	// Sometime, if it's only an external contact to gmail (exchange by instance)
-            	// the rawId is not set and with have to check the address (phone number)
-            	if (!outgoingSms && rawId == 0 && sender != null && addressName.compareTo(sender) != 0) {
-            		smsCount--;
-                	continue;
+                Long rawId = Tools.getLong(c, "person");
+                String address = Tools.getString(c, "address");
+                String addressName = ContactsManager.getContactName(_context, address);
+                
+                // Sometime, if it's only an external contact to gmail (exchange by instance)
+                // the rawId is not set and with have to check the address (phone number)
+                if (!outgoingSms && rawId == 0 && sender != null && addressName.compareTo(sender) != 0) {
+                    smsCount--;
+                    continue;
                 }
-            	
-            	String receiver = outgoingSms ? addressName : _context.getString(R.string.chat_me);
-                String body = 	Tools.getString(c, "body");
+                
+                String receiver = outgoingSms ? addressName : _context.getString(R.string.chat_me);
+                String body =     Tools.getString(c, "body");
                 Sms sms = new Sms(address, body,  Tools.getDateMilliSeconds(c, "date"), receiver);
                 String currentSender = sender;   
                 

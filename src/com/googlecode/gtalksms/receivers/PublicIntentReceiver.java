@@ -39,7 +39,7 @@ public class PublicIntentReceiver extends BroadcastReceiver {
     }
     
     public static void initReceiver(Context ctx) {
-    	getReceiver(ctx);
+        getReceiver(ctx);
     }
 
     public static PublicIntentReceiver getReceiver(Context ctx) {
@@ -51,10 +51,10 @@ public class PublicIntentReceiver extends BroadcastReceiver {
     }
 
     public static void onServiceStop() {
-    	if (sPublicIntentReceiver != null) {
-    		sContext.unregisterReceiver(sPublicIntentReceiver);
-    		sPublicIntentReceiver = null;
-    	}
+        if (sPublicIntentReceiver != null) {
+            sContext.unregisterReceiver(sPublicIntentReceiver);
+            sPublicIntentReceiver = null;
+        }
     }
 
     @Override

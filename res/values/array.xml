@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="icons_prefix">
+    <string-array name="icons_prefix">
         <item>status_green_</item>
         <item>status_orange_</item>
         <item>status_red_</item>
@@ -20,11 +20,11 @@
         <item>20</item>
     </string-array>
     <string-array name="list_locale_entries">
-		<item>System Default</item>
-		<item>French</item>
-		<item>German</item>
-		<item>English</item>
-	</string-array>
+        <item>System Default</item>
+        <item>French</item>
+        <item>German</item>
+        <item>English</item>
+    </string-array>
     <string-array name="list_locale_entryValues">
         <item>default</item>
         <item>fr</item>
@@ -49,9 +49,9 @@
         <item>Optional</item>
     </string-array>    
     <string-array name="list_xmppConnectionSecurity_entryValues">
-	   <item>dis</item>
-	   <item>req</item>
-	   <item>opt</item>
+       <item>dis</item>
+       <item>req</item>
+       <item>opt</item>
     </string-array>
     <string-array name="predefined_xmpp_servers">
         <item>jabber.ccc.de</item>

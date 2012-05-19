@@ -12,7 +12,7 @@ import android.database.Cursor;
  *
  */
 public class AliasDatabase extends Database {
-	
+    
     public AliasDatabase(Context ctx) {
         super(ctx);
     }

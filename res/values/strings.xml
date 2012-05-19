@@ -2,6 +2,11 @@
 <resources>
     <string name="panel_buddies_add_hint">buddy@jabber.org</string>
     <string name="panel_buddies_add_button">Add</string>
+    <string name="panel_buddies_add_message">Request sent!</string>
+    <string name="panel_buddies_popup_button_invite">Send Invite</string>
+    <string name="panel_buddies_popup_button_ok">OK</string>
+    <string name="panel_buddies_popup_button_name">Name:</string>
+    <string name="panel_buddies_popup_button_user_id">User ID:</string>
     <string name="panel_connection_notif">Account:</string>
     <string name="panel_connection_notif_hint">notification@jabber.org</string>
     <string name="panel_connection_notif_help">This address will be used to interact with GTalkSMS from your computer.</string>

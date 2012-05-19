@@ -80,7 +80,7 @@ public class SmsCmd extends CommandHandlerBase {
 
     @Override
     protected void execute(String command, String args) {
-    	String contactInformation;
+        String contactInformation;
         if (isMatchingCmd("sms", command)) {
             int separatorPos = args.indexOf(":");
             contactInformation = null;
@@ -126,16 +126,16 @@ public class SmsCmd extends CommandHandlerBase {
                 markSmsAsReadByNumber(RecipientCmd.getLastRecipientNumber(), RecipientCmd.getLastRecipientName());
             }
         } else if (command.equals("chat")) {
-        	if (args.length() > 0) {
+            if (args.length() > 0) {
                 inviteRoom(args);
-        	} else if (RecipientCmd.getLastRecipientNumber() != null) {
-        	    try {
-					XmppMuc.getInstance(sContext).inviteRoom(RecipientCmd.getLastRecipientNumber(), RecipientCmd.getLastRecipientName(), XmppMuc.MODE_SMS);
-				} catch (XMPPException e) {
-					// Creation of chat with last recipient failed
-				    send(R.string.chat_error, e.getLocalizedMessage());
-				}
-        	}
+            } else if (RecipientCmd.getLastRecipientNumber() != null) {
+                try {
+                    XmppMuc.getInstance(sContext).inviteRoom(RecipientCmd.getLastRecipientNumber(), RecipientCmd.getLastRecipientName(), XmppMuc.MODE_SMS);
+                } catch (XMPPException e) {
+                    // Creation of chat with last recipient failed
+                    send(R.string.chat_error, e.getLocalizedMessage());
+                }
+            }
         } else if (isMatchingCmd("delsms", command)) {
             if (args.length() == 0) {
                 send(R.string.chat_del_sms_syntax);

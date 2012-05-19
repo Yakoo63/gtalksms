@@ -14,16 +14,16 @@ import com.googlecode.gtalksms.tools.Tools;
 import org.jivesoftware.smack.PacketListener;
 
 public class ChatPacketListener implements PacketListener {
-		private SettingsManager mSettings;
-		private Context mCtx;
-		private XMPPConnection mConnection;
-		
-		public ChatPacketListener(XMPPConnection connection, Context ctx) {
-			this.mConnection = connection;
-			this.mCtx = ctx;
-			this.mSettings = SettingsManager.getSettingsManager(ctx);
-		}
-		
+        private SettingsManager mSettings;
+        private Context mCtx;
+        private XMPPConnection mConnection;
+        
+        public ChatPacketListener(XMPPConnection connection, Context ctx) {
+            this.mConnection = connection;
+            this.mCtx = ctx;
+            this.mSettings = SettingsManager.getSettingsManager(ctx);
+        }
+        
         public void processPacket(Packet packet) {
             Message message = (Message) packet;
             String from = message.getFrom();
