@@ -41,7 +41,7 @@
 	    <View
 	        android:layout_width="fill_parent"
 	        android:layout_height="0.45dip"
-	        android:background="@android:color/darker_gray"
+	        android:background="#808080"
 	        android:layout_marginTop="15dip"
 	        android:layout_marginBottom="10dip" />
 	    
@@ -92,7 +92,7 @@
 	    <View
 			android:layout_width="fill_parent"
 			android:layout_height="0.45dip"
-			android:background="@android:color/darker_gray"
+			android:background="#808080"
 			android:layout_marginTop="15dip"
 	        android:layout_marginBottom="5dip" />
 	    
