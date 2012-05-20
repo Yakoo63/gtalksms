@@ -50,9 +50,7 @@ public class Tools {
     public final static String getVersionName(Context context) {
 
         try {
-            PackageInfo pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-           
-            return "v" + pinfo.versionName;
+            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {
             return "";
         }
