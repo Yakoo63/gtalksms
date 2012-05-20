@@ -102,7 +102,7 @@
             android:layout_width="180dip"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:text="@string/panel_connection_button"
+            android:text="@string/panel_connection_button_connect"
             android:textAppearance="?android:attr/textAppearanceLarge" />
         
     </LinearLayout>

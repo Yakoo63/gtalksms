@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="panel_buddies">Buddies</string>
     <string name="panel_buddies_add_hint">buddy@jabber.org</string>
     <string name="panel_buddies_add_button">Add</string>
     <string name="panel_buddies_add_message">Request sent!</string>
@@ -10,7 +11,10 @@
     <string name="panel_buddies_popup_button_cancel">Cancel</string>
     <string name="panel_buddies_popup_button_name">Name:</string>
     <string name="panel_buddies_popup_button_user_id">User ID:</string>
-    <string name="panel_command_hint">cmd:subcmd:args</string>
+    <string name="panel_commands">Commands</string>
+    <string name="panel_commands_hint">cmd:subcmd:args</string>
+    <string name="panel_help">Help / About</string>
+    <string name="panel_connection">Connection</string>
     <string name="panel_connection_notif">Account:</string>
     <string name="panel_connection_notif_hint">notification@jabber.org</string>
     <string name="panel_connection_notif_help">This address will be used to interact with GTalkSMS from your computer.</string>
@@ -23,12 +27,10 @@
     <string name="panel_connection_button_disconnect">Disconnect</string>
     <string name="panel_connection_button_disconnecting">Disconnecting&#8230;</string>
     <string name="panel_connection_button_waiting">Waiting&#8230;</string>
-    <string name="panel_connection_button">Connect</string>
     <string name="panel_main_adfree_version">Get AdFree Version</string>
     <string name="panel_main_paypal">Donate via Paypal</string>
     <string name="about_authors">Authors</string>
     <string name="about_change_log">Change Log</string>
-    <string name="about_donate">Donate</string>
     <string name="about_donate_string">Buying donate versions on market shows your appreciation for the app to the developers :) You can also give a donation with Paypal:\n</string>
     <string name="about_donate_market">\tDonate via Google Market\n\n</string>
     <string name="about_donate_paypal">\tDonate via Paypal\n</string>

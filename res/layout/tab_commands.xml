@@ -27,7 +27,7 @@
         
         <EditText
             android:id="@+id/editTextCommand"
-            android:hint="@string/panel_command_hint"
+            android:hint="@string/panel_commands_hint"
             android:inputType="textNoSuggestions"
             android:imeOptions="actionDone"
             android:layout_width="0dip"
