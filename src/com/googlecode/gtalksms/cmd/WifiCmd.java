@@ -215,6 +215,7 @@ public class WifiCmd extends CommandHandlerBase {
     @Override
     protected void initializeSubCommands() {
         Cmd wifi = mCommandMap.get("wifi");
+        wifi.setHelp(R.string.chat_help_wifi_state, null);   
         wifi.AddSubCmd("on", R.string.chat_help_wifi_on, null);   
         wifi.AddSubCmd("off", R.string.chat_help_wifi_off, null);   
         wifi.AddSubCmd("state", R.string.chat_help_wifi_state, null);   

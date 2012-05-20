@@ -106,7 +106,7 @@ public class RecipientCmd extends CommandHandlerBase {
 
     @Override
     protected void initializeSubCommands() {
-//        Cmd cmd = mCommandMap.get("recipient");
-//        cmd.setHelp(0, null);
+        Cmd re = mCommandMap.get("recipient");
+        re.setHelp(R.string.chat_help_recipient, null);
     }
 }

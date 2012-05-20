@@ -237,6 +237,6 @@ public class FileCmd extends CommandHandlerBase {
     protected void initializeSubCommands() {
         mCommandMap.get("send").setHelp(R.string.chat_help_send, "#file#");   
         mCommandMap.get("ls").setHelp(R.string.chat_help_ls, "#path#");   
+        mCommandMap.get("rm").setHelp(R.string.chat_help_rm, "#filepath#");   
     }
-
 }

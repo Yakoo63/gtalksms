@@ -252,9 +252,7 @@ public class CommandsTabFragment extends SherlockFragment {
             final EditText cmdArgs = (EditText) row.findViewById(R.id.editTextArgs);
             final Button buttonSend = (Button) row.findViewById(R.id.buttonSend);
             
-            if (subCmd.getHelpArgs() == null || subCmd.getHelpArgs().isEmpty()) {
-                cmdArgs.setVisibility(View.INVISIBLE);
-            } else {
+            if (subCmd.getHelpArgs() != null) {
                 cmdArgs.setHint(subCmd.getHelpArgs());
                 cmdArgs.setOnEditorActionListener(new OnEditorActionListener() {
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -264,6 +262,9 @@ public class CommandsTabFragment extends SherlockFragment {
                         return false;
                     }
                 });
+                cmdArgs.setVisibility(View.VISIBLE);
+            } else {
+                cmdArgs.setVisibility(View.INVISIBLE);
             }
             
             buttonSend.setOnClickListener(new View.OnClickListener() {

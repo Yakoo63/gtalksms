@@ -166,7 +166,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
     protected void initializeSubCommands() {
         Cmd sc = mCommandMap.get("screenshot");
         sc.setHelp(R.string.chat_help_sc, null);
-        sc.AddSubCmd("email", R.string.chat_help_sc_email, "email");
-        sc.AddSubCmd("xmpp", R.string.chat_help_sc_xmpp, "xmpp");
+        sc.AddSubCmd("email", R.string.chat_help_sc_email, null);
+        sc.AddSubCmd("xmpp", R.string.chat_help_sc_xmpp, null);
     }
 }

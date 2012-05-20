@@ -156,7 +156,14 @@ public class RingCmd extends CommandHandlerBase {
 
     @Override
     protected void initializeSubCommands() {
-        mCommandMap.get("ring").setHelp(R.string.chat_help_ring, "|[0-100]|stop");   
-        mCommandMap.get("ringmode").setHelp(R.string.chat_help_ringmode, "#mode#");   
+        Cmd ring = mCommandMap.get("ring");
+        ring.setHelp(R.string.chat_help_ring, "[0-100]");
+        ring.AddSubCmd("stop", R.string.chat_help_ring_stop, null);
+  
+        Cmd ringmode = mCommandMap.get("ringmode");
+        ringmode.setHelp(R.string.chat_help_ringmode, null);
+        ringmode.AddSubCmd("silent", R.string.chat_help_ringmode_silent, null);
+        ringmode.AddSubCmd("vibrate", R.string.chat_help_ringmode_vibrate, null);
+        ringmode.AddSubCmd("normal", R.string.chat_help_ringmode_normal, null);
     }
 }
