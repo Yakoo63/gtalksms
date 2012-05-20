@@ -239,9 +239,16 @@ public class CommandsTabFragment extends SherlockFragment {
             
             final Cmd.SubCmd subCmd = getItem(position);
             
+            final EditText cmdSubCmd = (EditText) row.findViewById(R.id.editTextSubCmd);
             TextView cmdName = (TextView) row.findViewById(R.id.textViewCmd);
-            cmdName.setText(subCmd.getName());
-
+            if (subCmd.getName().startsWith("#") && subCmd.getName().endsWith("#")) {
+                cmdName.setVisibility(View.GONE);
+                cmdSubCmd.setHint(subCmd.getName());
+            } else {
+                cmdName.setText(subCmd.getName());
+                cmdSubCmd.setVisibility(View.GONE);
+            }
+            
             final EditText cmdArgs = (EditText) row.findViewById(R.id.editTextArgs);
             final Button buttonSend = (Button) row.findViewById(R.id.buttonSend);
             
@@ -261,7 +268,11 @@ public class CommandsTabFragment extends SherlockFragment {
             
             buttonSend.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    sendCommandAndVibrate(mCmd.getName(), subCmd.getName() + ":" + cmdArgs.getText().toString(), v);
+                    String args = subCmd.getName().startsWith("#") && subCmd.getName().endsWith("#") ? cmdSubCmd.getText().toString() : subCmd.getName();
+                    if (! cmdArgs.getText().toString().isEmpty()) {
+                        args += ":" + cmdArgs.getText().toString();
+                    }
+                    sendCommandAndVibrate(mCmd.getName(), args, v);
                 }
             });
 

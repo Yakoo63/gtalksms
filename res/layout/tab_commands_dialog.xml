@@ -27,7 +27,6 @@
             
             <EditText
                 android:id="@+id/editTextArgs"
-                android:hint="@string/panel_command_args_hint"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:inputType="textNoSuggestions"
@@ -62,7 +61,8 @@
         android:layout_marginTop="10dip"/>
         
     <ListView 
-        android:id="@+id/ListViewCommands" 
+        android:id="@+id/ListViewCommands"
+        android:descendantFocusability="afterDescendants"
         android:layout_width="fill_parent" 
         android:layout_height="0dip"
         android:layout_marginTop="10dip"

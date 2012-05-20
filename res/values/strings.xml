@@ -11,7 +11,6 @@
     <string name="panel_buddies_popup_button_name">Name:</string>
     <string name="panel_buddies_popup_button_user_id">User ID:</string>
     <string name="panel_command_hint">cmd:subcmd:args</string>
-    <string name="panel_command_args_hint">args</string>
     <string name="panel_connection_notif">Account:</string>
     <string name="panel_connection_notif_hint">notification@jabber.org</string>
     <string name="panel_connection_notif_help">This address will be used to interact with GTalkSMS from your computer.</string>
@@ -127,9 +126,13 @@
     <string name="chat_help_cmd">execute shell instruction with root access if possible.</string>
     <string name="chat_help_contact">display informations of a searched contact.</string>
     <string name="chat_help_copy">copy text to clipboard or sent phone clipboard if text is empty.</string>
+    <string name="chat_help_del_sms">Delete SMS without confirmation!</string>    
     <string name="chat_help_del_sms_all">Delete all SMS without confirmation!</string>    
+    <string name="chat_help_del_sms_number">Delete all SMS in the thread of the specified number without confirmation!</string>
     <string name="chat_help_del_sms_contact">Delete all SMS in the thread of the specified contact without confirmation!</string>
     <string name="chat_help_del_sms_last">Delete last [number] SMS, 1 by default.</string>    
+    <string name="chat_help_del_sms_last_in">Delete last [number] received SMS, 1 by default.</string>    
+    <string name="chat_help_del_sms_last_out">Delete last [number] sent SMS, 1 by default.</string>    
     <string name="chat_help_del_sms_sent">Delete all sent SMS without confirmation!</string>    
     <string name="chat_help_dial">dial the specified contact.</string>
     <string name="chat_help_find_sms">search specific message in all SMS from searched contacts.</string>

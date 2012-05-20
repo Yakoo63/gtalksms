@@ -19,14 +19,22 @@
             android:textSize="14dip" />
         
         <EditText
-            android:id="@+id/editTextArgs"
-            android:hint="@string/panel_command_args_hint"
+            android:id="@+id/editTextSubCmd"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:inputType="textNoSuggestions"
             android:imeOptions="actionDone"
             android:textSize="14dip"
-            android:layout_weight="9" />
+            android:layout_weight="1" />
+        
+        <EditText
+            android:id="@+id/editTextArgs"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:inputType="textNoSuggestions"
+            android:imeOptions="actionDone"
+            android:textSize="14dip"
+            android:layout_weight="1" />
         
         <Button
             style="@android:style/Widget.Holo.Button.Borderless"
