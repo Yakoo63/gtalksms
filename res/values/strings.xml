@@ -10,6 +10,8 @@
     <string name="panel_buddies_popup_button_cancel">Cancel</string>
     <string name="panel_buddies_popup_button_name">Name:</string>
     <string name="panel_buddies_popup_button_user_id">User ID:</string>
+    <string name="panel_command_hint">cmd:subcmd:args</string>
+    <string name="panel_command_args_hint">args</string>
     <string name="panel_connection_notif">Account:</string>
     <string name="panel_connection_notif_hint">notification@jabber.org</string>
     <string name="panel_connection_notif_help">This address will be used to interact with GTalkSMS from your computer.</string>

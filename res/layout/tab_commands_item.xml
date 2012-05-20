@@ -44,6 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="italic"
+            android:textSize="12dip"
             android:layout_margin="5dip"/>
         
     </LinearLayout>
@@ -64,6 +65,6 @@
         android:scaleType="centerInside"
         android:layout_gravity="center_vertical"
         android:padding="5dip"
-        android:background="@drawable/command_send" />
+        android:background="@drawable/command_edit" />
 
 </LinearLayout>

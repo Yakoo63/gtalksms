@@ -7,19 +7,27 @@ import java.util.List;
 import java.util.Set;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager.LayoutParams;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.googlecode.gtalksms.MainService;
@@ -30,6 +38,8 @@ import com.googlecode.gtalksms.tools.StringFmt;
 
 public class CommandsTabFragment extends SherlockFragment {
     private ListView mListViewCommands;
+    private EditText mEditTextCommand;
+    private Button mButtonSend;
     private List<Cmd> mListCommands = new ArrayList<Cmd>();
     
     @Override
@@ -51,6 +61,32 @@ public class CommandsTabFragment extends SherlockFragment {
                 imageView.setImageResource(isActive ? R.drawable.buddy_available : R.drawable.buddy_offline);
             }
         });
+        
+        mEditTextCommand = (EditText) view.findViewById(R.id.editTextCommand);
+        mEditTextCommand.setOnEditorActionListener(new OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    mButtonSend.callOnClick();
+                }
+                return false;
+            }
+        });
+        
+        mButtonSend = (Button) view.findViewById(R.id.buttonCommandSend);
+        mButtonSend.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                String cmd = mEditTextCommand.getText().toString();
+                int index = cmd.indexOf(':');
+                if (index == -1) {
+                    sendCommandAndVibrate(cmd, null, v);
+                } else  if (index < cmd.length() - 1) {
+                    sendCommandAndVibrate( cmd.substring(0, index), cmd.substring(index + 1), v);
+                } else {
+                    sendCommandAndVibrate( cmd.substring(0, index), null, v);
+                }
+            }
+        });
+        
         return view;
     }
     
@@ -72,19 +108,29 @@ public class CommandsTabFragment extends SherlockFragment {
         } 
           
         if (mListViewCommands != null ) {
-            mListViewCommands.setAdapter(new CmdListAdapter(getActivity(), R.layout.tab_commands_item, mListCommands.toArray(new Cmd[mListCommands.size()])));
+            mListViewCommands.setAdapter(new CmdListAdapter(getActivity(), R.layout.tab_commands_item, mListCommands));
         }
+    }
+    
+    public void sendCommandAndVibrate(String cmd, String args, View view) {
+        Intent intent = new Intent(MainService.ACTION_COMMAND);
+        intent.putExtra("cmd", cmd);
+        if (args != null) {
+            intent.putExtra("args", args);
+        }
+        intent.setClass(getActivity().getBaseContext(), MainService.class);
+        getActivity().startService(intent);
+        
+        view.performHapticFeedback( HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
     }
     
     public class CmdListAdapter extends ArrayAdapter<Cmd> {
         
         LayoutInflater mInflater;
-        Cmd[] mCommands;
         
-        public CmdListAdapter(Activity activity, int textViewResourceId, Cmd[] list) {
+        public CmdListAdapter(Activity activity, int textViewResourceId, List<Cmd> list) {
             super(activity, textViewResourceId, list);
             mInflater = activity.getLayoutInflater();
-            mCommands = list;
         }
 
         @Override
@@ -113,15 +159,114 @@ public class CommandsTabFragment extends SherlockFragment {
             ImageView buttonSend = (ImageView) row.findViewById(R.id.SendCommand);
             buttonSend.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
-                    Intent intent = new Intent(MainService.ACTION_COMMAND);
-                    intent.putExtra("cmd", cmd.getName());
-                    intent.setClass(getContext(), MainService.class);
-                    getActivity().startService(intent);
                     
-                    ImageView button = (ImageView)v;
-                    button.performHapticFeedback( HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
+                    final Dialog dialog = new Dialog(getSherlockActivity());
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.tab_commands_dialog);
+                    
+                    TextView cmdName = (TextView) dialog.findViewById(R.id.textViewCmd);
+                    cmdName.setText(cmd.getName());
+
+                    final EditText cmdArgs = (EditText) dialog.findViewById(R.id.editTextArgs);
+                    final Button buttonSend = (Button) dialog.findViewById(R.id.buttonSend);
+                    
+                    if (cmd.getHelpArgs() == null || cmd.getHelpArgs().isEmpty()) {
+                        cmdArgs.setVisibility(View.INVISIBLE);
+                    } else {
+                        cmdArgs.setHint(cmd.getHelpArgs());
+                        cmdArgs.setOnEditorActionListener(new OnEditorActionListener() {
+                            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                                    buttonSend.callOnClick();
+                                }
+                                return false;
+                            }
+                        });
+                    }
+                    
+                    buttonSend.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            sendCommandAndVibrate(cmd.getName(), cmdArgs.getText().toString(), v);
+                        }
+                    });
+
+                    TextView cmdHelp = (TextView) dialog.findViewById(R.id.textViewCmdHelp);
+                    cmdHelp.setText(cmd.getHelpMsg());
+                    
+                    ListView subCommands = (ListView) dialog.findViewById(R.id.ListViewCommands);
+                    subCommands.setAdapter(new SubCmdListAdapter(getSherlockActivity(), R.layout.tab_commands_sub_item, cmd));
+
+                    Button buttonClose = (Button) dialog.findViewById(R.id.buttonOk);
+                    buttonClose.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+                    
+                    // TODO backup the command args somewhere
+//                    dialog.setOnDismissListener(new OnDismissListener() {
+//                         public void onDismiss(DialogInterface dialog) {
+//                        }
+//                    });
+                    
+                    dialog.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+                    dialog.show();
                 }
             });
+            
+            return row;
+        }
+    }
+    
+    public class SubCmdListAdapter extends ArrayAdapter<Cmd.SubCmd> {
+        
+        LayoutInflater mInflater;
+        Cmd mCmd;
+        
+        public SubCmdListAdapter(Activity activity, int textViewResourceId, Cmd cmd) {
+            super(activity, textViewResourceId, cmd.getSubCmds());
+            mInflater = activity.getLayoutInflater();
+            mCmd = cmd;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            
+            View row = convertView;
+            if (row == null) {
+                row = mInflater.inflate(R.layout.tab_commands_sub_item, parent, false);
+            }
+            
+            final Cmd.SubCmd subCmd = getItem(position);
+            
+            TextView cmdName = (TextView) row.findViewById(R.id.textViewCmd);
+            cmdName.setText(subCmd.getName());
+
+            final EditText cmdArgs = (EditText) row.findViewById(R.id.editTextArgs);
+            final Button buttonSend = (Button) row.findViewById(R.id.buttonSend);
+            
+            if (subCmd.getHelpArgs() == null || subCmd.getHelpArgs().isEmpty()) {
+                cmdArgs.setVisibility(View.INVISIBLE);
+            } else {
+                cmdArgs.setHint(subCmd.getHelpArgs());
+                cmdArgs.setOnEditorActionListener(new OnEditorActionListener() {
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            buttonSend.callOnClick();
+                        }
+                        return false;
+                    }
+                });
+            }
+            
+            buttonSend.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    sendCommandAndVibrate(mCmd.getName(), subCmd.getName() + ":" + cmdArgs.getText().toString(), v);
+                }
+            });
+
+            TextView cmdHelp = (TextView) row.findViewById(R.id.textViewCmdHelp);
+            cmdHelp.setText(subCmd.getHelpMsg());
             
             return row;
         }

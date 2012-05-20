@@ -12,14 +12,17 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -115,8 +118,20 @@ public class BuddiesTabFragment extends SherlockFragment {
         mButtonAdd = (Button) view.findViewById(R.id.buttonBuddyAdd);
         mBuddiesListView = (ListView) view.findViewById(R.id.ListViewBuddies);
         
+        mEditTextBuddy.setOnEditorActionListener(new OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    mButtonAdd.callOnClick();
+                }
+                return false;
+            }
+        });
+        
         mButtonAdd.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                Button button = (Button)v;
+                button.performHapticFeedback( HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
+                
                 String name = mEditTextBuddy.getText().toString();
                 if (!name.isEmpty()) {
                     XmppBuddies.getInstance(getActivity().getBaseContext()).addFriend(name);

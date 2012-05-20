@@ -11,18 +11,26 @@
         android:layout_height="0dip"
         android:layout_marginTop="10dip"
         android:layout_weight="9" />
-              
+    
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.3dip"
+        android:layout_gravity="center"
+        android:background="#303030"
+        android:layout_marginBottom="3dip"
+        android:layout_marginTop="3dip" />
+    
     <LinearLayout 
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip" >
+        android:layout_height="wrap_content" >
         
         <EditText
             android:id="@+id/editTextBuddyName"
             android:hint="@string/panel_buddies_add_hint"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
             android:ems="10"
             android:inputType="textEmailAddress"
             android:layout_weight="9" />

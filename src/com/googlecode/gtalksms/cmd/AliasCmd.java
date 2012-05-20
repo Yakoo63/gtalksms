@@ -25,7 +25,7 @@ public class AliasCmd extends CommandHandlerBase {
 
     protected void initializeSubCommands() {
         Cmd alias = mCommandMap.get("alias");
-        alias.setHelp(R.string.chat_help_alias_general, "subCommand:argument");
+        alias.setHelp(R.string.chat_help_alias_general, null);
         
         alias.AddSubCmd("add", R.string.chat_help_alias_add, "#aliasname#:#contact#");
         alias.AddSubCmd("show",R.string.chat_help_alias_show, "#aliasname#");
