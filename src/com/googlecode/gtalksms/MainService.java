@@ -172,8 +172,7 @@ public class MainService extends Service {
             throw new IllegalThreadStateException();
         }
         // We need to handle XMPP state changes which happened "externally" -
-        // eg,
-        // due to a connection error, or running out of retries, or a retry
+        // eg, due to a connection error, or running out of retries, or a retry
         // handler actually succeeding etc.
         int initialState = getConnectionStatus();
         updateListenersToCurrentState(initialState);
@@ -466,6 +465,12 @@ public class MainService extends Service {
             sXmppMgr = null;
         }
         teardownListenersForConnection();
+        // All data must be cleaned, because onDestroy can be call without releasing the current object
+        // It's due to BIND_AUTO_CREATE used for Service Binder
+        // http://developer.android.com/reference/android/content/Context.html#stopService(android.content.Intent)
+        sCommands.clear();
+        sCommandSet.clear();
+        
         GoogleAnalyticsHelper.stop();
         sServiceLooper.quit();
         super.onDestroy();
@@ -776,7 +781,7 @@ public class MainService extends Service {
         if (wantListeners && !sListenersActive) {
             setupListenersForConnection();
             sListenersActive = true;
-        } else if (!wantListeners && sListenersActive) {
+        } else if (!wantListeners) {
             teardownListenersForConnection();
             sListenersActive = false;
         }
