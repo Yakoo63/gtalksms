@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -275,16 +276,26 @@ public class BuddiesTabFragment extends SherlockFragment {
 
             deleteView.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
-                    mFriends.remove(buddy.getUserId());
-                    mAdapterArray.remove(buddy);
-                    updateBuddiesList();
-                    
                     ImageView button = (ImageView)v;
                     button.performHapticFeedback( HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
 
-                    new Thread(new Runnable() { public void run() {
-                        XmppBuddies.getInstance(getActivity().getBaseContext()).removeFriend(buddy.getUserId());
-                    }}).start();
+                    new AlertDialog.Builder(getActivity())
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(R.string.panel_buddies_popup_button_delete_title)
+                        .setMessage(String.format(getString(R.string.panel_buddies_popup_button_delete), buddy.getName()))
+                        .setPositiveButton(R.string.panel_buddies_popup_button_ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                mFriends.remove(buddy.getUserId());
+                                mAdapterArray.remove(buddy);
+                                updateBuddiesList();
+    
+                                new Thread(new Runnable() { public void run() {
+                                    XmppBuddies.getInstance(getActivity().getBaseContext()).removeFriend(buddy.getUserId());
+                                }}).start();   
+                            }
+                        })
+                        .setNegativeButton(R.string.panel_buddies_popup_button_cancel, null)
+                        .show();
                 }
             });
             return row;

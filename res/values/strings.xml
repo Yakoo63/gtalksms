@@ -3,8 +3,11 @@
     <string name="panel_buddies_add_hint">buddy@jabber.org</string>
     <string name="panel_buddies_add_button">Add</string>
     <string name="panel_buddies_add_message">Request sent!</string>
+    <string name="panel_buddies_popup_button_delete_title">Confirmation</string>
+    <string name="panel_buddies_popup_button_delete">%1$s will be removed from your buddy list.\n</string>
     <string name="panel_buddies_popup_button_invite">Send Invite</string>
     <string name="panel_buddies_popup_button_ok">OK</string>
+    <string name="panel_buddies_popup_button_cancel">Cancel</string>
     <string name="panel_buddies_popup_button_name">Name:</string>
     <string name="panel_buddies_popup_button_user_id">User ID:</string>
     <string name="panel_connection_notif">Account:</string>
