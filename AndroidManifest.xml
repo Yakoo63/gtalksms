@@ -2,8 +2,8 @@
 <manifest 
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms" 
-    android:versionName="3.5" 
-    android:versionCode="57">
+    android:versionName="Holo β" 
+    android:versionCode="58">
     
     <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="12"/>
     
