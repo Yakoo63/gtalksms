@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
@@ -144,6 +145,11 @@ public class MainActivity extends SherlockFragmentActivity {
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // Workaround from http://stackoverflow.com/a/10353524/194894
+        if (Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+            this.setTheme(com.actionbarsherlock.R.style.Theme_Sherlock);
+       }
+
         super.onCreate(savedInstanceState);
         
         setTitle(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
