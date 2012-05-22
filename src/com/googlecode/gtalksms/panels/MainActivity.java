@@ -145,11 +145,7 @@ public class MainActivity extends SherlockFragmentActivity {
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // Workaround from http://stackoverflow.com/a/10353524/194894
-        if (Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
-            this.setTheme(com.actionbarsherlock.R.style.Theme_Sherlock);
-       }
-
+        this.setTheme(com.actionbarsherlock.R.style.Theme_Sherlock);
         super.onCreate(savedInstanceState);
         
         setTitle(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
