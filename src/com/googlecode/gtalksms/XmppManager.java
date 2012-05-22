@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -667,7 +668,9 @@ public class XmppManager {
      * @throws XMPPException 
      */
     private static XMPPConnection createNewConnection(SettingsManager settings) throws XMPPException {
+        String trustStorePath;
         ConnectionConfiguration conf;
+
         if (settings.manuallySpecifyServerSettings) {
             // trim the serverHost here because of Issue 122
             conf = new ConnectionConfiguration(settings.serverHost.trim(), settings.serverPort, settings.serviceName);
@@ -679,10 +682,17 @@ public class XmppManager {
             // and http://code.google.com/p/android/issues/detail?id=9431            
             conf = new AndroidConnectionConfiguration(settings.serviceName, DNSSRV_TIMEOUT);
         }
-        
-        conf.setTruststorePath("/system/etc/security/cacerts.bks");
+
+        conf.setTruststoreType("BKS");
+        trustStorePath = System.getProperty("javax.net.ssl.trustStore");
+        if (trustStorePath == null) {
+            trustStorePath = System.getProperty("java.home") + File.separator
+                    + "etc" + File.separator + "security" + File.separator
+                    + "cacerts.bks";
+        }
+        conf.setTruststorePath(trustStorePath);
         conf.setTruststorePassword("changeit");
-        conf.setTruststoreType("bks");
+
         switch (settings.xmppSecurityModeInt) {
         case SettingsManager.XMPPSecurityOptional:
             conf.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
