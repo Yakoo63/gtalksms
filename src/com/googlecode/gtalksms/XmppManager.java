@@ -26,6 +26,7 @@ import org.jivesoftware.smackx.MultipleRecipientManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.xbill.DNS.Lookup;
 
 import android.app.Service;
 import android.content.Context;
@@ -466,6 +467,10 @@ public class XmppManager {
         
         // everything is ready for a connection attempt
         updateStatus(CONNECTING);
+        
+        // Workaround for aSmack Issue 5
+        // https://github.com/Flowdalic/asmack/issues/5
+        Lookup.refreshDefault();
 
         // create a new connection if the connection is obsolete or if the
         // old connection is still active
