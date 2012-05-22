@@ -228,7 +228,7 @@ public class SettingsManager {
         useGoogleMapUrl = mSharedPreferences.getBoolean("useGoogleMapUrl", true);
         useOpenStreetMapUrl = mSharedPreferences.getBoolean("useOpenStreetMapUrl", false);
         
-        showStatusIcon = mSharedPreferences.getBoolean("showStatusIcon", true);
+        showStatusIcon = mSharedPreferences.getBoolean("showStatusIcon", false);
         
         notifyApplicationConnection = mSharedPreferences.getBoolean("notifyApplicationConnection", false);
         notifyBattery = mSharedPreferences.getBoolean("notifyBattery", false);
