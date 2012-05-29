@@ -50,7 +50,7 @@ public class LocationService extends Service {
      * http://www.maximyudin.com/2008/12/07/android/vklyuchenievyklyuchenie-gps-na-g1-programmno/
      */
     private boolean getGPSStatus() {
-        String allowedLocationProviders = Settings.System.getString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED);
+        String allowedLocationProviders = Settings.System.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
         if (allowedLocationProviders == null) {
             allowedLocationProviders = "";
         }
@@ -58,7 +58,7 @@ public class LocationService extends Service {
     }
 
     private void setGPSStatus(final boolean newGPSStatus) throws Exception {
-        String allowedLocationProviders = Settings.System.getString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED);
+        String allowedLocationProviders = Settings.System.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
         // use the old way to get the GPS going
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
             if (allowedLocationProviders == null) {
@@ -72,7 +72,7 @@ public class LocationService extends Service {
             if (newGPSStatus == true) {
                 allowedLocationProviders += "," + LocationManager.GPS_PROVIDER;
             }
-            Settings.System.putString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
+            Settings.System.putString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
             Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
             m.setAccessible(true);
             m.invoke(_locationManager, new Object[] {});
