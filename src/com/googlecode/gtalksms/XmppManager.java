@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,6 +27,7 @@ import org.jivesoftware.smackx.MultipleRecipientManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.xbill.DNS.Lookup;
 
 import android.app.Service;
 import android.content.Context;
@@ -34,7 +36,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;
@@ -290,7 +291,7 @@ public class XmppManager {
                 start(XmppManager.WAITING_TO_CONNECT);
                 break;
             case XmppManager.WAITING_TO_CONNECT:
-            	break;
+                break;
             case XmppManager.WAITING_FOR_NETWORK:
                 cleanupConnection();
                 start(XmppManager.CONNECTED);
@@ -310,7 +311,7 @@ public class XmppManager {
                 break;
             case XmppManager.WAITING_TO_CONNECT:
                 cleanupConnection();
-            	break;
+                break;
             case XmppManager.WAITING_FOR_NETWORK:
                 break;
             default:
@@ -357,7 +358,6 @@ public class XmppManager {
                     float diff = stop - start;
                     diff = diff / 1000;
                     Log.i("disconnectED xmpp connection. Took: " + diff + " s");
-                    GoogleAnalyticsHelper.trackDisconTime(diff);
                 }
             }
         }
@@ -466,6 +466,10 @@ public class XmppManager {
         
         // everything is ready for a connection attempt
         updateStatus(CONNECTING);
+        
+        // Workaround for aSmack Issue 5
+        // https://github.com/Flowdalic/asmack/issues/5
+        Lookup.refreshDefault();
 
         // create a new connection if the connection is obsolete or if the
         // old connection is still active
@@ -557,16 +561,16 @@ public class XmppManager {
                 mConnection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
                 mXmppBuddies.retrieveFriendList();
             } catch (Exception ex) {
-                GoogleAnalyticsHelper.trackAndLogError("Failed to setup XMPP friend list roster.", ex);
+                Log.e("Failed to setup XMPP friend list roster.", ex);
             }
 
             // It is important that we query the server for offline messages
             // BEFORE we send the first presence stanza
-            XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.notifiedAddress, mContext);
+            XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.getNotifiedAddress(), mContext);
         } catch (Exception e) {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
-            GoogleAnalyticsHelper.trackAndLogError("xmppMgr exception caught", e);
+            Log.e("xmppMgr exception caught", e);
             maybeStartReconnect();
             return;
         }
@@ -634,7 +638,7 @@ public class XmppManager {
         serviceDiscoMgr.addFeature("bug-fix-gtalksms");
         
         try {
-            connection.login(mSettings.login, mSettings.password, Tools.APP_NAME);
+            connection.login(mSettings.getLogin(), mSettings.getPassword(), Tools.APP_NAME);
         } catch (Exception e) {
             xmppDisconnect(connection);
             Log.e("xmpp login failed: " + e.getMessage());
@@ -662,7 +666,9 @@ public class XmppManager {
      * @throws XMPPException 
      */
     private static XMPPConnection createNewConnection(SettingsManager settings) throws XMPPException {
+        String trustStorePath;
         ConnectionConfiguration conf;
+
         if (settings.manuallySpecifyServerSettings) {
             // trim the serverHost here because of Issue 122
             conf = new ConnectionConfiguration(settings.serverHost.trim(), settings.serverPort, settings.serviceName);
@@ -674,10 +680,17 @@ public class XmppManager {
             // and http://code.google.com/p/android/issues/detail?id=9431            
             conf = new AndroidConnectionConfiguration(settings.serviceName, DNSSRV_TIMEOUT);
         }
-        
-        conf.setTruststorePath("/system/etc/security/cacerts.bks");
+
+        conf.setTruststoreType("BKS");
+        trustStorePath = System.getProperty("javax.net.ssl.trustStore");
+        if (trustStorePath == null) {
+            trustStorePath = System.getProperty("java.home") + File.separator
+                    + "etc" + File.separator + "security" + File.separator
+                    + "cacerts.bks";
+        }
+        conf.setTruststorePath(trustStorePath);
         conf.setTruststorePassword("changeit");
-        conf.setTruststoreType("bks");
+
         switch (settings.xmppSecurityModeInt) {
         case SettingsManager.XMPPSecurityOptional:
             conf.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
@@ -712,7 +725,7 @@ public class XmppManager {
     }
     
     public boolean getCompressionStatus() {
-    	return mConnection == null ? false : mConnection.isUsingCompression();
+        return mConnection == null ? false : mConnection.isUsingCompression();
     }
     
     /**
@@ -769,7 +782,7 @@ public class XmppManager {
             // Message has no destination information
             // Send to all known resources 
             if (muc == null && to == null) {
-                Iterator<Presence> presences = mConnection.getRoster().getPresences(mSettings.notifiedAddress);
+                Iterator<Presence> presences = mConnection.getRoster().getPresences(mSettings.getNotifiedAddress());
                 List<String> toList = new LinkedList<String>();
                 while (presences.hasNext()) {
                     Presence p = presences.next();
@@ -779,7 +792,7 @@ public class XmppManager {
                     // It would be nice if there was a better way to detect 
                     // an Android gTalk XMPP client, but currently there is none
                     if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
-                    	toList.add(toPresence);
+                        toList.add(toPresence);
                     }
                 }
                 if (toList.size() > 0) {

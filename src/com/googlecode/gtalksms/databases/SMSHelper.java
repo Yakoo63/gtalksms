@@ -1,7 +1,7 @@
 package com.googlecode.gtalksms.databases;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.cmd.smsCmd.Sms;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.content.Context;
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
  *
  */
-public class SMSHelper {	
+public class SMSHelper {    
     private static SMSHelper smsHelper = null;
     
     /**
@@ -24,10 +24,10 @@ public class SMSHelper {
     }
     
     public static SMSHelper getSMSHelper(Context ctx) {
-    	if (smsHelper == null) {
-    		smsHelper = new SMSHelper(ctx);
-    	}    	
-    	return smsHelper;
+        if (smsHelper == null) {
+            smsHelper = new SMSHelper(ctx);
+        }        
+        return smsHelper;
     }
     
     public boolean addSMS(Sms sms) {
@@ -84,10 +84,10 @@ public class SMSHelper {
                 sentIntent[partNum] = 'X';
                 SMSDatabase.putSentIntent(smsID, sentIntent.toString());
             } else {
-                GoogleAnalyticsHelper.trackAndLogError("SMSHelper.setSentIntent() OutOfBounds: " +
-                		"partNum=" + partNum +
-                		" length=" + sentIntent.length +
-                		" sentIntentSTr= " + sentIntentStr);
+                Log.e("SMSHelper.setSentIntent() OutOfBounds: " +
+                        "partNum=" + partNum +
+                        " length=" + sentIntent.length +
+                        " sentIntentSTr= " + sentIntentStr);
             }
         } // TODO handle null case
     }
@@ -101,7 +101,7 @@ public class SMSHelper {
                 delIntent[partNum] = 'X';
                 SMSDatabase.putDelIntent(smsID, delIntent.toString());
             } else {
-                GoogleAnalyticsHelper.trackAndLogError("SMSHelper.setSentIntent() OutOfBounds: " +
+                Log.e("SMSHelper.setSentIntent() OutOfBounds: " +
                         "partNum=" + partNum +
                         " length=" + delIntent.length +
                         " sentIntentSTr= " + delIntentStr);

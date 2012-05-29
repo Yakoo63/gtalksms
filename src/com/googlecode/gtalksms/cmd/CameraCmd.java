@@ -50,7 +50,7 @@ public class CameraCmd extends CommandHandlerBase {
         } else {
             path = new File(Environment.getExternalStorageDirectory(), "DCIM");
         }
-        emailReceiving = settings.notifiedAddress;
+        emailReceiving = settings.getNotifiedAddress();
         try {
             repository = new File(path, Tools.APP_NAME);
             if(!repository.exists()) {
@@ -233,6 +233,7 @@ public class CameraCmd extends CommandHandlerBase {
         cam.AddSubCmd("list", R.string.chat_help_camera_list, null);
         cam.AddSubCmd("set", R.string.chat_help_camera_set, "#number#");
         Cmd flash = mCommandMap.get("flash");
+        flash.setHelp(R.string.chat_help_flash_on, null);
         flash.AddSubCmd("on", R.string.chat_help_flash_on, null);
         flash.AddSubCmd("off", R.string.chat_help_flash_off, null);
     }

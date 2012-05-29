@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms.cmd;
 
+import android.content.Intent;
+
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 
@@ -12,7 +14,8 @@ public class ExitCmd extends CommandHandlerBase {
 
     @Override
     protected void execute(String cmd, String args) {
-       sMainService.stopSelf();
+        MainService.sendToServiceHandler(new Intent(MainService.ACTION_DISCONNECT));
+        sMainService.stopSelf();
     }
 
     @Override

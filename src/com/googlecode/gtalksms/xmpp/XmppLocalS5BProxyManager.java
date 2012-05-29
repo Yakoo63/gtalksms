@@ -59,7 +59,7 @@ public class XmppLocalS5BProxyManager {
             String ip = Tools.ipIntToString(info.getIpAddress());
             // Sometimes "0.0.0.0" gets returned
             if (!ip.equals("0.0.0.0"))
-            	addresses.add(ip);
+                addresses.add(ip);
 
         } 
         // set an ip in case there is a Wifi Connection

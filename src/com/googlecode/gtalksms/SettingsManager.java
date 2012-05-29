@@ -42,10 +42,22 @@ public class SettingsManager {
     public String serviceName;
     public int serverPort;
     
-    public String login;
-    public String password;
-    public String notifiedAddress;
-    public boolean useDifferentAccount;
+    private String _login;
+    public String getLogin() { return _login; }
+    public void setLogin(String value) { _login = saveStringSetting("login", value); }
+    
+    private String _password;
+    public String getPassword() { return _password; }
+    public void setPassword(String value) { _password = saveStringSetting("password", value); }
+
+    private String _notifiedAddress;
+    public String getNotifiedAddress() { return _notifiedAddress; }
+    public void setNotifiedAddress(String value) { _notifiedAddress = saveStringSetting("notifiedAddress", value); }
+
+    private boolean _connectOnMainScreenStartup;
+    public boolean getConnectOnMainScreenStartup() { return _connectOnMainScreenStartup; }
+    public void setConnectOnMainScreenStartup(boolean value) { _connectOnMainScreenStartup = saveBooleanSetting("connectOnMainscreenShow", value); }
+    
     public String roomPassword;
     public String mucServer;
     public boolean forceMucServer;
@@ -99,7 +111,6 @@ public class SettingsManager {
     
     // app settings
     public boolean debugLog;
-    public boolean connectOnMainscreenShow;
     public String displayIconIndex;
     
     // auto start and stop settings
@@ -125,9 +136,9 @@ public class SettingsManager {
     private OnSharedPreferenceChangeListener mChangeListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-			if (debugLog) {
-				Log.i(Tools.LOG_TAG, "Preferences updated: key=" + key);
-			}
+            if (debugLog) {
+                Log.i(Tools.LOG_TAG, "Preferences updated: key=" + key);
+            }
             importPreferences();
             OnPreferencesUpdated(key);
         }
@@ -153,7 +164,17 @@ public class SettingsManager {
     }
     
     public SharedPreferences.Editor getEditor() {
-    	return mSharedPreferences.edit();
+        return mSharedPreferences.edit();
+    }
+    
+    public String saveStringSetting(String key, String value) {
+        getEditor().putString(key, value).commit();
+        return value;
+    }
+    
+    public boolean saveBooleanSetting(String key, boolean value) {
+        getEditor().putBoolean(key, value).commit();
+        return value;
     }
     
     public Map<String, ?> getAllSharedPreferences() {
@@ -161,123 +182,117 @@ public class SettingsManager {
     }
     
     public boolean SharedPreferencesContains(String key) {
-    	return mSharedPreferences.contains(key);
+        return mSharedPreferences.contains(key);
     }
 
     public void OnPreferencesUpdated(String key) {
-    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
-    		BackupManager.dataChanged(mContext.getPackageName());
-    	}
-    	for (String s : xmppConnectionSettings) {
-    	    if (s.equals(key)) {
-    	        connectionSettingsObsolete = true;
-    	    }
-    	}
-    	if (key.equals("locale")) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
+            BackupManager.dataChanged(mContext.getPackageName());
+        }
+        for (String s : xmppConnectionSettings) {
+            if (s.equals(key)) {
+                connectionSettingsObsolete = true;
+            }
+        }
+        if (key.equals("locale")) {
             Tools.setLocale(this, mContext);
-    	}
+        }
     }
     
     /** imports the preferences */
-	private void importPreferences() {	   
-            serverHost = mSharedPreferences.getString("serverHost", "");
-            serverPort = mSharedPreferences.getInt("serverPort", 0);
-            
-            notifiedAddress = mSharedPreferences.getString("notifiedAddress", "");
-            
-            useDifferentAccount = mSharedPreferences.getBoolean("useDifferentAccount", false);
-            if (useDifferentAccount) {
-                login = mSharedPreferences.getString("login", "");
-            } else {
-                login = notifiedAddress;
-            }
-            
-            manuallySpecifyServerSettings = mSharedPreferences.getBoolean("manuallySpecifyServerSettings", true);
-            if (manuallySpecifyServerSettings) {
-                serviceName = mSharedPreferences.getString("serviceName", "");
-            } else {
-                serviceName = StringUtils.parseServer(login);
-            }
-            
-            password =  mSharedPreferences.getString("password", "");
-            xmppSecurityMode = mSharedPreferences.getString("xmppSecurityMode", "opt");
-            if(xmppSecurityMode.equals("req")) {
-                xmppSecurityModeInt = XMPPSecurityRequired;
-            } else if (xmppSecurityMode.equals("dis")) {
-                xmppSecurityModeInt = XMPPSecurityDisabled;
-            } else {
-                xmppSecurityModeInt = XMPPSecurityOptional;
-            }
-            useCompression = mSharedPreferences.getBoolean("useCompression", false);
-            
-            useGoogleMapUrl = mSharedPreferences.getBoolean("useGoogleMapUrl", true);
-            useOpenStreetMapUrl = mSharedPreferences.getBoolean("useOpenStreetMapUrl", false);
-            
-            showStatusIcon = mSharedPreferences.getBoolean("showStatusIcon", false);
-            
-            notifyApplicationConnection = mSharedPreferences.getBoolean("notifyApplicationConnection", false);
-            notifyBattery = mSharedPreferences.getBoolean("notifyBattery", false);
-            notifyBatteryInStatus = mSharedPreferences.getBoolean("notifyBatteryInStatus", true);
-            batteryNotificationInterval = mSharedPreferences.getString("batteryNotificationInterval", "10");
-            batteryNotificationIntervalInt = Integer.parseInt(batteryNotificationInterval);
-            notifySmsSent = mSharedPreferences.getBoolean("notifySmsSent", true);
-            notifySmsDelivered = mSharedPreferences.getBoolean("notifySmsDelivered", false);
-            notifySmsSentDelivered = notifySmsSent || notifySmsDelivered;
-            ringtone = mSharedPreferences.getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
-            showSentSms = mSharedPreferences.getBoolean("showSentSms", false);
-            markSmsReadOnReply = mSharedPreferences.getBoolean("markSmsReadOnReply", false);
-            smsNumber = mSharedPreferences.getInt("smsNumber", 5);
-            callLogsNumber = mSharedPreferences.getInt("callLogsNumber", 10);
-            formatResponses = mSharedPreferences.getBoolean("formatResponses", false);
-            notifyIncomingCalls = mSharedPreferences.getBoolean("notifyIncomingCalls", false);
-            displayIconIndex = mSharedPreferences.getString("displayIconIndex", "0");
-            
-            String localeStr = mSharedPreferences.getString("locale", "default");
-            if (localeStr.equals("default")) {
-                locale = Locale.getDefault();
-            } else {
-                locale = new Locale(localeStr);
-            }
-            
-            roomPassword = mSharedPreferences.getString("roomPassword", "gtalksms");
-            forceMucServer = mSharedPreferences.getBoolean("forceMucServer", false);
-            mucServer = mSharedPreferences.getString("mucServer", "conference.jwchat.org");
-            String notificationIncomingSmsType = mSharedPreferences.getString("notificationIncomingSmsType", "same");
-            
-            if (notificationIncomingSmsType.equals("both")) {
-                notifySmsInChatRooms = true;
-                notifySmsInSameConversation = true;
-            } else if (notificationIncomingSmsType.equals("no")) {
-                notifySmsInChatRooms = false;
-                notifySmsInSameConversation = false;
-            } else if (notificationIncomingSmsType.equals("separate")) {
-                notifySmsInChatRooms = true;
-                notifySmsInSameConversation = false;
-            } else {
-                notifySmsInSameConversation = true;
-                notifySmsInChatRooms = false;
-            }
-            smsMagicWord = mSharedPreferences.getString("smsMagicWord", "GTalkSMS");
-            notifyInMuc = mSharedPreferences.getBoolean("notifyInMuc", false); 
-            smsReplySeparate = mSharedPreferences.getBoolean("smsReplySeparate", false);
-            framebufferMode = mSharedPreferences.getString("framebufferMode", "ARGB_8888");
-            connectOnMainscreenShow = mSharedPreferences.getBoolean("connectOnMainscreenShow", false);
-            debugLog = mSharedPreferences.getBoolean("debugLog", false);
-            
-            // auto start and stop settings
-            startOnBoot = mSharedPreferences.getBoolean("startOnBoot", false);
-            startOnPowerConnected = mSharedPreferences.getBoolean("startOnPowerConnected", false);
-            startOnWifiConnected = mSharedPreferences.getBoolean("startOnWifiConnected", false);
-            stopOnPowerDisconnected = mSharedPreferences.getBoolean("stopOnPowerDisconnected", false);
-            stopOnWifiDisconnected = mSharedPreferences.getBoolean("stopOnWifiDisconnected", false);
-            stopOnPowerDelay = mSharedPreferences.getInt("stopOnPowerDelay", 1);
-            
-            // pulic intent settings
-            publicIntentsEnabled = mSharedPreferences.getBoolean("publicIntentsEnabled", false);
-            publicIntentTokenRequired = mSharedPreferences.getBoolean("publicIntentTokenRequired", false);
-            publicIntentToken = mSharedPreferences.getString("publicIntentToken", "secret");
-            
-            // reply command settings
-            dontDisplayRecipient = false; // TODO
-	}
+    private void importPreferences() {       
+        serverHost = mSharedPreferences.getString("serverHost", "");
+        serverPort = mSharedPreferences.getInt("serverPort", 0);
+        
+        _notifiedAddress = mSharedPreferences.getString("notifiedAddress", "");
+        _login = mSharedPreferences.getString("login", "");
+        
+        manuallySpecifyServerSettings = mSharedPreferences.getBoolean("manuallySpecifyServerSettings", false);
+        if (manuallySpecifyServerSettings) {
+            serviceName = mSharedPreferences.getString("serviceName", "");
+        } else {
+            serviceName = StringUtils.parseServer(_login);
+        }
+        
+        _password =  mSharedPreferences.getString("password", "");
+        xmppSecurityMode = mSharedPreferences.getString("xmppSecurityMode", "opt");
+        if(xmppSecurityMode.equals("req")) {
+            xmppSecurityModeInt = XMPPSecurityRequired;
+        } else if (xmppSecurityMode.equals("dis")) {
+            xmppSecurityModeInt = XMPPSecurityDisabled;
+        } else {
+            xmppSecurityModeInt = XMPPSecurityOptional;
+        }
+        useCompression = mSharedPreferences.getBoolean("useCompression", false);
+        
+        useGoogleMapUrl = mSharedPreferences.getBoolean("useGoogleMapUrl", true);
+        useOpenStreetMapUrl = mSharedPreferences.getBoolean("useOpenStreetMapUrl", false);
+        
+        showStatusIcon = mSharedPreferences.getBoolean("showStatusIcon", false);
+        
+        notifyApplicationConnection = mSharedPreferences.getBoolean("notifyApplicationConnection", false);
+        notifyBattery = mSharedPreferences.getBoolean("notifyBattery", false);
+        notifyBatteryInStatus = mSharedPreferences.getBoolean("notifyBatteryInStatus", true);
+        batteryNotificationInterval = mSharedPreferences.getString("batteryNotificationInterval", "10");
+        batteryNotificationIntervalInt = Integer.parseInt(batteryNotificationInterval);
+        notifySmsSent = mSharedPreferences.getBoolean("notifySmsSent", true);
+        notifySmsDelivered = mSharedPreferences.getBoolean("notifySmsDelivered", false);
+        notifySmsSentDelivered = notifySmsSent || notifySmsDelivered;
+        ringtone = mSharedPreferences.getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
+        showSentSms = mSharedPreferences.getBoolean("showSentSms", false);
+        markSmsReadOnReply = mSharedPreferences.getBoolean("markSmsReadOnReply", false);
+        smsNumber = mSharedPreferences.getInt("smsNumber", 5);
+        callLogsNumber = mSharedPreferences.getInt("callLogsNumber", 10);
+        formatResponses = mSharedPreferences.getBoolean("formatResponses", false);
+        notifyIncomingCalls = mSharedPreferences.getBoolean("notifyIncomingCalls", false);
+        displayIconIndex = mSharedPreferences.getString("displayIconIndex", "0");
+        
+        String localeStr = mSharedPreferences.getString("locale", "default");
+        if (localeStr.equals("default")) {
+            locale = Locale.getDefault();
+        } else {
+            locale = new Locale(localeStr);
+        }
+        
+        roomPassword = mSharedPreferences.getString("roomPassword", "gtalksms");
+        forceMucServer = mSharedPreferences.getBoolean("forceMucServer", false);
+        mucServer = mSharedPreferences.getString("mucServer", "conference.jwchat.org");
+        String notificationIncomingSmsType = mSharedPreferences.getString("notificationIncomingSmsType", "same");
+        
+        if (notificationIncomingSmsType.equals("both")) {
+            notifySmsInChatRooms = true;
+            notifySmsInSameConversation = true;
+        } else if (notificationIncomingSmsType.equals("no")) {
+            notifySmsInChatRooms = false;
+            notifySmsInSameConversation = false;
+        } else if (notificationIncomingSmsType.equals("separate")) {
+            notifySmsInChatRooms = true;
+            notifySmsInSameConversation = false;
+        } else {
+            notifySmsInSameConversation = true;
+            notifySmsInChatRooms = false;
+        }
+        smsMagicWord = mSharedPreferences.getString("smsMagicWord", "GTalkSMS");
+        notifyInMuc = mSharedPreferences.getBoolean("notifyInMuc", false); 
+        smsReplySeparate = mSharedPreferences.getBoolean("smsReplySeparate", false);
+        framebufferMode = mSharedPreferences.getString("framebufferMode", "ARGB_8888");
+        _connectOnMainScreenStartup = mSharedPreferences.getBoolean("connectOnMainscreenShow", false);
+        debugLog = mSharedPreferences.getBoolean("debugLog", false);
+        
+        // auto start and stop settings
+        startOnBoot = mSharedPreferences.getBoolean("startOnBoot", false);
+        startOnPowerConnected = mSharedPreferences.getBoolean("startOnPowerConnected", false);
+        startOnWifiConnected = mSharedPreferences.getBoolean("startOnWifiConnected", false);
+        stopOnPowerDisconnected = mSharedPreferences.getBoolean("stopOnPowerDisconnected", false);
+        stopOnWifiDisconnected = mSharedPreferences.getBoolean("stopOnWifiDisconnected", false);
+        stopOnPowerDelay = mSharedPreferences.getInt("stopOnPowerDelay", 1);
+        
+        // pulic intent settings
+        publicIntentsEnabled = mSharedPreferences.getBoolean("publicIntentsEnabled", false);
+        publicIntentTokenRequired = mSharedPreferences.getBoolean("publicIntentTokenRequired", false);
+        publicIntentToken = mSharedPreferences.getString("publicIntentToken", "secret");
+        
+        // reply command settings
+        dontDisplayRecipient = false; // TODO
+    }
 }

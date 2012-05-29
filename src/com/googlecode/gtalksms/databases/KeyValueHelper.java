@@ -12,13 +12,13 @@ import android.content.Context;
  *
  */
 public class KeyValueHelper {
-	public static final String KEY_LAST_RECIPIENT = "lastRecipient";
-	public static final String KEY_SEND_DIR = "sendDir";
-	public static final String KEY_SMS_ID = "smsID";
-	public static final String KEY_SINTENT = "sIntent";
-	public static final String KEY_DINTENT = "dIntent";
-	public static final String KEY_XMPP_STATUS = "xmppStatus";
-	
+    public static final String KEY_LAST_RECIPIENT = "lastRecipient";
+    public static final String KEY_SEND_DIR = "sendDir";
+    public static final String KEY_SMS_ID = "smsID";
+    public static final String KEY_SINTENT = "sIntent";
+    public static final String KEY_DINTENT = "dIntent";
+    public static final String KEY_XMPP_STATUS = "xmppStatus";
+    
     private static KeyValueHelper keyValueHelper = null;
     
     /**
@@ -30,10 +30,10 @@ public class KeyValueHelper {
     }
     
     public static KeyValueHelper getKeyValueHelper(Context ctx) {
-    	if (keyValueHelper == null) {
-    		keyValueHelper = new KeyValueHelper(ctx);
-    	}
-    	return keyValueHelper;
+        if (keyValueHelper == null) {
+            keyValueHelper = new KeyValueHelper(ctx);
+        }
+        return keyValueHelper;
     }
     
     public boolean addKey(String key, String value) {
@@ -54,31 +54,31 @@ public class KeyValueHelper {
     
     public boolean containsKey(String key) {
         if(!key.contains("'")) {
-    		return KeyValueDatabase.containsKey(key);
+            return KeyValueDatabase.containsKey(key);
         } else {
-        	return false;
+            return false;
         }
         
     }
      
-	public String getValue(String key) {
-		if (!key.contains("'")) {
-			return KeyValueDatabase.getValue(key);
-		} else {
-			return null;
-		}
-	}
-	
-	public Integer getIntegerValue(String key) {
-	    String value = getValue(key);
-	    Integer res;
-	    try {
-	    res = Integer.parseInt(value);
-	    } catch (Exception e) {
-	        res = null;
-	    }
-	    return res;
-	}
+    public String getValue(String key) {
+        if (!key.contains("'")) {
+            return KeyValueDatabase.getValue(key);
+        } else {
+            return null;
+        }
+    }
+    
+    public Integer getIntegerValue(String key) {
+        String value = getValue(key);
+        Integer res;
+        try {
+        res = Integer.parseInt(value);
+        } catch (Exception e) {
+            res = null;
+        }
+        return res;
+    }
     
     public String[][] getAllKeyValue() {
         String[][] res = KeyValueDatabase.getFullDatabase();

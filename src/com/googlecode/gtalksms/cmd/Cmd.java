@@ -14,6 +14,8 @@ public class Cmd {
     public class SubCmd {
         private String mName;
         private String mHelp;
+        private String mHelpMsg;
+        private String mHelpArgs;
         private String [] mAlias;
         
         SubCmd(String name, Cmd baseCmd, int resHelp, String args, Object... alias) {
@@ -23,6 +25,8 @@ public class Cmd {
                 mAlias[i] = alias[i].toString();  
             }
             
+            mHelpMsg = getString(resHelp);
+            mHelpArgs = args;
             mHelp = buildHelp(baseCmd, mName, mAlias, resHelp, args);
         }
         
@@ -32,6 +36,14 @@ public class Cmd {
         
         public String getHelp() {
             return mHelp;
+        }
+
+        public String getHelpMsg() {
+            return mHelpMsg;
+        }
+        
+        public String getHelpArgs() {
+            return mHelpArgs;
         }
         
         public String[] getAlias() {
@@ -120,6 +132,18 @@ public class Cmd {
     
     public String getHelp() {
         return buildHelp(null, mName, mAlias, mResHelp, mHelpArgs);
+    }
+    
+    public String getHelpMsg() {
+        if (mResHelp != 0) {
+            return getString(mResHelp);
+        } else {
+            return "";
+        }
+    }
+    
+    public String getHelpArgs() {
+        return mHelpArgs;
     }
     
     public String getHelpSummary() {

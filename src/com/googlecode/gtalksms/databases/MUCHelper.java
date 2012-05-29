@@ -11,7 +11,7 @@ import android.content.Context;
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
  *
  */
-public class MUCHelper {	
+public class MUCHelper {    
     private static MUCHelper mucHelper = null;
     
     /**
@@ -23,10 +23,10 @@ public class MUCHelper {
     }
     
     public static MUCHelper getMUCHelper(Context ctx) {
-    	if (mucHelper == null) {
-    		mucHelper = new MUCHelper(ctx);
-    	}
-    	return mucHelper;
+        if (mucHelper == null) {
+            mucHelper = new MUCHelper(ctx);
+        }
+        return mucHelper;
     }
     
     public boolean addMUC(String muc, String number) {
@@ -47,9 +47,9 @@ public class MUCHelper {
     
     public boolean containsMUC(String muc) {
         if(!muc.contains("'")) {
-    		return MUCDatabase.containsMUC(muc);
+            return MUCDatabase.containsMUC(muc);
         } else {
-        	return false;
+            return false;
         }
         
     }

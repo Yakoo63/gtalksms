@@ -12,7 +12,7 @@ import android.database.Cursor;
  *
  */
 public class KeyValueDatabase extends Database {
-	
+    
     public KeyValueDatabase(Context ctx) {
         super(ctx);
     }

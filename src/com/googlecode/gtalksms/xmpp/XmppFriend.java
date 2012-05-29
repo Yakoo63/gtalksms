@@ -1,6 +1,6 @@
 package com.googlecode.gtalksms.xmpp;
 
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
+import com.googlecode.gtalksms.Log;
 
 public class XmppFriend {
     
@@ -38,7 +38,7 @@ public class XmppFriend {
         case OFFLINE:
             return "Offline";
         default:
-            GoogleAnalyticsHelper.trackAndLogError("XMPP Friend state unknown: " + state);
+            Log.e("XMPP Friend state unknown: " + state);
             return "unkown";
         }
     }

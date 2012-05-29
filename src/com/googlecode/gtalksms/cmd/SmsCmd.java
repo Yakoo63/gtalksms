@@ -80,7 +80,7 @@ public class SmsCmd extends CommandHandlerBase {
 
     @Override
     protected void execute(String command, String args) {
-    	String contactInformation;
+        String contactInformation;
         if (isMatchingCmd("sms", command)) {
             int separatorPos = args.indexOf(":");
             contactInformation = null;
@@ -126,16 +126,16 @@ public class SmsCmd extends CommandHandlerBase {
                 markSmsAsReadByNumber(RecipientCmd.getLastRecipientNumber(), RecipientCmd.getLastRecipientName());
             }
         } else if (command.equals("chat")) {
-        	if (args.length() > 0) {
+            if (args.length() > 0) {
                 inviteRoom(args);
-        	} else if (RecipientCmd.getLastRecipientNumber() != null) {
-        	    try {
-					XmppMuc.getInstance(sContext).inviteRoom(RecipientCmd.getLastRecipientNumber(), RecipientCmd.getLastRecipientName(), XmppMuc.MODE_SMS);
-				} catch (XMPPException e) {
-					// Creation of chat with last recipient failed
-				    send(R.string.chat_error, e.getLocalizedMessage());
-				}
-        	}
+            } else if (RecipientCmd.getLastRecipientNumber() != null) {
+                try {
+                    XmppMuc.getInstance(sContext).inviteRoom(RecipientCmd.getLastRecipientNumber(), RecipientCmd.getLastRecipientName(), XmppMuc.MODE_SMS);
+                } catch (XMPPException e) {
+                    // Creation of chat with last recipient failed
+                    send(R.string.chat_error, e.getLocalizedMessage());
+                }
+            }
         } else if (isMatchingCmd("delsms", command)) {
             if (args.length() == 0) {
                 send(R.string.chat_del_sms_syntax);
@@ -265,12 +265,13 @@ public class SmsCmd extends CommandHandlerBase {
      */
     private void searchSMS(String message, String contactName) {
         ArrayList<Contact> contacts;
-        ArrayList<Sms> sentSms = null;
+        ArrayList<Sms> sentSms = new ArrayList<Sms>();
         
         send(R.string.chat_sms_search_start);
         
         contacts = ContactsManager.getMatchingContacts(sContext, contactName != null ? contactName : "*");
         
+        // TODO There is an issue if we are looking for a number
         if (sSettingsMgr.showSentSms) {
             sentSms = mSmsMmsManager.getAllSentSms(message);
         }
@@ -636,17 +637,21 @@ public class SmsCmd extends CommandHandlerBase {
         sms.setHelp(R.string.chat_help_sms_show_all, null);
         sms.AddSubCmd("unread", R.string.chat_help_sms_show_unread, null);
         sms.AddSubCmd("#contact#", R.string.chat_help_sms_show_contact, null);
-        sms.AddSubCmd("#contact#:#message#", R.string.chat_help_sms_send, null);
+        sms.AddSubCmd("#contact#", R.string.chat_help_sms_send, "#message#");
                
         Cmd fs = mCommandMap.get("findsms");
-        fs.AddSubCmd("#message#", R.string.chat_help_find_sms_all, null);
-        fs.AddSubCmd("#contact#:#message#", R.string.chat_help_find_sms, null);
+        fs.setHelp(R.string.chat_help_find_sms_all, "#message#");
+        fs.AddSubCmd("#contact#", R.string.chat_help_find_sms, "#message#");
         
         Cmd del = mCommandMap.get("delsms");
+        del.setHelp(R.string.chat_help_del_sms, null);
         del.AddSubCmd("all", R.string.chat_help_del_sms_all, null);
         del.AddSubCmd("sent", R.string.chat_help_del_sms_sent, null);
         del.AddSubCmd("last", R.string.chat_help_del_sms_last, "#number#");
+        del.AddSubCmd("lastin", R.string.chat_help_del_sms_last_in, "#number#");
+        del.AddSubCmd("lastout", R.string.chat_help_del_sms_last_out, "#number#");
         del.AddSubCmd("contact", R.string.chat_help_del_sms_contact, "#contact#");
+        del.AddSubCmd("number", R.string.chat_help_del_sms_number, "#phone_number#");
         
         mCommandMap.get("reply").setHelp(R.string.chat_help_sms_reply, "#message#");   
         mCommandMap.get("chat").setHelp(R.string.chat_help_sms_chat, "#contact#");   

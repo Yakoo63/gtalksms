@@ -2,10 +2,10 @@ package com.googlecode.gtalksms.cmd.smsCmd;
 
 import java.util.Map;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.databases.SMSHelper;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 import android.app.Activity;
 import android.content.Context;
@@ -46,7 +46,7 @@ public class DeliveredIntentReceiver extends SmsPendingIntentReceiver {
     @Override
     public void onReceiveWithoutSms(Context context, int partNum, int res) {
         answerTo = null;
-        GoogleAnalyticsHelper.trackAndLogWarning("sms in smsMap missing");
+        Log.w("sms in smsMap missing");
         switch (res) {
         case Activity.RESULT_OK:
             send(context.getString(R.string.chat_sms_delivered));

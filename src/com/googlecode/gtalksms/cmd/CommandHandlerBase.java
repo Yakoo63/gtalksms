@@ -135,44 +135,44 @@ public abstract class CommandHandlerBase {
      * @param answerTo
      */
     public final void execute(String cmd, String args, String answerTo) {
-    	/*
-    	 * This method should be depreciated, and currently contains an 
-    	 * experiment to isolate Xmpp From the commands altogether.
-    	 * As the XmppUserCommand class is verified to be good, the XmppUserCommand
-    	 * initialization should be moved out to the caller of this method.
-    	 */
-    	execute(new XmppUserCommand(XmppManager.getInstance(sContext), cmd, args, answerTo));
+        /*
+         * This method should be depreciated, and currently contains an 
+         * experiment to isolate Xmpp From the commands altogether.
+         * As the XmppUserCommand class is verified to be good, the XmppUserCommand
+         * initialization should be moved out to the caller of this method.
+         */
+        execute(new XmppUserCommand(XmppManager.getInstance(sContext), cmd, args, answerTo));
     }
     
     private static class XmppUserCommand extends Command {
-    	private final XmppManager xmppManager;
-		public XmppUserCommand(XmppManager xmppManager, String cmd, String args, String replyTo) {
-			super(cmd + ":" + args, replyTo);
-			this.xmppManager = xmppManager;
-		}
+        private final XmppManager xmppManager;
+        public XmppUserCommand(XmppManager xmppManager, String cmd, String args, String replyTo) {
+            super(cmd + ":" + args, replyTo);
+            this.xmppManager = xmppManager;
+        }
 
-		@Override
-		public void respond(String message) {
-			xmppManager.send(new XmppMsg(message), getReplyTo());
-		}
-		
-		@SuppressWarnings("unused")
-		public void respond(XmppMsg msg) {
-			xmppManager.send(msg, getReplyTo());
-		}
-    	
+        @Override
+        public void respond(String message) {
+            xmppManager.send(new XmppMsg(message), getReplyTo());
+        }
+        
+        @SuppressWarnings("unused")
+        public void respond(XmppMsg msg) {
+            xmppManager.send(msg, getReplyTo());
+        }
+        
     }
     
     public void execute(Command userCommand) {
-    	/*
-    	 * Default implementation is to fall back to old behavior with
-    	 * _answerTo variable and Xmpp awareness in sub classes.
-    	 * <p>
-    	 * Make abstract when execute(String, String) is gone, but for now default to it for
-    	 * backwards compatibility.
-    	 */
-    	this.mAnswerTo = userCommand.getReplyTo();
-    	execute(userCommand.getCommand(), userCommand.getAllArguments());
+        /*
+         * Default implementation is to fall back to old behavior with
+         * _answerTo variable and Xmpp awareness in sub classes.
+         * <p>
+         * Make abstract when execute(String, String) is gone, but for now default to it for
+         * backwards compatibility.
+         */
+        this.mAnswerTo = userCommand.getReplyTo();
+        execute(userCommand.getCommand(), userCommand.getAllArguments());
     }
     
     /**
@@ -186,7 +186,7 @@ public abstract class CommandHandlerBase {
      */
     @Deprecated
     protected void execute(String cmd, String args) {
-    	throw new RuntimeException("Must implement execute(UserCommand)");
+        throw new RuntimeException("Must implement execute(UserCommand)");
     }
         
     /**

@@ -22,10 +22,8 @@ public class BluetoothCmd extends CommandHandlerBase {
             enableAdapter();
         } else if (args.equals("off")) {
             disableAdapter();
-        } else if (args.equals("state")) {
-            showState();
         } else {
-            send(R.string.chat_bt_command_error, args, cmd);
+            showState();
         }
     }
     
@@ -86,8 +84,8 @@ public class BluetoothCmd extends CommandHandlerBase {
     @Override
     protected void initializeSubCommands() {
         Cmd bt = mCommandMap.get("bluetooth");
+        bt.setHelp(R.string.chat_help_bt_state, null);
         bt.AddSubCmd("on", R.string.chat_help_bt_on, null);
         bt.AddSubCmd("off",R.string.chat_help_bt_off, null);
-        bt.AddSubCmd("state",R.string.chat_help_bt_state, null);
     }
 }

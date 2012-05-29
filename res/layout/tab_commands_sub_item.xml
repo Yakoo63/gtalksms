@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    
+    <LinearLayout 
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+        
+        <TextView 
+            android:id="@+id/textViewCmd"
+            android:layout_width="50dip"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:textSize="14dip" />
+        
+        <EditText
+            android:id="@+id/editTextSubCmd"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:inputType="textNoSuggestions"
+            android:imeOptions="actionDone"
+            android:textSize="14dip"
+            android:layout_weight="1" />
+        
+        <EditText
+            android:id="@+id/editTextArgs"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:inputType="textNoSuggestions"
+            android:imeOptions="actionDone"
+            android:textSize="14dip"
+            android:layout_weight="1" />
+        
+        <Button
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:id="@+id/buttonSend"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:background="@drawable/command_send"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+                
+    </LinearLayout>
+         
+    <TextView 
+         android:id="@+id/textViewCmdHelp"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginBottom="10dip"
+         android:textStyle="italic"
+         android:textSize="12dip" />
+
+</LinearLayout>

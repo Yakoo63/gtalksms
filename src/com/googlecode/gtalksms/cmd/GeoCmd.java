@@ -106,7 +106,9 @@ public class GeoCmd extends CommandHandlerBase {
 
     @Override
     protected void initializeSubCommands() {
-        mCommandMap.get("geo").setHelp(R.string.chat_help_geo, "#address#");   
-        mCommandMap.get("where").setHelp(R.string.chat_help_where, "[stop]");   
+        mCommandMap.get("geo").setHelp(R.string.chat_help_geo, "#address#");
+        Cmd where = mCommandMap.get("where");
+        where.setHelp(R.string.chat_help_where, null);
+        where.AddSubCmd("stop", R.string.chat_help_where_stop, null);
     }
 }

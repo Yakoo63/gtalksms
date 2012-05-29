@@ -49,13 +49,11 @@ import com.googlecode.gtalksms.cmd.ToastCmd;
 import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.cmd.WifiCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
-import com.googlecode.gtalksms.panels.MainScreen;
-import com.googlecode.gtalksms.panels.Preferences;
+import com.googlecode.gtalksms.panels.MainActivity;
 import com.googlecode.gtalksms.receivers.PublicIntentReceiver;
 import com.googlecode.gtalksms.receivers.StorageLowReceiver;
 import com.googlecode.gtalksms.tools.CrashedStartCounter;
 import com.googlecode.gtalksms.tools.DisplayToast;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -67,6 +65,7 @@ public class MainService extends Service {
 
     // The following actions are documented and registered in our manifest
     public final static String ACTION_CONNECT = "com.googlecode.gtalksms.action.CONNECT";
+    public final static String ACTION_DISCONNECT = "com.googlecode.gtalksms.action.DISCONNECT";
     public final static String ACTION_TOGGLE = "com.googlecode.gtalksms.action.TOGGLE";
     public final static String ACTION_SEND = "com.googlecode.gtalksms.action.SEND";
     public final static String ACTION_COMMAND = "com.googlecode.gtalksms.action.COMMAND";
@@ -91,6 +90,7 @@ public class MainService extends Service {
     public static final int STATUS_ICON_GREEN = 0;
     public static final int STATUS_ICON_ORANGE = 1;
     public static final int STATUS_ICON_RED = 2;
+    public static final int STATUS_ICON_BLUE = 3;
 
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
@@ -116,9 +116,6 @@ public class MainService extends Service {
     private final IBinder mBinder = new LocalBinder();
 
     private long mHandlerThreadId;
-
-    // to get the helper use MainService.getAnalyticsHelper()
-    private static GoogleAnalyticsHelper sGoogleAnalytics;
 
     private static Context sUiContext;
 
@@ -171,8 +168,7 @@ public class MainService extends Service {
             throw new IllegalThreadStateException();
         }
         // We need to handle XMPP state changes which happened "externally" -
-        // eg,
-        // due to a connection error, or running out of retries, or a retry
+        // eg, due to a connection error, or running out of retries, or a retry
         // handler actually succeeding etc.
         int initialState = getConnectionStatus();
         updateListenersToCurrentState(initialState);
@@ -189,6 +185,8 @@ public class MainService extends Service {
                 // A simple 'connect' request.
                 sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             }
+        } else if (action.equals(ACTION_DISCONNECT)) {
+            sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
         } else if (action.equals(ACTION_TOGGLE)) {
             switch (initialState) {
                 case XmppManager.CONNECTED:
@@ -263,9 +261,6 @@ public class MainService extends Service {
             boolean available = intent.getBooleanExtra("available", true);
             boolean failover = intent.getBooleanExtra("failover", false);
             Log.i("network_changed with available=" + available + ", failover=" + failover + " and when in state: " + XmppManager.statusAsString(initialState));
-            if (available) {
-                GoogleAnalyticsHelper.dispatch();
-            }
             // We are in a waiting state and have a network - try to connect.
             if (available && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
                 sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
@@ -297,7 +292,7 @@ public class MainService extends Service {
             // ACTION_XMPP_CONNECTION_CHANGED is handled implicitly by every
             // call
         } else if (!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {
-            GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
+            Log.w("Unexpected intent: " + action);
         }
         Log.i("handled action '" + action + "' - state now: " + sXmppMgr.statusString());
 
@@ -321,7 +316,7 @@ public class MainService extends Service {
     }
 
     public Set<CommandHandlerBase> getCommandSet() {
-        return sCommandSet;
+        return new HashSet<CommandHandlerBase>(sCommandSet);
     }
 
     public boolean getTLSStatus() {
@@ -332,10 +327,6 @@ public class MainService extends Service {
     public boolean getCompressionStatus() {
         // null check necessary
         return sXmppMgr == null ? false : sXmppMgr.getCompressionStatus();
-    }
-
-    public static GoogleAnalyticsHelper getAnalyticsHelper() {
-        return sGoogleAnalytics;
     }
 
     public void updateBuddies() {
@@ -362,8 +353,6 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        sGoogleAnalytics = new GoogleAnalyticsHelper(this);
-        sGoogleAnalytics.trackInstalls();
         sPm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         sWl = sPm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, Tools.APP_NAME + " WakeLock");
 
@@ -382,7 +371,7 @@ public class MainService extends Service {
 
         sUiContext = this;
 
-        sContentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainScreen.class), 0);
+        sContentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
 
         Log.i("onCreate(): service thread created - IsRunning is set to true");
         IsRunning = true;
@@ -405,7 +394,6 @@ public class MainService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        sGoogleAnalytics.trackServiceStartsPerDay();
         if (intent == null) {
             // The application has been killed by Android and
             // we try to restart the connection
@@ -414,7 +402,7 @@ public class MainService extends Service {
                 CrashedStartCounter.getInstance(this).count();
                 startService(new Intent(MainService.ACTION_CONNECT));
             } else {
-                GoogleAnalyticsHelper.trackAndLogWarning("onStartCommand() null intent with Gingerbread or higher");
+                Log.w("onStartCommand() null intent with Gingerbread or higher");
             }
             return START_STICKY;
         }
@@ -428,15 +416,15 @@ public class MainService extends Service {
             // A real action request
         } else {
             // check if the user has done his part
-            if (sSettingsMgr.notifiedAddress == null || sSettingsMgr.notifiedAddress.equals("") || sSettingsMgr.notifiedAddress.equals("your.login@gmail.com")) {
-                Log.w("Preferences not set! Showing preferences page.");
-                displayToast(R.string.main_toast_pref_not_set, null);
-                Intent settingsActivity = new Intent(this, Preferences.class);
-                settingsActivity.putExtra("panel", R.xml.prefs_connection);
-                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(settingsActivity);
-                return START_STICKY;
-            }
+//            if (sSettingsMgr.getNotifiedAddress() == null || sSettingsMgr.getNotifiedAddress().equals("") || sSettingsMgr.getNotifiedAddress().equals("your.login@gmail.com")) {
+//                Log.w("Preferences not set! Showing preferences page.");
+//                displayToast(R.string.main_toast_pref_not_set, null);
+//                Intent settingsActivity = new Intent(this, Preferences.class);
+//                settingsActivity.putExtra("panel", R.xml.prefs_connection);
+//                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(settingsActivity);
+//                return START_STICKY;
+//            }
 
             // redirect the intent to the service handler thread
             sendToServiceHandler(startId, intent);
@@ -463,7 +451,12 @@ public class MainService extends Service {
             sXmppMgr = null;
         }
         teardownListenersForConnection();
-        GoogleAnalyticsHelper.stop();
+        // All data must be cleaned, because onDestroy can be call without releasing the current object
+        // It's due to BIND_AUTO_CREATE used for Service Binder
+        // http://developer.android.com/reference/android/content/Context.html#stopService(android.content.Intent)
+        sCommands.clear();
+        sCommandSet.clear();
+        
         sServiceLooper.quit();
         super.onDestroy();
         Log.i("MainService onDestroy(): service destroyed");
@@ -494,7 +487,7 @@ public class MainService extends Service {
         if (sXmppMgr != null) {
             sXmppMgr.send(msg, to);
         } else {
-            GoogleAnalyticsHelper.trackAndLogError("MainService send XmppMsg: _xmppMgr == null");
+            Log.w("MainService send XmppMsg: _xmppMgr == null");
         }
     }
 
@@ -570,8 +563,7 @@ public class MainService extends Service {
                 }
             } catch (Exception e) {
                 String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
-                Log.e("executeCommand: " + error, e);
-                GoogleAnalyticsHelper.trackAndLogError("executeCommnad: exception ", e);
+                Log.e("executeCommand() Exception", e);
                 send(getString(R.string.chat_error, error), answerTo);
             }
         } else {
@@ -592,6 +584,9 @@ public class MainService extends Service {
                     break;
                 case STATUS_ICON_RED:
                     res = R.drawable.class.getField("status_red_" + index).getInt(null);
+                    break;
+                case STATUS_ICON_BLUE:
+                    res = R.drawable.class.getField("status_blue_" + index).getInt(null);
                     break;
             }
         } catch (Exception e) {
@@ -626,7 +621,7 @@ public class MainService extends Service {
                 case XmppManager.WAITING_FOR_NETWORK:
                     String msgNotif = getString(R.string.main_service_waiting);
                     msg = getString(R.string.main_service_waiting_to_connect);
-                    notification = new Notification(getImageStatus(STATUS_ICON_ORANGE), msgNotif, System.currentTimeMillis());
+                    notification = new Notification(getImageStatus(STATUS_ICON_BLUE), msgNotif, System.currentTimeMillis());
                     break;
                 default:
                     throw new IllegalStateException("onConnectionSTatusChanged: Unkown status int");
@@ -711,7 +706,6 @@ public class MainService extends Service {
             } catch (Exception e) {
                 // Should not happen.
                 Log.e("Failed to register command " + c.getName(), e);
-                GoogleAnalyticsHelper.trackAndLogError("MainService.setupListenersForConnection: Setup commands error", e);
             }
         }
     }
@@ -770,7 +764,7 @@ public class MainService extends Service {
         if (wantListeners && !sListenersActive) {
             setupListenersForConnection();
             sListenersActive = true;
-        } else if (!wantListeners && sListenersActive) {
+        } else if (!wantListeners) {
             teardownListenersForConnection();
             sListenersActive = false;
         }
@@ -811,18 +805,18 @@ public class MainService extends Service {
      * @return
      */
     public static boolean sendToServiceHandler(int i, Intent intent) {
-    	if (sServiceHandler != null) {
+        if (sServiceHandler != null) {
             Message msg = sServiceHandler.obtainMessage();
             msg.arg1 = i;
             msg.obj = intent;
             sServiceHandler.sendMessage(msg);
             return true;
-    	} else {
-    		Log.w("sendToServiceHandler() called with " 
-    				+ intent.getAction() 
-    				+ " when service handler is null");
-    		return false;
-    	}
+        } else {
+            Log.w("sendToServiceHandler() called with " 
+                    + intent.getAction() 
+                    + " when service handler is null");
+            return false;
+        }
     }
 
     /**
@@ -831,6 +825,6 @@ public class MainService extends Service {
      * @return
      */
     public static boolean sendToServiceHandler(Intent intent) {
-    	return sendToServiceHandler(0, intent);
+        return sendToServiceHandler(0, intent);
     }
 }

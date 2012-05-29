@@ -28,7 +28,6 @@ import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.databases.MUCHelper;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMuc {
@@ -42,7 +41,7 @@ public class XmppMuc {
     private static final long REJOIN_ROOMS_SLEEP = 1000;
 
     private static XmppMuc sXmppMuc;
-	
+    
     private Map<String, MultiUserChat> mRooms = new HashMap<String, MultiUserChat>();
     private Set<Integer> mRoomNumbers = new HashSet<Integer>();
     private Context mCtx;
@@ -84,7 +83,7 @@ public class XmppMuc {
                     }
                 } catch (XMPPException e) {
                     // This is not fatal, just log a warning
-                    GoogleAnalyticsHelper.trackAndLogWarning("Could not discover local MUC component: ", e);            
+                    Log.w("Could not discover local MUC component: ", e);            
                 }
             }
         };
@@ -149,24 +148,24 @@ public class XmppMuc {
      * @return true if successful, otherwise false
      * @throws XMPPException 
      */
-	public MultiUserChat inviteRoom(String number, String contact, int mode)
-			throws XMPPException {
-		MultiUserChat muc;
-		if (!mRooms.containsKey(number)) {
-			muc = createRoom(number, contact, mode);
-			mRooms.put(number, muc);
+    public MultiUserChat inviteRoom(String number, String contact, int mode)
+            throws XMPPException {
+        MultiUserChat muc;
+        if (!mRooms.containsKey(number)) {
+            muc = createRoom(number, contact, mode);
+            mRooms.put(number, muc);
 
-		} else {
-			muc = mRooms.get(number);
-			// TODO: test if occupants contains also the sender (in case we
-			// invite other people)
-			if (muc != null && muc.getOccupantsCount() < 2) {
-				muc.invite(mSettings.notifiedAddress, "SMS conversation with "
-						+ contact);
-			}
-		}
-		return muc;
-	}   
+        } else {
+            muc = mRooms.get(number);
+            // TODO: test if occupants contains also the sender (in case we
+            // invite other people)
+            if (muc != null && muc.getOccupantsCount() < 2) {
+                muc.invite(mSettings.getNotifiedAddress(), "SMS conversation with "
+                        + contact);
+            }
+        }
+        return muc;
+    }   
     
     /**
      * Checks if a room for the specific number
@@ -176,7 +175,7 @@ public class XmppMuc {
      * @return true if the room exists and gtalksms is in it, otherwise false
      */
     public boolean roomExists(String number) {
-    	return mRooms.containsKey(number);
+        return mRooms.containsKey(number);
     }    
     
     /**
@@ -198,7 +197,7 @@ public class XmppMuc {
         }
         return null;
     }
-	
+    
     /**
      * Creates a new MUC AND invites the user
      * room name will be extended with an random number for security purposes
@@ -227,12 +226,12 @@ public class XmppMuc {
         // TODO localize
         switch (mode) {
             case MODE_SMS:
-                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + mSettings.login.replaceAll("@", "_") + "@" + getMUCServer();
+                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + mSettings.getLogin().replaceAll("@", "_") + "@" + getMUCServer();
                 subjectInviteStr =  "SMS conversation with " + getRoomString(number, name);
                 break;
 
             case MODE_SHELL:
-                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + mSettings.login.replaceAll("@", "_") + "@" + getMUCServer();
+                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + mSettings.getLogin().replaceAll("@", "_") + "@" + getMUCServer();
                 subjectInviteStr =  "New Android Terminal " + getRoomString(number, name);
                 break;
 
@@ -259,16 +258,12 @@ public class XmppMuc {
 
             try {
                 List<String> owners = new ArrayList<String>();
-                if (mSettings.useDifferentAccount) {
-                    owners.add(mSettings.login);
-                    owners.add(mSettings.notifiedAddress);
-                } else {
-                    owners.add(mSettings.login);
-                }
+                owners.add(mSettings.getLogin());
+                owners.add(mSettings.getNotifiedAddress());
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
                 // Password protected MUC fallback code begins here
-                GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + getMUCServer()
+                Log.w("Unable to configure room owners on Server " + getMUCServer()
                         + ". Falling back to room passwords", ex);
                 // Seee http://xmpp.org/registrar/formtypes.html#http:--jabber.org-protocol-mucroomconfig
                 try {
@@ -290,13 +285,13 @@ public class XmppMuc {
             multiUserChat.sendConfigurationForm(submitForm);
             multiUserChat.changeSubject(subjectInviteStr);
         } catch (XMPPException e1) {
-            GoogleAnalyticsHelper.trackAndLogWarning("Unable to send conference room configuration form.", e1);
+            Log.w("Unable to send conference room configuration form.", e1);
             send(mCtx.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
             // then we also should not send an invite as the room will be locked
             throw e1;
         }
 
-        multiUserChat.invite(mSettings.notifiedAddress, subjectInviteStr);
+        multiUserChat.invite(mSettings.getNotifiedAddress(), subjectInviteStr);
         registerRoom(multiUserChat, number, name, randomInt, mode);
         return multiUserChat;
     }
@@ -329,12 +324,12 @@ public class XmppMuc {
     }
 
     private void registerRoom(MultiUserChat muc, String number, String name) {
-    	String roomJID = muc.getRoom();
-    	Integer randomInt = getRoomInt(roomJID);
-    	// TODO This contains not so safe, if we have a user that has 
-    	// the string "_SMS_" in his name. A cleaner way would be to 
-    	// extend the MUC DB with this information.
-    	registerRoom(muc, number, name, randomInt, roomJID.toUpperCase().contains("_SMS_") ? MODE_SMS : MODE_SHELL);
+        String roomJID = muc.getRoom();
+        Integer randomInt = getRoomInt(roomJID);
+        // TODO This contains not so safe, if we have a user that has 
+        // the string "_SMS_" in his name. A cleaner way would be to 
+        // extend the MUC DB with this information.
+        registerRoom(muc, number, name, randomInt, roomJID.toUpperCase().contains("_SMS_") ? MODE_SMS : MODE_SHELL);
     }
     
     private void registerRoom(MultiUserChat muc, String number, String name, Integer randomInt, int mode) {
@@ -353,13 +348,13 @@ public class XmppMuc {
      * @return the roomInfo or null
      */
     private RoomInfo getRoomInfo(String room) {
-    	RoomInfo info;
-    	try {
-    		info = MultiUserChat.getRoomInfo(mConnection, room);
-    	} catch (XMPPException e) {
-    		return null;
-    	}
-    	return info;
+        RoomInfo info;
+        try {
+            info = MultiUserChat.getRoomInfo(mConnection, room);
+        } catch (XMPPException e) {
+            return null;
+        }
+        return info;
     }
     
     /**
@@ -369,11 +364,11 @@ public class XmppMuc {
      * @return
      */
     private boolean affilateCheck(Collection<Affiliate> affCol) {
-    	Set<String> jids = new HashSet<String>();
-    	for (Affiliate a : affCol) {
-    		jids.add(a.getJid());
-    	}
-    	return jids.contains(mSettings.login);    	
+        Set<String> jids = new HashSet<String>();
+        for (Affiliate a : affCol) {
+            jids.add(a.getJid());
+        }
+        return jids.contains(mSettings.getLogin());        
     }
     /**
      * Extracts the room random integer from the room JID
@@ -382,8 +377,8 @@ public class XmppMuc {
      * @return
      */
     private Integer getRoomInt(String room) {
-    	int intEnd = room.indexOf("_", ROOM_START_TAG_LENGTH);
-    	return new Integer(room.substring(ROOM_START_TAG_LENGTH, intEnd));    	
+        int intEnd = room.indexOf("_", ROOM_START_TAG_LENGTH);
+        return new Integer(room.substring(ROOM_START_TAG_LENGTH, intEnd));        
     }
         
     /**

@@ -20,7 +20,6 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -74,14 +73,9 @@ public class LocationService extends Service {
                 allowedLocationProviders += "," + LocationManager.GPS_PROVIDER;
             }
             Settings.System.putString(getContentResolver(), Settings.System.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
-            try {
-                Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
-                m.setAccessible(true);
-                m.invoke(_locationManager, new Object[] {});
-            } catch (Exception e) {
-                GoogleAnalyticsHelper.trackAndLogWarning("LocationService.setGPSStatus() exception on Android SDK Level: " + Build.VERSION.SDK_INT, e);
-                throw e;
-            }
+            Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
+            m.setAccessible(true);
+            m.invoke(_locationManager, new Object[] {});
         // use the secuirty hole from http://code.google.com/p/android/issues/detail?id=7890
         } else {
             // the GPS is not in the requested state
@@ -134,12 +128,12 @@ public class LocationService extends Service {
         
         // try to enable the GPS
         if (!getGPSStatus()) {
-			try {
-				setGPSStatus(true);
-			} catch (Exception e) {
-				send("Could not enable GPS: " + e);
-			}
-		}
+            try {
+                setGPSStatus(true);
+            } catch (Exception e) {
+                send("Could not enable GPS: " + e);
+            }
+        }
         
         _locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
@@ -185,11 +179,11 @@ public class LocationService extends Service {
     }
     
     private void send(String message) {
-    	Tools.send(message, answerTo, this);
+        Tools.send(message, answerTo, this);
     }
     
     private void send(XmppMsg msg) {
-    	Tools.send(msg, answerTo, this);
+        Tools.send(msg, answerTo, this);
     }
 
     /** 
