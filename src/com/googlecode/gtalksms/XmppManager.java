@@ -12,6 +12,7 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.SmackAndroid;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -29,12 +30,12 @@ import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.xbill.DNS.Lookup;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.os.Build;
 
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
@@ -124,13 +125,14 @@ public class XmppManager {
             Connection.DEBUG_ENABLED = true;
         }
         
+        SmackAndroid.init(context);
+        
         mReconnectHandler = new Handler(MainService.getServiceLooper());
         
         mConnectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
         mSettings = SettingsManager.getSettingsManager(context);
         Log.initialize(mSettings);
         mContext = context;
-        ConfigureProviderManager.configureProviderManager();
         mXmppBuddies = XmppBuddies.getInstance(context);
         mXmppFileMgr = XmppFileManager.getInstance(context);
         mXmppMuc = XmppMuc.getInstance(context);
@@ -153,6 +155,7 @@ public class XmppManager {
         SmackConfiguration.setKeepAliveInterval(1000 * 60 * 12);  // 12 min
         SmackConfiguration.setPacketReplyTimeout(1000 * 40);      // 40 sec
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
+        SmackConfiguration.setLocalSocks5ProxyPort(-7777);        // negative number means try next port if already in use
         
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
         // connection can be null, it is created on demand
@@ -466,10 +469,6 @@ public class XmppManager {
         
         // everything is ready for a connection attempt
         updateStatus(CONNECTING);
-        
-        // Workaround for aSmack Issue 5
-        // https://github.com/Flowdalic/asmack/issues/5
-        Lookup.refreshDefault();
 
         // create a new connection if the connection is obsolete or if the
         // old connection is still active
@@ -667,7 +666,6 @@ public class XmppManager {
      * @throws XMPPException 
      */
     private static XMPPConnection createNewConnection(SettingsManager settings) throws XMPPException {
-        String trustStorePath;
         ConnectionConfiguration conf;
 
         if (settings.manuallySpecifyServerSettings) {
@@ -679,18 +677,23 @@ public class XmppManager {
             // but on a real device it just works fine
             // see: http://stackoverflow.com/questions/2879455/android-2-2-and-bad-address-family-on-socket-connect
             // and http://code.google.com/p/android/issues/detail?id=9431            
-            conf = new AndroidConnectionConfiguration(settings.serviceName, DNSSRV_TIMEOUT);
+            conf = new AndroidConnectionConfiguration(settings.serviceName, DNSSRV_TIMEOUT):
         }
-
-        conf.setTruststoreType("BKS");
-        trustStorePath = System.getProperty("javax.net.ssl.trustStore");
-        if (trustStorePath == null) {
-            trustStorePath = System.getProperty("java.home") + File.separator
-                    + "etc" + File.separator + "security" + File.separator
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            conf.setTruststoreType("AndroidCAStore");
+            conf.setTruststorePassword(null);
+            conf.setTruststorePath(null);
+        } else {
+            conf.setTruststoreType("BKS");
+            String path = System.getProperty("javax.net.ssl.trustStore");
+            if (path == null) {
+                path = System.getProperty("java.home") + File.separator + "etc"
+                    + File.separator + "security" + File.separator
+ + "security" + File.separator
                     + "cacerts.bks";
         }
-        conf.setTruststorePath(trustStorePath);
-        conf.setTruststorePassword("changeit");
+        conf.setTruststorePath(path);
 
         switch (settings.xmppSecurityModeInt) {
         case SettingsManager.XMPPSecurityOptional:
