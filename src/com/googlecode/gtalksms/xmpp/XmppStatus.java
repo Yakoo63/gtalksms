@@ -2,9 +2,9 @@ package com.googlecode.gtalksms.xmpp;
 
 import java.io.File;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 import android.content.Context;
 
@@ -56,7 +56,7 @@ public class XmppStatus {
             try {
                 res = Integer.parseInt(value);
             } catch(NumberFormatException e) { 
-                GoogleAnalyticsHelper.trackAndLogError("XmppStatus unable to parse integer", e);
+                Log.e("XmppStatus unable to parse integer", e);
             }
         }
         return res;        

@@ -54,7 +54,6 @@ import com.googlecode.gtalksms.receivers.PublicIntentReceiver;
 import com.googlecode.gtalksms.receivers.StorageLowReceiver;
 import com.googlecode.gtalksms.tools.CrashedStartCounter;
 import com.googlecode.gtalksms.tools.DisplayToast;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -117,9 +116,6 @@ public class MainService extends Service {
     private final IBinder mBinder = new LocalBinder();
 
     private long mHandlerThreadId;
-
-    // to get the helper use MainService.getAnalyticsHelper()
-    private static GoogleAnalyticsHelper sGoogleAnalytics;
 
     private static Context sUiContext;
 
@@ -265,9 +261,6 @@ public class MainService extends Service {
             boolean available = intent.getBooleanExtra("available", true);
             boolean failover = intent.getBooleanExtra("failover", false);
             Log.i("network_changed with available=" + available + ", failover=" + failover + " and when in state: " + XmppManager.statusAsString(initialState));
-            if (available) {
-                GoogleAnalyticsHelper.dispatch();
-            }
             // We are in a waiting state and have a network - try to connect.
             if (available && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
                 sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
@@ -299,7 +292,7 @@ public class MainService extends Service {
             // ACTION_XMPP_CONNECTION_CHANGED is handled implicitly by every
             // call
         } else if (!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {
-            GoogleAnalyticsHelper.trackAndLogWarning("Unexpected intent: " + action);
+            Log.w("Unexpected intent: " + action);
         }
         Log.i("handled action '" + action + "' - state now: " + sXmppMgr.statusString());
 
@@ -336,10 +329,6 @@ public class MainService extends Service {
         return sXmppMgr == null ? false : sXmppMgr.getCompressionStatus();
     }
 
-    public static GoogleAnalyticsHelper getAnalyticsHelper() {
-        return sGoogleAnalytics;
-    }
-
     public void updateBuddies() {
         if (sXmppMgr != null) {
             XmppBuddies.getInstance(this).retrieveFriendList();
@@ -364,8 +353,6 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        sGoogleAnalytics = new GoogleAnalyticsHelper(this);
-        sGoogleAnalytics.trackInstalls();
         sPm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         sWl = sPm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, Tools.APP_NAME + " WakeLock");
 
@@ -407,7 +394,6 @@ public class MainService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        sGoogleAnalytics.trackServiceStartsPerDay();
         if (intent == null) {
             // The application has been killed by Android and
             // we try to restart the connection
@@ -416,7 +402,7 @@ public class MainService extends Service {
                 CrashedStartCounter.getInstance(this).count();
                 startService(new Intent(MainService.ACTION_CONNECT));
             } else {
-                GoogleAnalyticsHelper.trackAndLogWarning("onStartCommand() null intent with Gingerbread or higher");
+                Log.w("onStartCommand() null intent with Gingerbread or higher");
             }
             return START_STICKY;
         }
@@ -471,7 +457,6 @@ public class MainService extends Service {
         sCommands.clear();
         sCommandSet.clear();
         
-        GoogleAnalyticsHelper.stop();
         sServiceLooper.quit();
         super.onDestroy();
         Log.i("MainService onDestroy(): service destroyed");
@@ -502,7 +487,7 @@ public class MainService extends Service {
         if (sXmppMgr != null) {
             sXmppMgr.send(msg, to);
         } else {
-            GoogleAnalyticsHelper.trackAndLogError("MainService send XmppMsg: _xmppMgr == null");
+            Log.w("MainService send XmppMsg: _xmppMgr == null");
         }
     }
 
@@ -578,8 +563,7 @@ public class MainService extends Service {
                 }
             } catch (Exception e) {
                 String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
-                Log.e("executeCommand: " + error, e);
-                GoogleAnalyticsHelper.trackAndLogError("executeCommnad: exception ", e);
+                Log.e("executeCommand() Exception", e);
                 send(getString(R.string.chat_error, error), answerTo);
             }
         } else {
@@ -722,7 +706,6 @@ public class MainService extends Service {
             } catch (Exception e) {
                 // Should not happen.
                 Log.e("Failed to register command " + c.getName(), e);
-                GoogleAnalyticsHelper.trackAndLogError("MainService.setupListenersForConnection: Setup commands error", e);
             }
         }
     }

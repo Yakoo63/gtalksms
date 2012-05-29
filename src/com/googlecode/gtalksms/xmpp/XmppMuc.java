@@ -28,7 +28,6 @@ import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.databases.MUCHelper;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMuc {
@@ -84,7 +83,7 @@ public class XmppMuc {
                     }
                 } catch (XMPPException e) {
                     // This is not fatal, just log a warning
-                    GoogleAnalyticsHelper.trackAndLogWarning("Could not discover local MUC component: ", e);            
+                    Log.w("Could not discover local MUC component: ", e);            
                 }
             }
         };
@@ -264,7 +263,7 @@ public class XmppMuc {
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
                 // Password protected MUC fallback code begins here
-                GoogleAnalyticsHelper.trackAndLogWarning("Unable to configure room owners on Server " + getMUCServer()
+                Log.w("Unable to configure room owners on Server " + getMUCServer()
                         + ". Falling back to room passwords", ex);
                 // Seee http://xmpp.org/registrar/formtypes.html#http:--jabber.org-protocol-mucroomconfig
                 try {
@@ -286,7 +285,7 @@ public class XmppMuc {
             multiUserChat.sendConfigurationForm(submitForm);
             multiUserChat.changeSubject(subjectInviteStr);
         } catch (XMPPException e1) {
-            GoogleAnalyticsHelper.trackAndLogWarning("Unable to send conference room configuration form.", e1);
+            Log.w("Unable to send conference room configuration form.", e1);
             send(mCtx.getString(R.string.chat_sms_muc_conf_error, e1.getMessage()));
             // then we also should not send an invite as the room will be locked
             throw e1;

@@ -36,7 +36,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;
@@ -359,7 +358,6 @@ public class XmppManager {
                     float diff = stop - start;
                     diff = diff / 1000;
                     Log.i("disconnectED xmpp connection. Took: " + diff + " s");
-                    GoogleAnalyticsHelper.trackDisconTime(diff);
                 }
             }
         }
@@ -563,7 +561,7 @@ public class XmppManager {
                 mConnection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
                 mXmppBuddies.retrieveFriendList();
             } catch (Exception ex) {
-                GoogleAnalyticsHelper.trackAndLogError("Failed to setup XMPP friend list roster.", ex);
+                Log.e("Failed to setup XMPP friend list roster.", ex);
             }
 
             // It is important that we query the server for offline messages
@@ -572,7 +570,7 @@ public class XmppManager {
         } catch (Exception e) {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
-            GoogleAnalyticsHelper.trackAndLogError("xmppMgr exception caught", e);
+            Log.e("xmppMgr exception caught", e);
             maybeStartReconnect();
             return;
         }

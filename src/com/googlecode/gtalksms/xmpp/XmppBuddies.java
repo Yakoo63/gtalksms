@@ -17,10 +17,10 @@ import org.jivesoftware.smack.util.StringUtils;
 import android.content.Context;
 import android.content.Intent;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 public class XmppBuddies implements RosterListener {
     
@@ -137,7 +137,7 @@ public class XmppBuddies implements RosterListener {
 
                 sendFriendList(friends);
             } catch (Exception ex) {
-                GoogleAnalyticsHelper.trackAndLogWarning("Failed to retrieve Xmpp Friend list", ex);
+                Log.w("Failed to retrieve Xmpp Friend list", ex);
             }
         }
         
@@ -174,7 +174,7 @@ public class XmppBuddies implements RosterListener {
         try {
             userStatus = sConnection.getRoster().getPresence(userID).getStatus();
         } catch (NullPointerException e) {
-            GoogleAnalyticsHelper.trackAndLogError("Invalid connection or user in retrieveStatus() - NPE");
+            Log.e("Invalid connection or user in retrieveStatus() - NPE", e);
             userStatus = "";
         }
         // Server may set their status to null; we want empty string
@@ -193,7 +193,7 @@ public class XmppBuddies implements RosterListener {
             userFromServer = sConnection.getRoster().getPresence(userID);
             userState = retrieveState(userFromServer.getMode(), userFromServer.isAvailable());
         } catch (NullPointerException e) {
-            GoogleAnalyticsHelper.trackAndLogError("retrieveState(): Invalid connection or user - NPE");
+            Log.e("retrieveState(): Invalid connection or user - NPE", e);
         }
 
         return userState;

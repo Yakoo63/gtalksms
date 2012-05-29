@@ -1,7 +1,7 @@
 package com.googlecode.gtalksms.databases;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.cmd.smsCmd.Sms;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -84,7 +84,7 @@ public class SMSHelper {
                 sentIntent[partNum] = 'X';
                 SMSDatabase.putSentIntent(smsID, sentIntent.toString());
             } else {
-                GoogleAnalyticsHelper.trackAndLogError("SMSHelper.setSentIntent() OutOfBounds: " +
+                Log.e("SMSHelper.setSentIntent() OutOfBounds: " +
                         "partNum=" + partNum +
                         " length=" + sentIntent.length +
                         " sentIntentSTr= " + sentIntentStr);
@@ -101,7 +101,7 @@ public class SMSHelper {
                 delIntent[partNum] = 'X';
                 SMSDatabase.putDelIntent(smsID, delIntent.toString());
             } else {
-                GoogleAnalyticsHelper.trackAndLogError("SMSHelper.setSentIntent() OutOfBounds: " +
+                Log.e("SMSHelper.setSentIntent() OutOfBounds: " +
                         "partNum=" + partNum +
                         " length=" + delIntent.length +
                         " sentIntentSTr= " + delIntentStr);

@@ -15,7 +15,6 @@ import android.content.Intent;
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
-import com.googlecode.gtalksms.tools.GoogleAnalyticsHelper;
 
 class MUCPacketListener implements PacketListener {
     private String mNumber;
@@ -103,7 +102,6 @@ class MUCPacketListener implements PacketListener {
                         Log.w("MUCPacketListener: Received old message: date="
                                 + sentDate.toLocaleString() + " ; message="
                                 + message.getBody());
-                        GoogleAnalyticsHelper.trackAndLogError("MUCPacketListener: Received old message");
                     }
                 }
             } else {
