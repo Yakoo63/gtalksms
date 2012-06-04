@@ -23,12 +23,10 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.ConfigureProviderManager;
 import org.jivesoftware.smackx.MultipleRecipientManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.xbill.DNS.Lookup;
 
 import android.content.Context;
 import android.content.Intent;
