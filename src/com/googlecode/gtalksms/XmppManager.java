@@ -688,7 +688,6 @@ public class XmppManager {
             if (path == null) {
                 path = System.getProperty("java.home") + File.separator + "etc"
                     + File.separator + "security" + File.separator
- + "security" + File.separator
                     + "cacerts.bks";
         }
         conf.setTruststorePath(path);
