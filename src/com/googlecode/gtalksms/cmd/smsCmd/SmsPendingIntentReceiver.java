@@ -51,12 +51,12 @@ public abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
     }   
     
     protected Sms getSms(int smsId) {
-        Integer i = new Integer(smsId);
+        Integer i = Integer.valueOf(smsId);
         return smsMap.get(i);
     }
     
     protected void removeSms(int smsId) {
-        Integer i = new Integer(smsId);
+        Integer i = Integer.valueOf(smsId);
         smsMap.remove(i);
         smsHelper.deleteSMS(smsId);
     }    

@@ -378,7 +378,7 @@ public class XmppMuc {
      */
     private Integer getRoomInt(String room) {
         int intEnd = room.indexOf("_", ROOM_START_TAG_LENGTH);
-        return new Integer(room.substring(ROOM_START_TAG_LENGTH, intEnd));        
+        return Integer.valueOf(room.substring(ROOM_START_TAG_LENGTH, intEnd));        
     }
         
     /**

@@ -62,7 +62,7 @@ public class Sms implements Comparable<Sms> {
     }
     
     public Sms(int smsID, String phoneNumber, String name, String shortendMessage, String answerTo, String dIntents, String sIntents, int resSIntent, int resDIntent, long date) {
-        this.id = new Integer(smsID);
+        this.id = Integer.valueOf(smsID);
         this.number = phoneNumber;
         this.to = name;
         this.shortendMessage = shortendMessage;

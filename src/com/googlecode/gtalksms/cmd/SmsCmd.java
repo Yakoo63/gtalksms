@@ -602,7 +602,7 @@ public class SmsCmd extends CommandHandlerBase {
         int res = sSmsID;
         sSmsID++;
         mKeyValueHelper.addKey(KeyValueHelper.KEY_SMS_ID, sSmsID.toString());        
-        return new Integer(res);
+        return Integer.valueOf(res);
     }
     
     private int getSIntentStart(int size) {
