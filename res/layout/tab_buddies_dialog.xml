@@ -84,7 +84,6 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
         
         <LinearLayout 
-            android:id="@+id/layoutSpace"
             android:orientation="horizontal"
             android:layout_width="0dip"
             android:layout_height="wrap_content"

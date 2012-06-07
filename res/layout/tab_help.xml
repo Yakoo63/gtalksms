@@ -6,7 +6,6 @@
     android:layout_height="fill_parent" >
     
     <ScrollView 
-        android:id="@+id/ScrollViewAbout" 
         android:layout_width="fill_parent" 
         android:layout_height="fill_parent" 
         android:layout_weight=".9">

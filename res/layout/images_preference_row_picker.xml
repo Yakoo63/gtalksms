@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:paddingBottom="8dip"
@@ -9,29 +9,17 @@
     android:paddingLeft="10dip"
     android:paddingRight="10dip">
 
-    <TableLayout
-        android:id="@+id/custom_list_view_row_table_layout"
+    <LinearLayout 
+        android:id="@+id/custom_list_view_row_layout"
+        android:orientation="horizontal"
+        android:layout_weight="1"
         android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+    
+    <RadioButton
+        android:checked="false"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:stretchColumns="0">
-
-        <TableRow
-            android:id="@+id/custom_list_view_row_table_row"
-            android:gravity="center_vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <LinearLayout 
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/custom_list_view_row_layout"
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">                  
-            </LinearLayout>
-            <RadioButton
-                android:checked="false"
-                android:id="@+id/custom_list_view_row_radio_button"/>
-        </TableRow>
-    </TableLayout>
-
+        android:id="@+id/custom_list_view_row_radio_button"/>
+      
 </LinearLayout>
