@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.cmd;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -337,7 +338,7 @@ public class SmsCmd extends CommandHandlerBase {
      * @param sms
      */
     private static void appendSMS(XmppMsg msg, Sms sms) {
-        msg.appendItalicLine(sms.getDate().toLocaleString() + " - " + sms.getSender() + " --> " + sms.getReceiver());
+        msg.appendItalicLine(DateFormat.getDateTimeInstance().format(sms.getDate()) + " - " + sms.getSender() + " --> " + sms.getReceiver());
         msg.appendLine(sms.getMessage());
     }
 

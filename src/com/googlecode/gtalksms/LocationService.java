@@ -108,6 +108,7 @@ public class LocationService extends Service {
         send(msg);
     }
 
+    @SuppressWarnings("deprecation")
     public void onStart(final Intent intent, int startId) {
         super.onStart(intent, startId);
         if (_settingsManager.debugLog) {

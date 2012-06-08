@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.xmpp;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 import org.jivesoftware.smack.PacketListener;
@@ -100,7 +101,7 @@ class MUCPacketListener implements PacketListener {
                         // which is now disabled, lets get some metrics and decide later if we 
                         // can remove this check
                         Log.w("MUCPacketListener: Received old message: date="
-                                + sentDate.toLocaleString() + " ; message="
+                                + DateFormat.getDateTimeInstance().format(sentDate) + " ; message="
                                 + message.getBody());
                     }
                 }

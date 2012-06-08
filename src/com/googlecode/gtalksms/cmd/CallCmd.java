@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms.cmd;
 
 import java.lang.reflect.Method;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +80,7 @@ public class CallCmd extends CommandHandlerBase {
         List<Call> callList = Tools.getLastElements(arrayList, callLogsNumber);
         if (callList.size() > 0) {
             for (Call call : callList) {
-                all.appendItalic(call.date.toLocaleString());
+                all.appendItalic(DateFormat.getDateTimeInstance().format(call.date));
                 all.append(" - ");
                 all.appendBold(ContactsManager.getContactName(sContext, call.phoneNumber));
                 all.appendLine(" - " + call.type(sContext) + getString(R.string.chat_call_duration) + call.duration());

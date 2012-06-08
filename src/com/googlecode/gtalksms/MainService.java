@@ -598,42 +598,37 @@ public class MainService extends Service {
     /** Updates the status about the service state (and the status bar) */
     private void onConnectionStatusChanged(int oldStatus, int status) {
         if (sSettingsMgr.showStatusIcon) {
-            Notification notification = new Notification();
-            String msg = null;
+            Notification.Builder builder = new Notification.Builder(this);
+            builder.setWhen(System.currentTimeMillis());
+            
             switch (status) {
                 case XmppManager.CONNECTED:
-                    msg = getString(R.string.main_service_connected);
-                    notification = new Notification(getImageStatus(STATUS_ICON_GREEN), msg, System.currentTimeMillis());
+                    builder.setContentText(getString(R.string.main_service_connected));
+                    builder.setSmallIcon(getImageStatus(STATUS_ICON_GREEN));
                     break;
                 case XmppManager.CONNECTING:
-                    msg = getString(R.string.main_service_connecting);
-                    notification = new Notification(getImageStatus(STATUS_ICON_ORANGE), msg, System.currentTimeMillis());
+                    builder.setContentText(getString(R.string.main_service_connecting));
+                    builder.setSmallIcon(getImageStatus(STATUS_ICON_ORANGE));
                     break;
                 case XmppManager.DISCONNECTED:
-                    msg = getString(R.string.main_service_disconnected);
-                    notification = new Notification(getImageStatus(STATUS_ICON_RED), msg, System.currentTimeMillis());
+                    builder.setContentText(getString(R.string.main_service_disconnected));
+                    builder.setSmallIcon(getImageStatus(STATUS_ICON_RED));
                     break;
                 case XmppManager.DISCONNECTING:
-                    msg = getString(R.string.main_service_disconnecting);
-                    notification = new Notification(getImageStatus(STATUS_ICON_ORANGE), msg, System.currentTimeMillis());
+                    builder.setContentText(getString(R.string.main_service_disconnecting));
+                    builder.setSmallIcon(getImageStatus(STATUS_ICON_ORANGE));
                     break;
                 case XmppManager.WAITING_TO_CONNECT:
                 case XmppManager.WAITING_FOR_NETWORK:
-                    String msgNotif = getString(R.string.main_service_waiting);
-                    msg = getString(R.string.main_service_waiting_to_connect);
-                    notification = new Notification(getImageStatus(STATUS_ICON_BLUE), msgNotif, System.currentTimeMillis());
+                    builder.setContentText(getString(R.string.main_service_waiting_to_connect));
+                    builder.setSmallIcon(getImageStatus(STATUS_ICON_BLUE));
                     break;
                 default:
                     throw new IllegalStateException("onConnectionSTatusChanged: Unkown status int");
             }
-
-            notification.setLatestEventInfo(this, Tools.APP_NAME, msg, sContentIntent);
-            notification.flags |= Notification.FLAG_ONGOING_EVENT;
-            notification.flags |= Notification.FLAG_NO_CLEAR;
-            notification.tickerText = null;
-            // we respect androids rules and only set startForeground
-            // if _settingsMgr.showStatusIcon is true
-            startForeground(ID, notification);
+            builder.setContentIntent(sContentIntent);
+            builder.setContentTitle(Tools.APP_NAME);
+            startForeground(ID, builder.getNotification());
         }
     }
 

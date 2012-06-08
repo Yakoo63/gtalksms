@@ -13,45 +13,51 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class NetworkConnectivityReceiver extends BroadcastReceiver {
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onReceive(Context context, Intent intent) {
         SharedPreferences prefs = context.getSharedPreferences(Tools.APP_NAME, 0);
         boolean debugLog = prefs.getBoolean("debugLog", false);
-        boolean failover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
-        boolean connected;
-        String networkType;
-        
-        NetworkInfo network = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-        if (network != null) {
-            connected = network.getState().equals(NetworkInfo.State.CONNECTED);
-            networkType = network.getTypeName();
-        } else {
-            Log.e(Tools.LOG_TAG, "NetworkConnectivityReceiver: could not get EXTRA_NETWORK_INFO)");
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) {
+            Log.e(Tools.LOG_TAG, "NetworkConnectivityReceiver: Connectivity Manager is null!");
             return;
         }
-
-        if (prefs.getBoolean("startOnWifiConnected", false) && connected && networkType.equals("WIFI")) {
-            // Start GTalkSMS
-            if (debugLog) Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: startOnWifiConnected enabled, wifi connected, sending intent");
-            Intent net_changed = new Intent(MainService.ACTION_NETWORK_CHANGED);
-            net_changed.putExtra("available", true);
-            context.startService(net_changed);
-            context.startService(new Intent(MainService.ACTION_CONNECT));
-        } else if (prefs.getBoolean("stopOnWifiDisconnected", false) && !connected && networkType.equals("WIFI")) {            
-            // Stop GTalkSMS
-            if (debugLog) Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: stopOnWifiDisconnected enabled, wifi disconnected, sending intent");
-            Intent serviceIntent = new Intent(MainService.ACTION_CONNECT);
-            serviceIntent.putExtra("disconnect", true);
-            context.startService(serviceIntent);
-        } else if (MainService.IsRunning) {
-            if (debugLog)
-                Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: Broadcasting intent " + MainService.ACTION_NETWORK_CHANGED 
-                        + " with available=" + connected + ", failover=" + failover + ", networkName=" + network.getTypeName());
+        
+        if (debugLog) {
+            for (NetworkInfo network : cm.getAllNetworkInfo()) {
+                Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: "
+                        + " available=" + (network.isAvailable()?1:0)
+                        + ", connected=" + (network.isConnected()?1:0)
+                        + ", connectedOrConnecting=" + (network.isConnectedOrConnecting()?1:0)
+                        + ", failover=" + (network.isFailover()?1:0)
+                        + ", roaming=" + (network.isRoaming()?1:0)
+                        + ", networkName=" + network.getTypeName());
+            } 
+        }
+        
+        NetworkInfo network = cm.getActiveNetworkInfo();
+        if (network != null && MainService.IsRunning) {
+            Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: " + MainService.ACTION_NETWORK_CHANGED + " " + network.getTypeName());
             Intent svcintent = new Intent(MainService.ACTION_NETWORK_CHANGED);
-            svcintent.putExtra("available", connected);
-            svcintent.putExtra("failover", failover);
+            svcintent.putExtra("available", network.isConnected());
+            svcintent.putExtra("failover", network.isFailover());
             context.startService(svcintent);
+        }
 
+        network = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+        if (network.getTypeName().equals("WIFI") && network.isConnected() && prefs.getBoolean("startOnWifiConnected", false)) {
+            // Start GTalkSMS
+            if (debugLog) {
+                Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: startOnWifiConnected enabled, wifi connected, sending intent");
+            }
+            context.startService(new Intent(MainService.ACTION_CONNECT));
+        } else if (network.getTypeName().equals("WIFI") && !network.isConnected() && prefs.getBoolean("stopOnWifiDisconnected", false)) {            
+            // Stop GTalkSMS
+            if (debugLog) {
+                Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: stopOnWifiDisconnected enabled, wifi disconnected, sending intent");
+            }
+            context.startService(new Intent(MainService.ACTION_DISCONNECT));
         }
     }
 }
