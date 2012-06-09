@@ -78,6 +78,7 @@
         <receiver android:name="com.googlecode.gtalksms.receivers.PublicIntentReceiver">
             <intent-filter>
                 <action android:name="com.googlecode.gtalksms.action.CONNECT" />
+                <action android:name="com.googlecode.gtalksms.action.DISCONNECT" />
                 <action android:name="com.googlecode.gtalksms.action.TOGGLE" />
             </intent-filter>    
         </receiver>
