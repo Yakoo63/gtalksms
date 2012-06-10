@@ -56,8 +56,7 @@ class MUCPacketListener implements PacketListener {
         String from = message.getFrom();
         String fromBareResource = StringUtils.parseResource(from);
 
-        Log.d("MUCPacketListener: packet received. messageFrom=" + message.getFrom()
-                    + " messageBody=" + message.getBody());
+        Log.d("MUCPacketListener: packet received. messageFrom=" + message.getFrom() + " messageBody=" + message.getBody());
         
         // messages from the room JID itself, are matched here, because they have no 
         // resource part these are normally status messages about the room we send them 

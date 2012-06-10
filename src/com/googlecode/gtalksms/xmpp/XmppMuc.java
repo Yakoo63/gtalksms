@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.xmpp;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -160,8 +161,7 @@ public class XmppMuc {
             // TODO: test if occupants contains also the sender (in case we
             // invite other people)
             if (muc != null && muc.getOccupantsCount() < 2) {
-                muc.invite(mSettings.getNotifiedAddress(), "SMS conversation with "
-                        + contact);
+                muc.invite(mSettings.getNotifiedAddress(), "SMS conversation with " + contact);
             }
         }
         return muc;
@@ -222,17 +222,20 @@ public class XmppMuc {
             randomInt = mRndGen.nextInt();
         } while (mRoomNumbers.contains(randomInt));
 
-        
-        // TODO localize
+        String normalizedName = name.replaceAll(" ", "_").replaceAll("[\\W]|µ", "");
+        normalizedName = Normalizer.normalize(normalizedName, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        String cleanLogin = mSettings.getLogin().replaceAll("@", "_");
+        String roomUID = normalizedName + "_" + ROOM_START_TAG + randomInt + "_" + cleanLogin;
+
         switch (mode) {
             case MODE_SMS:
-                roomJID = ROOM_START_TAG + randomInt + "_SMS_" + mSettings.getLogin().replaceAll("@", "_") + "@" + getMUCServer();
-                subjectInviteStr =  "SMS conversation with " + getRoomString(number, name);
+                roomJID = roomUID + "_SMS_" + "@" + getMUCServer();
+                subjectInviteStr =  mCtx.getString(R.string.xmpp_muc_sms) + getRoomString(number, name);
                 break;
 
             case MODE_SHELL:
-                roomJID = ROOM_START_TAG + randomInt + "_Shell_" + mSettings.getLogin().replaceAll("@", "_") + "@" + getMUCServer();
-                subjectInviteStr =  "New Android Terminal " + getRoomString(number, name);
+                roomJID = roomUID + "_Shell_" + "@" + getMUCServer();
+                subjectInviteStr =  mCtx.getString(R.string.xmpp_muc_shell) + getRoomString(number, name);
                 break;
 
             default:
@@ -240,13 +243,21 @@ public class XmppMuc {
                 subjectInviteStr = null;
                 break;
         }
+        Log.i("Creating room " + roomJID + " " + getRoomInt(roomJID));
         
         // See issue 136
         try {
             multiUserChat = new MultiUserChat(mConnection, roomJID);
+        } catch (Exception e) {  
+            Log.e("MUC creation failed: ", e);
+            throw new XMPPException("MUC creation failed for " + roomJID + ": " + e.getLocalizedMessage(), e);
+        }
+
+        try {
             multiUserChat.create(name);
         } catch (Exception e) {  
-            throw new XMPPException("MUC creation failed", e);
+            Log.e("MUC creation failed: ", e);
+            throw new XMPPException("MUC creation failed for " + name + ": " + e.getLocalizedMessage(), e);
         }
 
         try {
@@ -263,8 +274,7 @@ public class XmppMuc {
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
                 // Password protected MUC fallback code begins here
-                Log.w("Unable to configure room owners on Server " + getMUCServer()
-                        + ". Falling back to room passwords", ex);
+                Log.w("Unable to configure room owners on Server " + getMUCServer() + ". Falling back to room passwords", ex);
                 // Seee http://xmpp.org/registrar/formtypes.html#http:--jabber.org-protocol-mucroomconfig
                 try {
                     submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
@@ -377,8 +387,9 @@ public class XmppMuc {
      * @return
      */
     private Integer getRoomInt(String room) {
-        int intEnd = room.indexOf("_", ROOM_START_TAG_LENGTH);
-        return Integer.valueOf(room.substring(ROOM_START_TAG_LENGTH, intEnd));        
+        int intBegin = room.indexOf(ROOM_START_TAG) + ROOM_START_TAG_LENGTH;
+        int intEnd = room.indexOf("_", intBegin);
+        return Integer.valueOf(room.substring(intBegin, intEnd));        
     }
         
     /**
