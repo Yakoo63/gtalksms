@@ -564,9 +564,10 @@ public class XmppManager {
                 Log.e("Failed to setup XMPP friend list roster.", ex);
             }
 
-            // It is important that we query the server for offline messages
-            // BEFORE we send the first presence stanza
-            XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.getNotifiedAddress(), mContext);
+            // It is important that we query the server for offline messages BEFORE we send the first presence stanza
+            for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+                XmppOfflineMessages.handleOfflineMessages(mConnection, notifiedAddress, mContext);
+            }
         } catch (Exception e) {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
@@ -779,27 +780,28 @@ public class XmppManager {
         
 
         if (isConnected()) {
-            // Message has no destination information
-            // Send to all known resources 
+            // Message has no destination information send to all known resources 
             if (muc == null && to == null) {
-                Iterator<Presence> presences = mConnection.getRoster().getPresences(mSettings.getNotifiedAddress());
-                List<String> toList = new LinkedList<String>();
-                while (presences.hasNext()) {
-                    Presence p = presences.next();
-                    String toPresence = p.getFrom();
-                    String toResource = StringUtils.parseResource(toPresence);
-                    // Don't send messages to gtalk Android devices
-                    // It would be nice if there was a better way to detect 
-                    // an Android gTalk XMPP client, but currently there is none
-                    if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
-                        toList.add(toPresence);
+                for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+                    Iterator<Presence> presences = mConnection.getRoster().getPresences(notifiedAddress);
+                    List<String> toList = new LinkedList<String>();
+                    while (presences.hasNext()) {
+                        Presence p = presences.next();
+                        String toPresence = p.getFrom();
+                        String toResource = StringUtils.parseResource(toPresence);
+                        // Don't send messages to gtalk Android devices
+                        // It would be nice if there was a better way to detect 
+                        // an Android gTalk XMPP client, but currently there is none
+                        if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
+                            toList.add(toPresence);
+                        }
                     }
-                }
-                if (toList.size() > 0) {
-                    try {
-                        MultipleRecipientManager.send(mConnection, msg, toList, null, null);
-                    } catch (Exception e) {
-                        return false;
+                    if (toList.size() > 0) {
+                        try {
+                            MultipleRecipientManager.send(mConnection, msg, toList, null, null);
+                        } catch (Exception e) {
+                            return false;
+                        }
                     }
                 }
             // Message has a known destination information

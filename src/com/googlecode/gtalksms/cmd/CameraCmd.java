@@ -33,7 +33,7 @@ public class CameraCmd extends CommandHandlerBase {
     private static WindowManager windowManager;
     private static Camera sCamera = null;
     private static File repository;
-    private static String emailReceiving;
+    private static String[] emailReceiving;
     private static int streamVolume;
     private static int cameraId = 0;
     
@@ -50,7 +50,7 @@ public class CameraCmd extends CommandHandlerBase {
         } else {
             path = new File(Environment.getExternalStorageDirectory(), "DCIM");
         }
-        emailReceiving = settings.getNotifiedAddress();
+        emailReceiving = settings.getNotifiedAddresses();
         try {
             repository = new File(path, Tools.APP_NAME);
             if(!repository.exists()) {
@@ -175,7 +175,7 @@ public class CameraCmd extends CommandHandlerBase {
                 break;
             case VOID_CALLBACK:
             default:
-                pictureCallback = new VoidCallback(repository, sContext, emailReceiving);
+                pictureCallback = new VoidCallback(repository, sContext, mAnswerTo);
             }
             
             streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM); 

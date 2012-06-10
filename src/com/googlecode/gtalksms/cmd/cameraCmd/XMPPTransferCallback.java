@@ -9,15 +9,18 @@ import com.googlecode.gtalksms.MainService;
 
 public class XMPPTransferCallback extends ExtentedPictureCallback {
 
+    String mRecipient;
+    
     public XMPPTransferCallback(File path, Context ctx, String recipient) {
-        super(path, ctx, recipient);
+        super(path, ctx);
+        mRecipient = recipient;
     }
 
     @Override
     protected boolean onPictureSaved(File picture) {
         Intent i = new Intent(MainService.ACTION_COMMAND);
         i.setClass(ctx, MainService.class);
-        i.putExtra("from", recipient);
+        i.putExtra("from", mRecipient);
         i.putExtra("cmd", "send");
         i.putExtra("args", picture.getAbsolutePath());
         MainService.sendToServiceHandler(i);

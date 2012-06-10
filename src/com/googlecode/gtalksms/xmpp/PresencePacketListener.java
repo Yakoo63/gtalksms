@@ -19,12 +19,13 @@ public class PresencePacketListener implements PacketListener  {
 
     @Override
     public void processPacket(Packet packet) {
-        final String notifiedAddress = mSettings.getNotifiedAddress();
-        Presence presence = (Presence) packet;
-        String fromJID = StringUtils.parseBareAddress(presence.getFrom());
-        
-        if (fromJID.equals(notifiedAddress) && presence.getType().equals(Presence.Type.subscribe)) {
-            XmppBuddies.grantSubscription(notifiedAddress, mConnection);
+        for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+            Presence presence = (Presence) packet;
+            String fromJID = StringUtils.parseBareAddress(presence.getFrom());
+            
+            if (fromJID.equals(notifiedAddress) && presence.getType().equals(Presence.Type.subscribe)) {
+                XmppBuddies.grantSubscription(notifiedAddress, mConnection);
+            }
         }
     }
 }

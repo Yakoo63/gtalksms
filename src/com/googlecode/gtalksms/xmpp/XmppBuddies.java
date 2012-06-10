@@ -250,7 +250,7 @@ public class XmppBuddies implements RosterListener {
         // TODO Make this a general intent action.NOTIFICATION_ADDRESS_AVAILABLE
         // and handle it for example within XmppPresenceStatus
         // if the notification address is/has become available, update the resource status string
-        if (bareUserId.equals(sSettings.getNotifiedAddress()) && presence.isAvailable()) {
+        if (sSettings.containsNotifiedAddress(bareUserId) && presence.isAvailable()) {
             intent = new Intent(MainService.ACTION_COMMAND);
             intent.setClass(sContext, MainService.class);
             intent.putExtra("cmd", "batt");
@@ -268,14 +268,21 @@ public class XmppBuddies implements RosterListener {
         if (sRoster != null) {
             // getPresence retrieves eventually the status of the notified Address in an internal data structure cache
             // thus avoiding an extra data packet
-            Presence presence = sRoster.getPresence(sSettings.getNotifiedAddress());
-            return presence.isAvailable();
+            for (String notifiedAddress : sSettings.getNotifiedAddresses()) {
+                Presence presence = sRoster.getPresence(notifiedAddress);
+                if( presence.isAvailable()) {
+                    return true;
+                }
+            }
+            return false;
         }
         return true;
     }
     
     private void checkNotificationAddressRoster() {
-        addFriend(sSettings.getNotifiedAddress());
+        for (String notifiedAddress : sSettings.getNotifiedAddresses()) {
+            addFriend(notifiedAddress);
+        }
     }
     
     /**

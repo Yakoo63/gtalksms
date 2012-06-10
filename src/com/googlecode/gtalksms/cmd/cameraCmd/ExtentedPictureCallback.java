@@ -13,7 +13,6 @@ import com.googlecode.gtalksms.tools.Tools;
 public abstract class ExtentedPictureCallback implements PictureCallback {
     private File path;
     protected Context ctx;
-    protected String recipient;
     
     /**
      * 
@@ -21,10 +20,9 @@ public abstract class ExtentedPictureCallback implements PictureCallback {
      * @param ctx
      * @param recipient
      */
-    public ExtentedPictureCallback(File path, Context ctx, String recipient) {
+    public ExtentedPictureCallback(File path, Context ctx) {
         this.path = path;
         this.ctx = ctx;
-        this.recipient = recipient;
     }
     
     public void onPictureTaken(byte[] data, Camera camera) {

@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms.panels.tabs;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,7 +47,7 @@ public class ConnectionTabFragment extends SherlockFragment {
         mSwitchConnection = new SwitchCheckBoxCompat(view, R.id.switchConnection);
 
         mEditTextLogin.setText(mSettingsMgr.getLogin());
-        mEditNotificationAddress.setText(mSettingsMgr.getNotifiedAddress());
+        mEditNotificationAddress.setText(TextUtils.join("|",mSettingsMgr.getNotifiedAddresses()));
         mEditTextPassword.setText(mSettingsMgr.getPassword());
         mSwitchConnection.setChecked(mSettingsMgr.getConnectOnMainScreenStartup());
         
@@ -71,7 +72,6 @@ public class ConnectionTabFragment extends SherlockFragment {
                 }
             }
         });
-
         return view;
     }
     
@@ -105,6 +105,7 @@ public class ConnectionTabFragment extends SherlockFragment {
                     throw new IllegalStateException();
             }
             
+            mEditNotificationAddress.setText(TextUtils.join("|",mSettingsMgr.getNotifiedAddresses()));
             if(mCurrentAction.equals(MainService.ACTION_CONNECT)) {
                 mStartStopButton.setEnabled(true);
                 mEditTextLogin.setEnabled(true);

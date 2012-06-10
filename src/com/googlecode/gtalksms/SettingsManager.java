@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms;
 
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Build;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.googlecode.gtalksms.tools.Tools;
@@ -51,9 +53,47 @@ public class SettingsManager {
     public void setPassword(String value) { _password = saveStringSetting("password", value); }
 
     private String _notifiedAddress;
-    public String getNotifiedAddress() { return _notifiedAddress; }
-    public void setNotifiedAddress(String value) { _notifiedAddress = saveStringSetting("notifiedAddress", value); }
+    private ArrayList<String> _notifiedAddresses = new ArrayList<String>();
+    public String[] getNotifiedAddresses() { return _notifiedAddresses.toArray(new String[_notifiedAddresses.size()]); }
+    public void setNotifiedAddress(String value) { 
+        _notifiedAddress = saveStringSetting("notifiedAddress", value);
+        updateNotifiedAddresses();
+    }
+    
+    public void updateNotifiedAddresses() { 
+        _notifiedAddresses.clear();
+        for (String str : TextUtils.split(_notifiedAddress, "\\|")) {
+            _notifiedAddresses.add(str.toLowerCase());
+        }
+    }
 
+    public boolean containsNotifiedAddress(String value) { 
+        return _notifiedAddresses.contains(value.toLowerCase());
+    }
+
+    public boolean startWithNotifiedAddress(String value) {
+        for (String notifiedAddress : _notifiedAddresses) {
+            if (value.toLowerCase().startsWith(notifiedAddress.toLowerCase() + "/")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void addNotifiedAddress(String value) { 
+        if (! containsNotifiedAddress(value)) {
+            _notifiedAddresses.add(value);
+        }
+        setNotifiedAddress(TextUtils.join("|", _notifiedAddresses));
+    }
+
+    public void removeNotifiedAddress(String value) { 
+        if (containsNotifiedAddress(value)) {
+            _notifiedAddresses.remove(value);
+        }
+        setNotifiedAddress(TextUtils.join("|", _notifiedAddresses));
+    }
+    
     private boolean _connectOnMainScreenStartup;
     public boolean getConnectOnMainScreenStartup() { return _connectOnMainScreenStartup; }
     public void setConnectOnMainScreenStartup(boolean value) { _connectOnMainScreenStartup = saveBooleanSetting("connectOnMainscreenShow", value); }
@@ -205,6 +245,7 @@ public class SettingsManager {
         serverPort = mSharedPreferences.getInt("serverPort", 0);
         
         _notifiedAddress = mSharedPreferences.getString("notifiedAddress", "");
+        updateNotifiedAddresses();
         _login = mSharedPreferences.getString("login", "");
         
         manuallySpecifyServerSettings = mSharedPreferences.getBoolean("manuallySpecifyServerSettings", false);

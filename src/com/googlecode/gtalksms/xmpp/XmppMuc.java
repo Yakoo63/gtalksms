@@ -19,6 +19,7 @@ import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.Occupant;
 import org.jivesoftware.smackx.muc.RoomInfo;
 
 import android.content.Context;
@@ -149,8 +150,7 @@ public class XmppMuc {
      * @return true if successful, otherwise false
      * @throws XMPPException 
      */
-    public MultiUserChat inviteRoom(String number, String contact, int mode)
-            throws XMPPException {
+    public MultiUserChat inviteRoom(String number, String contact, int mode) throws XMPPException {
         MultiUserChat muc;
         if (!mRooms.containsKey(number)) {
             muc = createRoom(number, contact, mode);
@@ -158,10 +158,20 @@ public class XmppMuc {
 
         } else {
             muc = mRooms.get(number);
-            // TODO: test if occupants contains also the sender (in case we
-            // invite other people)
-            if (muc != null && muc.getOccupantsCount() < 2) {
-                muc.invite(mSettings.getNotifiedAddress(), "SMS conversation with " + contact);
+            if (muc != null) {
+                Collection<Occupant> occupants = muc.getParticipants();
+                for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+                    boolean found = false;
+                    for (Occupant occupant : occupants) {
+                        if (occupant.getJid().startsWith(notifiedAddress + "/")) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        muc.invite(notifiedAddress, "SMS conversation with " + contact);
+                    }
+                }
             }
         }
         return muc;
@@ -270,7 +280,9 @@ public class XmppMuc {
             try {
                 List<String> owners = new ArrayList<String>();
                 owners.add(mSettings.getLogin());
-                owners.add(mSettings.getNotifiedAddress());
+                for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+                    owners.add(notifiedAddress);
+                }
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
                 // Password protected MUC fallback code begins here
@@ -301,7 +313,9 @@ public class XmppMuc {
             throw e1;
         }
 
-        multiUserChat.invite(mSettings.getNotifiedAddress(), subjectInviteStr);
+        for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+            multiUserChat.invite(notifiedAddress, subjectInviteStr);
+        }
         registerRoom(multiUserChat, number, name, randomInt, mode);
         return multiUserChat;
     }
