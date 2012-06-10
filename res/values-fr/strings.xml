@@ -170,6 +170,11 @@
     <string name="chat_help_sms_show_unread">Affiche les SMS non lus de tous les contacts.</string>
     <string name="chat_help_stop">Stoppe l\'application sur le téléphone.</string>
     <string name="chat_help_title">Commandes disponibles :</string>
+    <string name="chat_help_tts">Enonce le texte fournit.</string>
+    <string name="chat_help_ttslang">Change la langue TTS avec le code de la langue ou le code pays en plus.</string>
+    <string name="chat_help_ttslanglist">Affiche la liste des langues disponibles.</string>
+    <string name="chat_help_ttsengine">Change le moteur TTS avec le nom du namespace en paramètre (ex: com.google.android.tts).</string>
+    <string name="chat_help_ttsenginelist">Affiche la liste des moteurs disponibles.</string>
     <string name="chat_help_urls">Envoie des liens pour les ouvrir dans le navigateur du téléphone.</string>
     <string name="chat_help_where">Envoie en continue des liens Google Map pour localiser le téléphone jusqu\'à l\'envoie de la commande stop.</string>
     <string name="chat_help_where_stop">Arrête la localisation du téléphone.</string>
@@ -231,6 +236,11 @@
     <string name="chat_stop_locating">Arrêt de la localisation du téléphone</string>
     <string name="chat_stop_ringing">Arrêt de la sonnerie du téléphone</string>
     <string name="chat_text_copied">Texte copié</string>
+    <string name="chat_tts_installation">Verifiez l\'installation de TTS.</string>
+    <string name="chat_tts_engines">Les moteurs disponibles sont :\n</string>
+    <string name="chat_tts_languages">Les langues disponibles sont :\n</string>
+    <string name="chat_tts_engine">Le moteur current est :&#xA0;</string>
+    <string name="chat_tts_language">La langue currente est:&#xA0;</string>
     <string name="chat_welcome">Bienvenue dans GTalkSMS %s. Envoyer \"?\" pour afficher l\'aide.</string>
     <string name="log_panel_acquiring">Acquisition des logs</string>
     <string name="log_panel_collect">Récupère les logs de GTalkSMS et compose un nouveau message. Vous pouvez vous envoyer ce message et le joindre à un bug décrivant votre problème.</string>

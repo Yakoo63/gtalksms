@@ -126,6 +126,10 @@ public class Cmd {
         mHelpArgs = args;
     }
     
+    public void setHelp(int resHelp) {
+        setHelp(resHelp, null);
+    }
+    
     public String getName() {
         return mName;
     }

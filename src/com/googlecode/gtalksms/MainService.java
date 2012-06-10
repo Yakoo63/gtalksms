@@ -45,6 +45,7 @@ import com.googlecode.gtalksms.cmd.SettingsCmd;
 import com.googlecode.gtalksms.cmd.ShellCmd;
 import com.googlecode.gtalksms.cmd.SmsCmd;
 import com.googlecode.gtalksms.cmd.SystemCmd;
+import com.googlecode.gtalksms.cmd.TextToSpeechCmd;
 import com.googlecode.gtalksms.cmd.ToastCmd;
 import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.cmd.WifiCmd;
@@ -70,8 +71,7 @@ public class MainService extends Service {
     public final static String ACTION_SEND = "com.googlecode.gtalksms.action.SEND";
     public final static String ACTION_COMMAND = "com.googlecode.gtalksms.action.COMMAND";
 
-    // The following actions are undocumented and internal to our
-    // implementation.
+    // The following actions are undocumented and internal to our implementation.
     public final static String ACTION_BROADCAST_STATUS = "com.googlecode.gtalksms.action.BROADCAST_STATUS";
     public final static String ACTION_SMS_RECEIVED = "com.googlecode.gtalksms.action.SMS_RECEIVED";
     public final static String ACTION_NETWORK_CHANGED = "com.googlecode.gtalksms.action.NETWORK_CHANGED";
@@ -84,7 +84,6 @@ public class MainService extends Service {
     public static final String ACTION_XMPP_PRESENCE_CHANGED = "com.googlecode.gtalksms.action.XMPP.PRESENCE_CHANGED";
     public static final String ACTION_XMPP_CONNECTION_CHANGED = "com.googlecode.gtalksms.action.XMPP.CONNECTION_CHANGED";
 
-    // 
     public static final String SERVICE_THREAD_NAME = Tools.APP_NAME + ".Service";
 
     public static final int STATUS_ICON_GREEN = 0;
@@ -205,10 +204,9 @@ public class MainService extends Service {
         } else if (action.equals(ACTION_SEND)) {
             XmppMsg xmppMsg = (XmppMsg) intent.getParcelableExtra("xmppMsg");
             if (xmppMsg == null) {
-                sXmppMgr.send(new XmppMsg(intent.getStringExtra("message")), intent.getStringExtra("to"));
-            } else {
-                sXmppMgr.send(xmppMsg, intent.getStringExtra("to"));
+                xmppMsg = new XmppMsg(intent.getStringExtra("message"));
             }
+            sXmppMgr.send(xmppMsg, intent.getStringExtra("to"));
         } else if (action.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
             sWl.acquire();
             String message = intent.getStringExtra("message");
@@ -245,8 +243,7 @@ public class MainService extends Service {
                 try {
                     XmppMuc.getInstance(this).writeRoom(number, name, message, XmppMuc.MODE_SMS);
                 } catch (XMPPException e) {
-                    // room creation and/or writing failed -
-                    // notify about this error
+                    // room creation and/or writing failed - notify about this error
                     // and send the message to the notification address
                     XmppMsg msg = new XmppMsg();
                     msg.appendLine("ACTION_SMS_RECEIVED - Error writing to MUC: " + e);
@@ -266,8 +263,7 @@ public class MainService extends Service {
                 sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             } else if (!available && !failover && initialState == XmppManager.CONNECTED) {
                 // We are connected but the network has gone down - disconnect
-                // and go
-                // into WAITING state so we auto-connect when we get a future
+                // and go into WAITING state so we auto-connect when we get a future
                 // notification that a network is available.
                 sXmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
             }
@@ -275,13 +271,10 @@ public class MainService extends Service {
             String cmd = intent.getStringExtra("cmd");
             if (cmd != null) {
                 String args = intent.getStringExtra("args");
-                // from can be a regular user JID with or without resource part
-                // or a MUC,
+                // from can be a regular user JID with or without resource part or a MUC,
                 String from = intent.getStringExtra("from");
-                // Send to the notification address (from = null) if the command
-                // is from a MUC
-                // and we don't want to be notified about status messages in
-                // MUCs
+                // Send to the notification address (from = null) if the command is from a MUC
+                // and we don't want to be notified about status messages in MUCs
                 if (intent.getBooleanExtra("fromMuc", false) && !sSettingsMgr.notifyInMuc) {
                     from = null;
                 }
@@ -289,8 +282,7 @@ public class MainService extends Service {
             } else {
                 Log.w("Intent " + MainService.ACTION_COMMAND + " without extra cmd");
             }
-            // ACTION_XMPP_CONNECTION_CHANGED is handled implicitly by every
-            // call
+        // ACTION_XMPP_CONNECTION_CHANGED is handled implicitly by every call
         } else if (!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {
             Log.w("Unexpected intent: " + action);
         }
@@ -377,8 +369,7 @@ public class MainService extends Service {
         IsRunning = true;
 
         // it seems that with gingerbread android doesn't issue null intents any
-        // more when restarting a service
-        // but only calls the service's onCreate()
+        // more when restarting a service but only calls the service's onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             int lastStatus = XmppStatus.getInstance(this).getLastKnowState();
             int currentStatus = (sXmppMgr == null) ? XmppManager.DISCONNECTED : sXmppMgr.getConnectionStatus();
@@ -415,17 +406,6 @@ public class MainService extends Service {
             XmppManager.broadcastStatus(this, state, state);
             // A real action request
         } else {
-            // check if the user has done his part
-//            if (sSettingsMgr.getNotifiedAddress() == null || sSettingsMgr.getNotifiedAddress().equals("") || sSettingsMgr.getNotifiedAddress().equals("your.login@gmail.com")) {
-//                Log.w("Preferences not set! Showing preferences page.");
-//                displayToast(R.string.main_toast_pref_not_set, null);
-//                Intent settingsActivity = new Intent(this, Preferences.class);
-//                settingsActivity.putExtra("panel", R.xml.prefs_connection);
-//                settingsActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                startActivity(settingsActivity);
-//                return START_STICKY;
-//            }
-
             // redirect the intent to the service handler thread
             sendToServiceHandler(startId, intent);
         }
@@ -668,6 +648,7 @@ public class MainService extends Service {
     private void setupCommands() {
         
         Class<?>[] cmds = new Class[] { 
+                TextToSpeechCmd.class,
                 ToastCmd.class,
                 ClipboardCmd.class,
                 CameraCmd.class,
@@ -792,13 +773,7 @@ public class MainService extends Service {
     public static Handler getDelayedDisconnectHandler() {
         return sDelayedDisconnectHandler;
     }
-
-    /**
-     * 
-     * @param i
-     * @param intent
-     * @return
-     */
+    
     public static boolean sendToServiceHandler(int i, Intent intent) {
         if (sServiceHandler != null) {
             Message msg = sServiceHandler.obtainMessage();
@@ -814,11 +789,6 @@ public class MainService extends Service {
         }
     }
 
-    /**
-     * 
-     * @param intent
-     * @return
-     */
     public static boolean sendToServiceHandler(Intent intent) {
         return sendToServiceHandler(0, intent);
     }
