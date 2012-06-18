@@ -28,6 +28,7 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -675,7 +676,7 @@ public class XmppManager {
             // but on a real device it just works fine
             // see: http://stackoverflow.com/questions/2879455/android-2-2-and-bad-address-family-on-socket-connect
             // and http://code.google.com/p/android/issues/detail?id=9431            
-            conf = new AndroidConnectionConfiguration(settings.serviceName, DNSSRV_TIMEOUT):
+            conf = new AndroidConnectionConfiguration(settings.serviceName, DNSSRV_TIMEOUT);
         }
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -689,8 +690,9 @@ public class XmppManager {
                 path = System.getProperty("java.home") + File.separator + "etc"
                     + File.separator + "security" + File.separator
                     + "cacerts.bks";
+            }
+            conf.setTruststorePath(path);
         }
-        conf.setTruststorePath(path);
 
         switch (settings.xmppSecurityModeInt) {
         case SettingsManager.XMPPSecurityOptional:
@@ -704,6 +706,7 @@ public class XmppManager {
             conf.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             break;
         }
+        
         if (settings.useCompression) {
             conf.setCompressionEnabled(true);
         }
@@ -713,7 +716,7 @@ public class XmppManager {
         conf.setReconnectionAllowed(false);
         conf.setSendPresence(false);
         
-        return new XMPPConnection(conf);     
+        return new XMPPConnection(conf);
     }
 
     /** returns the current connection state */
