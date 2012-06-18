@@ -15,3 +15,5 @@ syntax: regexp
 ^proguard-project\.txt$
 syntax: regexp
 ^ant\.properties$
+syntax: regexp
+^external-libs/ActionBarSherlock-4\.1\.0\.0/local\.properties$
