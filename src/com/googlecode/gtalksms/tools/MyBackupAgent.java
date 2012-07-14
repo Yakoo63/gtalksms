@@ -38,10 +38,10 @@ public class MyBackupAgent extends BackupAgent {
         settingsManager = SettingsManager.getSettingsManager(this);
         String sharedPrefsPath = Tools.getSharedPrefDir(this) + "/" + Tools.APP_NAME + ".xml";
         File mDataFile = new File(sharedPrefsPath);
+        DataInputStream in = null;
         try {
             // step 1 - check if update necessary
-            FileInputStream instream = new FileInputStream(oldState.getFileDescriptor());
-            DataInputStream in = new DataInputStream(instream);
+            in = new DataInputStream(new FileInputStream(oldState.getFileDescriptor()));
             // Get the last modified timestamp from the state file and data file
             long stateModified = in.readLong();
             long fileModified = mDataFile.lastModified();
@@ -51,8 +51,11 @@ public class MyBackupAgent extends BackupAgent {
             }
         } catch (IOException e) {
             // Unable to read state file... be safe and do a backup
-        } catch (Exception e1) {
-            
+        } catch (Exception e) {
+        } finally {
+            if (in != null) {
+                in.close();
+            }
         }
         
         //step 2
@@ -63,7 +66,7 @@ public class MyBackupAgent extends BackupAgent {
         DataOutputStream out = new DataOutputStream(outstream);
         long modified = mDataFile.lastModified();
         out.writeLong(modified);
-        
+        out.close();
     }
 
     @Override

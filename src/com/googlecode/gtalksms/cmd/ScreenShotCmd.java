@@ -137,9 +137,11 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 bitmap = Bitmap.createBitmap(sBuffer2, displayWidth, displayHeight, Bitmap.Config.ARGB_8888);
             } else {
                 send(R.string.chat_sc_error_framebuffer);
+                in.close();
                 rawTmpFile.delete();
                 return;
             }
+            in.close();
             
             File picture = new File(repository, "screenshot_" + Tools.getFileFormat(GregorianCalendar.getInstance()) + ".png");
             FileOutputStream fos = new FileOutputStream(picture);
