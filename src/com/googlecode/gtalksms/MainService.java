@@ -37,6 +37,7 @@ import com.googlecode.gtalksms.cmd.FileCmd;
 import com.googlecode.gtalksms.cmd.GeoCmd;
 import com.googlecode.gtalksms.cmd.HelpCmd;
 import com.googlecode.gtalksms.cmd.KeyboardCmd;
+import com.googlecode.gtalksms.cmd.LogsCmd;
 import com.googlecode.gtalksms.cmd.RebootCmd;
 import com.googlecode.gtalksms.cmd.RecipientCmd;
 import com.googlecode.gtalksms.cmd.RingCmd;
@@ -648,6 +649,7 @@ public class MainService extends Service {
     private void setupCommands() {
         
         Class<?>[] cmds = new Class[] { 
+                LogsCmd.class,
                 TextToSpeechCmd.class,
                 ToastCmd.class,
                 ClipboardCmd.class,
