@@ -264,10 +264,15 @@ public class XmppManager {
      */
     protected void xmppRequestStateChange(int newState) {
         int currentState = getConnectionStatus();
+        Log.i("xmppRequestStateChange " + statusAsString(currentState) + " => " + statusAsString(newState));
         switch (newState) {
         case XmppManager.CONNECTED:
             switch (currentState) {
             case XmppManager.CONNECTED:
+                if (mConnection == null || !mConnection.isConnected()) {
+                    cleanupConnection();
+                    start(XmppManager.CONNECTED);
+                }
                 break;
             case XmppManager.CONNECTING:    
             case XmppManager.DISCONNECTED:
@@ -511,6 +516,7 @@ public class XmppManager {
                 // connection was closed by the foreign host
                 // or we have closed the connection
                 Log.i("ConnectionListener: connectionClosed() called - connection was shutdown by foreign host or by us");
+                xmppRequestStateChange(getConnectionStatus());
             }
 
             @Override
@@ -821,8 +827,10 @@ public class XmppManager {
             }
             return true;
         } else {
+            boolean result = mClientOfflineMessages.addOfflineMessage(msg);
             Log.d("Adding message: \"" + message.toShortString() + "\" to offline queue, because we are not connected. Status=" + statusString());
-            return mClientOfflineMessages.addOfflineMessage(msg);
+            xmppRequestStateChange(getConnectionStatus());
+            return result;
         }
     }
     
