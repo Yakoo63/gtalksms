@@ -35,7 +35,7 @@ public class Web {
             while ((current = bis.read()) != -1) {
                 baf.append((char) current);
             }
-            Log.d(Tools.LOG_TAG, "downloaded in" + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
+            Log.d(Tools.LOG_TAG, "downloaded in " + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
 
         } catch (IOException e) {
             Log.d(Tools.LOG_TAG, "IOException in DownloadFromUrl(): " + e);
@@ -66,7 +66,7 @@ public class Web {
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(baf.toByteArray());
             fos.close();
-            Log.d(Tools.LOG_TAG, "Downloaded in" + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
+            Log.d(Tools.LOG_TAG, "Downloaded in " + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
 
         } catch (IOException e) {
             Log.d(Tools.LOG_TAG, "Error: " + e);
