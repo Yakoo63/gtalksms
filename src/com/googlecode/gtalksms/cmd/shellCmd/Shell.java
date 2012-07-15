@@ -17,42 +17,17 @@ import com.googlecode.gtalksms.xmpp.XmppFont;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class Shell {
-    // Id to identify the console/room (0 for main chat windows)
-    int mShellId;
-    
-    // Execution thread
-    Thread mThread;
-    
-    // Buffered results
-    StringBuilder mResults = new StringBuilder();
-    
-    // Command
-    // TODO an array ?
-    String mCurrentCommand;
-
-    // Reference to shell command manager to manage results
-    ShellCmd mCmdBase;
-    
-    // Android context reference
-    Context mContext;
-    
-    // Default result font
-    // TODO allow modifications ?
-    XmppFont _font = new XmppFont("consolas", "red");
-
-    public Shell(int id, ShellCmd cmdBase, Context context) {
-        mShellId = id;
-        mCmdBase = cmdBase;
-        mContext = context;
-    }
-    
-    private Runnable _cmdRunnable = new Runnable() {
+    class ShellThread implements Runnable {
+        boolean mStop = false;
+        
+        public void stop() {
+            mStop = true;
+        }
         
         public void run() {
             mResults.append(mCurrentCommand);
             mResults.append(Tools.LineSep);
             
-           
             Process myproc = null;
             
             try { 
@@ -72,7 +47,12 @@ public class Shell {
                 readStream(myproc.getInputStream());
                 readStream(myproc.getErrorStream());
                 
-                sendResults();
+                if (!mStop) {
+                    sendResults();
+                }
+            }
+            catch (InterruptedException ex) {
+                sendMessage(mCurrentCommand + " killed.");
             }
             catch (Exception ex) {
                 Log.w(Tools.LOG_TAG, "Shell command error", ex);
@@ -97,7 +77,7 @@ public class Shell {
             Date start = new Date();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             
-            while ((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null && !mStop) {
                 mResults.append(line);
                 mResults.append(Tools.LineSep);
                 
@@ -115,8 +95,38 @@ public class Shell {
                 }
             }
         }
-    };
+    }
     
+    // Id to identify the console/room (0 for main chat windows)
+    int mShellId;
+    
+    // Execution thread
+    Thread mThread;
+    ShellThread mShellThread;
+    
+    // Buffered results
+    StringBuilder mResults = new StringBuilder();
+    
+    // Command
+    // TODO an array ?
+    String mCurrentCommand;
+
+    // Reference to shell command manager to manage results
+    ShellCmd mCmdBase;
+    
+    // Android context reference
+    Context mContext;
+    
+    // Default result font
+    // TODO allow modifications ?
+    XmppFont _font = new XmppFont("consolas", "red");
+
+    public Shell(int id, ShellCmd cmdBase, Context context) {
+        mShellId = id;
+        mCmdBase = cmdBase;
+        mContext = context;
+    }
+       
     /**
      * Executes a given command, if the previous command is still running, it's
      * thread will be stopped.
@@ -126,18 +136,12 @@ public class Shell {
     public void executeCommand(String shellCmd) {
         // check if the previous Command Thread still exists
         if (mThread != null && mThread.isAlive()) {
-            sendMessage(mCurrentCommand + " killed.");
-            try { 
-                mThread.interrupt();
-                mThread.join(1000); 
-            } catch (Exception e) {}
-            
-            try { mThread.stop(); } catch (Exception e) {}
-            
-            sendResults();
+            mShellThread.stop();
+            mResults = new StringBuilder();
         }
         mCurrentCommand = shellCmd;
-        mThread = new Thread(_cmdRunnable);
+        mShellThread = new ShellThread();
+        mThread = new Thread(mShellThread);
         mThread.start();
     }
     
