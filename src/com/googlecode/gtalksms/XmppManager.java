@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.AndroidConnectionConfiguration;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
@@ -28,13 +28,10 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Handler;
 import android.os.Build;
+import android.os.Handler;
 
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
@@ -53,7 +50,7 @@ import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class XmppManager {
     
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     
     // my first measuring showed that the disconnect in fact does not hang
     // but takes sometimes a lot of time
@@ -175,32 +172,6 @@ public class XmppManager {
         return sXmppManager;
     }
     
-    /**
-     * This getter is solely for the purpose that the setup wizard is able to
-     * inform the XmppManager that a new connection has been created
-     * and that the XmppManager should use this connection from now on
-     * 
-     * @param ctx
-     * @param connection
-     * @return
-     */
-    public static XmppManager getInstance(Context ctx, XMPPConnection connection) {
-        if (sXmppManager == null) {
-            sXmppManager = new XmppManager(ctx, connection);
-        } else {
-            // This case is only for the wizard, which hands over a connection
-            // therefore we cleanup every possible connection and simply 
-            // call onConnectionEstablished()
-            // Start with removing all possible references to the old connection
-            // note that this will note change sStatus
-            sXmppManager.cleanupConnection();
-            // init XmppManager with the new connection
-            // setting up all packetListeners etc.
-            sXmppManager.onConnectionEstablished(connection);
-        }
-        return sXmppManager;
-    }
-    
     private void start(int initialState) {
         switch (initialState) {
             case CONNECTED:
@@ -223,6 +194,7 @@ public class XmppManager {
         updateStatus(DISCONNECTING);
         cleanupConnection();
         updateStatus(DISCONNECTED);
+        mConnection = null;
     }
     
     /**
@@ -236,19 +208,33 @@ public class XmppManager {
         mReconnectHandler.removeCallbacks(mReconnectRunnable);
 
         if (mConnection != null) {
-            if (mConnection.isConnected()) {
-                xmppDisconnect(mConnection);
+            if (mPacketListener != null) {
+                mConnection.removePacketListener(mPacketListener);
             }
-            // xmppDisconnect may has set mConnection to null, so we have to double check
-            if (mConnection != null) {
-                if (mPacketListener != null) {
-                    mConnection.removePacketListener(mPacketListener);
-                }
-                if (mConnectionListener != null) {
-                    mConnection.removeConnectionListener(mConnectionListener);
-                }
-                if (mPresencePacketListener != null) {
-                    mConnection.removePacketListener(mPresencePacketListener);
+            if (mConnectionListener != null) {
+                mConnection.removeConnectionListener(mConnectionListener);
+            }
+            if (mPresencePacketListener != null) {
+                mConnection.removePacketListener(mPresencePacketListener);
+            }
+            
+            if (mConnection.isConnected()) {
+                // Try to disconnect
+                Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            mConnection.disconnect();
+                        } catch (Exception e) {}
+                    }
+                }, "xmpp-disconnector");
+                // we don't want this thread to hold up process shutdown so mark as daemon.
+                t.setDaemon(true);
+                t.start();
+
+                try {
+                    t.join(DISCON_TIMEOUT);
+                } catch (InterruptedException e) {
+                    mConnection = null;
                 }
             }
         }
@@ -267,122 +253,27 @@ public class XmppManager {
         Log.i("xmppRequestStateChange " + statusAsString(currentState) + " => " + statusAsString(newState));
         switch (newState) {
         case XmppManager.CONNECTED:
-            switch (currentState) {
-            case XmppManager.CONNECTED:
-                if (mConnection == null || !mConnection.isConnected()) {
-                    cleanupConnection();
-                    start(XmppManager.CONNECTED);
-                }
-                break;
-            case XmppManager.CONNECTING:    
-            case XmppManager.DISCONNECTED:
-            case XmppManager.WAITING_TO_CONNECT:
-            case XmppManager.WAITING_FOR_NETWORK:
+            if (!isXmppConnected()) {
                 cleanupConnection();
                 start(XmppManager.CONNECTED);
-                break;
-            default:
-                throw new IllegalStateException("xmppRequestStateChange() unexpected current state when moving to connected: " + currentState);
             }
             break;
         case XmppManager.DISCONNECTED:
             stop();
             break;
         case XmppManager.WAITING_TO_CONNECT:
-            switch (currentState) {
-            case XmppManager.CONNECTED:
-                stop();
-                start(XmppManager.WAITING_TO_CONNECT);
-                break;
-            case XmppManager.DISCONNECTED:
-                start(XmppManager.WAITING_TO_CONNECT);
-                break;
-            case XmppManager.WAITING_TO_CONNECT:
-                break;
-            case XmppManager.WAITING_FOR_NETWORK:
-                cleanupConnection();
-                start(XmppManager.CONNECTED);
-                break;
-            default:
-                throw new IllegalStateException("xmppRequestStateChange() xmppRequestStateChangeunexpected current state when moving to waiting: " + currentState);
-            }
+            cleanupConnection();
+            start(XmppManager.WAITING_TO_CONNECT);
             break;
         case XmppManager.WAITING_FOR_NETWORK:
-            switch (currentState) {
-            case XmppManager.CONNECTED:
-                stop();
-                start(XmppManager.WAITING_FOR_NETWORK);
-                break;
-            case XmppManager.DISCONNECTED:
-                start(XmppManager.WAITING_FOR_NETWORK);
-                break;
-            case XmppManager.WAITING_TO_CONNECT:
-                cleanupConnection();
-                break;
-            case XmppManager.WAITING_FOR_NETWORK:
-                break;
-            default:
-                throw new IllegalStateException("xmppRequestStateChange() xmppRequestStateChangeunexpected current state when moving to waiting: " + currentState);
-            }
+            cleanupConnection();
+            start(XmppManager.WAITING_FOR_NETWORK);
             break;
         default:
-            throw new IllegalStateException("xmppRequestStateChange() invalid state to switch to: " + statusAsString(newState));
+            Log.w("xmppRequestStateChange() invalid state to switch to: " + statusAsString(newState));
         }
         // Now we have requested a new state, our state receiver will see when
         // the state actually changes and update everything accordingly.
-    }
-
-    private void xmppDisconnect(XMPPConnection connection) {
-        // In some cases the 'disconnect' may hang - see
-        // http://code.google.com/p/gtalksms/issues/detail?id=12 for an
-        // example.  We worm around this by leveraging the fact that we 
-        // are going to throw the XmppConnection away after disconnecting,
-        // so just spawn a thread to perform the disconnection.  In the
-        // usual good case the thread will terminate very quickly, and 
-        // in the bad case the thread may hang around much longer - but 
-        // at least we are still working and it should go away 
-        // eventually...
-        class DisconnectRunnable implements Runnable {
-            private XMPPConnection con;
-
-            public DisconnectRunnable(XMPPConnection con) {
-                this.con = con;
-            }
-            
-            public void run() {
-                if (con.isConnected()) {
-                    Log.i("disconnectING xmpp connection");
-                    float start = System.currentTimeMillis();
-                    try {
-                        con.disconnect();
-                    } catch (Exception e) {
-                        // Even if we double check that the connection is still connected
-                        // sometimes the connection timeout occurs when the disconnect method
-                        // is running, so we just log that here
-                        Log.i("xmpp disconnect failed: " + e);
-                    }
-                    float stop = System.currentTimeMillis();
-                    float diff = stop - start;
-                    diff = diff / 1000;
-                    Log.i("disconnectED xmpp connection. Took: " + diff + " s");
-                }
-            }
-        }
-        
-        Thread t = new Thread(new DisconnectRunnable(connection), "xmpp-disconnector");
-        // we don't want this thread to hold up process shutdown so mark as daemon.
-        t.setDaemon(true);
-        t.start();
-        
-        try {
-            t.join(DISCON_TIMEOUT);
-        } catch (InterruptedException e) {}
-        // the thread is still alive, this means that the disconnect is still running
-        // we don't have the time, so prepare for a new connection
-        if (t.isAlive()) {
-            Log.i(t.getName() + " was still alive: connection will be set to null");
-            mConnection = null;
-        }
     }
 
     /**
@@ -400,9 +291,7 @@ public class XmppManager {
         Intent intent = new Intent(MainService.ACTION_XMPP_CONNECTION_CHANGED);                      
         intent.putExtra("old_state", old_state);
         intent.putExtra("new_state", new_state);
-        if (new_state == CONNECTED 
-                && sXmppManager != null
-                && sXmppManager.mConnection != null) {
+        if (new_state == CONNECTED && sXmppManager != null && sXmppManager.mConnection != null) {
             intent.putExtra("TLS", sXmppManager.mConnection.isUsingTLS());
             intent.putExtra("Compression", sXmppManager.mConnection.isUsingCompression());
         }
@@ -459,18 +348,17 @@ public class XmppManager {
         XMPPConnection connection;
 
         // assert we are only ever called from one thread
-        String currentThreadName = Thread.currentThread().getName();
-        assert (!currentThreadName.equals(MainService.SERVICE_THREAD_NAME));
-        
-        NetworkInfo active = ((ConnectivityManager)mContext.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        if (active == null || !active.isAvailable()) {
-            Log.e("initConnection: connection request, but no network available");
-            // we don't destroy the service here - our network receiver will notify us when
-            // the network comes up and we try again then.
-            updateStatus(WAITING_FOR_NETWORK);
-            return;
-        }
-        
+        assert (!Thread.currentThread().getName().equals(MainService.SERVICE_THREAD_NAME));
+//        
+//        NetworkInfo active = ((ConnectivityManager)mContext.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+//        if (active == null || !active.isAvailable()) {
+//            Log.e("initConnection: connection request, but no network available");
+//            // we don't destroy the service here - our network receiver will notify us when
+//            // the network comes up and we try again then.
+//            updateStatus(WAITING_FOR_NETWORK);
+//            return;
+//        }
+//        
         // everything is ready for a connection attempt
         updateStatus(CONNECTING);
 
@@ -612,13 +500,6 @@ public class XmppManager {
             connection.connect();
         } catch (Exception e) {
             Log.w("xmpp connection failed: " + e.getMessage());
-            // "No response from server" usually means that the connection is somehow in an undefined state
-            // so we throw away the XMPPConnection by null-ing it
-            // see also issue 133 - http://code.google.com/p/gtalksms/issues/detail?id=133
-            if (e.getMessage() != null && e.getMessage().startsWith("Connection failed. No response from server")) {
-                Log.w("xmpp connection in an unusable state, marking it as obsolete", e);
-                mConnection = null;
-            }
             if (e instanceof XMPPException) {
                 XMPPException xmppEx = (XMPPException) e;
                 StreamError error = xmppEx.getStreamError();
@@ -628,10 +509,11 @@ public class XmppManager {
                 }
             }
             maybeStartReconnect();
+            mConnection = null;
             return false;
         }          
         
-        // we reuse the connection and the auth was done with the connect()
+        // if we reuse the connection and the auth was done with the connect()
         if (connection.isAuthenticated()) {
             return true;
         }
@@ -645,7 +527,8 @@ public class XmppManager {
         try {
             connection.login(mSettings.getLogin(), mSettings.getPassword(), Tools.APP_NAME);
         } catch (Exception e) {
-            xmppDisconnect(connection);
+            cleanupConnection();
+            
             Log.e("xmpp login failed: " + e.getMessage());
             // sadly, smack throws the same generic XMPPException for network
             // related messages (eg "no response from the server") as for
@@ -781,12 +664,7 @@ public class XmppManager {
         }
 
         // determine the type of the message, groupchat or chat
-        if (muc == null) {
-            msg.setType(Message.Type.chat);
-        } else {
-            msg.setType(Message.Type.groupchat);
-        }
-        
+        msg.setType(muc == null ? Message.Type.chat : Message.Type.groupchat);
 
         if (isConnected()) {
             // Message has no destination information send to all known resources 
@@ -798,7 +676,7 @@ public class XmppManager {
                         Presence p = presences.next();
                         String toPresence = p.getFrom();
                         String toResource = StringUtils.parseResource(toPresence);
-                        // Don't send messages to gtalk Android devices
+                        // Don't send messages to GTalk Android devices
                         // It would be nice if there was a better way to detect 
                         // an Android gTalk XMPP client, but currently there is none
                         if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
@@ -835,10 +713,11 @@ public class XmppManager {
     }
     
     public boolean isConnected() {
-        boolean res = (mConnection != null 
-                && mConnection.isConnected() 
-                && mStatus == CONNECTED);
-        return res;
+        return isXmppConnected() && mStatus == CONNECTED;
+    }
+    
+    public boolean isXmppConnected() {
+        return mConnection != null && mConnection.isConnected();
     }
     
     public void registerConnectionChangeListener(XmppConnectionChangeListener listener) {
@@ -852,30 +731,28 @@ public class XmppManager {
     public static int getReusedConnectionCount() {
         return sReusedConnectionCount;
     }
-    
+
     public static String statusAsString(int state) {
-        String res;
+        String res = "??";
         switch(state) {
-        case 1:
+        case DISCONNECTED:
             res = "Disconnected";
             break;
-        case 2:
+        case CONNECTING:
             res = "Connecting";
             break;
-        case 3:
+        case CONNECTED:
             res = "Connected";
             break;
-        case 4:
+        case DISCONNECTING:
             res = "Disconnecting";
             break;
-        case 5:
+        case WAITING_TO_CONNECT:
             res = "Waiting to connect";
             break;
-        case 6:
+        case WAITING_FOR_NETWORK:
             res = "Waiting for network";
             break;
-        default:
-            throw new IllegalStateException();
         }
         return res;                        
     }
