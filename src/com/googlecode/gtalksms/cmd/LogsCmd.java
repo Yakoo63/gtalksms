@@ -14,11 +14,23 @@ public class LogsCmd extends CommandHandlerBase {
         int mLength;
         
         public LogsThread() {
-            this(50000);
+            this(null, 100);
         }
         
         public LogsThread(int length) {
-            mLogs = new Logs(false);
+            this(null, length);
+        }
+        
+        public LogsThread(String tags) {
+            this(tags, 100);
+        }
+        
+        public LogsThread(String tags, int length) {
+            if (tags == null) {
+                mLogs = new Logs(false);
+            } else {
+                mLogs = new Logs(tags, false);
+            }
             mStop = false;
             mLength = length;
         }
@@ -66,8 +78,14 @@ public class LogsCmd extends CommandHandlerBase {
             }
             if (argsArray.length == 0) {
                 mLogsThread = new LogsThread();
-            } else {
-                mLogsThread = new LogsThread(Tools.parseInt(argsArray[0], 100));
+            } else if (argsArray.length == 1) {
+                if (Tools.isInt(argsArray[0])) {
+                    mLogsThread = new LogsThread(Tools.parseInt(argsArray[0], 100));
+                } else {
+                    mLogsThread = new LogsThread(argsArray[0]);
+                }
+            } else if (argsArray.length == 2) {
+                mLogsThread = new LogsThread(argsArray[0], Tools.parseInt(argsArray[1], 100));
             }
             mThread = new Thread(mLogsThread);
             mThread.start();

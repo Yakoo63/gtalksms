@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,9 +23,15 @@ public class Logs {
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
     boolean mStop = false;
     boolean mIncludeContext = false;
+    String mTags = "";
     
     public Logs(boolean includeContext) {
         mIncludeContext = includeContext;
+    }
+    
+    public Logs(String tags, boolean includeContext) {
+        mIncludeContext = includeContext;
+        mTags = tags;
     }
     
     public void stop() {
@@ -31,20 +39,18 @@ public class Logs {
     }
     
     public String getLogs(Context ctx, int maxLength){
-        return getLogs(ctx, maxLength, "-v", "time", "AndroidRuntime:E", "gtalksms:V", "*:S");
+        return getLogs(ctx, maxLength, Arrays.asList(new String[] {"-v", "time", "AndroidRuntime:E", "gtalksms:V", "*:S", mTags}));
     }
     
-    public String getLogs(Context ctx, int maxLength, String... params){
+    public String getLogs(Context ctx, int maxLength, List<String> list){
         final StringBuilder log = new StringBuilder();
         log.append(LINE_SEPARATOR);
         try{
             ArrayList<String> commandLine = new ArrayList<String>();
             commandLine.add("logcat");//$NON-NLS-1$
             commandLine.add("-d");//$NON-NLS-1$
-            if (params != null && params.length > 0){
-                for (String param : params) {
-                    commandLine.add(param);
-                }
+            if (list != null){
+                commandLine.addAll(list);
             }
 
             Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]));

@@ -116,6 +116,14 @@ public class Tools {
         context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
     }
     
+    public final static boolean isInt(String value) {
+        try {
+            Integer.parseInt(value);
+            return true;
+        } catch (NumberFormatException nfe) {}
+        return false;
+    }
+    
     public final static Integer parseInt(String value) {
         Integer res = null;
         try { 
