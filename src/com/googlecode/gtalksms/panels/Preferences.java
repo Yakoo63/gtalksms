@@ -9,6 +9,7 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class Preferences extends PreferenceActivity {
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
