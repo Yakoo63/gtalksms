@@ -59,6 +59,7 @@ public class Shell {
             }
             
             mThread = null;
+            mShellThread = null;
             mCurrentCommand = null;
         }
         
