@@ -19,10 +19,10 @@ public class Cmd {
         private String [] mAlias;
         
         SubCmd(String name, Cmd baseCmd, int resHelp, String args, Object... alias) {
-            mName = name;
+            mName = name.toLowerCase();
             mAlias = new String[alias.length];
             for (int i = 0 ; i < alias.length ; ++i) {
-                mAlias[i] = alias[i].toString();  
+                mAlias[i] = alias[i].toString().toLowerCase();  
             }
             
             mHelpMsg = getString(resHelp);
@@ -59,7 +59,7 @@ public class Cmd {
     private static Context sContext;
     
     Cmd(String name, Object... alias) {
-        mName = name;
+        mName = name.toLowerCase();
         mAlias = new String[alias.length];
         for (int i = 0 ; i < alias.length ; ++i) {
             mAlias[i] = alias[i].toString().toLowerCase();  

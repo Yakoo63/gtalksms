@@ -50,6 +50,12 @@
     <string name="chat_alias_empty">No aliases set.</string>
     <string name="chat_alias_invalid_char">Alias name can not contain a single quote ("'").</string>
     <string name="chat_alias_show_non_existent">Alias \'%1$s\' does not exists.</string>
+    <string name="chat_apps_user">\nInstalled user applications are:\n</string>
+    <string name="chat_apps_system">\nInstalled system applications are:\n</string>
+    <string name="chat_apps_find">Applications for \'%1$s\' are:\n</string>
+    <string name="chat_apps_find_err">No application for \'%1$s\'.</string>
+    <string name="chat_apps_start">Application \'%1$s\' started.</string>
+    <string name="chat_apps_start_err">Failed to launch application \'%1$s\'.</string>
     <string name="chat_battery_level">Battery level %d%%</string>
     <string name="chat_bt_adapter_error">Error on Bluetooth adapter</string>
     <string name="chat_bt_adapter_state">Bluetooth adapter is %1$s</string>
@@ -115,6 +121,11 @@
     <string name="chat_help_alias_del">Deletes the specified alias.</string>
     <string name="chat_help_alias_general">Allows the creation/manipulation of permanent aliases, that can be use anywhere within GTalkSMS where otherwise a number of full name would be required</string>
     <string name="chat_help_alias_show">Shows the alias information. If #aliasname# is \"all\", every known alias will be presented.</string>
+    <string name="chat_help_apps_list_all">Get the list of all installed applications.</string>
+    <string name="chat_help_apps_list_user">Get the list of all installed user applications.</string>
+    <string name="chat_help_apps_list_system">Get the list of all installed system applications.</string>
+    <string name="chat_help_apps_find">Find an installed application.</string>
+    <string name="chat_help_apps_start">Start a specific application.</string>
     <string name="chat_help_battery">show battery level in percent.</string>
     <string name="chat_help_bt_off">turn off the bluetooth adapter.</string>
     <string name="chat_help_bt_on">turn on the bluetooth adapter.</string>

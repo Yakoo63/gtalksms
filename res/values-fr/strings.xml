@@ -50,6 +50,12 @@
     <string name="chat_alias_empty">Aucun alias</string>
     <string name="chat_alias_invalid_char">Les alias ne peuvent pas contenir d\'apostrophe ("'").</string>
     <string name="chat_alias_show_non_existent">L\'alias \'%1$s\' n\'existe pas</string>
+    <string name="chat_apps_user">\nLes applications utilisateurs installées sont :\n</string>
+    <string name="chat_apps_system">\nLes applications systèmes installées sont :\n</string>
+    <string name="chat_apps_find">Les applications pour \'%1$s\' sont :\n</string>
+    <string name="chat_apps_find_err">Aucune application pour \'%1$s\'.</string>
+    <string name="chat_apps_start">Application \'%1$s\' démarrée.</string>
+    <string name="chat_apps_start_err">Echec du lancement de l\'application \'%1$s\'.</string>
     <string name="chat_battery_level">Batterie à %d%%</string>
     <string name="chat_bt_adapter_error">Erreur sur composant BlueTooth</string>
     <string name="chat_bt_adapter_state">Le composant BlueTooth est %1$s</string>
@@ -115,6 +121,11 @@
     <string name="chat_help_alias_del">Supprime un alias.</string>
     <string name="chat_help_alias_general">Permet la gestion d\'alias permanents qui peuvent être utilisés à la place d\'un nom de contact ou d\'un numéro de téléphone dans GTalkSMS</string>
     <string name="chat_help_alias_show">Affiche le détail d\'un alias. Si #aliasname# est \"all\", tous les alias sont affichés.</string>    
+    <string name="chat_help_apps_list_all">Affiche la liste des applications installées.</string>
+    <string name="chat_help_apps_list_user">Affiche la liste des applications utilisateurs installées.</string>
+    <string name="chat_help_apps_list_system">Affiche la liste des applications systèmes installées.</string>
+    <string name="chat_help_apps_find">Recherche une application.</string>
+    <string name="chat_help_apps_start">Démarre l\'application.</string>
     <string name="chat_help_battery">Affiche l\'état de la batterie.</string>
     <string name="chat_help_bt_off">Désactive le composant bluetooth.</string>
     <string name="chat_help_bt_on">Active le composant bluetooth.</string>
