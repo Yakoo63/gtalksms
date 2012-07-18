@@ -24,6 +24,7 @@ import android.os.Message;
 import android.os.PowerManager;
 
 import com.googlecode.gtalksms.cmd.AliasCmd;
+import com.googlecode.gtalksms.cmd.ApplicationsCmd;
 import com.googlecode.gtalksms.cmd.BatteryCmd;
 import com.googlecode.gtalksms.cmd.BluetoothCmd;
 import com.googlecode.gtalksms.cmd.CallCmd;
@@ -649,6 +650,7 @@ public class MainService extends Service {
     private void setupCommands() {
         
         Class<?>[] cmds = new Class[] { 
+                ApplicationsCmd.class,
                 LogsCmd.class,
                 TextToSpeechCmd.class,
                 ToastCmd.class,
