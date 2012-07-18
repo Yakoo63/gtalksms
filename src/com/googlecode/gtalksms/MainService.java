@@ -533,7 +533,7 @@ public class MainService extends Service {
 
     private void executeCommand(String cmd, String args, String answerTo) {
         assert (cmd != null);
-        if (sCommands.containsKey(cmd)) {
+        if (sCommands.containsKey(cmd.toLowerCase())) {
             Log.d("MainService executing command: \"" + cmd + ":" + Tools.shortenMessage(args) + "\"");
             try {
                 CommandHandlerBase exec = sCommands.get(cmd);
@@ -714,10 +714,10 @@ public class MainService extends Service {
 
     private static void registerCommand(CommandHandlerBase cmd) {
         for (Cmd c : cmd.getCommands()) {
-            sCommands.put(c.getName(), cmd);
+            sCommands.put(c.getName().toLowerCase(), cmd);
             if (c.getAlias() != null) {
                 for (String a : c.getAlias()) {
-                    sCommands.put(a, cmd);
+                    sCommands.put(a.toLowerCase(), cmd);
                 }
             }
         }

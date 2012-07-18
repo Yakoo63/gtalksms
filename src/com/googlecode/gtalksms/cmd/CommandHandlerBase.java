@@ -42,7 +42,7 @@ public abstract class CommandHandlerBase {
         mCommandMap = new HashMap<String, Cmd>();
         for (Object o : commands) {
             Cmd c = (Cmd)o;
-            mCommandMap.put(c.getName(), c);
+            mCommandMap.put(c.getName().toLowerCase(), c);
         }
         mCmdType = cmdType;
         mAnswerTo = null;
@@ -90,14 +90,14 @@ public abstract class CommandHandlerBase {
     }   
     
     public Cmd getCommand(String name) {
-        Cmd cmd = mCommandMap.get(name);
+        Cmd cmd = mCommandMap.get(name.toLowerCase());
         
         if (cmd != null) {
             return cmd;
         } else {
             for (Cmd c : mCommandMap.values()) {
                 for (String a : c.getAlias()) {
-                    if (a.equals(name)) {
+                    if (a.equals(name.toLowerCase())) {
                         return c;
                     }
                 }

@@ -62,7 +62,7 @@ public class Cmd {
         mName = name;
         mAlias = new String[alias.length];
         for (int i = 0 ; i < alias.length ; ++i) {
-            mAlias[i] = alias[i].toString();  
+            mAlias[i] = alias[i].toString().toLowerCase();  
         }
         mSubCmds = new ArrayList<SubCmd>();
     }
