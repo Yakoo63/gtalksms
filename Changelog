@@ -1,4 +1,4 @@
-Incoming version
+4.0
 * New Applications command to see or start installed applications
 * New Text To Speech command
 * Command "wappend" & "wsend" to add text as a virtual keyboard and validate the field
