@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 import android.content.Context;
 import android.content.Intent;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
@@ -83,6 +84,16 @@ public abstract class CommandHandlerBase {
 
     protected void send(XmppMsg message, String to) {
         sMainService.send(message, to);
+    }
+    
+    /**
+     * Sends an exception back to the user and
+     * also logs this exception with info level
+     * @param e
+     */
+    protected void send(Exception e) {
+        send("Exception: " + e.toString(), mAnswerTo);
+        Log.i("Exception", e);
     }
 
     public Cmd[] getCommands() {
