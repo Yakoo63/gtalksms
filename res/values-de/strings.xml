@@ -50,6 +50,12 @@
     <string name="chat_alias_empty">Keine Aliase gesetzt.</string>
     <string name="chat_alias_invalid_char">Alias Name darf kein Apostroph enthalten ("'").</string>  
     <string name="chat_alias_show_non_existent">Alias \'%1$s\' exsistiert nicht.</string>
+    <string name="chat_apps_user">\nInstallierte Anwendungen:\n</string>
+    <string name="chat_apps_system">\nInstallierte Systemanwendungen:\n</string>
+    <string name="chat_apps_find">Anwendungen für \'%1$s\':\n</string>
+    <string name="chat_apps_find_err">Keine Anwendung für \'%1$s\'.</string>
+    <string name="chat_apps_start">Anwendung \'%1$s\' gestartet.</string>
+    <string name="chat_apps_start_err">Fehler beim starten von Anwendung \'%1$s\'.</string>
     <string name="chat_battery_level">Akkuladestand %d%%</string>
     <string name="chat_bt_adapter_error">Bluetooth Adapter Fehler</string>
     <string name="chat_bt_adapter_state">Bluetooth Adapter: %1$s</string>
@@ -115,6 +121,11 @@
     <string name="chat_help_alias_del">Löscht den Alias.</string>
     <string name="chat_help_alias_general">Ermöglicht die Erzeugung und Bearbeitung von Aliasen, welche anstatt Namen oder Nummern verwendet werden können</string>
     <string name="chat_help_alias_show">Zeigt die Informationen über den Alias an. Falls #aliasname# gleich \"all\", werden alle bekannten Aliases ausgegeben.</string>
+    <string name="chat_help_apps_list_all">Zeigt alle installierten Anwendungen an.</string>
+    <string name="chat_help_apps_list_user">Zeigt alle von Benutzer installierten Anwendungen an.</string>
+    <string name="chat_help_apps_list_system">Zeigt alle installierten Systemanwendungen an.</string>
+    <string name="chat_help_apps_find">Sucht nach einer Anwendung.</string>
+    <string name="chat_help_apps_start">Startet eine Anwendung.</string>
     <string name="chat_help_battery">Zeigt den Akkuladezustand in Prozent an.</string>
     <string name="chat_help_bt_off">Deaktiviert Bluetooth.</string>
     <string name="chat_help_bt_on">Aktiviert Bluetooth.</string>
