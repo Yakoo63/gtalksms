@@ -182,6 +182,7 @@ public class CommandsTabFragment extends SherlockFragment {
                                         buttonSend.callOnClick(); 
                                     } else {
                                         // what TODO when not >= API 15 ?
+                                        buttonSend.performClick();
                                     }
                                 }
                                 return false;
