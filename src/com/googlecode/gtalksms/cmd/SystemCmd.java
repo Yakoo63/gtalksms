@@ -8,6 +8,7 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Process;
 import android.os.SystemClock;
 import android.os.Debug.MemoryInfo;
@@ -65,6 +66,8 @@ public class SystemCmd extends CommandHandlerBase {
             appendPreferences(res);
             res.newLine();
             appendTelephonStatus(res);
+            res.newLine();
+            appendBuildInfo(res);
             res.newLine();
             appendNullIntentStartCounter(res);
         } else if (isMatchingCmd("telinfo", cmd)) {
@@ -248,5 +251,34 @@ public class SystemCmd extends CommandHandlerBase {
             line += values[i] + " ";
         }
         msg.appendLine(line);
+    }
+    
+    @SuppressWarnings("deprecation")
+    private static void appendBuildInfo(XmppMsg msg) {
+        msg.appendBoldLine("BuildInfo");
+        msg.appendLine("Manufacturer: " + android.os.Build.MANUFACTURER);
+        msg.appendLine("Model: " + android.os.Build.MODEL);
+        msg.appendLine("Product: " + android.os.Build.PRODUCT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            msg.appendLine("Serial: " + android.os.Build.SERIAL);
+        }
+        msg.appendLine("Build Tags: " + android.os.Build.TAGS);
+        msg.appendLine("Build Type: " + android.os.Build.TYPE);
+        msg.appendLine("Build ID: " + android.os.Build.ID);
+        msg.appendLine("Build Host: " + android.os.Build.HOST);
+        msg.appendLine("Build Fingerprint: " + android.os.Build.FINGERPRINT);
+        msg.appendLine("Brand: " + android.os.Build.BRAND);
+        msg.appendLine("Bootloader: " + android.os.Build.BOOTLOADER);
+        msg.appendLine("Board: " + android.os.Build.BRAND);
+        msg.appendLine("Hardware: " + android.os.Build.HARDWARE);
+        msg.appendLine("CPU ABI: " + android.os.Build.CPU_ABI);
+        msg.appendLine("CPU ABI2: " + android.os.Build.CPU_ABI2);
+        msg.appendLine("Display: " + android.os.Build.DISPLAY);
+        msg.appendLine("Device: " + android.os.Build.DEVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            msg.appendLine("Radio: " + android.os.Build.getRadioVersion());
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            msg.appendLine("Radio: " + android.os.Build.RADIO);
+        }
     }
 }

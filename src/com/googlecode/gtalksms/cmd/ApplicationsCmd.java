@@ -107,12 +107,12 @@ public class ApplicationsCmd extends CommandHandlerBase {
                 try {
                     sContext.startActivity(pm.getLaunchIntentForPackage(packageInfo.packageName));
                     send(getString(R.string.chat_apps_start, name));
-                    return;
                 } catch (Exception e) {
+                    send(getString(R.string.chat_apps_start_err, name));
+                    send(e);
                 }
             }
         }
-        send(getString(R.string.chat_apps_start_err, name));
     }
 
     @Override

@@ -9,6 +9,7 @@ import java.util.Set;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
@@ -177,7 +178,12 @@ public class CommandsTabFragment extends SherlockFragment {
                         cmdArgs.setOnEditorActionListener(new OnEditorActionListener() {
                             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                                    buttonSend.callOnClick();
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                                        buttonSend.callOnClick(); 
+                                    } else {
+                                        // what TODO when not >= API 15 ?
+                                        buttonSend.performClick();
+                                    }
                                 }
                                 return false;
                             }
