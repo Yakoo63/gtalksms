@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.jivesoftware.smack.XMPPException;
 
-import android.app.Notification;
+import android.support.v4.app.NotificationCompat;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -580,7 +580,7 @@ public class MainService extends Service {
     /** Updates the status about the service state (and the status bar) */
     private void onConnectionStatusChanged(int oldStatus, int status) {
         if (sSettingsMgr.showStatusIcon) {
-            Notification.Builder builder = new Notification.Builder(this);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
             builder.setWhen(System.currentTimeMillis());
             
             switch (status) {
