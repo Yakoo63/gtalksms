@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms" 
     android:versionName="4.0" 
-    android:versionCode="61">
+    android:versionCode="62">
     
-    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="15"/>
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="15"/>
     
     <uses-feature android:required="false" android:name="android.hardware.camera"/>
     <uses-feature android:required="false" android:name="android.hardware.camera.autofocus"/>

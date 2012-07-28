@@ -67,7 +67,7 @@ public class ConnectionTabFragment extends SherlockFragment {
                 mSettingsMgr.setNotifiedAddress(mEditNotificationAddress.getText().toString());
                 mSettingsMgr.setPassword(mEditTextPassword.getText().toString());
                 
-                if (!mSettingsMgr.getLogin().isEmpty()) {
+                if (!mSettingsMgr.getLogin().equals("")) {
                     Tools.startSvcIntent(getActivity().getBaseContext(), mCurrentAction);
                 }
             }

@@ -78,7 +78,7 @@ public class BuddiesTabFragment extends SherlockFragment {
                 button.performHapticFeedback( HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
                 
                 String name = mEditTextBuddy.getText().toString();
-                if (!name.isEmpty()) {
+                if (!name.equals("")) {
                     XmppBuddies.getInstance(getActivity().getBaseContext()).addFriend(name);
                     mEditTextBuddy.setText("");
                     mEditTextBuddy.setHint(R.string.panel_buddies_add_message);

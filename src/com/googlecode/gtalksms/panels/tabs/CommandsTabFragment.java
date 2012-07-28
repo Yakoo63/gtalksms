@@ -170,7 +170,7 @@ public class CommandsTabFragment extends SherlockFragment {
                     final EditText cmdArgs = (EditText) dialog.findViewById(R.id.editTextArgs);
                     final Button buttonSend = (Button) dialog.findViewById(R.id.buttonSend);
                     
-                    if (cmd.getHelpArgs() == null || cmd.getHelpArgs().isEmpty()) {
+                    if (cmd.getHelpArgs() == null || cmd.getHelpArgs().equals("")) {
                         cmdArgs.setVisibility(View.INVISIBLE);
                     } else {
                         cmdArgs.setHint(cmd.getHelpArgs());
@@ -270,7 +270,7 @@ public class CommandsTabFragment extends SherlockFragment {
             buttonSend.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     String args = subCmd.getName().startsWith("#") && subCmd.getName().endsWith("#") ? cmdSubCmd.getText().toString() : subCmd.getName();
-                    if (! cmdArgs.getText().toString().isEmpty()) {
+                    if (! cmdArgs.getText().toString().equals("")) {
                         args += ":" + cmdArgs.getText().toString();
                     }
                     sendCommandAndVibrate(mCmd.getName(), args, v);
