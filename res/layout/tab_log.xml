@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    
+    <LinearLayout 
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+        
+        <Button
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:id="@+id/buttonStartStop"
+            android:layout_width="80dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:id="@+id/buttonClear"
+            android:layout_width="80dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="Clear"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:id="@+id/buttonAutoScroll"
+            android:layout_width="80dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        
+        </LinearLayout>
+    <ScrollView
+        android:id="@+id/ScrollView" 
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent" 
+        android:layout_weight=".9">
+        <TextView 
+            android:id="@+id/Text" 
+            android:textSize="10dip"
+            android:layout_height="wrap_content" 
+            android:layout_width="wrap_content"/>
+    </ScrollView>
+    
+</LinearLayout>
