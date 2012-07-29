@@ -92,7 +92,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
 
     @Override
     public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
+        if (status == TextToSpeech.SUCCESS && mTts != null) {
             Log.i(Tools.LOG_TAG, "TTS initialized!");
             mTts.setLanguage(mLocale);
             mTtsAvailable = true;
