@@ -144,7 +144,7 @@
             android:value="AEdPqrEAAAAI8M6AdV8LJxkmMhej-2G7N_JLe-1BbFB-qOoM7Q" />
         
         <!-- Track Market installs from AdMob ads -->       
-        <receiver android:name="com.admob.android.ads.analytics.InstallReceiver" android:exported="true">
+        <receiver android:name="com.google.ads.InstallReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
