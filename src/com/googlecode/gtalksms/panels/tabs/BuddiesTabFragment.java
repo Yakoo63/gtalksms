@@ -12,23 +12,20 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
-import android.view.inputmethod.EditorInfo;
-import android.widget.CheckBox;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.LinearLayout;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -36,6 +33,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.panels.tools.AutoClickEditorActionListener;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppFriend;
 
@@ -63,14 +61,7 @@ public class BuddiesTabFragment extends SherlockFragment {
         mButtonAdd = (Button) view.findViewById(R.id.buttonBuddyAdd);
         mBuddiesListView = (ListView) view.findViewById(R.id.ListViewBuddies);
 
-        mEditTextBuddy.setOnEditorActionListener(new OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    mButtonAdd.callOnClick();
-                }
-                return false;
-            }
-        });
+        mEditTextBuddy.setOnEditorActionListener(new AutoClickEditorActionListener(mButtonAdd));
 
         mButtonAdd.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {

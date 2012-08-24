@@ -9,17 +9,14 @@ import java.util.Set;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -28,13 +25,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.Cmd;
 import com.googlecode.gtalksms.cmd.CommandHandlerBase;
+import com.googlecode.gtalksms.panels.tools.AutoClickEditorActionListener;
 import com.googlecode.gtalksms.tools.StringFmt;
 
 public class CommandsTabFragment extends SherlockFragment {
@@ -64,16 +61,9 @@ public class CommandsTabFragment extends SherlockFragment {
         });
         
         mEditTextCommand = (EditText) view.findViewById(R.id.editTextCommand);
-        mEditTextCommand.setOnEditorActionListener(new OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    mButtonSend.callOnClick();
-                }
-                return false;
-            }
-        });
-        
         mButtonSend = (Button) view.findViewById(R.id.buttonCommandSend);
+        
+        mEditTextCommand.setOnEditorActionListener(new AutoClickEditorActionListener(mButtonSend));
         mButtonSend.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 String cmd = mEditTextCommand.getText().toString();
@@ -175,19 +165,7 @@ public class CommandsTabFragment extends SherlockFragment {
                         cmdArgs.setVisibility(View.INVISIBLE);
                     } else {
                         cmdArgs.setHint(cmd.getHelpArgs());
-                        cmdArgs.setOnEditorActionListener(new OnEditorActionListener() {
-                            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                                        buttonSend.callOnClick(); 
-                                    } else {
-                                        // what TODO when not >= API 15 ?
-                                        buttonSend.performClick();
-                                    }
-                                }
-                                return false;
-                            }
-                        });
+                        cmdArgs.setOnEditorActionListener(new AutoClickEditorActionListener(buttonSend));
                     }
                     
                     buttonSend.setOnClickListener(new View.OnClickListener() {
@@ -260,14 +238,7 @@ public class CommandsTabFragment extends SherlockFragment {
             
             if (subCmd.getHelpArgs() != null) {
                 cmdArgs.setHint(subCmd.getHelpArgs());
-                cmdArgs.setOnEditorActionListener(new OnEditorActionListener() {
-                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                        if (actionId == EditorInfo.IME_ACTION_DONE) {
-                            buttonSend.callOnClick();
-                        }
-                        return false;
-                    }
-                });
+                cmdArgs.setOnEditorActionListener(new AutoClickEditorActionListener(buttonSend));
                 cmdArgs.setVisibility(View.VISIBLE);
             } else {
                 cmdArgs.setVisibility(View.INVISIBLE);
