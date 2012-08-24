@@ -28,7 +28,7 @@ public class XmppStatus {
     private XmppStatus(Context ctx) {
         File filesDir = ctx.getFilesDir();
         mStatefile = new File(filesDir, STATEFILE_NAME);
-        mKeyValueHelper = KeyValueHelper.getKeyValueHelper(ctx);
+        mKeyValueHelper = KeyValueHelper.getKeyValueHelper(ctx.getApplicationContext());
         // Delete the old statefile
         // TODO remove this check with a future release
         if (mStatefile.isFile()) {
