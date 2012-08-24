@@ -53,7 +53,11 @@ public class PublicIntentReceiver extends BroadcastReceiver {
 
     public static void onServiceStop() {
         if (sPublicIntentReceiver != null) {
-            sContext.unregisterReceiver(sPublicIntentReceiver);
+            try {
+                sContext.unregisterReceiver(sPublicIntentReceiver);
+            } catch (Exception e) {
+                Log.e("Failed to unregistrer public receiver", e);
+            }
             sPublicIntentReceiver = null;
         }
     }
