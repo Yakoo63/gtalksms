@@ -3,6 +3,8 @@ package com.googlecode.gtalksms.cmd;
 import java.util.Locale;
 
 import android.content.Intent;
+import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.EngineInfo;
 import android.speech.tts.TextToSpeech.OnInitListener;
@@ -41,11 +43,15 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
                 sContext.startActivity(new Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA));
             }
         } else if (isMatchingCmd("tts-engine-list", cmd)) {
-            StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_engines));
-            for (EngineInfo engine : mTts.getEngines()) {
-                sb.append(engine.label + " - " + engine.name + "\n");
+            if (Build.VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
+                send(getString(R.string.android_version_incompatible, "ICE CREAM SANDWICH"));
+            } else {
+                StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_engines));
+                for (EngineInfo engine : mTts.getEngines()) {
+                    sb.append(engine.label + " - " + engine.name + "\n");
+                }
+                send(sb.substring(0, Math.max(0,sb.length() - 1)));
             }
-            send(sb.substring(0, Math.max(0,sb.length() - 1)));
         } else if (isMatchingCmd("tts-lang-list", cmd)) {
             StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_languages));
             for (Locale locale : Locale.getAvailableLocales()) {
@@ -66,8 +72,12 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
             }
             send(sb.substring(0, Math.max(0,sb.length() - 1)));
         } else if (isMatchingCmd("tts-engine", cmd)) {
-            mTts = new TextToSpeech(sContext, this, args);
-            send(getString(R.string.chat_tts_engine) + mTts.getDefaultEngine());
+            if (Build.VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
+                send(getString(R.string.android_version_incompatible, "ICE CREAM SANDWICH"));
+            } else {
+                mTts = new TextToSpeech(sContext, this, args);
+                send(getString(R.string.chat_tts_engine) + mTts.getDefaultEngine());
+            }
         } else if (isMatchingCmd("tts-lang", cmd)) {
             String[] argList = splitArgs(args);
             if (argList.length == 1) {
