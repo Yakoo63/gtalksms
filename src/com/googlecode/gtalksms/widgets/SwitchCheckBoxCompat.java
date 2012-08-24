@@ -15,7 +15,7 @@ public class SwitchCheckBoxCompat {
             Class.forName("android.widget.Switch");
             mSwitch = (Switch) v.findViewById(id);
             mIsSwitchSupported = true;
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             mIsSwitchSupported = false;
             mCheckBox = (CheckBox) v.findViewById(id);
         }
