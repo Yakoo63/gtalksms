@@ -33,7 +33,7 @@ public abstract class CommandHandlerBase {
     protected final int mCmdType;
     protected String mAnswerTo;
         
-    CommandHandlerBase(MainService mainService, int cmdType, Object... commands) {
+    CommandHandlerBase(MainService mainService, int cmdType, Cmd... commands) {
         if (sMainService == null) {
             sMainService = mainService;
             sSettingsMgr = SettingsManager.getSettingsManager(sContext);
@@ -41,8 +41,7 @@ public abstract class CommandHandlerBase {
             Cmd.setContext(sContext);
         }
         mCommandMap = new HashMap<String, Cmd>();
-        for (Object o : commands) {
-            Cmd c = (Cmd)o;
+        for (Cmd c : commands) {
             mCommandMap.put(c.getName().toLowerCase(), c);
         }
         mCmdType = cmdType;

@@ -349,16 +349,7 @@ public class XmppManager {
 
         // assert we are only ever called from one thread
         assert (!Thread.currentThread().getName().equals(MainService.SERVICE_THREAD_NAME));
-//        
-//        NetworkInfo active = ((ConnectivityManager)mContext.getSystemService(Service.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-//        if (active == null || !active.isAvailable()) {
-//            Log.e("initConnection: connection request, but no network available");
-//            // we don't destroy the service here - our network receiver will notify us when
-//            // the network comes up and we try again then.
-//            updateStatus(WAITING_FOR_NETWORK);
-//            return;
-//        }
-//        
+
         // everything is ready for a connection attempt
         updateStatus(CONNECTING);
 
@@ -600,8 +591,7 @@ public class XmppManager {
             conf.setCompressionEnabled(true);
         }
         
-        // disable the built-in ReconnectionManager
-        // since we handle this
+        // disable the built-in ReconnectionManager since we handle this
         conf.setReconnectionAllowed(false);
         conf.setSendPresence(false);
         

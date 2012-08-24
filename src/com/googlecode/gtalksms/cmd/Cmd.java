@@ -58,7 +58,7 @@ public class Cmd {
     private ArrayList<SubCmd> mSubCmds;
     private static Context sContext;
     
-    Cmd(String name, Object... alias) {
+    Cmd(String name, String... alias) {
         mName = name.toLowerCase();
         mAlias = new String[alias.length];
         for (int i = 0 ; i < alias.length ; ++i) {
