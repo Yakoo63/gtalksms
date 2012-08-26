@@ -38,11 +38,8 @@ public class CameraCmd extends CommandHandlerBase {
     private static int cameraId = 0;
     
     public CameraCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_MEDIA, new Cmd("camera", "photo"), new Cmd("flash", "light"));
+        super(mainService, CommandHandlerBase.TYPE_MEDIA, "Camera", new Cmd("camera", "photo"), new Cmd("flash", "light"));
         File path;
-        
-        windowManager = (WindowManager) sMainService.getSystemService(Context.WINDOW_SERVICE);
-        audioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         
         SettingsManager settings = SettingsManager.getSettingsManager(sContext);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {  // API Level >= 8 check
@@ -61,6 +58,32 @@ public class CameraCmd extends CommandHandlerBase {
         }
     }
     
+    public void activate() {
+        super.activate();
+        windowManager = (WindowManager) sMainService.getSystemService(Context.WINDOW_SERVICE);
+        audioManager = (AudioManager) sMainService.getSystemService(Context.AUDIO_SERVICE);
+    }
+    @Override
+    public synchronized void deactivate() {
+        super.deactivate();
+        releaseResources();
+        windowManager = null;
+        audioManager = null;
+    }
+    
+    private void releaseResources() {
+        if (sCamera != null) {
+            try {
+                sCamera.stopPreview();
+                sCamera.setPreviewCallback(null);
+                sCamera.unlock();
+                sCamera.release();
+            } catch (Exception e) {
+                Log.e(Tools.LOG_TAG, "Failed to release Camera", e);
+            }
+            sCamera = null;
+        }
+    }
     @Override
     protected void execute(String cmd, String args) {
         String[] splitedArgs = splitArgs(args);
@@ -152,7 +175,7 @@ public class CameraCmd extends CommandHandlerBase {
     }
     
     private void takePicture(int pCallbackMethod) {
-        cleanUp();
+        releaseResources();
         PictureCallback pictureCallback;
         
         try {
@@ -188,12 +211,13 @@ public class CameraCmd extends CommandHandlerBase {
                     audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, streamVolume, 0); 
                 }
             };
-
+            send("Taking picture");
             sCamera.takePicture(cb, null, pictureCallback);
         } catch (Exception e) {
+            Log.w("Error taking picture", e);
             send(R.string.chat_camera_error_picture, e.getLocalizedMessage());
-            cleanUp();
         }
+        releaseResources();
     }
     
     public void setLight(boolean turnOn) {
@@ -205,25 +229,10 @@ public class CameraCmd extends CommandHandlerBase {
         sCamera.setParameters(params);
         
         if (!turnOn) {
-            cleanUp();
+            releaseResources();
         }
     }
        
-    @Override
-    public synchronized void cleanUp() {
-        if (sCamera != null) {
-            try {
-                sCamera.stopPreview();
-                sCamera.setPreviewCallback(null);
-                sCamera.unlock();
-                sCamera.release();
-            } catch (Exception e) {
-                Log.e(Tools.LOG_TAG, "Failed to release Camera", e);
-            }
-            sCamera = null;
-        }
-    }
-
     @Override
     protected void initializeSubCommands() {
         Cmd cam = mCommandMap.get("camera");

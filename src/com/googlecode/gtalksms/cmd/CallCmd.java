@@ -25,26 +25,34 @@ import com.android.internal.telephony.ITelephony;
 public class CallCmd extends CommandHandlerBase {
     private static boolean sListenerActive = false;
     private PhoneManager _phoneMgr;
-    private PhoneCallListener _phoneListener = null;
-    private TelephonyManager _telephonyMgr = null;
+    private PhoneCallListener mPhoneListener = null;
+    private TelephonyManager mTelephonyMgr = null;
     private ContactsResolver mContactsResolver = null;
         
     public CallCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_CONTACTS, new Cmd("calls"), new Cmd("dial"), new Cmd("ignore"), new Cmd("reject"));
+        super(mainService, CommandHandlerBase.TYPE_CONTACTS, "Call", new Cmd("calls"), new Cmd("dial"), new Cmd("ignore"), new Cmd("reject"));
         _phoneMgr = new PhoneManager(sContext);
-        _telephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
+        mTelephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
         mContactsResolver = ContactsResolver.getInstance(sContext);
-        
-        setup();
     }
     
-    public void setup() {
+    public void activate() {
+        super.activate();
         if (sSettingsMgr.notifyIncomingCalls && !sListenerActive) {
-            if (_phoneListener == null) {
-                _phoneListener = new PhoneCallListener(sMainService);
+            if (mPhoneListener == null) {
+                mPhoneListener = new PhoneCallListener(sMainService);
             }
-            _telephonyMgr.listen(_phoneListener, PhoneStateListener.LISTEN_CALL_STATE);
+            mTelephonyMgr.listen(mPhoneListener, PhoneStateListener.LISTEN_CALL_STATE);
             sListenerActive = true;
+        }
+    }
+    
+    @Override
+    public void deactivate() {
+        super.deactivate();
+        if (mPhoneListener != null) {
+            mTelephonyMgr.listen(mPhoneListener, 0);
+            sListenerActive = false;
         }
     }
     
@@ -125,14 +133,6 @@ public class CallCmd extends CommandHandlerBase {
         // check if the dial is successful
         if (!_phoneMgr.Dial(number)) {
             send(R.string.chat_error_dial);
-        }
-    }
-
-    @Override
-    public void cleanUp() {
-        if (_phoneListener != null) {
-            _telephonyMgr.listen(_phoneListener, 0);
-            sListenerActive = false;
         }
     }
 

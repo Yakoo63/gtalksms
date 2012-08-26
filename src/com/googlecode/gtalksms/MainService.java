@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -109,8 +110,9 @@ public class MainService extends Service {
     private static PowerManager.WakeLock sWl;
     private static PendingIntent sContentIntent = null;
 
-    private static Map<String, CommandHandlerBase> sCommands = new HashMap<String, CommandHandlerBase>();
-    private static Set<CommandHandlerBase> sCommandSet = new HashSet<CommandHandlerBase>();
+    private static Set<CommandHandlerBase> sAvailableCommandSet = new HashSet<CommandHandlerBase>();
+    private static Map<String, CommandHandlerBase> sActiveCommands = Collections.synchronizedMap(new HashMap<String, CommandHandlerBase>());
+    private static Set<CommandHandlerBase> sActiveCommandSet = Collections.synchronizedSet(new HashSet<CommandHandlerBase>());
 
     // This is the object that receives interactions from clients. See
     // RemoteService for a more complete example.
@@ -168,15 +170,13 @@ public class MainService extends Service {
         if (Thread.currentThread().getId() != mHandlerThreadId) {
             throw new IllegalThreadStateException();
         }
-        // We need to handle XMPP state changes which happened "externally" -
-        // eg, due to a connection error, or running out of retries, or a retry
-        // handler actually succeeding etc.
-        int initialState = getConnectionStatus();
-        updateListenersToCurrentState(initialState);
 
         String action = intent.getAction();
+        int initialState = getConnectionStatus();
         Log.i("handling action '" + action + "' while in state " + XmppManager.statusAsString(initialState));
 
+        // Start with handling the actions the could result in a change
+        // of the connection status
         if (action.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
                 // Request to disconnect. We will stop the service if
@@ -203,7 +203,28 @@ public class MainService extends Service {
                 default:
                     throw new IllegalStateException("Unkown initialState while handling" + MainService.ACTION_TOGGLE);
             }
-        } else if (action.equals(ACTION_SEND)) {
+        } else if (action.equals(ACTION_NETWORK_CHANGED)) {
+            boolean available = intent.getBooleanExtra("available", true);
+            boolean failover = intent.getBooleanExtra("failover", false);
+            Log.i("network_changed with available=" + available + ", failover=" + failover + " and when in state: " + XmppManager.statusAsString(initialState));
+            // We are in a waiting state and have a network - try to connect.
+            if (available && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
+                sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+            } else if (!available && !failover && initialState == XmppManager.CONNECTED) {
+                // We are connected but the network has gone down - disconnect
+                // and go into WAITING state so we auto-connect when we get a future
+                // notification that a network is available.
+                sXmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
+            }
+        }
+
+        // Now that the connection state may has changed either because of a
+        // Intent Action or because of connection changes that happened "externally"
+        // (eg, due to a connection error, or running out of retries, or a retry
+        // handler actually succeeding etc.) we may need to update the listener
+        updateListenersToCurrentState(getConnectionStatus());
+        
+        if (action.equals(ACTION_SEND)) {
             XmppMsg xmppMsg = (XmppMsg) intent.getParcelableExtra("xmppMsg");
             if (xmppMsg == null) {
                 xmppMsg = new XmppMsg(intent.getStringExtra("message"));
@@ -255,20 +276,7 @@ public class MainService extends Service {
                     sXmppMgr.send(msg, null);
                 }
             }
-            sWl.release();
-        } else if (action.equals(ACTION_NETWORK_CHANGED)) {
-            boolean available = intent.getBooleanExtra("available", true);
-            boolean failover = intent.getBooleanExtra("failover", false);
-            Log.i("network_changed with available=" + available + ", failover=" + failover + " and when in state: " + XmppManager.statusAsString(initialState));
-            // We are in a waiting state and have a network - try to connect.
-            if (available && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
-                sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
-            } else if (!available && !failover && initialState == XmppManager.CONNECTED) {
-                // We are connected but the network has gone down - disconnect
-                // and go into WAITING state so we auto-connect when we get a future
-                // notification that a network is available.
-                sXmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
-            }
+            sWl.release(); 
         } else if (action.equals(ACTION_COMMAND)) {
             String cmd = intent.getStringExtra("cmd");
             if (cmd != null) {
@@ -285,7 +293,11 @@ public class MainService extends Service {
                 Log.w("Intent " + MainService.ACTION_COMMAND + " without extra cmd");
             }
         // ACTION_XMPP_CONNECTION_CHANGED is handled implicitly by every call
-        } else if (!action.equals(ACTION_XMPP_CONNECTION_CHANGED)) {
+        } else if (!action.equals(ACTION_XMPP_CONNECTION_CHANGED)
+                && !action.equals(ACTION_CONNECT)
+                && !action.equals(ACTION_DISCONNECT)
+                && !action.equals(ACTION_TOGGLE)
+                && !action.equals(ACTION_NETWORK_CHANGED)) {
             Log.w("Unexpected intent: " + action);
         }
         Log.i("handled action '" + action + "' - state now: " + sXmppMgr.statusString());
@@ -304,13 +316,18 @@ public class MainService extends Service {
     public int getConnectionStatus() {
         return sXmppMgr == null ? XmppManager.DISCONNECTED : sXmppMgr.getConnectionStatus();
     }
-
-    public Map<String, CommandHandlerBase> getCommands() {
-        return sCommands;
+    
+    public static Set<CommandHandlerBase> getAvailableCommandSet() {
+        return sAvailableCommandSet; 
     }
 
-    public Set<CommandHandlerBase> getCommandSet() {
-        return new HashSet<CommandHandlerBase>(sCommandSet);
+    public static Map<String, CommandHandlerBase> getActiveCommands() {
+        return sActiveCommands;
+    }
+
+    public static Set<CommandHandlerBase> getActiveCommandSet() {
+        return sActiveCommandSet;
+//        return new HashSet<CommandHandlerBase>(sActiveCommandSet);
     }
 
     public boolean getTLSStatus() {
@@ -436,10 +453,11 @@ public class MainService extends Service {
         // All data must be cleaned, because onDestroy can be call without releasing the current object
         // It's due to BIND_AUTO_CREATE used for Service Binder
         // http://developer.android.com/reference/android/content/Context.html#stopService(android.content.Intent)
-        sCommands.clear();
-        sCommandSet.clear();
+        sActiveCommands.clear();
+        sActiveCommandSet.clear();
         
         sServiceLooper.quit();
+        sXmppMgr.mSmackAndroid.exit();
         super.onDestroy();
         Log.i("MainService onDestroy(): service destroyed");
     }
@@ -533,10 +551,10 @@ public class MainService extends Service {
 
     private void executeCommand(String cmd, String args, String answerTo) {
         assert (cmd != null);
-        if (sCommands.containsKey(cmd.toLowerCase())) {
+        if (sActiveCommands.containsKey(cmd.toLowerCase())) {
             Log.d("MainService executing command: \"" + cmd + ":" + Tools.shortenMessage(args) + "\"");
             try {
-                CommandHandlerBase exec = sCommands.get(cmd);
+                CommandHandlerBase exec = sActiveCommands.get(cmd);
                 Cmd execCmd = exec.getCommand(cmd);
                 if (execCmd != null && execCmd.isActive()) {
                     exec.execute(cmd, args == null ? "" : args, answerTo);
@@ -694,9 +712,9 @@ public class MainService extends Service {
      * Calls cleanUp() for every registered command
      */
     private static void cleanupCommands() {
-        for (CommandHandlerBase cmd : sCommandSet) {
+        for (CommandHandlerBase cmd : sActiveCommandSet) {
             try {
-                cmd.cleanUp();
+                cmd.deactivate();
             } catch (Exception e) {
                 Log.e("Failed to cleanup command", e);
             }
@@ -707,21 +725,31 @@ public class MainService extends Service {
      * used to stop ongoing actions, like gps updates, ringing, ...
      */
     private static void stopCommands() {
-        for (CommandHandlerBase c : sCommandSet) {
+        for (CommandHandlerBase c : sAvailableCommandSet) {
             c.stop();
+        }
+    }
+    
+    public static void updateCommandState() {
+        for (CommandHandlerBase c : sAvailableCommandSet) {
+            c.updateAndReturnStatus();
         }
     }
 
     private static void registerCommand(CommandHandlerBase cmd) {
-        for (Cmd c : cmd.getCommands()) {
-            sCommands.put(c.getName().toLowerCase(), cmd);
-            if (c.getAlias() != null) {
-                for (String a : c.getAlias()) {
-                    sCommands.put(a.toLowerCase(), cmd);
+        sAvailableCommandSet.add(cmd);
+        
+        if (cmd.updateAndReturnStatus()) {
+            for (Cmd c : cmd.getCommands()) {
+                sActiveCommands.put(c.getName().toLowerCase(), cmd);
+                if (c.getAlias() != null) {
+                    for (String a : c.getAlias()) {
+                        sActiveCommands.put(a.toLowerCase(), cmd);
+                    }
                 }
             }
+            sActiveCommandSet.add(cmd);
         }
-        sCommandSet.add(cmd);
     }
 
     private int updateListenersToCurrentState(int currentState) {
@@ -758,8 +786,8 @@ public class MainService extends Service {
      */
     private void setupListenersForConnection() {
         Log.i("setupListenersForConnection()");
-        for (CommandHandlerBase c : sCommandSet) {
-            c.setup();
+        for (CommandHandlerBase c : sAvailableCommandSet) {
+            c.updateAndReturnStatus();
         }
     }
 

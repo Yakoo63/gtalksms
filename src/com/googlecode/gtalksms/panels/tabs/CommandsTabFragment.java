@@ -43,7 +43,7 @@ public class CommandsTabFragment extends SherlockFragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateCommands(null);
+        updateCommands();
     }
     
     @Override
@@ -55,6 +55,7 @@ public class CommandsTabFragment extends SherlockFragment {
                 Cmd cmd = (Cmd)parent.getItemAtPosition(position);
                 boolean isActive = !cmd.isActive();
                 cmd.setActive(isActive);
+                MainService.updateCommandState();
                 ImageView imageView = (ImageView) view.findViewById(R.id.State);
                 imageView.setImageResource(isActive ? R.drawable.buddy_available : R.drawable.buddy_offline);
             }
@@ -81,7 +82,8 @@ public class CommandsTabFragment extends SherlockFragment {
         return view;
     }
     
-    public void updateCommands(Set<CommandHandlerBase> commands) {
+    public void updateCommands() {
+        Set<CommandHandlerBase> commands = MainService.getAvailableCommandSet();
         if (commands != null && commands.size() > 0) {
             mListCommands.clear();
             for (CommandHandlerBase cmdBase : commands) {

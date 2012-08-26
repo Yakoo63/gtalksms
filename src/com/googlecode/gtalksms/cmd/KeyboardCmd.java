@@ -6,7 +6,7 @@ import com.googlecode.gtalksms.R;
 
 public class KeyboardCmd extends CommandHandlerBase {
     public KeyboardCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_COPY, new Cmd("write", "w"), new Cmd("wappend", "wa"), new Cmd("wsend", "ws", "wl"));
+        super(mainService, CommandHandlerBase.TYPE_COPY, "Keyboard", new Cmd("write", "w"), new Cmd("wappend", "wa"), new Cmd("wsend", "ws", "wl"));
     }
     
     @Override

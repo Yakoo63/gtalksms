@@ -51,7 +51,7 @@ public class SmsCmd extends CommandHandlerBase {
     private SMSHelper mSmsHelper;
           
     public SmsCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_MESSAGE, new Cmd("sms", "s"), new Cmd("reply", "r"), new Cmd("findsms", "fs"), new Cmd("markasread", "mar"), new Cmd("chat", "c"), new Cmd("delsms"));
+        super(mainService, CommandHandlerBase.TYPE_MESSAGE, "SMS", new Cmd("sms", "s"), new Cmd("reply", "r"), new Cmd("findsms", "fs"), new Cmd("markasread", "mar"), new Cmd("chat", "c"), new Cmd("delsms"));
         mSmsMmsManager = new SmsMmsManager(sSettingsMgr, sContext);
         mSmsHelper = SMSHelper.getSMSHelper(sContext);
         mAliasHelper = AliasHelper.getAliasHelper(sContext);
@@ -59,10 +59,10 @@ public class SmsCmd extends CommandHandlerBase {
         mContactsResolver = ContactsResolver.getInstance(sContext);
         
         restoreSmsInformation();
-        setup();
     }
 
-    public void setup() {
+    public void activate() {
+        super.activate();
         if (sSettingsMgr.notifySmsSent && !sSentIntentReceiverRegistered) {
             if (sSentSmsReceiver == null) {
                 sSentSmsReceiver = new SentIntentReceiver(sMainService, mSmsMap, mSmsHelper);
@@ -78,7 +78,18 @@ public class SmsCmd extends CommandHandlerBase {
             sDelIntentReceiverRegistered = true;
         }
     }
-
+    @Override
+    public void deactivate() {
+        super.deactivate();
+        if (sSentSmsReceiver != null && sSentIntentReceiverRegistered) {
+            sContext.unregisterReceiver(sSentSmsReceiver);
+            sSentIntentReceiverRegistered = false;
+        }
+        if (sDeliveredSmsReceiver != null && sDelIntentReceiverRegistered) {
+            sContext.unregisterReceiver(sDeliveredSmsReceiver);
+            sDelIntentReceiverRegistered = false;
+        }
+    }    
     @Override
     protected void execute(String command, String args) {
         String contactInformation;
@@ -620,17 +631,6 @@ public class SmsCmd extends CommandHandlerBase {
         return res;
     }
     
-    @Override
-    public void cleanUp() {
-        if (sSentSmsReceiver != null && sSentIntentReceiverRegistered) {
-            sContext.unregisterReceiver(sSentSmsReceiver);
-            sSentIntentReceiverRegistered = false;
-        }
-        if (sDeliveredSmsReceiver != null && sDelIntentReceiverRegistered) {
-            sContext.unregisterReceiver(sDeliveredSmsReceiver);
-            sDelIntentReceiverRegistered = false;
-        }
-    }    
 
     @Override
     protected void initializeSubCommands() {

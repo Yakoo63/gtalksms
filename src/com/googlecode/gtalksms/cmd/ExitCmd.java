@@ -9,7 +9,7 @@ import com.googlecode.gtalksms.R;
 public class ExitCmd extends CommandHandlerBase {
 
     public ExitCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("exit", "quit"));
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, "Exit", new Cmd("exit", "quit"));
     }
 
     @Override

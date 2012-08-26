@@ -14,7 +14,7 @@ import com.googlecode.gtalksms.tools.StringFmt;
 public class ApplicationsCmd extends CommandHandlerBase {
   
     public ApplicationsCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("applist", "apps"), new Cmd("appfind"), new Cmd("appstart", "start"));
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, "Applications", new Cmd("applist", "apps"), new Cmd("appfind"), new Cmd("appstart", "start"));
     }
 
     protected void execute(String cmd, String args) {

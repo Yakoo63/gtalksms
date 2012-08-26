@@ -25,7 +25,7 @@ public class Web {
         StringBuffer baf = new StringBuffer(1024);
         try {
             long startTime = System.currentTimeMillis();
-            Log.d(Tools.LOG_TAG, "Downloading url:" + url);
+            Log.d(Tools.LOG_TAG, "Downloading URL: " + url);
 
             HttpURLConnection ucon = (HttpURLConnection) url.openConnection();
             InputStream is = ucon.getInputStream();
@@ -35,7 +35,7 @@ public class Web {
             while ((current = bis.read()) != -1) {
                 baf.append((char) current);
             }
-            Log.d(Tools.LOG_TAG, "downloaded in " + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
+            Log.d(Tools.LOG_TAG, "Downloaded " + url + " in " + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
 
         } catch (IOException e) {
             Log.d(Tools.LOG_TAG, "IOException in DownloadFromUrl(): " + e);

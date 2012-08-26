@@ -24,6 +24,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
     public TextToSpeechCmd(MainService mainService) {
         super(mainService, 
                 CommandHandlerBase.TYPE_MESSAGE, 
+                "TTS",
                 new Cmd("tts", "say"), 
                 new Cmd("tts-lang", "ttslang"), 
                 new Cmd("tts-lang-list", "ttslanglist"), 
@@ -31,7 +32,20 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
                 new Cmd("tts-engine-list", "ttsenginelist"));
         mLocale = Locale.getDefault();
     }
-
+    @Override
+    public void activate() {
+        super.activate();
+        mTts = new TextToSpeech(sContext, this);
+    }
+    
+    @Override
+    public void deactivate() {
+        super.deactivate();
+        if (mTts != null) {
+            mTts.shutdown();
+            mTts = null;
+        }
+    }
     protected void execute(String cmd, String args) {
         Log.i(Tools.LOG_TAG, "TTS: " + cmd + " (" + args + ")");
         
@@ -109,19 +123,6 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
         } else {
             Log.e(Tools.LOG_TAG, "Can't initialise TTS!");
             mTtsAvailable = false;
-        }
-    }
-    
-    @Override
-    public void setup() {
-        mTts = new TextToSpeech(sContext, this);
-    }
-    
-    @Override
-    public void cleanUp() {
-        if (mTts != null) {
-            mTts.shutdown();
-            mTts = null;
         }
     }
 }

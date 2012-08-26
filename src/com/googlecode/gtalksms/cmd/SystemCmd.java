@@ -26,20 +26,30 @@ public class SystemCmd extends CommandHandlerBase {
     private final static int myPidArray[] = { myPid };
     private static ActivityManager activityManager; 
     private static ConnectivityManager connectivityManager;
-    private static MainService mainService;
     private static TelephonyManager telephonyManager;
     private static CrashedStartCounter sNullIntentStartCounter;
     
     public SystemCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_INTERNAL, new Cmd("sysinfo"), new Cmd("telinfo"));
-        if (SystemCmd.mainService == null) {
-            Context ctx = sContext;
-            activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
-            connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-            telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
-            SystemCmd.mainService = mainService;
-            sNullIntentStartCounter = CrashedStartCounter.getInstance(ctx);
-        }
+        super(mainService, CommandHandlerBase.TYPE_INTERNAL, "System", new Cmd("sysinfo"), new Cmd("telinfo"));
+    }
+    
+    public void activate() {
+        super.activate();
+        activityManager = (ActivityManager) sContext
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        connectivityManager = (ConnectivityManager) sContext
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        telephonyManager = (TelephonyManager) sContext
+                .getSystemService(Context.TELEPHONY_SERVICE);
+        sNullIntentStartCounter = CrashedStartCounter.getInstance(sContext);
+
+    }
+    
+    public void deactivate() {
+        super.deactivate();
+        activityManager = null;
+        connectivityManager = null;
+        telephonyManager = null;
     }
 
     @Override

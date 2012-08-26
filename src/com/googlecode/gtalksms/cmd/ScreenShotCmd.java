@@ -35,7 +35,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
     private static int screenshotSize;
 
     public ScreenShotCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_MEDIA, new Cmd("screenshot", "sc"));        
+        super(mainService, CommandHandlerBase.TYPE_MEDIA, "Screenshot", new Cmd("screenshot", "sc"));        
         if (repository == null) {
             File path;
 

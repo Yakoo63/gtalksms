@@ -17,7 +17,7 @@ public class RecipientCmd extends CommandHandlerBase {
     private KeyValueHelper mKeyValueHelper;
 
     public RecipientCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_MESSAGE, new Cmd("recipient", "re"));
+        super(mainService, CommandHandlerBase.TYPE_MESSAGE, "Recipient", new Cmd("recipient", "re"));
         mKeyValueHelper = KeyValueHelper.getKeyValueHelper(sContext);
         restoreLastRecipient();
         

@@ -21,7 +21,7 @@ public class ClipboardCmd extends CommandHandlerBase {
     ClipboardManager mOldClipboardMgr;
     
     public ClipboardCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_COPY, new Cmd("clipboard", "copy"));
+        super(mainService, CommandHandlerBase.TYPE_COPY, "Clipboard", new Cmd("clipboard", "copy"));
         mOldClipboardMgr = (ClipboardManager) mainService.getSystemService(Service.CLIPBOARD_SERVICE);
     }
     

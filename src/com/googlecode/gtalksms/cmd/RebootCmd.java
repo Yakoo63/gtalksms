@@ -23,7 +23,7 @@ public class RebootCmd extends CommandHandlerBase {
     private PowerManager mPowerManager;
 
     public RebootCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_INTERNAL, new Cmd("reboot"));
+        super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Reboot", new Cmd("reboot"));
         mPowerManager = (PowerManager) sContext.getSystemService(Context.POWER_SERVICE);
     }
 

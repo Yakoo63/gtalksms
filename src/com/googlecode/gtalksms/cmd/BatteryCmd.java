@@ -26,13 +26,13 @@ public class BatteryCmd extends CommandHandlerBase {
     private static XmppPresenceStatus sXmppPresenceStatus;    
     
     public BatteryCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_SYSTEM, new Cmd("battery", "batt"));
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, "Battery", new Cmd("battery", "batt"));
         sXmppPresenceStatus = XmppPresenceStatus.getInstance(sContext);
         sLastKnownPowerSource = "NotInitialized";
-        setup();
     }
     
-    public void setup() {
+    public void activate() {
+        super.activate();
         if (!sReceiverRegistered) {
             if (sBatInfoReceiver == null) {
                 sBatInfoReceiver = new BroadcastReceiver() {
@@ -69,6 +69,15 @@ public class BatteryCmd extends CommandHandlerBase {
             }
             sContext.registerReceiver(sBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
             sReceiverRegistered = true;
+        }
+    }
+    
+    @Override
+    public void deactivate() {
+        super.deactivate();
+        if (sReceiverRegistered == true) {
+            sContext.unregisterReceiver(sBatInfoReceiver);
+            sReceiverRegistered = false;
         }
     }
     
@@ -140,14 +149,6 @@ public class BatteryCmd extends CommandHandlerBase {
             sendBatteryInfos(false);
         } else {
             sendBatteryInfos(true);
-        }
-    }
-
-    @Override
-    public void cleanUp() {
-        if (sReceiverRegistered == true) {
-            sContext.unregisterReceiver(sBatInfoReceiver);
-            sReceiverRegistered = false;
         }
     }
 

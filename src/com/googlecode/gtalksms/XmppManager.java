@@ -106,6 +106,7 @@ public class XmppManager {
 
     private SettingsManager mSettings;
     private Context mContext;
+    protected SmackAndroid mSmackAndroid;
     
     /**
      * Constructor for an XmppManager instance, connection is optional. It 
@@ -121,7 +122,7 @@ public class XmppManager {
             Connection.DEBUG_ENABLED = true;
         }
         
-        SmackAndroid.init(context);
+        mSmackAndroid = SmackAndroid.init(context);
         
         mReconnectHandler = new Handler(MainService.getServiceLooper());
         

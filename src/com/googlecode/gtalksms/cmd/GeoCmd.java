@@ -15,7 +15,7 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class GeoCmd extends CommandHandlerBase {
     public GeoCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_GEO, new Cmd("geo"), new Cmd("where"));
+        super(mainService, CommandHandlerBase.TYPE_GEO, "Geo", new Cmd("geo"), new Cmd("where"));
     }
     
     @Override

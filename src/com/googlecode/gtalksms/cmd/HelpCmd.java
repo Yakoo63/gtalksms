@@ -35,7 +35,7 @@ public class HelpCmd extends CommandHandlerBase {
     }
     
     public HelpCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_INTERNAL, new Cmd("?", "help"));
+        super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Help", new Cmd("?", "help"));
         
         _msg = new XmppMsg();
         _msgAll = new XmppMsg();
@@ -56,8 +56,8 @@ public class HelpCmd extends CommandHandlerBase {
         String copyCmds = "";
         String internalCmds = "";
             
-        commands = mainService.getCommands();
-        Set<CommandHandlerBase> commandSet = mainService.getCommandSet();
+        commands = mainService.getActiveCommands();
+        Set<CommandHandlerBase> commandSet = mainService.getActiveCommandSet();
         
         _msg.appendLine(getString(R.string.chat_help_title));
         _msg.appendLine(format(R.string.chat_help_help, "\"help\""));

@@ -24,11 +24,15 @@ public class RingCmd extends CommandHandlerBase {
     private boolean mCanRing;
    
     public RingCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_MEDIA, new Cmd("ring"), new Cmd("ringmode"));
+        super(mainService, CommandHandlerBase.TYPE_MEDIA, "Ring", new Cmd("ring"), new Cmd("ringmode"));
         sAudioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
         mVibrator = (Vibrator) mainService.getSystemService(Context.VIBRATOR_SERVICE);
     }
-    
+    @Override
+    public void deactivate() {
+        super.deactivate();
+        clearMediaPlayer();
+    }
     @Override
     protected void execute(String cmd, String args) {
         if (isMatchingCmd("ring", cmd)) {
@@ -147,11 +151,6 @@ public class RingCmd extends CommandHandlerBase {
     public void stop() {
         clearMediaPlayer();        
         mVibrator.cancel();
-    }
-    
-    @Override
-    public void cleanUp() {
-        clearMediaPlayer();
     }
 
     @Override

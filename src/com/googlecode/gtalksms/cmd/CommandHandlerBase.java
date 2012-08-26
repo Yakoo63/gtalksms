@@ -2,6 +2,8 @@ package com.googlecode.gtalksms.cmd;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import android.content.Context;
@@ -32,22 +34,90 @@ public abstract class CommandHandlerBase {
     protected final HashMap<String,Cmd> mCommandMap;
     protected final int mCmdType;
     protected String mAnswerTo;
+    
+    private boolean mIsActivated;
+    private String mName;
         
-    CommandHandlerBase(MainService mainService, int cmdType, Cmd... commands) {
+    CommandHandlerBase(MainService mainService, int cmdType, String name, Cmd... commands) {
         if (sMainService == null) {
             sMainService = mainService;
             sSettingsMgr = SettingsManager.getSettingsManager(sContext);
             sContext = mainService.getBaseContext();
             Cmd.setContext(sContext);
         }
+        
         mCommandMap = new HashMap<String, Cmd>();
         for (Cmd c : commands) {
             mCommandMap.put(c.getName().toLowerCase(), c);
         }
         mCmdType = cmdType;
         mAnswerTo = null;
+        mName = name;
         
         initializeSubCommands();
+        
+        mIsActivated = false;
+        //updateAndReturnStatus();
+    }
+    
+    /**
+     * Setups the command to get working. Usually called when the user want's 
+     * GTalkSMS to be active (meaning connected) and if the command is
+     * activated
+     */
+    public void activate() {
+        Map<String, CommandHandlerBase> activeCommands = sMainService.getActiveCommands();
+        Set<CommandHandlerBase> activeCommandSet = sMainService.getActiveCommandSet(); 
+        
+        for (Cmd c : getCommands()) {
+            activeCommands.put(c.getName().toLowerCase(), this);
+            if (c.getAlias() != null) {
+                for (String a : c.getAlias()) {
+                    activeCommands.put(a.toLowerCase(), this);
+                }
+            }
+        }
+        activeCommandSet.add(this);
+        mIsActivated = true;
+    }
+    
+    /**
+     * Cleans up the structures holden by the CommandHanlderBase Class.
+     * Common actions are: unregister broadcast receivers etc.
+     * Usually issued on the stop of the MainService
+     */
+    public void deactivate() {
+        Map<String, CommandHandlerBase> activeCommands = sMainService.getActiveCommands();
+        Set<CommandHandlerBase> activeCommandSet = sMainService.getActiveCommandSet(); 
+        
+        for (Cmd c : getCommands()) {
+            activeCommands.remove(c.getName().toLowerCase());
+            if (c.getAlias() != null) {
+                for (String a : c.getAlias()) {
+                    activeCommands.remove(a.toLowerCase());
+                }
+            }
+        }
+        activeCommandSet.remove(this);
+        mIsActivated = false;
+    }
+    
+    public boolean updateAndReturnStatus() {
+        boolean atLeastOneCommandActive = false;
+        for (Cmd c : mCommandMap.values()) {
+            if (c.isActive()) {
+                atLeastOneCommandActive = true;
+            }
+        }
+        
+        if (atLeastOneCommandActive && !mIsActivated) {
+            activate();
+        } else if (!atLeastOneCommandActive && mIsActivated) {
+            deactivate();
+            MainService.displayToast("Disabled " + mName, null, true);
+        }
+        
+        return mIsActivated;
     }
 
     protected String getString(int id, Object... args) {
@@ -204,20 +274,6 @@ public abstract class CommandHandlerBase {
      * gets called in mainService when "stop" command received
      */
     public void stop() {}
-    
-    /**
-     * Setups the command to get working. Usually called when the user want's 
-     * GTalkSMS to be active (meaning connected)
-     * setup() the contrary to cleanUp()
-     */
-    public void setup() {};
-    
-    /**
-     * Cleans up the structures holden by the CommandHanlderBase Class.
-     * Common actions are: unregister broadcast receivers etc.
-     * Usually issued on the stop of the MainService
-     */
-    public void cleanUp() {};   
     
     /**
      * Request a help String array from the command

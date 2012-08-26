@@ -67,7 +67,7 @@ public class LogsCmd extends CommandHandlerBase {
     LogsThread mLogsThread;
     
     public LogsCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_INTERNAL, new Cmd("logs", "log"));
+        super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Logs", new Cmd("logs", "log"));
     }
 
     protected void execute(String cmd, String args) {

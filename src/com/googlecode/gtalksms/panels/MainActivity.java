@@ -160,6 +160,7 @@ public class MainActivity extends SherlockFragmentActivity {
         
         mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_connection)).setTabListener(new TabListener(mPager, 0)));
         mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_help)).setTabListener(new TabListener(mPager, 1)));
+
         
         if (Tools.isDonateAppInstalled(getBaseContext())) {
             findViewById(R.id.StatusBar).setVisibility(View.GONE);
@@ -275,7 +276,7 @@ public class MainActivity extends SherlockFragmentActivity {
         boolean b2 = removeTab(getString(R.string.panel_commands));
         
         if (status == XmppManager.CONNECTED) {
-            mCommandsTabFragment.updateCommands(mMainService.getCommandSet());
+            mCommandsTabFragment.updateCommands();
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_buddies)).setTabListener(new TabListener(mPager, 2)));
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_commands)).setTabListener(new TabListener(mPager, 3)));
         } else if (b1 || b2) {
