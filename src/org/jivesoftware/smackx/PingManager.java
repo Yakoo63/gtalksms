@@ -1,6 +1,7 @@
 package org.jivesoftware.smackx;
 
 import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
@@ -25,22 +26,19 @@ public class PingManager {
     
     private Connection connection;
     private Thread serverPingThread;
+    private ServerPingTask serverPingTask;
+    private int pingIntervall;
 
     
     public PingManager(Connection connection, int pingIntervall) {
-        this.connection = connection;
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(connection);
         sdm.addFeature(NAMESPACE);
         PacketFilter pingPacketFilter = new PacketTypeFilter(Ping.class);
         connection.addPacketListener(new PingPacketListener(connection), pingPacketFilter);
-        
-        if (pingIntervall > 0) {
-            ServerPingTask serverPingTask = new ServerPingTask(pingIntervall);
-            serverPingThread = new Thread(serverPingTask);
-            serverPingThread.setDaemon(true);
-            serverPingThread.setName("Smack Ping Server Task (" + connection.getServiceName() + ")");
-            serverPingThread.start();
-        }
+        this.connection = connection;
+        this.pingIntervall = pingIntervall;
+        connection.addConnectionListener(new PingConnectionListener());
+        maybeStartPingServerTask();
     }
     
     public boolean ping(String to) {
@@ -63,6 +61,51 @@ public class PingManager {
         }
         return true;
     }
+    
+    private class PingConnectionListener implements ConnectionListener {
+
+        @Override
+        public void connectionClosed() {
+            maybeStopPingServerTask();
+        }
+
+        @Override
+        public void connectionClosedOnError(Exception arg0) {
+            maybeStopPingServerTask();
+        }
+
+        @Override
+        public void reconnectingIn(int arg0) {
+        }
+
+        @Override
+        public void reconnectionFailed(Exception arg0) {
+        }
+
+        @Override
+        public void reconnectionSuccessful() {
+            maybeStartPingServerTask();
+        }
+        
+    }
+    
+    private void maybeStartPingServerTask() {
+        if (pingIntervall > 0) {
+            serverPingTask = new ServerPingTask();
+            serverPingThread = new Thread(serverPingTask);
+            serverPingThread.setDaemon(true);
+            serverPingThread.setName("Smack Ping Server Task (" + connection.getServiceName() + ")");
+            serverPingThread.start();
+        }
+    }
+    
+    private void maybeStopPingServerTask() {
+        if (serverPingThread != null) {
+            serverPingTask.setDone();
+            serverPingThread.interrupt();
+        }
+        
+    }
 
 
     private class PingPacketListener implements PacketListener {
@@ -79,33 +122,35 @@ public class PingManager {
     }
     
     private class ServerPingTask implements Runnable {
-        private int delay;
+        boolean done;
         
-        ServerPingTask(int delay) {
-            this.delay = delay;
+        ServerPingTask() {
+            done = false;
         }
         
-        public void run() {
-            boolean res;
-            
+        public void setDone() {
+            done = true;
+        }
+        
+        public void run() {            
             try {
-                // Sleep a minimum of 15 seconds plus delay before sending first heartbeat. This will give time to
-                // properly finish TLS negotiation and then start sending heartbeats.
-                Thread.sleep(15000 + delay);
+                // Sleep a minimum of 60 seconds plus delay before sending first ping.
+                // This will give time to properly finish TLS negotiation and 
+                // then start sending XMPP pings to the server.
+                Thread.sleep(60000 + pingIntervall);
             }
             catch (InterruptedException ie) {
                 // Do nothing
             }
             
-            while(true) {
+            while(!done) {
                 if (connection.isAuthenticated()) {
-                    res = ping(connection.getServiceName());
+                    ping(connection.getServiceName());
                 }
                 try {
-                    Thread.sleep(delay);
+                    Thread.sleep(pingIntervall);
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    /* Ignore */
                 }
             }
         }
