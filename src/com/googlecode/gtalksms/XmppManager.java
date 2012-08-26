@@ -24,6 +24,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.MultipleRecipientManager;
+import org.jivesoftware.smackx.PingManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -511,9 +512,9 @@ public class XmppManager {
         }
         
         ServiceDiscoveryManager serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
+        new PingManager(connection, 1000*60*30); // Ping every 30 min
         XHTMLManager.setServiceEnabled(connection, false);   
         serviceDiscoMgr.addFeature("http://jabber.org/protocol/disco#info");
-        serviceDiscoMgr.addFeature("http://jabber.org/protocol/muc");
         serviceDiscoMgr.addFeature("bug-fix-gtalksms");
         
         try {
@@ -596,7 +597,8 @@ public class XmppManager {
         conf.setReconnectionAllowed(false);
         conf.setSendPresence(false);
         
-        return new XMPPConnection(conf);
+        XMPPConnection connection = new XMPPConnection(conf);
+        return connection;
     }
 
     /** returns the current connection state */

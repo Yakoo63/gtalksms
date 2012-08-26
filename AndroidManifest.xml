@@ -42,7 +42,7 @@
         android:label="@string/app_name" 
         android:restoreAnyVersion="true" 
         android:backupAgent="com.googlecode.gtalksms.tools.MyBackupAgent"
-        android:allowBackup="true" android:debuggable="true">
+        android:allowBackup="true" android:debuggable="false">
         <activity 
             android:name="com.googlecode.gtalksms.panels.MainActivity"
             android:theme="@style/Theme.Sherlock"
