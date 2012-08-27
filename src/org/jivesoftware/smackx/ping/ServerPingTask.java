@@ -7,42 +7,42 @@ import org.jivesoftware.smack.Connection;
 
 class ServerPingTask implements Runnable {
     
+    // This has to be a weak reference because IIRC all threads are roots
+    // for objects and we have a new thread here that should hold a strong
+    // reference to connection so that it can be GCed.
     private WeakReference<Connection> weakConnection;
-    private int pingIntervall;
+    private int pingInterval;
+    private volatile long lastSuccessfulPing = -1;
     
     private int delta = 1000; // 1 seconds
     private int tries = 3; // 3 tries
     
     protected ServerPingTask(Connection connection, int pingIntervall) {
         this.weakConnection = new WeakReference<Connection>(connection);
-        this.pingIntervall = pingIntervall;
+        this.pingInterval = pingIntervall;
     }
     
     protected void setDone() {
-        this.pingIntervall = -1;
+        this.pingInterval = -1;
     }
     
-    protected void setPingIntervall(int pingIntervall) {
-        this.pingIntervall = pingIntervall;
+    protected void setPingInterval(int pingIntervall) {
+        this.pingInterval = pingIntervall;
     }
     
-    protected int getIntIntervall() {
-        return pingIntervall;
+    protected int getIntInterval() {
+        return pingInterval;
     }
     
-    public void run() {            
-        try {
-            // Sleep a minimum of 60 seconds plus delay before sending first ping.
-            // This will give time to properly finish TLS negotiation and 
-            // then start sending XMPP pings to the server.
-            Thread.sleep(60000 + pingIntervall);
-        }
-        catch (InterruptedException ie) {
-            // Do nothing
-        }
+    protected long getLastSucessfulPing() {
+        return lastSuccessfulPing;
+    }
+    
+    public void run() {
+        sleep(60000);
         
         outerLoop:
-        while(pingIntervall > 0) {
+        while(pingInterval > 0) {
             Connection connection = weakConnection.get();
             if (connection == null) {
                 // connection has been collected by GC
@@ -65,8 +65,10 @@ class ServerPingTask implements Runnable {
                     }
                     res = pingManager.pingMyServer();
                     // stop when we receive a pong back
-                    if (res)
+                    if (res) {
+                        lastSuccessfulPing = System.currentTimeMillis();
                         break;
+                    }
                 }
                 if (!res) {
                     Set<PingFailedListener> pingFailedListeners = pingManager.getPingFailedListeners();
@@ -75,11 +77,25 @@ class ServerPingTask implements Runnable {
                     }
                 }
             }
+            sleep();
+        }
+    }
+    
+    private void sleep(int extraSleepTime) {
+        int totalSleep = pingInterval + extraSleepTime;
+        if (totalSleep > 0) {
             try {
-                Thread.sleep(pingIntervall);
+                Thread.sleep(totalSleep);
             } catch (InterruptedException e) {
                 /* Ignore */
             }
         }
+    }
+    
+    /**
+     * Sleeps the amount of pingInterval
+     */
+    private void sleep() {
+        sleep(0);
     }
 }

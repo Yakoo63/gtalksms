@@ -75,7 +75,7 @@ public class PingManager {
     public void setPingIntervall(int pingIntervall) {
         this.pingIntervall = pingIntervall;
         if (serverPingTask != null) {
-            serverPingTask.setPingIntervall(pingIntervall);
+            serverPingTask.setPingInterval(pingIntervall);
         }
     }
     
@@ -167,6 +167,21 @@ public class PingManager {
         }
         catch (XMPPException e) {
             return false;
+        }
+    }
+    
+    /**
+     * Returns the time of the last successful Ping Pong with the 
+     * users server. If there was no successful Ping (e.g. because this
+     * feature is disabled) -1 will be returned.
+     *  
+     * @return
+     */
+    public long getLastSuccessfulPing() {
+        if (serverPingTask == null) {
+            return -1;
+        } else {
+            return serverPingTask.getLastSucessfulPing();
         }
     }
     
