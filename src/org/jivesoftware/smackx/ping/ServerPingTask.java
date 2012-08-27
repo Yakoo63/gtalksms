@@ -54,7 +54,6 @@ class ServerPingTask implements Runnable {
                 boolean res = false;
                 
                 for(int i = 0; i < tries; i++) {
-                    res = pingManager.pingMyServer();
                     if (i != 0) {
                         try {
                             Thread.sleep(delta);
@@ -64,6 +63,7 @@ class ServerPingTask implements Runnable {
                             break outerLoop;
                         }
                     }
+                    res = pingManager.pingMyServer();
                     // stop when we receive a pong back
                     if (res)
                         break;
