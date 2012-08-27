@@ -27,6 +27,7 @@ import org.jivesoftware.smackx.MultipleRecipientManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 
 import android.content.Context;
@@ -51,7 +52,7 @@ import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class XmppManager {
     
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     
     // my first measuring showed that the disconnect in fact does not hang
     // but takes sometimes a lot of time
@@ -83,9 +84,8 @@ public class XmppManager {
     private List<XmppConnectionChangeListener> mConnectionChangeListeners;
     private XMPPConnection mConnection = null;
     private PacketListener mPacketListener = null;
-    
     private PacketListener mPresencePacketListener = null;
-    
+    private PingManager mPingManager = null;
     private ConnectionListener mConnectionListener = null;    
     private XmppMuc mXmppMuc;
     private XmppBuddies mXmppBuddies;
@@ -516,7 +516,16 @@ public class XmppManager {
         }
         
         ServiceDiscoveryManager serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
-        PingManager.getInstaceFor(connection);
+        mPingManager = PingManager.getInstaceFor(connection);
+        mPingManager.registerPingFailedListener(new PingFailedListener() {
+            
+            @Override
+            public void pingFailed() {
+                maybeStartReconnect();
+                
+            }
+        });
+        
         XHTMLManager.setServiceEnabled(connection, false);   
         serviceDiscoMgr.addFeature("http://jabber.org/protocol/disco#info");
         serviceDiscoMgr.addFeature("bug-fix-gtalksms");

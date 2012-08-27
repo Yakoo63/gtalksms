@@ -1,5 +1,5 @@
 package org.jivesoftware.smackx.ping;
 
-interface PingFailedListener {
+public interface PingFailedListener {
     void pingFailed();
 }
