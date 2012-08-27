@@ -525,6 +525,7 @@ public class XmppManager {
                 // TODO remember that maybeStartReconnect is called from a 
                 // different thread (the PingTask) here, it may causes 
                 // synchronization problems
+                Log.d("PingManager reported failed ping, calling maybeStartReconnect()");
                 maybeStartReconnect();
                 
             }
