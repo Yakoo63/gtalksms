@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionCreationListener;
 import org.jivesoftware.smack.ConnectionListener;
@@ -112,7 +113,7 @@ public class PingManager {
         return pingFailedListeners;
     }
     
-    private class PingConnectionListener implements ConnectionListener {
+    private class PingConnectionListener extends AbstractConnectionListener {
 
         @Override
         public void connectionClosed() {
@@ -125,18 +126,10 @@ public class PingManager {
         }
 
         @Override
-        public void reconnectingIn(int arg0) {
-        }
-
-        @Override
-        public void reconnectionFailed(Exception arg0) {
-        }
-
-        @Override
         public void reconnectionSuccessful() {
             maybeStartPingServerTask();
         }
-        
+
     }
     
     private void maybeStartPingServerTask() {
