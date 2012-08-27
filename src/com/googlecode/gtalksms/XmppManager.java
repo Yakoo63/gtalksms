@@ -241,6 +241,7 @@ public class XmppManager {
                     t.join(DISCON_TIMEOUT);
                 } catch (InterruptedException e) {
                     mConnection = null;
+                    mPingManager = null;
                 }
             }
         }
@@ -521,6 +522,9 @@ public class XmppManager {
             
             @Override
             public void pingFailed() {
+                // TODO remember that maybeStartReconnect is called from a 
+                // different thread (the PingTask) here, it may causes 
+                // synchronization problems
                 maybeStartReconnect();
                 
             }

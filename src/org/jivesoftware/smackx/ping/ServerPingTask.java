@@ -81,6 +81,9 @@ class ServerPingTask implements Runnable {
         }
     }
     
+    /*
+     * If pingInterval > 0 sleeps a minimum of pingInterval
+     */
     private void sleep(int extraSleepTime) {
         int totalSleep = pingInterval + extraSleepTime;
         if (totalSleep > 0) {
