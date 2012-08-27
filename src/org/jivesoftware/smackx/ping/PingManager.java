@@ -9,7 +9,6 @@ import java.util.WeakHashMap;
 import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionCreationListener;
-import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
@@ -135,6 +134,7 @@ public class PingManager {
     private void maybeStartPingServerTask() {
         if (pingIntervall > 0) {
             serverPingTask = new ServerPingTask(connection, pingIntervall);
+            serverPingTask.setPingIntervall(pingIntervall);
             serverPingThread = new Thread(serverPingTask);
             serverPingThread.setDaemon(true);
             serverPingThread.setName("Smack Ping Server Task (" + connection.getServiceName() + ")");
