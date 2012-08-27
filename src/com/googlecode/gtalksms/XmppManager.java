@@ -24,10 +24,10 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.MultipleRecipientManager;
-import org.jivesoftware.smackx.PingManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.ping.PingManager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -204,9 +204,13 @@ public class XmppManager {
      * 
      * Spawns a new disconnect runnable if the connection
      * is still connected and removes packetListeners and 
-     * Callbacks for the reconnectHandler
+     * Callbacks for the reconnectHandler.
+     * 
+     * synchronized because cleanupConnection() ->
+     * maybeStartReconnect() -> connectionClosedOnError()
+     * is called from a different thread
      */
-    private void cleanupConnection() {
+    private synchronized void cleanupConnection() {
         mReconnectHandler.removeCallbacks(mReconnectRunnable);
 
         if (mConnection != null) {
@@ -512,7 +516,7 @@ public class XmppManager {
         }
         
         ServiceDiscoveryManager serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
-        new PingManager(connection, 1000*60*30); // Ping every 30 min
+        PingManager.getInstaceFor(connection); // Ping every 30 min
         XHTMLManager.setServiceEnabled(connection, false);   
         serviceDiscoMgr.addFeature("http://jabber.org/protocol/disco#info");
         serviceDiscoMgr.addFeature("bug-fix-gtalksms");

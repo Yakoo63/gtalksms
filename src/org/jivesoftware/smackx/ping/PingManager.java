@@ -1,6 +1,13 @@
-package org.jivesoftware.smackx;
+package org.jivesoftware.smackx.ping;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.ConnectionCreationListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
@@ -11,6 +18,7 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.Ping;
 import org.jivesoftware.smackx.packet.Pong;
 import org.jivesoftware.smackx.provider.PingProvider;
@@ -19,26 +27,61 @@ public class PingManager {
     
     public static final String NAMESPACE = "urn:xmpp:ping";
     public static final String ELEMENT = "ping";
+    private static Map<Connection, PingManager> instances =
+            Collections.synchronizedMap(new WeakHashMap<Connection, PingManager>());
     
     static {
         ProviderManager.getInstance().addIQProvider(ELEMENT, NAMESPACE, new PingProvider());
+        Connection.addConnectionCreationListener(new ConnectionCreationListener() {
+            public void connectionCreated(Connection connection) {
+                new PingManager(connection);
+            }
+        });
     }
     
     private Connection connection;
     private Thread serverPingThread;
     private ServerPingTask serverPingTask;
-    private int pingIntervall;
-
+    private int pingIntervall = 30*60*1000;
+    private Set<PingFailedListener> pingFailedListeners = Collections
+            .synchronizedSet(new HashSet<PingFailedListener>());
     
-    public PingManager(Connection connection, int pingIntervall) {
+    private PingManager(Connection connection) {
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(connection);
         sdm.addFeature(NAMESPACE);
         PacketFilter pingPacketFilter = new PacketTypeFilter(Ping.class);
         connection.addPacketListener(new PingPacketListener(connection), pingPacketFilter);
         this.connection = connection;
-        this.pingIntervall = pingIntervall;
         connection.addConnectionListener(new PingConnectionListener());
+        instances.put(connection, this);
         maybeStartPingServerTask();
+    }
+    
+    public static PingManager getInstaceFor(Connection connection) {
+        PingManager pingManager = instances.get(connection);
+        
+        if (pingManager == null) {
+            pingManager = new PingManager(connection);
+        }
+        
+        return pingManager;
+    }
+    
+    public void setPingIntervall(int pingIntervall) {
+        this.pingIntervall = pingIntervall;
+        serverPingTask.setPingIntervall(pingIntervall);
+    }
+    
+    public int getPingIntervall() {
+        return pingIntervall;
+    }
+    
+    public void registerPingFailedListener(PingFailedListener listener) {
+        pingFailedListeners.add(listener);
+    }
+    
+    public void unregisterPingFailedListener(PingFailedListener listener) {
+        pingFailedListeners.remove(listener);
     }
     
     public boolean ping(String to) {
@@ -57,9 +100,14 @@ public class PingManager {
         }
         if (result.getType() == IQ.Type.ERROR) {
             // A Error response is as good as a pong response
+            // at least somebody is answering :)
             return true;
         }
         return true;
+    }
+    
+    protected Set<PingFailedListener> getPingFailedListeners() {
+        return pingFailedListeners;
     }
     
     private class PingConnectionListener implements ConnectionListener {
@@ -91,7 +139,7 @@ public class PingManager {
     
     private void maybeStartPingServerTask() {
         if (pingIntervall > 0) {
-            serverPingTask = new ServerPingTask();
+            serverPingTask = new ServerPingTask(connection, pingIntervall);
             serverPingThread = new Thread(serverPingTask);
             serverPingThread.setDaemon(true);
             serverPingThread.setName("Smack Ping Server Task (" + connection.getServiceName() + ")");
@@ -104,7 +152,6 @@ public class PingManager {
             serverPingTask.setDone();
             serverPingThread.interrupt();
         }
-        
     }
 
 
@@ -115,44 +162,12 @@ public class PingManager {
             this.connection = connection;
         }
         
+        /**
+         * Sends a Pong for every Ping
+         */
         public void processPacket(Packet packet) {
             Pong pong = new Pong(packet);
             this.connection.sendPacket(pong);
-        }
-    }
-    
-    private class ServerPingTask implements Runnable {
-        boolean done;
-        
-        ServerPingTask() {
-            done = false;
-        }
-        
-        public void setDone() {
-            done = true;
-        }
-        
-        public void run() {            
-            try {
-                // Sleep a minimum of 60 seconds plus delay before sending first ping.
-                // This will give time to properly finish TLS negotiation and 
-                // then start sending XMPP pings to the server.
-                Thread.sleep(60000 + pingIntervall);
-            }
-            catch (InterruptedException ie) {
-                // Do nothing
-            }
-            
-            while(!done) {
-                if (connection.isAuthenticated()) {
-                    ping(connection.getServiceName());
-                }
-                try {
-                    Thread.sleep(pingIntervall);
-                } catch (InterruptedException e) {
-                    /* Ignore */
-                }
-            }
         }
     }
 }

@@ -1,7 +1,7 @@
 package org.jivesoftware.smackx.packet;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smackx.PingManager;
+import org.jivesoftware.smackx.ping.PingManager;
 
 public class Ping extends IQ {
     
