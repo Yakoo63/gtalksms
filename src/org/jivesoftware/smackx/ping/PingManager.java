@@ -42,7 +42,7 @@ public class PingManager {
     private Connection connection;
     private Thread serverPingThread;
     private ServerPingTask serverPingTask;
-    private int pingIntervall = 30*60*1000;
+    private int pingIntervall = 30*60*1000; // 30 min
     private Set<PingFailedListener> pingFailedListeners = Collections
             .synchronizedSet(new HashSet<PingFailedListener>());
     
@@ -69,7 +69,9 @@ public class PingManager {
     
     public void setPingIntervall(int pingIntervall) {
         this.pingIntervall = pingIntervall;
-        serverPingTask.setPingIntervall(pingIntervall);
+        if (serverPingTask != null) {
+            serverPingTask.setPingIntervall(pingIntervall);
+        }
     }
     
     public int getPingIntervall() {

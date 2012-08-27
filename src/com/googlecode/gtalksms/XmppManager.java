@@ -516,7 +516,7 @@ public class XmppManager {
         }
         
         ServiceDiscoveryManager serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
-        PingManager.getInstaceFor(connection); // Ping every 30 min
+        PingManager.getInstaceFor(connection);
         XHTMLManager.setServiceEnabled(connection, false);   
         serviceDiscoMgr.addFeature("http://jabber.org/protocol/disco#info");
         serviceDiscoMgr.addFeature("bug-fix-gtalksms");
