@@ -31,15 +31,7 @@ class ServerPingTask implements Runnable {
     }
     
     public void run() {            
-        try {
-            // Sleep a minimum of 60 seconds plus delay before sending first ping.
-            // This will give time to properly finish TLS negotiation and 
-            // then start sending XMPP pings to the server.
-            Thread.sleep(60000 + pingIntervall);
-        }
-        catch (InterruptedException ie) {
-            // Do nothing
-        }
+        sleep(60000);
         
         outerLoop:
         while(pingIntervall > 0) {
@@ -75,11 +67,21 @@ class ServerPingTask implements Runnable {
                     }
                 }
             }
+            sleep();
+        }
+    }
+    
+    private void sleep(int extendedInterval) {
+        if (pingIntervall + extendedInterval > 0) {
             try {
-                Thread.sleep(pingIntervall);
+                Thread.sleep(pingIntervall + extendedInterval);
             } catch (InterruptedException e) {
                 /* Ignore */
             }
         }
+    }
+    
+    private void sleep() {
+        sleep(0);
     }
 }
