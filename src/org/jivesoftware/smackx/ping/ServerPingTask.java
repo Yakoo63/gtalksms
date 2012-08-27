@@ -7,17 +7,16 @@ import org.jivesoftware.smack.Connection;
 
 class ServerPingTask implements Runnable {
     
-    private boolean done;
     private WeakReference<Connection> weakConnection;
     private int pingIntervall;
     
     protected ServerPingTask(Connection connection, int pingIntervall) {
         this.weakConnection = new WeakReference<Connection>(connection);
-        this.done = false;
+        this.pingIntervall = pingIntervall;
     }
     
     protected void setDone() {
-        this.done = true;
+        this.pingIntervall = -1;
     }
     
     protected void setPingIntervall(int pingIntervall) {
@@ -39,7 +38,7 @@ class ServerPingTask implements Runnable {
             // Do nothing
         }
         
-        while(!done) {
+        while(pingIntervall > 0) {
             Connection connection = weakConnection.get();
             if (connection == null) {
                 // connection has been collected by GC
@@ -48,7 +47,7 @@ class ServerPingTask implements Runnable {
             }
             if (connection.isAuthenticated()) {
                 PingManager pingManager = PingManager.getInstaceFor(connection);
-                if (!pingManager.ping(connection.getServiceName())) {
+                if (!pingManager.pingMyServer()) {
                     Set<PingFailedListener> pingFailedListeners = pingManager.getPingFailedListeners();
                     for (PingFailedListener l : pingFailedListeners) {
                         l.pingFailed();
