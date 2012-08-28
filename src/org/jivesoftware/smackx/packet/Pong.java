@@ -17,11 +17,10 @@
 package org.jivesoftware.smackx.packet;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Packet;
 
 public class Pong extends IQ {
     
-    public Pong(Packet ping) {
+    public Pong(Ping ping) {
         setType(IQ.Type.RESULT);
         setFrom(ping.getTo());
         setTo(ping.getFrom());

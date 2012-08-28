@@ -41,10 +41,22 @@ import org.jivesoftware.smackx.packet.Ping;
 import org.jivesoftware.smackx.packet.Pong;
 import org.jivesoftware.smackx.provider.PingProvider;
 
+/**
+ * Implements the XMPP Ping as defined by XEP-0199. This protocol offers an
+ * alternative to the traditional 'white space ping' approach of determining the
+ * availability of an entity. The XMPP Ping protocol allows pings to be
+ * performed in a more XML-friendly approach, which can be used over more than
+ * one hop in the communication path.
+ * 
+ * @author Florian Schmaus
+ * @see <a href="http://www.xmpp.org/extensions/xep-0199.html">XEP-0199:XMPP Ping</a>
+ */
 public class PingManager {
     
     public static final String NAMESPACE = "urn:xmpp:ping";
     public static final String ELEMENT = "ping";
+    public static final int DEFAULT_PING_INTERVAL = 30*60*1000; // 30 min
+    
     private static Map<Connection, PingManager> instances =
             Collections.synchronizedMap(new WeakHashMap<Connection, PingManager>());
     
@@ -60,10 +72,11 @@ public class PingManager {
     private Connection connection;
     private Thread serverPingThread;
     private ServerPingTask serverPingTask;
-    private int pingIntervall = 30*60*1000; // 30 min
+    private int pingInterval = DEFAULT_PING_INTERVAL; // 30 min
     private Set<PingFailedListener> pingFailedListeners = Collections
             .synchronizedSet(new HashSet<PingFailedListener>());
     
+    // Ping Flood protection
     private long pingMinDelta = 100;
     private long lastPingStamp = 0;
     
@@ -89,14 +102,22 @@ public class PingManager {
     }
     
     public void setPingIntervall(int pingIntervall) {
-        this.pingIntervall = pingIntervall;
+        this.pingInterval = pingIntervall;
         if (serverPingTask != null) {
             serverPingTask.setPingInterval(pingIntervall);
         }
     }
     
     public int getPingIntervall() {
-        return pingIntervall;
+        return pingInterval;
+    }
+    
+    public void registerPingFailedListener(PingFailedListener listener) {
+        pingFailedListeners.add(listener);
+    }
+    
+    public void unregisterPingFailedListener(PingFailedListener listener) {
+        pingFailedListeners.remove(listener);
     }
     
     public void disablePingFloodProtection() {
@@ -111,18 +132,13 @@ public class PingManager {
         return this.pingMinDelta;
     }
     
-    public void registerPingFailedListener(PingFailedListener listener) {
-        pingFailedListeners.add(listener);
-    }
-    
-    public void unregisterPingFailedListener(PingFailedListener listener) {
-        pingFailedListeners.remove(listener);
-    }
-    
     /**
      * Pings the given jid and returns the IQ response which is either of 
      * IQ.Type.ERROR or IQ.Type.RESULT. If we are not connected or if there was
      * no reply, null is returned.
+     * 
+     * You should use isPingSupported(jid) to determine if XMPP Ping is 
+     * supported by the user.
      * 
      * @param jid
      * @param pingTimeout
@@ -146,6 +162,13 @@ public class PingManager {
         return result;
     }
     
+    /**
+     * Pings the given jid and returns the IQ response with the default
+     * packet reply timeout
+     * 
+     * @param jid
+     * @return
+     */
     public IQ ping(String jid) {
         return ping(jid, SmackConfiguration.getPacketReplyTimeout());
     }
@@ -158,8 +181,11 @@ public class PingManager {
      * by the entity (e.g. a user JID) or from a server in between. This is
      * intended behavior to avoid presence leaks.
      * 
+     * Always use isPingSupported(jid) to determine if XMPP Ping is supported
+     * by the entity.
+     * 
      * @param jid
-     * @return True if successful, otherwise false
+     * @return True if a pong was received, otherwise false
      */
     public boolean pingEntity(String jid, long pingTimeout) {
         IQ result = ping(jid, pingTimeout);
@@ -258,8 +284,8 @@ public class PingManager {
             System.err.println("Smack PingManger: Found existing serverPingTask");
         }
         
-        if (pingIntervall > 0) {
-            serverPingTask = new ServerPingTask(connection, pingIntervall);
+        if (pingInterval > 0) {
+            serverPingTask = new ServerPingTask(connection, pingInterval);
             serverPingThread = new Thread(serverPingTask);
             serverPingThread.setDaemon(true);
             serverPingThread.setName("Smack Ping Server Task (" + connection.getServiceName() + ")");
@@ -293,7 +319,7 @@ public class PingManager {
                     return;
                 }
             }
-            Pong pong = new Pong(packet);
+            Pong pong = new Pong((Ping)packet);
             connection.sendPacket(pong);
         }
     }
