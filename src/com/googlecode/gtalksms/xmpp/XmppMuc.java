@@ -85,7 +85,7 @@ public class XmppMuc {
                     }
                 } catch (XMPPException e) {
                     // This is not fatal, just log a warning
-                    Log.w("Could not discover local MUC component: ", e);            
+                    Log.i("Could not discover local MUC component: " + e.getMessage());            
                 }
             }
         };
@@ -232,7 +232,7 @@ public class XmppMuc {
             randomInt = mRndGen.nextInt();
         } while (mRoomNumbers.contains(randomInt));
 
-        String normalizedName = name.replaceAll(" ", "_").replaceAll("[\\W]|µ", "");
+        String normalizedName = name.replaceAll(" ", "_").replaceAll("[\\W]|ï¿½", "");
         normalizedName = Normalizer.normalize(normalizedName, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
         String cleanLogin = mSettings.getLogin().replaceAll("@", "_");
         String roomUID = normalizedName + "_" + ROOM_START_TAG + randomInt + "_" + cleanLogin;

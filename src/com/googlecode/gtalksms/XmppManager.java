@@ -497,13 +497,13 @@ public class XmppManager {
         try {
             connection.connect();
         } catch (Exception e) {
-            Log.w("xmpp connection failed: " + e.getMessage());
+            Log.w("XMPP connection failed", e);
             if (e instanceof XMPPException) {
                 XMPPException xmppEx = (XMPPException) e;
                 StreamError error = xmppEx.getStreamError();
                 // Make sure the error is not null
                 if (error != null) {
-                    Log.w(error.toString());
+                    Log.w("XMPP connection failed because of stream error: " + error.toString());
                 }
             }
             maybeStartReconnect();
