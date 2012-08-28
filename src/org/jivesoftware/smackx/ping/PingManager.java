@@ -202,7 +202,8 @@ public class PingManager {
     }
     
     /**
-     * Pings the user's server.
+     * Pings the user's server. Will notify the registered 
+     * pingFailedListeners in case of error.
      * 
      * If we receive as response, we can be sure that it came from the server.
      * 
@@ -210,9 +211,14 @@ public class PingManager {
      */
     public boolean pingMyServer(long pingTimeout) {
         IQ result = ping(connection.getServiceName(), pingTimeout);
+
         if (result == null) {
+            for (PingFailedListener l : pingFailedListeners) {
+                l.pingFailed();
+            }
             return false;
         }
+        
         return true;
     }
     
