@@ -1,3 +1,19 @@
+/**
+ * Copyright 2012 Florian Schmaus
+ *
+ * All rights reserved. Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jivesoftware.smackx.ping;
 
 import java.util.Collections;
@@ -103,18 +119,35 @@ public class PingManager {
         pingFailedListeners.remove(listener);
     }
     
-    public IQ ping(String to) {
-        Ping ping = new Ping(connection.getUser(), to);
+    /**
+     * Pings the given jid and returns the IQ response which is either of 
+     * IQ.Type.ERROR or IQ.Type.RESULT. If we are not connected or if there was
+     * no reply, null is returned.
+     * 
+     * @param jid
+     * @param pingTimeout
+     * @return
+     */
+    public IQ ping(String jid, long pingTimeout) {
+        // Make sure we actually connected to the server
+        if (!connection.isAuthenticated())
+            return null;
+        
+        Ping ping = new Ping(connection.getUser(), jid);
         
         PacketCollector collector =
                 connection.createPacketCollector(new PacketIDFilter(ping.getPacketID()));
         
         connection.sendPacket(ping);
         
-        IQ result = (IQ) collector.nextResult(SmackConfiguration.getPacketReplyTimeout());
+        IQ result = (IQ) collector.nextResult(pingTimeout);
         
         collector.cancel();
         return result;
+    }
+    
+    public IQ ping(String jid) {
+        return ping(jid, SmackConfiguration.getPacketReplyTimeout());
     }
     
     /**
@@ -128,14 +161,18 @@ public class PingManager {
      * @param jid
      * @return True if successful, otherwise false
      */
-    public boolean pingEntity(String jid) {
-        IQ result = ping(jid);
+    public boolean pingEntity(String jid, long pingTimeout) {
+        IQ result = ping(jid, pingTimeout);
         
         if (result == null 
                 || result.getType() == IQ.Type.ERROR) {
             return false;
         } 
         return true;
+    }
+    
+    public boolean pingEntity(String jid) {
+        return pingEntity(jid, SmackConfiguration.getPacketReplyTimeout());
     }
     
     /**
@@ -145,12 +182,16 @@ public class PingManager {
      * 
      * @return True if successful, otherwise false
      */
-    public boolean pingMyServer() {
-        IQ result = ping(connection.getServiceName());
+    public boolean pingMyServer(long pingTimeout) {
+        IQ result = ping(connection.getServiceName(), pingTimeout);
         if (result == null) {
             return false;
         }
         return true;
+    }
+    
+    public boolean pingMyServer() {
+        return pingMyServer(SmackConfiguration.getPacketReplyTimeout());
     }
     
     /**

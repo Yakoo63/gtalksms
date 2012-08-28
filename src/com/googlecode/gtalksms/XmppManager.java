@@ -52,7 +52,7 @@ import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class XmppManager {
     
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     
     // my first measuring showed that the disconnect in fact does not hang
     // but takes sometimes a lot of time
