@@ -48,6 +48,7 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
 import com.googlecode.gtalksms.xmpp.XmppOfflineMessages;
 import com.googlecode.gtalksms.xmpp.XmppPresenceStatus;
+import com.googlecode.gtalksms.xmpp.XmppSocketFactory;
 import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class XmppManager {
@@ -566,7 +567,7 @@ public class XmppManager {
      */
     private static XMPPConnection createNewConnection(SettingsManager settings) throws XMPPException {
         ConnectionConfiguration conf;
-
+        
         if (settings.manuallySpecifyServerSettings) {
             // trim the serverHost here because of Issue 122
             conf = new ConnectionConfiguration(settings.serverHost.trim(), settings.serverPort, settings.serviceName);
@@ -578,6 +579,8 @@ public class XmppManager {
             // and http://code.google.com/p/android/issues/detail?id=9431            
             conf = new AndroidConnectionConfiguration(settings.serviceName, DNSSRV_TIMEOUT);
         }
+        
+        conf.setSocketFactory(new XmppSocketFactory());
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             conf.setTruststoreType("AndroidCAStore");
