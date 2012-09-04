@@ -447,6 +447,7 @@ public class MainService extends Service {
             sStorageLowReceiver = null;
 
             sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+            sXmppMgr.mSmackAndroid.exit();
             sXmppMgr = null;
         }
         teardownListenersForConnection();
@@ -457,7 +458,7 @@ public class MainService extends Service {
         sActiveCommandSet.clear();
         
         sServiceLooper.quit();
-        sXmppMgr.mSmackAndroid.exit();
+
         super.onDestroy();
         Log.i("MainService onDestroy(): service destroyed");
     }

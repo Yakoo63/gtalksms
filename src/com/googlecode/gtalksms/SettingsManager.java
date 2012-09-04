@@ -227,7 +227,8 @@ public class SettingsManager {
 
     public void OnPreferencesUpdated(String key) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
-            BackupManager.dataChanged(mContext.getPackageName());
+            BackupManager bm = new BackupManager(mContext);
+            bm.dataChanged();
         }
         for (String s : xmppConnectionSettings) {
             if (s.equals(key)) {
