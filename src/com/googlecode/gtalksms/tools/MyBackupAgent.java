@@ -35,7 +35,7 @@ public class MyBackupAgent extends BackupAgent {
     @Override
     public void onBackup(ParcelFileDescriptor oldState, BackupDataOutput data, ParcelFileDescriptor newState) throws IOException {
         Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() begin");
-        settingsManager = SettingsManager.getSettingsManager(this);
+        //settingsManager = SettingsManager.getSettingsManager(this);
         String sharedPrefsPath = Tools.getSharedPrefDir(this) + "/" + Tools.APP_NAME + ".xml";
         File mDataFile = new File(sharedPrefsPath);
         DataInputStream in = null;
