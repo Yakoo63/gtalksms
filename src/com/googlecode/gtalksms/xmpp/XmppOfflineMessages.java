@@ -23,12 +23,16 @@ public class XmppOfflineMessages {
             return;
 
         Iterator<Message> i = offlineMessageManager.getMessages();
+        
+        if (!i.hasNext()) {
+            Log.d("No offline messages found on server");
+        }
         while (i.hasNext()) {
             Message msg = i.next();
             String fullJid = msg.getFrom();
             String bareJid = StringUtils.parseBareAddress(fullJid);
             String messageBody = msg.getBody();
-            Log.i("Retrived offline message from " + fullJid + " with content: " + messageBody.substring(0, 40));
+            Log.d("Retrived offline message from " + fullJid + " with content: " + messageBody.substring(0, 40));
             if (bareJid.equals(notifiedAddress) && (messageBody != null)) {
                 Tools.startSvcXMPPMsg(ctx, messageBody, fullJid);
             }
