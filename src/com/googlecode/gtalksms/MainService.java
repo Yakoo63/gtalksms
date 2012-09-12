@@ -713,7 +713,9 @@ public class MainService extends Service {
      * Calls cleanUp() for every registered command
      */
     private static void cleanupCommands() {
-        for (CommandHandlerBase cmd : sActiveCommandSet) {
+        // Make a copy of the activeCommandSet as deactivate() may remove a command from sActiveCommandSet
+        Set<CommandHandlerBase> currentActiveCommandSet = new HashSet<CommandHandlerBase>(sActiveCommandSet);
+        for (CommandHandlerBase cmd : currentActiveCommandSet) {
             try {
                 cmd.deactivate();
             } catch (Exception e) {
