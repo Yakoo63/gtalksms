@@ -131,6 +131,7 @@
     <string name="chat_help_bt_off">turn off the bluetooth adapter.</string>
     <string name="chat_help_bt_on">turn on the bluetooth adapter.</string>
     <string name="chat_help_bt_state">give the current state of the bluetooth adapter.</string>
+    <string name="chat_help_call">call the specified contact.</string>
     <string name="chat_help_calls">display call log. The number argument is optional</string>
     <string name="chat_help_camera">take a photo and store it in the picture directory.</string>
     <string name="chat_help_camera_email">take a photo, store it and send it by email.</string>

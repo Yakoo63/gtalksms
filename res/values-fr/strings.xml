@@ -131,6 +131,7 @@
     <string name="chat_help_bt_off">Désactive le composant bluetooth.</string>
     <string name="chat_help_bt_on">Active le composant bluetooth.</string>
     <string name="chat_help_bt_state">Donne l\'état du composant bluetooth.</string>
+    <string name="chat_help_call">Appelle le numéro du contact spécifié.</string>
     <string name="chat_help_calls">Affiche l\'historique d\'appels.</string>
     <string name="chat_help_camera">Prend une photo et l\'enregistre dans le répertoire des photos.</string>
     <string name="chat_help_camera_email">Prend une photo, l\'enregistre et l\'envoie par email.</string>

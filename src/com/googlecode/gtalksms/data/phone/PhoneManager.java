@@ -20,9 +20,9 @@ public class PhoneManager {
     }
 
     /** Dial a phone number */
-    public Boolean Dial(String number) {
+    public Boolean Dial(String number, boolean makeTheCall) {
         try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + number));
+            Intent intent = new Intent(makeTheCall ? Intent.ACTION_CALL : Intent.ACTION_VIEW, Uri.parse("tel:" + number));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             _context.startActivity(intent);
             return true;

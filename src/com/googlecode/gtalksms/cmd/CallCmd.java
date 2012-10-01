@@ -30,7 +30,7 @@ public class CallCmd extends CommandHandlerBase {
     private ContactsResolver mContactsResolver = null;
         
     public CallCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_CONTACTS, "Call", new Cmd("calls"), new Cmd("dial"), new Cmd("ignore"), new Cmd("reject"));
+        super(mainService, CommandHandlerBase.TYPE_CONTACTS, "Call", new Cmd("calls"), new Cmd("dial"), new Cmd("call"), new Cmd("ignore"), new Cmd("reject"));
         _phoneMgr = new PhoneManager(sContext);
         mTelephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
         mContactsResolver = ContactsResolver.getInstance(sContext);
@@ -59,7 +59,9 @@ public class CallCmd extends CommandHandlerBase {
     @Override
     protected void execute(String cmd, String args) {
         if (isMatchingCmd("dial", cmd)) {
-            dial(args);
+            dial(args, false);
+        } else if (isMatchingCmd("call", cmd)) {
+            dial(args, true);
         } else if (isMatchingCmd("calls", cmd)) {
             readCallLogs(args);
         } else if (isMatchingCmd("ignore", cmd)) {
@@ -100,12 +102,12 @@ public class CallCmd extends CommandHandlerBase {
     }
     
     /** dial the specified contact */
-    private void dial(String contactInformation) {
+    private void dial(String contactInformation, boolean makeTheCall) {
         if (contactInformation.equals("")) {
             String lastRecipient = RecipientCmd.getLastRecipientNumber();
             String lastRecipientName = RecipientCmd.getLastRecipientName();
             if (lastRecipient != null) {
-                doDial(lastRecipientName, lastRecipient);
+                doDial(lastRecipientName, lastRecipient, makeTheCall);
             } else {
                 // TODO l18n
                 send("error: last recipient not set");
@@ -116,14 +118,14 @@ public class CallCmd extends CommandHandlerBase {
             if (resolvedContact == null) {
                 send(R.string.chat_no_match_for, contactInformation);
             } else if (resolvedContact.isDistinct()) {
-                doDial(resolvedContact.getName(), resolvedContact.getNumber());
+                doDial(resolvedContact.getName(), resolvedContact.getNumber(), makeTheCall);
             } else if (!resolvedContact.isDistinct()) {
                 askForMoreDetails(resolvedContact.getCandidates());
             }
         }
     }
 
-    private void doDial(String name, String number) {
+    private void doDial(String name, String number, boolean makeTheCall) {
         if (number != null) {
             send(R.string.chat_dial, name + " (" + number + ")");
         } else {
@@ -131,7 +133,7 @@ public class CallCmd extends CommandHandlerBase {
         }
 
         // check if the dial is successful
-        if (!_phoneMgr.Dial(number)) {
+        if (!_phoneMgr.Dial(number, makeTheCall)) {
             send(R.string.chat_error_dial);
         }
     }
@@ -177,6 +179,7 @@ public class CallCmd extends CommandHandlerBase {
     protected void initializeSubCommands() {
         mCommandMap.get("calls").setHelp(R.string.chat_help_calls, "#count#");
         mCommandMap.get("dial").setHelp(R.string.chat_help_dial, "#contact#");
+        mCommandMap.get("call").setHelp(R.string.chat_help_call, "#contact#");
         mCommandMap.get("reject").setHelp(R.string.chat_help_reject, null);
         mCommandMap.get("ignore").setHelp(R.string.chat_help_ignore, null);
     }
