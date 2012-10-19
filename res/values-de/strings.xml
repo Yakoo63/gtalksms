@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="android_version_incompatible">Die verwendete Android version ist nicht kompatibel, es wird mindestens %s benötigt.</string>
     <string name="panel_buddies">Kontakte</string>
     <string name="panel_buddies_add_hint">buddy@jabber.org</string>
     <string name="panel_buddies_add_button">Hinzufügen</string>
@@ -130,6 +131,7 @@
     <string name="chat_help_bt_off">Deaktiviert Bluetooth.</string>
     <string name="chat_help_bt_on">Aktiviert Bluetooth.</string>
     <string name="chat_help_bt_state">Zeigt den aktuellen Bluetooth Status an.</string>
+    <string name="chat_help_call">Ruft den Kontakt an.</string>
     <string name="chat_help_calls">Zeigt die Anrufeliste an. Optional kann die Anzal der Einträge angegeben werden</string>
     <string name="chat_help_camera">Macht ein Foto und speichert es.</string>
     <string name="chat_help_camera_email">Macht ein Foto und sendet es per E-Mail.</string>
