@@ -34,10 +34,12 @@ import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.MainService.LocalBinder;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.panels.tabs.BuddiesTabFragment;
 import com.googlecode.gtalksms.panels.tabs.CommandsTabFragment;
+import com.googlecode.gtalksms.panels.tabs.ConnectionStatusTabFragment;
 import com.googlecode.gtalksms.panels.tabs.ConnectionTabFragment;
 import com.googlecode.gtalksms.panels.tabs.HelpTabFragment;
 import com.googlecode.gtalksms.tools.StringFmt;
@@ -98,6 +100,7 @@ public class MainActivity extends SherlockFragmentActivity {
     private BuddiesTabFragment mBuddiesTabFragment = new BuddiesTabFragment();
     private CommandsTabFragment mCommandsTabFragment = new CommandsTabFragment();
     private HelpTabFragment mHelpTabFragment = new HelpTabFragment();
+    private ConnectionStatusTabFragment mConnectionStatusTabFragment = new ConnectionStatusTabFragment();
     private ArrayList<SherlockFragment> mFragments = new ArrayList<SherlockFragment>();
     
     private BroadcastReceiver mXmppreceiver = new BroadcastReceiver() {
@@ -119,13 +122,17 @@ public class MainActivity extends SherlockFragmentActivity {
     
     private ServiceConnection mMainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            mMainService = ((MainService.LocalBinder) service).getService();
+            LocalBinder binder = (LocalBinder) service;
+            MainService mainService = binder.getService();
+            mMainService = mainService;
             mMainService.updateBuddies();
             updateStatus(mMainService.getConnectionStatus());
+            mConnectionStatusTabFragment.setMainService(mainService);
         }
 
         public void onServiceDisconnected(ComponentName className) {
             mMainService = null;
+            mConnectionStatusTabFragment.unsetMainService();
         }
     };
 
@@ -190,6 +197,7 @@ public class MainActivity extends SherlockFragmentActivity {
         mFragments.add(mHelpTabFragment);
         mFragments.add(mBuddiesTabFragment);
         mFragments.add(mCommandsTabFragment);
+        mFragments.add(mConnectionStatusTabFragment);
         
         mPager.setAdapter(new TabAdapter(getSupportFragmentManager(), mActionBar, mFragments));
        
@@ -274,12 +282,14 @@ public class MainActivity extends SherlockFragmentActivity {
         
         boolean b1 = removeTab(getString(R.string.panel_buddies));
         boolean b2 = removeTab(getString(R.string.panel_commands));
+        boolean b3 = removeTab("ConnectionStatus"); // TODO to resource
         
         if (status == XmppManager.CONNECTED) {
             mCommandsTabFragment.updateCommands();
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_buddies)).setTabListener(new TabListener(mPager, 2)));
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_commands)).setTabListener(new TabListener(mPager, 3)));
-        } else if (b1 || b2) {
+            mActionBar.addTab(mActionBar.newTab().setText("ConnectionStatus").setTabListener(new TabListener(mPager, 4)));
+        } else if (b1 || b2 || b3) {
             mActionBar.setSelectedNavigationItem(0);
             mPager.setCurrentItem(0);
         }

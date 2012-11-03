@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/sendPing"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ping" />
+
+    <ImageView
+        android:id="@+id/pingState"
+        android:layout_width="35dip"
+        android:layout_height="35dip"
+        android:layout_marginTop="3dip"
+        android:src="@drawable/buddy_available"
+        android:scaleType="centerInside"
+        android:paddingLeft="10dip" />
+    
+    <TextView
+        android:id="@+id/pingTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="time" 
+        />
+
+    <TextView
+        android:id="@+id/pingDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="date" 
+        />
+
+</LinearLayout>

@@ -734,6 +734,10 @@ public class XmppManager {
         return mConnection != null && mConnection.isConnected();
     }
     
+    public PingManager getPingManger() {
+        return mPingManager;
+    }
+    
     public void registerConnectionChangeListener(XmppConnectionChangeListener listener) {
         mConnectionChangeListeners.add(listener);
     }

@@ -78,7 +78,10 @@ public class PingManager {
     
     // Ping Flood protection
     private long pingMinDelta = 100;
-    private long lastPingStamp = 0;
+    private long lastPingStamp = 0; // timestamp of the last received ping
+    
+    // Last server pong timestamp if a ping request manually
+    private long lastServerPingStamp = -1;
     
     private PingManager(Connection connection) {
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(connection);
@@ -207,7 +210,7 @@ public class PingManager {
      * 
      * If we receive as response, we can be sure that it came from the server.
      * 
-     * @return True if successful, otherwise false
+     * @return true if successful, otherwise false
      */
     public boolean pingMyServer(long pingTimeout) {
         IQ result = ping(connection.getServiceName(), pingTimeout);
@@ -218,10 +221,16 @@ public class PingManager {
             }
             return false;
         }
-        
+        lastServerPingStamp = System.currentTimeMillis();
         return true;
     }
     
+    /**
+     * Pings the user's server with the PacketReplyTimeout as defined
+     * in SmackConfiguration.
+     * 
+     * @return true if successful, otherwise false
+     */
     public boolean pingMyServer() {
         return pingMyServer(SmackConfiguration.getPacketReplyTimeout());
     }
@@ -251,11 +260,11 @@ public class PingManager {
      * @return
      */
     public long getLastSuccessfulPing() {
-        if (serverPingTask == null) {
-            return -1;
-        } else {
-            return serverPingTask.getLastSucessfulPing();
+        long taskLastSuccessfulPing = -1;
+        if (serverPingTask != null) {
+            taskLastSuccessfulPing = serverPingTask.getLastSucessfulPing();
         }
+        return Math.max(taskLastSuccessfulPing, lastServerPingStamp);
     }
     
     protected Set<PingFailedListener> getPingFailedListeners() {

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.ping.PingManager;
 
 import android.support.v4.app.NotificationCompat;
 import android.app.PendingIntent;
@@ -338,6 +339,10 @@ public class MainService extends Service {
     public boolean getCompressionStatus() {
         // null check necessary
         return sXmppMgr == null ? false : sXmppMgr.getCompressionStatus();
+    }
+    
+    public PingManager getPingManager() {
+        return sXmppMgr == null ? null : sXmppMgr.getPingManger();
     }
 
     public void updateBuddies() {

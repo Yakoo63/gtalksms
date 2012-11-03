@@ -37,7 +37,7 @@ public class HelpTabFragment extends SherlockFragment {
         }
     }
     
-    private HashMap<URL, String> mUrlMap;
+    private volatile HashMap<URL, String> mUrlMap;
     
     private class AboutUrlToStringDownloader extends UrlToStringDownloader {
         protected void onPostExecute(HashMap<URL, String> result) {
