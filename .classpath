@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="lib" path="libs/jzlib-1.07.jar" sourcepath="libs/jzlib-1.0.7.zip"/>
-	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="libs/asmack-android-7.jar" sourcepath="libs-sources/asmack-android-7-source.zip">
 		<attributes>
@@ -12,5 +10,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/GoogleAdMobAdsSdk-6.1.0.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
