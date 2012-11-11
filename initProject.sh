@@ -12,6 +12,4 @@ else
 fi
 
 cp $FDIR/abs-build.xml $ABSDIR/build.xml
-cp $FDIR/abs-AndroidManifest.xml $ABSDIR/AndroidManifest.xml
-cp $FDIR/abs-project.properties $ABSDIR/project.properties
 cp $FDIR/abs-dot-project $ABSDIR/.project
