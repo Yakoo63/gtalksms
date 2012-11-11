@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 
@@ -63,12 +64,14 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
 
         mSendPingButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                Log.d("Send ping button pressed");
                 if (mPingMyServerAsyncTask != null) {
                     AsyncTask.Status status = mPingMyServerAsyncTask.getStatus();
                     switch (status) {
                     case PENDING:
                     case RUNNING:
                         // no action if there is already an AsyncTask running
+                        Log.d("No ping action, since there is a ping async task pending");
                         return;
                     default:
                         break;
@@ -77,6 +80,7 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
                 
                 PingManager pingManager = maybeGetPingManager();
                 if (pingManager == null) {
+                    Log.d("pingManager was null when send ping button was pressed");
                     return;
                 }
                 
@@ -128,7 +132,9 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
             }
             
             PingManager pingManager = params[0];
+            Log.d("Issuing pingMyServer in PingMyServerAsyncTask");
             Boolean res = pingManager.pingMyServer();
+            Log.d("Ping result was " + res);
             
             return res;
         }
