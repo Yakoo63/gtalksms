@@ -119,13 +119,15 @@ public class LocationService extends Service {
             }
         }
 
-        if (intent.getAction().equals(STOP_SERVICE)) {
-            destroy();
-            stopSelf();
-            return;
+        if (intent != null) {
+            if (intent.getAction().equals(STOP_SERVICE)) {
+                destroy();
+                stopSelf();
+                return;
+            }
+
+            answerTo = intent.getStringExtra("to");
         }
-        
-        answerTo = intent.getStringExtra("to");
         
         // try to enable the GPS
         if (!getGPSStatus()) {
