@@ -19,9 +19,9 @@ import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.UrlToStringDownloader;
 
 public class HelpTabFragment extends SherlockFragment {
-    private static final String AUTHORS_URL = "http://gtalksms.googlecode.com/hg/AUTHORS";
-    private static final String DONORS_URL = "http://gtalksms.googlecode.com/hg/Donors";
-    private static final String CHANGELOG_URL = "http://gtalksms.googlecode.com/hg/Changelog";
+    private static final String AUTHORS_URL = "http://gtalksms.googlecode.com/git/AUTHORS";
+    private static final String DONORS_URL = "http://gtalksms.googlecode.com/git/Donors";
+    private static final String CHANGELOG_URL = "http://gtalksms.googlecode.com/git/Changelog";
     
     private static URL[] sUrls;
     private TextView mTextViewConsole;
