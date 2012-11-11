@@ -28,6 +28,7 @@
     <string name="panel_connection_button_disconnect">Se déconnecter</string>
     <string name="panel_connection_button_disconnecting">Déconnexion&#8230;</string>
     <string name="panel_connection_button_waiting">Attente&#8230;</string>
+    <string name="panel_connectionstatus">TODO: Connection Status</string>
     <string name="panel_main_adfree_version">Enlever la Pub</string>
     <string name="panel_main_paypal">Donner via Paypal</string>
     <string name="about_authors">Auteurs</string>

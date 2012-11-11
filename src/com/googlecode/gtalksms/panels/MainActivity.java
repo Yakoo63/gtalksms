@@ -282,13 +282,13 @@ public class MainActivity extends SherlockFragmentActivity {
         
         boolean b1 = removeTab(getString(R.string.panel_buddies));
         boolean b2 = removeTab(getString(R.string.panel_commands));
-        boolean b3 = removeTab("ConnectionStatus"); // TODO to resource
+        boolean b3 = removeTab(getString(R.string.panel_connectionstatus)); // TODO to resource
         
         if (status == XmppManager.CONNECTED) {
             mCommandsTabFragment.updateCommands();
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_buddies)).setTabListener(new TabListener(mPager, 2)));
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_commands)).setTabListener(new TabListener(mPager, 3)));
-            mActionBar.addTab(mActionBar.newTab().setText("ConnectionStatus").setTabListener(new TabListener(mPager, 4)));
+            mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_connectionstatus)).setTabListener(new TabListener(mPager, 4)));
         } else if (b1 || b2 || b3) {
             mActionBar.setSelectedNavigationItem(0);
             mPager.setCurrentItem(0);
