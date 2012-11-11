@@ -29,7 +29,7 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
     private TextView mPingTime;
     private TextView mPingDate;
     
-    private MainService mMainService;
+    private volatile MainService mMainService;
     
     private PingMyServerAsyncTask mPingMyServerAsyncTask;
 
@@ -103,6 +103,7 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
     
     private PingManager maybeGetPingManager() {
         if (mMainService == null) {
+            Log.d("maybeGetPingManager: MainService was null");
             return null;
         } else {
             return mMainService.getPingManager();
