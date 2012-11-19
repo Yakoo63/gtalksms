@@ -335,4 +335,12 @@ public class Tools {
         (ip >> 16 & 0xff),
         (ip >> 24 & 0xff));
     }
+
+    public static String STMArrayToString(StackTraceElement[] stma) {
+        String res = "";
+        for (StackTraceElement e : stma) {
+            res += (e.toString() + '\n');
+        }
+        return res;
+    }
 }

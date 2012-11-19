@@ -33,9 +33,11 @@ import com.actionbarsherlock.view.Window;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.MainService.LocalBinder;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.panels.tabs.BuddiesTabFragment;
 import com.googlecode.gtalksms.panels.tabs.CommandsTabFragment;
@@ -122,6 +124,7 @@ public class MainActivity extends SherlockFragmentActivity {
     
     private ServiceConnection mMainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("MainActivity: MainService connected");
             LocalBinder binder = (LocalBinder) service;
             MainService mainService = binder.getService();
             mMainService = mainService;
@@ -131,6 +134,7 @@ public class MainActivity extends SherlockFragmentActivity {
         }
 
         public void onServiceDisconnected(ComponentName className) {
+            Log.d("mainActivity: MainService disconnected");
             mMainService = null;
             mConnectionStatusTabFragment.unsetMainService();
         }
@@ -153,6 +157,8 @@ public class MainActivity extends SherlockFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         this.setTheme(com.actionbarsherlock.R.style.Theme_Sherlock);
         super.onCreate(savedInstanceState);
+        
+        Log.initialize(SettingsManager.getSettingsManager(getApplicationContext()));
         
         setTitle(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -209,26 +215,28 @@ public class MainActivity extends SherlockFragmentActivity {
             }
         }); 
     }
-       
+
     @Override
-    public void onPause() {
-        super.onPause();
-        
+    public void onStop() {
+        super.onStop();
+
+        Log.d("MainActivity: onStop()");
         unbindService(mMainServiceConnection);
         unregisterReceiver(mXmppreceiver);
     }
     
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
 
+        Log.d("MainActivity: onSart()");
         IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_PRESENCE_CHANGED);
         intentFilter.addAction(MainService.ACTION_XMPP_CONNECTION_CHANGED);
         registerReceiver(mXmppreceiver, intentFilter);
         Intent intent = new Intent(MainService.ACTION_CONNECT);
         bindService(intent, mMainServiceConnection, Context.BIND_AUTO_CREATE);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add("Settings").setIcon(R.drawable.ic_menu_preferences).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);

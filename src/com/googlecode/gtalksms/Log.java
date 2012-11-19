@@ -11,7 +11,9 @@ public class Log {
     
     private static boolean checkSettings() {
         if (sSettingsMgr == null) {
-            android.util.Log.e(Tools.LOG_TAG, "Using log without initialize settings manager. " + Thread.currentThread().getStackTrace());
+            StackTraceElement[] stm = Thread.currentThread().getStackTrace();
+            String stmString = Tools.STMArrayToString(stm);
+            android.util.Log.e(Tools.LOG_TAG, "Using log without initialize settings manager. " + stmString);
             return false;
         }
         
