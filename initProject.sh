@@ -3,6 +3,10 @@
 FDIR='files'
 ABSDIR='external-libs/ActionBarSherlock/library'
 
+if [ ! -d $ABSDIR ] ; then
+    git submodule update --init --recursive || exit 1
+fi
+
 if [ -f local.properties ] ; then
     cp local.properties $ABSDIR/
 else
