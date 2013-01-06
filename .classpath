@@ -9,7 +9,6 @@
 			<attribute name="javadoc_location" value="http://www.igniterealtime.org/builds/smack/docs/latest/javadoc/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/GoogleAdMobAdsSdk-6.1.0.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="bin/classes"/>

@@ -30,9 +30,6 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.MainService.LocalBinder;
@@ -178,12 +175,6 @@ public class MainActivity extends SherlockFragmentActivity {
         if (Tools.isDonateAppInstalled(getBaseContext())) {
             findViewById(R.id.StatusBar).setVisibility(View.GONE);
         } else {
-            AdView adView = new AdView(this, AdSize.BANNER, "a14e5a583244738");
-            adView.loadAd(new AdRequest());
-            
-            LinearLayout adsLayout = (LinearLayout) findViewById(R.id.AdsLayout);
-            adsLayout.addView(adView);
-
             TextView marketLink = (TextView) findViewById(R.id.MarketLink);
             marketLink.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
