@@ -28,7 +28,7 @@
     <string name="panel_connection_button_disconnect">Se déconnecter</string>
     <string name="panel_connection_button_disconnecting">Déconnexion&#8230;</string>
     <string name="panel_connection_button_waiting">Attente&#8230;</string>
-    <string name="panel_connectionstatus">TODO: Connection Status</string>
+    <string name="panel_connectionstatus">Service</string>
     <string name="panel_main_adfree_version">Enlever la Pub</string>
     <string name="panel_main_paypal">Donner via Paypal</string>
     <string name="about_authors">Auteurs</string>
@@ -36,7 +36,7 @@
     <string name="about_donate_string">N\'hésitez pas à acheter la version de donation si vous appréciez l\'application :) Vous pouvez aussi donnez via Paypal:\n</string>
     <string name="about_donate_market">\tDonner via Google Market\n\n</string>
     <string name="about_donate_paypal">\tDonner via Paypal\n</string>
-    <string name="about_donors">Doneurs</string>
+    <string name="about_donors">Donateurs</string>
     <string name="about_help">\n\nSi vous ne trouvez pas les réponses sur le site, n\'hésitez pas à envoyer un mail à:\n</string>
     <string name="about_panel">A propos de GTalkSMS</string>
     <string name="about_rate_help">\nNotez l\'application sur le Google Market:\n\</string>
