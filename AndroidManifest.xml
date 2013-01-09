@@ -61,9 +61,6 @@
         <activity android:name="com.googlecode.gtalksms.panels.Preferences"
                   android:label="@string/preference_panel">
         </activity>
-        <activity android:name="com.googlecode.gtalksms.panels.About"
-                  android:label="@string/about_panel">
-        </activity>
         <activity android:name="com.googlecode.gtalksms.panels.LogCollector"/>
         <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService" android:exported="false">
             <intent-filter>
