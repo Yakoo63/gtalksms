@@ -1,11 +1,5 @@
 package com.googlecode.gtalksms;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.jivesoftware.smack.AndroidConnectionConfiguration;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -27,13 +21,9 @@ import org.jivesoftware.smackx.MultipleRecipientManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.packet.StreamInitiation.File;
 import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
-
-import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.os.Handler;
 
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
@@ -410,10 +400,7 @@ public class XmppManager {
             public void connectionClosedOnError(Exception e) {
                 // this happens mainly because of on IOException
                 // eg. connection timeouts because of lost connectivity
-                Log.w("xmpp disconnected due to error: ", e);
-                if (e.getMessage().startsWith("Attr.value missing")) {
-                    Log.w((android.util.Log.getStackTraceString(e)));
-                }
+                Log.d("xmpp disconnected due to error: ", e);
                 // We update the state to disconnected (mainly to cleanup listeners etc)
                 // then schedule an automatic reconnect.
                 maybeStartReconnect();
