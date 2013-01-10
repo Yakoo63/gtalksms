@@ -68,7 +68,7 @@
                 <action android:name="com.googlecode.gtalksms.action.DISCONNECT" />
                 <action android:name="com.googlecode.gtalksms.action.TOGGLE" />
                 <action android:name="com.googlecode.gtalksms.action.SEND" />
-                <action android:name="com.googlecode.gtalksms.action.NETWORK_CHANGED" />
+                <action android:name="com.googlecode.gtalksms.action.NETWORK_STATUS_CHANGED" />
                 <action android:name="com.googlecode.gtalksms.action.COMMAND" />
             </intent-filter>
         </service>

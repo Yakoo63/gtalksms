@@ -55,6 +55,7 @@ import com.googlecode.gtalksms.cmd.UrlsCmd;
 import com.googlecode.gtalksms.cmd.WifiCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainActivity;
+import com.googlecode.gtalksms.receivers.NetworkConnectivityReceiver;
 import com.googlecode.gtalksms.receivers.PublicIntentReceiver;
 import com.googlecode.gtalksms.receivers.StorageLowReceiver;
 import com.googlecode.gtalksms.tools.CrashedStartCounter;
@@ -78,7 +79,7 @@ public class MainService extends Service {
     // The following actions are undocumented and internal to our implementation.
     public final static String ACTION_BROADCAST_STATUS = "com.googlecode.gtalksms.action.BROADCAST_STATUS";
     public final static String ACTION_SMS_RECEIVED = "com.googlecode.gtalksms.action.SMS_RECEIVED";
-    public final static String ACTION_NETWORK_CHANGED = "com.googlecode.gtalksms.action.NETWORK_CHANGED";
+	public final static String ACTION_NETWORK_STATUS_CHANGED = "com.googlecode.gtalksms.action.NETWORK_STATUS_CHANGED";
     public final static String ACTION_SMS_SENT = "com.googlecode.gtalksms.action.SMS_SENT";
     public final static String ACTION_SMS_DELIVERED = "com.googlecode.gtalksms.action.SMS_DELIVERED";
     public final static String ACTION_WIDGET_ACTION = "com.googlecode.gtalksms.action.widget.ACTION";
@@ -204,20 +205,30 @@ public class MainService extends Service {
                 default:
                     throw new IllegalStateException("Unkown initialState while handling" + MainService.ACTION_TOGGLE);
             }
-        } else if (action.equals(ACTION_NETWORK_CHANGED)) {
-            boolean available = intent.getBooleanExtra("available", true);
-            boolean failover = intent.getBooleanExtra("failover", false);
-            Log.i("network_changed with available=" + available + ", failover=" + failover + " and when in state: " + XmppManager.statusAsString(initialState));
-            // We are in a waiting state and have a network - try to connect.
-            if (available && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
-                sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
-            } else if (!available && !failover && initialState == XmppManager.CONNECTED) {
-                // We are connected but the network has gone down - disconnect
-                // and go into WAITING state so we auto-connect when we get a future
-                // notification that a network is available.
-                sXmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
-            }
-        }
+		} else if (action.equals(ACTION_NETWORK_STATUS_CHANGED)) {
+			boolean networkChanged = intent.getBooleanExtra("networkChanged", false);
+			boolean connectedOrConnecting = intent.getBooleanExtra("connectedOrConnecting", true);
+			boolean connected = intent.getBooleanExtra("connected", true);
+			Log.i("NETWORK_CHANGED networkChanged=" + networkChanged + " connected=" + connected
+			        + " connectedOrConnecting=" + connectedOrConnecting + " state= "
+			        + XmppManager.statusAsString(initialState));
+
+			if (!connectedOrConnecting
+			        && (initialState == XmppManager.CONNECTED || initialState == XmppManager.CONNECTING)) {
+				// We are connected but the network has gone down - disconnect
+				// and go into WAITING state so we auto-connect when we get a future
+				// notification that a network is available.
+				sXmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
+			} else if (connected
+			        && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
+				sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+			} else if (networkChanged && initialState == XmppManager.CONNECTED) {
+				// The network has changed (WiFi <-> GSM switch) and we are connected
+				// reconnect now
+				sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+				sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+			}
+		}
 
         // Now that the connection state may has changed either because of a
         // Intent Action or because of connection changes that happened "externally"
@@ -298,7 +309,7 @@ public class MainService extends Service {
                 && !action.equals(ACTION_CONNECT)
                 && !action.equals(ACTION_DISCONNECT)
                 && !action.equals(ACTION_TOGGLE)
-                && !action.equals(ACTION_NETWORK_CHANGED)) {
+		        && !action.equals(ACTION_NETWORK_STATUS_CHANGED)) {
             Log.w("Unexpected intent: " + action);
         }
         Log.i("handled action '" + action + "' - state now: " + sXmppMgr.statusString());
@@ -369,11 +380,13 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+		NetworkConnectivityReceiver.setLastActiveNetworkName(this);
+
         sPm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         sWl = sPm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, Tools.APP_NAME + " WakeLock");
 
         sSettingsMgr = SettingsManager.getSettingsManager(this);
-
         Log.initialize(sSettingsMgr);
         Tools.setLocale(sSettingsMgr, this);
 

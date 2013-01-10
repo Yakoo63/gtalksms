@@ -13,6 +13,8 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class NetworkConnectivityReceiver extends BroadcastReceiver {
 
+    private static String lastActiveNetworkName = null;
+
     @SuppressWarnings("deprecation")
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -35,15 +37,28 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
                         + ", networkName=" + network.getTypeName());
             } 
         }
-        
-        NetworkInfo network = cm.getActiveNetworkInfo();
-        if (network != null && MainService.IsRunning) {
-            Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: " + MainService.ACTION_NETWORK_CHANGED + " " + network.getTypeName());
-            Intent svcintent = new Intent(MainService.ACTION_NETWORK_CHANGED);
-            svcintent.putExtra("available", network.isConnected());
-            svcintent.putExtra("failover", network.isFailover());
-            context.startService(svcintent);
-        }
+
+		NetworkInfo network = cm.getActiveNetworkInfo();
+		if (network != null && MainService.IsRunning) {
+			String networkName = network.getTypeName();
+			boolean networkChanged = false;
+			boolean connectedOrConnecting = network.isConnectedOrConnecting();
+			boolean connected = network.isConnected();
+			if (!networkName.equals(lastActiveNetworkName)) {
+				lastActiveNetworkName = networkName;
+				networkChanged = true;
+			}
+			Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: " + MainService.ACTION_NETWORK_STATUS_CHANGED + " name="
+			        + network.getTypeName() + " changed=" + networkChanged + "connected=" + connected
+			        + " connectedOrConnecting="
+			        + connectedOrConnecting);
+
+			Intent svcintent = new Intent(MainService.ACTION_NETWORK_STATUS_CHANGED);
+			svcintent.putExtra("networkChanged", networkChanged);
+			svcintent.putExtra("connectedOrConnecting", connectedOrConnecting);
+			svcintent.putExtra("connected", connected);
+			context.startService(svcintent);
+		}
 
         network = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
         if (network.getTypeName().equals("WIFI") && network.isConnected() && prefs.getBoolean("startOnWifiConnected", false)) {
@@ -60,4 +75,12 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
             context.startService(new Intent(MainService.ACTION_DISCONNECT));
         }
     }
+
+	public static void setLastActiveNetworkName(Context ctx) {
+		ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo network = cm.getActiveNetworkInfo();
+		if (network != null) {
+			lastActiveNetworkName = network.getTypeName();
+		}
+	}
 }
