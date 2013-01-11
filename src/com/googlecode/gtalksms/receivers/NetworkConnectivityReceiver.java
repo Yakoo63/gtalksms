@@ -49,7 +49,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
 				networkChanged = true;
 			}
 			Log.d(Tools.LOG_TAG, "NetworkConnectivityReceiver: " + MainService.ACTION_NETWORK_STATUS_CHANGED + " name="
-			        + network.getTypeName() + " changed=" + networkChanged + "connected=" + connected
+			        + network.getTypeName() + " changed=" + networkChanged + " connected=" + connected
 			        + " connectedOrConnecting="
 			        + connectedOrConnecting);
 

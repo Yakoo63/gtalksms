@@ -210,7 +210,7 @@ public class MainService extends Service {
 			boolean connectedOrConnecting = intent.getBooleanExtra("connectedOrConnecting", true);
 			boolean connected = intent.getBooleanExtra("connected", true);
 			Log.i("NETWORK_CHANGED networkChanged=" + networkChanged + " connected=" + connected
-			        + " connectedOrConnecting=" + connectedOrConnecting + " state= "
+			        + " connectedOrConnecting=" + connectedOrConnecting + " state="
 			        + XmppManager.statusAsString(initialState));
 
 			if (!connectedOrConnecting
