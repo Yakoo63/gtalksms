@@ -1,3 +1,10 @@
+upcoming
+* XMPP Ping support
+* Commands can be completly disabled to save resources,  e.g. TTS (Issue 287)
+* Added "Ping Server" button (does not work always) (Issue 292)
+* Removed Google Analytics (Issue 293)
+* Initiate a call with bypassing the dialer interface (Issue 297)
+
 4.0
 * New Applications command to see or start installed applications
 * New Text To Speech command
