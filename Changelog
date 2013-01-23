@@ -19,7 +19,7 @@ upcoming
 
 3.4
 * Make use of XEP-0033 if possible
-* Fixed issue with gTalk loops (Issue 43) 
+* Fixed issue with gTalk loops (Issue 43)
 * Added delay before automatic disconnect on A/C (Issue 191)
 
 3.3
@@ -69,7 +69,7 @@ upcoming
 * Admob banner added (Just click without follow the link)
 * Current charge status in XMPP presence message
 * Donate application version becomes a key
-* GTalkSMS now backups and restores its configuration automatically 
+* GTalkSMS now backups and restores its configuration automatically
 
 1.9
 * Ringmode command added
@@ -95,7 +95,7 @@ upcoming
 1.7
 * German language added
 * Localization preference added
-* GTalkSMS can manage SMS thread as conversation per contact 
+* GTalkSMS can manage SMS thread as conversation per contact
 
 1.6
 * Add french language
