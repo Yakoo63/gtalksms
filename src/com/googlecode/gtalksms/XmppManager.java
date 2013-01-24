@@ -82,7 +82,7 @@ public class XmppManager {
     
     private List<XmppConnectionChangeListener> mConnectionChangeListeners;
     private XMPPConnection mConnection = null;
-    private PacketListener mPacketListener = null;
+	private PacketListener mPacketListener = null;
     private PingManager mPingManager = null;
     private ConnectionListener mConnectionListener = null;    
     private XmppMuc mXmppMuc;
@@ -216,9 +216,11 @@ public class XmppManager {
         mReconnectHandler.removeCallbacks(mReconnectRunnable);
 
         if (mConnection != null) {
-            if (mPacketListener != null) {
-                mConnection.removePacketListener(mPacketListener);
-            }
+			// Removing the PacketListener should not be necessary
+			// as it's also done by XMPPConnection.disconnect()
+			// but it couldn't harm anyway
+			mConnection.removePacketListener(mPacketListener);
+
             if (mConnectionListener != null) {
                 mConnection.removeConnectionListener(mConnectionListener);
             }
@@ -243,7 +245,6 @@ public class XmppManager {
                 }
             }
         }
-        mPacketListener = null; 
         mConnectionListener = null;
     }
     
