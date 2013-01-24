@@ -436,9 +436,7 @@ public class XmppManager {
             mConnection.addPacketListener(mPacketListener, filter);
 
             // It is important that we query the server for offline messages BEFORE we send the first presence stanza
-            for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
-                XmppOfflineMessages.handleOfflineMessages(mConnection, notifiedAddress, mContext);
-            }
+			XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.getNotifiedAddresses(), mContext);
         } catch (Exception e) {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
