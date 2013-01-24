@@ -18,7 +18,6 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
@@ -38,7 +37,6 @@ import android.os.Handler;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;
-import com.googlecode.gtalksms.xmpp.PresencePacketListener;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
 import com.googlecode.gtalksms.xmpp.XmppEntityCapsCache;
@@ -85,7 +83,6 @@ public class XmppManager {
     private List<XmppConnectionChangeListener> mConnectionChangeListeners;
     private XMPPConnection mConnection = null;
     private PacketListener mPacketListener = null;
-    private PacketListener mPresencePacketListener = null;
     private PingManager mPingManager = null;
     private ConnectionListener mConnectionListener = null;    
     private XmppMuc mXmppMuc;
@@ -156,7 +153,11 @@ public class XmppManager {
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         SmackConfiguration.setLocalSocks5ProxyPort(-7777);        // negative number means try next port if already in use
         
+		// Roster settings
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
+
+		mPacketListener = new ChatPacketListener(mContext);
+
         // connection can be null, it is created on demand
         mConnection = connection;
     }
@@ -221,10 +222,6 @@ public class XmppManager {
             if (mConnectionListener != null) {
                 mConnection.removeConnectionListener(mConnectionListener);
             }
-            if (mPresencePacketListener != null) {
-                mConnection.removePacketListener(mPresencePacketListener);
-            }
-            
             if (mConnection.isConnected()) {
                 // Try to disconnect
                 Thread t = new Thread(new Runnable() {
@@ -248,7 +245,6 @@ public class XmppManager {
         }
         mPacketListener = null; 
         mConnectionListener = null;
-        mPresencePacketListener = null;
     }
     
     /** 
@@ -437,12 +433,7 @@ public class XmppManager {
             informListeners(mConnection);
 
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-			mPacketListener = new ChatPacketListener(mContext);
             mConnection.addPacketListener(mPacketListener, filter);
-
-            filter = new PacketTypeFilter(Presence.class);
-            mPresencePacketListener = new PresencePacketListener(mConnection, mSettings);
-            mConnection.addPacketListener(mPresencePacketListener, filter);
 
             try {
                 mConnection.getRoster().addRosterListener(mXmppBuddies);

@@ -8,10 +8,10 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-//import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.Presence.Mode;
+import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.util.StringUtils;
 
 import android.content.Context;
@@ -36,16 +36,19 @@ public class XmppBuddies implements RosterListener {
 
     }
 
-    public void registerListener(XmppManager xmppMgr) {
-        XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
-            public void newConnection(XMPPConnection connection) {
-                sConnection = connection;
-                sRoster = connection.getRoster();
-                checkNotificationAddressRoster();
-            }
-        };
-        xmppMgr.registerConnectionChangeListener(listener);
-    }
+	public void registerListener(XmppManager xmppMgr) {
+		XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
+			public void newConnection(XMPPConnection connection) {
+				sConnection = connection;
+				sRoster = connection.getRoster();
+				checkNotificationAddressRoster();
+
+				connection.addPacketListener(new PresencePacketListener(connection, sSettings), new PacketTypeFilter(
+				        Presence.class));
+			}
+		};
+		xmppMgr.registerConnectionChangeListener(listener);
+	}
     
     public static XmppBuddies getInstance(Context ctx) {
         if (sXmppBuddies == null) {
