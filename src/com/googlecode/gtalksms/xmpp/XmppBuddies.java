@@ -45,6 +45,13 @@ public class XmppBuddies implements RosterListener {
 
 				connection.addPacketListener(new PresencePacketListener(connection, sSettings), new PacketTypeFilter(
 				        Presence.class));
+
+				try {
+					connection.getRoster().addRosterListener(XmppBuddies.this);
+					retrieveFriendList();
+				} catch (Exception ex) {
+					Log.e("Failed to setup XMPP friend list roster.", ex);
+				}
 			}
 		};
 		xmppMgr.registerConnectionChangeListener(listener);

@@ -435,14 +435,6 @@ public class XmppManager {
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
             mConnection.addPacketListener(mPacketListener, filter);
 
-            try {
-                mConnection.getRoster().addRosterListener(mXmppBuddies);
-                mConnection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
-                mXmppBuddies.retrieveFriendList();
-            } catch (Exception ex) {
-                Log.e("Failed to setup XMPP friend list roster.", ex);
-            }
-
             // It is important that we query the server for offline messages BEFORE we send the first presence stanza
             for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
                 XmppOfflineMessages.handleOfflineMessages(mConnection, notifiedAddress, mContext);
