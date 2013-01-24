@@ -437,7 +437,7 @@ public class XmppManager {
             informListeners(mConnection);
 
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-            mPacketListener = new ChatPacketListener(mConnection, mContext);
+			mPacketListener = new ChatPacketListener(mContext);
             mConnection.addPacketListener(mPacketListener, filter);
 
             filter = new PacketTypeFilter(Presence.class);
