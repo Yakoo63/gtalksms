@@ -29,7 +29,7 @@
     <string name="panel_connection_button_disconnecting">Verbindung wird getrennt&#8230;</string>
     <string name="panel_connection_button_waiting">Warte&#8230;</string>
     <string name="panel_connectionstatus">Verbindungsstatus</string>
-    <string name="panel_main_adfree_version">Zur werbefreien Version</string>
+    <string name="panel_main_adfree_version">Spenden mittels Market</string>
     <string name="panel_main_paypal">Spenden mittels PayPal</string>
     <string name="about_authors">Autoren</string>
     <string name="about_change_log">Änderungen - Changelog</string>
