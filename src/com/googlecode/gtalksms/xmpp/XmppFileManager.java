@@ -82,7 +82,7 @@ public class XmppFileManager implements FileTransferListener {
     public void fileTransferRequest(FileTransferRequest request) {
         File saveTo;
         mAnswerTo = request.getRequestor();  // set answerTo for replies and send()        
-        if (!mSettings.startWithNotifiedAddress(mAnswerTo)) { 
+        if (!mSettings.cameFromNotifiedAddress(mAnswerTo)) { 
             send(R.string.chat_file_transfer_file_rejected, mAnswerTo);
             request.reject();
             return;                

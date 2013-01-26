@@ -25,13 +25,13 @@ public class ChatPacketListener implements PacketListener {
 		Message message = (Message) packet;
 		String from = message.getFrom();
 
-		if (mSettings.startWithNotifiedAddress(from) && message.getBody() != null) {
+		if (mSettings.cameFromNotifiedAddress(from) && message.getBody() != null) {
 			Log.d("XMPP packet received - sending Intent: " + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
 			// Aquire a WakeLock just before we are about to send the intent
 			MainService.maybeAquireWakelock();
 			Tools.startSvcXMPPMsg(mCtx, message.getBody(), from);
 		} else if (mSettings.debugLog) {
-			if (!mSettings.startWithNotifiedAddress(from)) {
+			if (!mSettings.cameFromNotifiedAddress(from)) {
 				Log.i("XMPP packet received - but from address \"" + from.toLowerCase()
 	                + "\" does not match notification address \""
 	                + TextUtils.join("|", mSettings.getNotifiedAddresses())
