@@ -4,7 +4,6 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.recipientCmd.SetLastRecipientRunnable;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
-import com.googlecode.gtalksms.data.phone.Phone;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
 
 public class RecipientCmd extends CommandHandlerBase {
