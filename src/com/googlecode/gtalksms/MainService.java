@@ -243,7 +243,7 @@ public class MainService extends Service {
             }
             sXmppMgr.send(xmppMsg, intent.getStringExtra("to"));
         } else if (action.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
-            sWl.acquire();
+			maybeAquireWakelock();
             String message = intent.getStringExtra("message");
             if (message != null) {
                 handleCommandFromXMPP(message, intent.getStringExtra("from"));
@@ -845,4 +845,9 @@ public class MainService extends Service {
     public static boolean sendToServiceHandler(Intent intent) {
         return sendToServiceHandler(0, intent);
     }
+
+	public static void maybeAquireWakelock() {
+		if (!sWl.isHeld())
+			sWl.acquire();
+	}
 }

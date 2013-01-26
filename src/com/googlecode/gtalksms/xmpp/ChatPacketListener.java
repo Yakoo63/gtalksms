@@ -6,8 +6,8 @@ import org.jivesoftware.smack.packet.Packet;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;
@@ -26,20 +26,17 @@ public class ChatPacketListener implements PacketListener {
 		String from = message.getFrom();
 
 		if (mSettings.startWithNotifiedAddress(from) && message.getBody() != null) {
-			if (mSettings.debugLog) {
-				Log.i(Tools.LOG_TAG, "XMPP packet received - sending Intent: "
-				        + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
-			}
-
+			Log.d("XMPP packet received - sending Intent: " + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+			// Aquire a WakeLock just before we are about to send the intent
+			MainService.maybeAquireWakelock();
 			Tools.startSvcXMPPMsg(mCtx, message.getBody(), from);
 		} else if (mSettings.debugLog) {
 			if (!mSettings.startWithNotifiedAddress(from)) {
-				Log.i(Tools.LOG_TAG,
-				        "XMPP packet received - but from address \"" + from.toLowerCase()
-				                + "\" does not match notification address \""
-				                + TextUtils.join("|", mSettings.getNotifiedAddresses()));
+				Log.i("XMPP packet received - but from address \"" + from.toLowerCase()
+				        + "\" does not match notification address \""
+				        + TextUtils.join("|", mSettings.getNotifiedAddresses()));
 			} else if (message.getBody() == null) {
-				Log.i(Tools.LOG_TAG, "XMPP Packet received - but without body (body == null)");
+				Log.i("XMPP Packet received - but without body (body == null)");
 			}
 		}
 	}
