@@ -31,6 +31,14 @@ public class XmppMsg implements Parcelable {
         mMessage.append(msg);
     }
 
+    public XmppMsg(String msg, boolean newLine) {
+        mMainFont = DEFAULT_FONT;
+        mMessage.append(msg);
+        if (newLine) {
+        	newLine();
+        }
+    }
+
     public XmppMsg(XmppFont font) {
         mMainFont = font;
     }

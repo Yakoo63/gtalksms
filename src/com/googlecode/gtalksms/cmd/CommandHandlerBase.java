@@ -57,7 +57,6 @@ public abstract class CommandHandlerBase {
         initializeSubCommands();
         
         mIsActivated = false;
-        //updateAndReturnStatus();
     }
     
     /**
@@ -66,8 +65,8 @@ public abstract class CommandHandlerBase {
      * activated
      */
     public void activate() {
-        Map<String, CommandHandlerBase> activeCommands = sMainService.getActiveCommands();
-        Set<CommandHandlerBase> activeCommandSet = sMainService.getActiveCommandSet(); 
+        Map<String, CommandHandlerBase> activeCommands = MainService.getActiveCommands();
+        Set<CommandHandlerBase> activeCommandSet = MainService.getActiveCommandSet(); 
         
         for (Cmd c : getCommands()) {
             activeCommands.put(c.getName().toLowerCase(), this);
@@ -87,8 +86,8 @@ public abstract class CommandHandlerBase {
      * Usually issued on the stop of the MainService
      */
     public void deactivate() {
-        Map<String, CommandHandlerBase> activeCommands = sMainService.getActiveCommands();
-        Set<CommandHandlerBase> activeCommandSet = sMainService.getActiveCommandSet(); 
+        Map<String, CommandHandlerBase> activeCommands = MainService.getActiveCommands();
+        Set<CommandHandlerBase> activeCommandSet = MainService.getActiveCommandSet(); 
         
         for (Cmd c : getCommands()) {
             activeCommands.remove(c.getName().toLowerCase());
@@ -174,12 +173,12 @@ public abstract class CommandHandlerBase {
         
         if (cmd != null) {
             return cmd;
-        } else {
-            for (Cmd c : mCommandMap.values()) {
-                for (String a : c.getAlias()) {
-                    if (a.equals(name.toLowerCase())) {
-                        return c;
-                    }
+        }
+        
+        for (Cmd c : mCommandMap.values()) {
+            for (String a : c.getAlias()) {
+                if (a.equals(name.toLowerCase())) {
+                    return c;
                 }
             }
         }
@@ -281,7 +280,7 @@ public abstract class CommandHandlerBase {
      * 
      * @return Help String array, null if there is no help available
      */
-    public String[] help() {
+    public ArrayList<String> help() {
         ArrayList<String> res = new ArrayList<String>();
         
         for (Cmd c : mCommandMap.values()) {
@@ -295,11 +294,7 @@ public abstract class CommandHandlerBase {
             }
         }
         
-        if (res.size() > 0) {
-            return res.toArray(new String[res.size()]);
-        } else {
-            return null;
-        }            
+        return res;            
     }
     
     protected abstract void initializeSubCommands();
@@ -357,13 +352,13 @@ public abstract class CommandHandlerBase {
      * 
      */
     protected final void sendHelp() {
-        String[] help = help();
-        if (help == null) {
+    	ArrayList<String> help = help();
+        if (help.isEmpty()) {
             return;
         }
         
         XmppMsg msg = new XmppMsg();
-        msg.addStringArray(help);
+        msg.addStringArray(help.toArray(new String[help.size()]));
         send(msg);
     }
     

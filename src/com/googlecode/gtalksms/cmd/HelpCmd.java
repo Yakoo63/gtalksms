@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms.cmd;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,16 +40,16 @@ public class HelpCmd extends CommandHandlerBase {
         super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Help", new Cmd("?", "help"));
         
         _msg = new XmppMsg();
-        _msgAll = new XmppMsg();
-        _msgContact = new XmppMsg();
-        _msgMessage = new XmppMsg();
-        _msgGeo = new XmppMsg();
-        _msgSystem = new XmppMsg();
-        _msgCopy = new XmppMsg();
-        _msgMedia = new XmppMsg();
-        _msgCategories = new XmppMsg();
-        _msgInternal = new XmppMsg();
-            
+        
+        ArrayList<String> allHelp = new ArrayList<String>();
+        ArrayList<String> contactHelp = new ArrayList<String>();
+        ArrayList<String> messageHelp = new ArrayList<String>();
+        ArrayList<String> geoHelp = new ArrayList<String>();
+        ArrayList<String> systemHelp = new ArrayList<String>();
+        ArrayList<String> mediaHelp = new ArrayList<String>();
+        ArrayList<String> copyHelp = new ArrayList<String>();
+        ArrayList<String> internalHelp = new ArrayList<String>();
+
         String contactCmds = "";
         String messageCmds = "";
         String geoCmds = "";
@@ -56,80 +58,90 @@ public class HelpCmd extends CommandHandlerBase {
         String copyCmds = "";
         String internalCmds = "";
             
-        commands = mainService.getActiveCommands();
-        Set<CommandHandlerBase> commandSet = mainService.getActiveCommandSet();
+        commands = MainService.getActiveCommands();
+        Set<CommandHandlerBase> commandSet = MainService.getActiveCommandSet();
         
         _msg.appendLine(getString(R.string.chat_help_title));
         _msg.appendLine(format(R.string.chat_help_help, "\"help\""));
         _msg.appendLine(format(R.string.chat_help_help_all, "\"help:all\""));
-        _msg.appendLine(format(R.string.chat_help_help_categories, "\"help:categories\"", "\"help:cat\""));
-                     
-        _msgAll.append(_msg); // attach the header to the full help message
-        
+        _msg.appendLine(format(R.string.chat_help_help_categories, "\"help:categories\"", "\"help:cat\""));    
         _msg.appendLine("- " + makeBold("\"help:#command#\"") + " - " + makeBold("\"help:#category#\""));
         
         for (CommandHandlerBase c : commandSet) {
-            String[] helpLines = c.help();
-            String str = c.getCommandsAsString();
-            
+        	 String str = c.getCommandsAsString();
+        	 ArrayList<String> helpLines = c.help();
+        	       
             // do nothing if the command provides no help
-            if (helpLines == null)  { 
+            if (helpLines.isEmpty()) { 
                 if (c.mCmdType == CommandHandlerBase.TYPE_INTERNAL) {
                     internalCmds += str;
                 }
                 continue;
             }
             
-            addLinesToMsg(_msgAll, helpLines);
+            
+            allHelp.addAll(helpLines);
             
             switch (c.mCmdType) {
-            case CommandHandlerBase.TYPE_CONTACTS:
-                contactCmds += str;
-                addLinesToMsg(_msgContact, helpLines);
-                break;
-            case CommandHandlerBase.TYPE_COPY:
-                copyCmds += str;
-                addLinesToMsg(_msgCopy, helpLines);
-                break;
-            case CommandHandlerBase.TYPE_GEO:
-                geoCmds += str;
-                addLinesToMsg(_msgGeo, helpLines);
-                break;
-            case CommandHandlerBase.TYPE_MESSAGE:
-                messageCmds += str;
-                addLinesToMsg(_msgMessage, helpLines);
-                break;
-            case CommandHandlerBase.TYPE_SYSTEM:
-                systemCmds += str;
-                addLinesToMsg(_msgSystem, helpLines);
-                break;
-            case CommandHandlerBase.TYPE_MEDIA:
-                mediaCmds += str;
-                addLinesToMsg(_msgMedia, helpLines);
-                break;
-            default:
-                Log.w(Tools.LOG_TAG, "help command unkown command type");           
+                case CommandHandlerBase.TYPE_CONTACTS:
+                    contactCmds += str;
+                    contactHelp.addAll(helpLines);
+                    break;
+                case CommandHandlerBase.TYPE_COPY:
+                    copyCmds += str;
+                    copyHelp.addAll(helpLines);
+                    break;
+                case CommandHandlerBase.TYPE_GEO:
+                    geoCmds += str;
+                    geoHelp.addAll(helpLines);
+                    break;
+                case CommandHandlerBase.TYPE_MESSAGE:
+                    messageCmds += str;
+                    messageHelp.addAll(helpLines);
+                    break;
+                case CommandHandlerBase.TYPE_SYSTEM:
+                    systemCmds += str;
+                    systemHelp.addAll(helpLines);
+                    break;
+                case CommandHandlerBase.TYPE_MEDIA:
+                    mediaCmds += str;
+                    mediaHelp.addAll(helpLines);
+                    break;
+                case CommandHandlerBase.TYPE_INTERNAL:
+                    internalCmds += str;
+                    internalHelp.addAll(helpLines);
+                    break;
+                default:
+                    Log.w(Tools.LOG_TAG, "help command unkown command type");           
             }
         }
         
-        contactCmds = StringFmt.delLastChar(contactCmds, 2);
-        messageCmds = StringFmt.delLastChar(messageCmds, 2);
-        geoCmds = StringFmt.delLastChar(geoCmds, 2);
-        systemCmds = StringFmt.delLastChar(systemCmds, 2);
-        copyCmds = StringFmt.delLastChar(copyCmds, 2);
-        mediaCmds = StringFmt.delLastChar(mediaCmds, 2);
-        internalCmds = StringFmt.delLastChar(internalCmds, 2);
+        _msgAll = new XmppMsg(getString(R.string.chat_help_title), true);
+        _msgContact = new XmppMsg(getString(R.string.chat_help_title), true);
+        _msgMessage = new XmppMsg(getString(R.string.chat_help_title), true);
+        _msgGeo = new XmppMsg(getString(R.string.chat_help_title), true);
+        _msgSystem = new XmppMsg(getString(R.string.chat_help_title), true);
+        _msgCopy = new XmppMsg(getString(R.string.chat_help_title), true);
+        _msgMedia = new XmppMsg(getString(R.string.chat_help_title), true);
+        _msgInternal = new XmppMsg(getString(R.string.chat_help_title), true);
+        _msgCategories = new XmppMsg(getString(R.string.chat_help_title), true);
         
-        _msgInternal.appendLine(makeBold("Internal commands") + ": " + internalCmds);
+        addLinesToMsg(_msgAll, allHelp);
+        addLinesToMsg(_msgContact, contactHelp);
+        addLinesToMsg(_msgMessage, messageHelp);
+        addLinesToMsg(_msgGeo, geoHelp);
+        addLinesToMsg(_msgSystem, systemHelp);
+        addLinesToMsg(_msgCopy, copyHelp);
+        addLinesToMsg(_msgMedia, mediaHelp);
+        addLinesToMsg(_msgInternal, internalHelp);
         
-        // after we have iterated over the command set, we can assemble the category message
-        _msgCategories.appendLine(getString(R.string.chat_help_title));
-        _msgCategories.appendLine("- " + makeBold("\"help:contacts\"") + ": " + contactCmds);
-        _msgCategories.appendLine("- " + makeBold("\"help:text\"") + ": " + copyCmds);               
-        _msgCategories.appendLine("- " + makeBold("\"help:geo\"") + ": " + geoCmds);
-        _msgCategories.appendLine("- " + makeBold("\"help:media\"") + ": " + mediaCmds);
-        _msgCategories.appendLine("- " + makeBold("\"help:message\"") + ": " + messageCmds);
-        _msgCategories.appendLine("- " + makeBold("\"help:system\"") + ": " + systemCmds);
+        _msgInternal.appendLine(makeBold("Internal commands") + ": " + StringFmt.delLastChar(internalCmds, 2));
+        _msgCategories.appendLine("- " + makeBold("\"help:contacts\"") + ": " + StringFmt.delLastChar(contactCmds, 2));
+        _msgCategories.appendLine("- " + makeBold("\"help:text\"") + ": " + StringFmt.delLastChar(copyCmds, 2));               
+        _msgCategories.appendLine("- " + makeBold("\"help:geo\"") + ": " + StringFmt.delLastChar(geoCmds, 2));
+        _msgCategories.appendLine("- " + makeBold("\"help:media\"") + ": " + StringFmt.delLastChar(mediaCmds, 2));
+        _msgCategories.appendLine("- " + makeBold("\"help:message\"") + ": " + StringFmt.delLastChar(messageCmds, 2));
+        _msgCategories.appendLine("- " + makeBold("\"help:system\"") + ": " + StringFmt.delLastChar(systemCmds, 2));
     }
 
     @Override
@@ -137,8 +149,8 @@ public class HelpCmd extends CommandHandlerBase {
         if (args.equals("all")) {
             send(_msgAll);
         } else if (commands.containsKey(args)) {
-            String[] helpLines = commands.get(args).help();
-            if (helpLines != null) {
+        	ArrayList<String> helpLines = commands.get(args).help();
+            if (!helpLines.isEmpty()) {
                 XmppMsg helpMsg = new XmppMsg();
                 addLinesToMsg(helpMsg, helpLines);
                 send(helpMsg);
@@ -171,10 +183,16 @@ public class HelpCmd extends CommandHandlerBase {
      * @param msg
      * @param lines - can be null
      */
-    private static final void addLinesToMsg(XmppMsg msg, String[] lines) {
-        if (lines == null) return;
-        for (String line : lines) 
+    private static final void addLinesToMsg(XmppMsg msg, ArrayList<String> lines) {
+        if (lines == null) {
+        	return;
+        }
+        
+        Collections.sort(lines);
+        
+        for (String line : lines) {
             msg.appendLine(line);
+        }
     }
 
     @Override
