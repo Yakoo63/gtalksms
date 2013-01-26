@@ -32,11 +32,10 @@ public class ChatPacketListener implements PacketListener {
 			Tools.startSvcXMPPMsg(mCtx, message.getBody(), from);
 		} else if (mSettings.debugLog) {
 			if (!mSettings.startWithNotifiedAddress(from)) {
-				Log.i(Tools.LOG_TAG,
-				        "XMPP packet received - but from address \"" + from.toLowerCase()
-				                + "\" does not match notification address \""
-				                + TextUtils.join("|", mSettings.getNotifiedAddresses())
-				                + "\"");
+				Log.i("XMPP packet received - but from address \"" + from.toLowerCase()
+	                + "\" does not match notification address \""
+	                + TextUtils.join("|", mSettings.getNotifiedAddresses())
+	                + "\"");
 			} else if (message.getBody() == null) {
 				Log.i("XMPP Packet received - but without body (body == null)");
 			}
