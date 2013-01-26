@@ -112,6 +112,7 @@ public class SettingsManager {
     public boolean notifyApplicationConnection;
     public boolean formatResponses;
     public boolean showStatusIcon;
+    public boolean displayContactNumber;
     
     // geo location
     public boolean useGoogleMapUrl;
@@ -286,6 +287,7 @@ public class SettingsManager {
         smsNumber = mSharedPreferences.getInt("smsNumber", 5);
         callLogsNumber = mSharedPreferences.getInt("callLogsNumber", 10);
         formatResponses = mSharedPreferences.getBoolean("formatResponses", false);
+        displayContactNumber = mSharedPreferences.getBoolean("displayContactNumber", false);
         notifyIncomingCalls = mSharedPreferences.getBoolean("notifyIncomingCalls", false);
         displayIconIndex = mSharedPreferences.getString("displayIconIndex", "0");
         

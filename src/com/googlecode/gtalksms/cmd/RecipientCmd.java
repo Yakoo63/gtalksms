@@ -81,11 +81,7 @@ public class RecipientCmd extends CommandHandlerBase {
         if (sLastRecipientNumber == null) {
             send(R.string.chat_error_no_recipient);
         } else {
-            String contact = ContactsManager.getContactName(sContext, sLastRecipientNumber);
-            if (Phone.isCellPhoneNumber(sLastRecipientNumber) && contact.compareTo(sLastRecipientNumber) != 0) {
-                contact += " (" + sLastRecipientNumber + ")";
-            }
-            String msg = getString(R.string.chat_reply_contact, contact);
+            String msg = getString(R.string.chat_reply_contact, ContactsManager.getContactName(sContext, sLastRecipientNumber));
             if (useAnswerTo) {
                 send(msg);
             } else {

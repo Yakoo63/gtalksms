@@ -13,7 +13,7 @@
     <string name="panel_buddies_popup_button_name">Nom:</string>
     <string name="panel_buddies_popup_button_user_id">Compte:</string>
     <string name="panel_commands">Commandes</string>
-    <string name="panel_command_hint">cmd:subcmd:args</string>
+    <string name="panel_commands_hint">cmd:subcmd:args</string>
     <string name="panel_help">Aide</string>
     <string name="panel_connection">Connexion</string>
     <string name="panel_connection_notif">Compte:</string>
@@ -275,6 +275,8 @@
     <string name="pref_app_call_logs_number_help">Nombre d\'appel à afficher dans l\'historique</string>
     <string name="pref_app_connect_mainscreen">Connexion de GTalkSMS au démarrage</string>
     <string name="pref_app_connect_mainscreen_help">Connexion de GTalkSMS quand l\'écran d\'accueil est affiché</string>    
+    <string name="pref_app_display_contact_number">Afficher le N°</string>
+    <string name="pref_app_display_contact_number_help">Afficher le numéro de téléphone en plus du nom du contact</string>
     <string name="pref_app_enable_debug">Log de Debug</string>
     <string name="pref_app_enable_debug_help">Activer les log en mode Debug</string>    
     <string name="pref_app_format_responses">Formater les résultats</string>

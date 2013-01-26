@@ -264,7 +264,6 @@
     <string name="main_service_disconnecting">Disconnecting&#8230;</string>
     <string name="main_service_waiting">Waiting&#8230;</string>
     <string name="main_service_waiting_to_connect">Waiting to connect&#8230;</string>
-    <string name="main_toast_pref_not_set">Preferences not set. Please set a valid notification Address</string>
     <string name="or">&#xA0;or&#xA0;</string>
     <string name="preference_panel">Preferences</string>
     <string name="pref_all">Preferences</string>
@@ -276,6 +275,8 @@
     <string name="pref_app_call_logs_number_help">Number of call logs to show</string>
     <string name="pref_app_connect_mainscreen">Connect on GTalkSMS start</string>
     <string name="pref_app_connect_mainscreen_help">Connects GTalkSMS when the Mainscreen is shown</string>  
+    <string name="pref_app_display_contact_number">Display Phone Number</string>
+    <string name="pref_app_display_contact_number_help">Displays the phone number with the contact name</string>
     <string name="pref_app_enable_debug">Debug Log</string>
     <string name="pref_app_enable_debug_help">Enabled debug log messages, increases log verbosity</string>
     <string name="pref_app_format_responses">Format chat responses</string>

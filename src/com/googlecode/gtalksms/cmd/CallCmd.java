@@ -81,7 +81,7 @@ public class CallCmd extends CommandHandlerBase {
             callLogsNumber = sSettingsMgr.callLogsNumber;
         } else {
             try {
-            callLogsNumber = Integer.parseInt(args);
+            	callLogsNumber = Integer.parseInt(args);
             } catch (Exception e) {
                 callLogsNumber = sSettingsMgr.callLogsNumber;
             }

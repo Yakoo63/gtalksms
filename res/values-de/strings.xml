@@ -264,7 +264,6 @@
     <string name="main_service_disconnecting">Trenne...</string>
     <string name="main_service_waiting">Wartend...</string>
     <string name="main_service_waiting_to_connect">Warte auf Verbindung...</string>
-    <string name="main_toast_pref_not_set">Bitte konfigurieren sie GTalkSMS</string>
     <string name="or">&#xA0;oder&#xA0;</string>
     <string name="preference_panel">Anwendungsoptionen</string>
     <string name="pref_all">Einstellungen</string>
@@ -276,6 +275,8 @@
     <string name="pref_app_call_logs_number_help">Anzahl der auf Befehl angezeigeten Anrufe</string>
     <string name="pref_app_connect_mainscreen">Verbinde bei Anwendungsstart</string>
     <string name="pref_app_connect_mainscreen_help">Verbindet GTalkSMS automatisch wenn die Anwedung gestartet wird</string>    
+    <string name="pref_app_display_contact_number">TO TRANSLATE: Display Phone Number</string>
+    <string name="pref_app_display_contact_number_help">TO TRANSLATE: Displays the phone number with the contact name</string>
     <string name="pref_app_enable_debug">Debug Log</string>
     <string name="pref_app_enable_debug_help">Aktiviert debug log</string>  
     <string name="pref_app_format_responses">Formatiere Chat Nachrichten</string>

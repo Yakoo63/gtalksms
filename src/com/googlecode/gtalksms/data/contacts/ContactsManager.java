@@ -51,10 +51,9 @@ public class ContactsManager {
      * Tries to get the contact's display name of the specified phone number.
      * If not found, returns the argument. If there is an error or phoneNumber
      * is null, R.string.chat_call_hidden will be returned.
-     * 
      */
     public static String getContactName (Context ctx, String phoneNumber) {
-        String res;
+    	String res;
         if (phoneNumber != null) {
             try {
                 res = phoneNumber;
@@ -63,7 +62,10 @@ public class ContactsManager {
                 Cursor c = resolver.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
     
                 if (c != null && c.moveToFirst()) {
-                    res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
+                    res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);      
+                    if (SettingsManager.getSettingsManager(ctx).displayContactNumber) {
+                    	res += " " + phoneNumber;
+                    }
                     c.close();
                 }
             } catch (Exception ex) {
