@@ -47,7 +47,7 @@ public class RecipientCmd extends CommandHandlerBase {
     }
 
     private void setLastRecipientInternal(String phoneNumber) {
-        SetLastRecipientRunnable slrRunnable = new SetLastRecipientRunnable(this, phoneNumber, sSettingsMgr);
+		SetLastRecipientRunnable slrRunnable = new SetLastRecipientRunnable(this, phoneNumber, sSettingsMgr, sContext);
         if (mSetLastrecipientRunnable != null) {
             mSetLastrecipientRunnable.setOutdated();
         }
