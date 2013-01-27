@@ -264,6 +264,7 @@
     <string name="main_service_disconnecting">Disconnecting&#8230;</string>
     <string name="main_service_waiting">Waiting&#8230;</string>
     <string name="main_service_waiting_to_connect">Waiting to connect&#8230;</string>
+    <string name="main_service_notification_stop_ringing">Click here to stop the \"ring\" command</string>
     <string name="or">&#xA0;or&#xA0;</string>
     <string name="preference_panel">Preferences</string>
     <string name="pref_all">Preferences</string>

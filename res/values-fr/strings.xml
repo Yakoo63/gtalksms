@@ -264,6 +264,7 @@
     <string name="main_service_disconnecting">Déconnexion…</string>
     <string name="main_service_waiting">En attente…</string>
     <string name="main_service_waiting_to_connect">En attente de connexion…</string>
+    <string name="main_service_notification_stop_ringing">Cliquer ici pour stopper la sonnerie</string>
     <string name="or">&#xA0;ou&#xA0;</string>
     <string name="preference_panel">Préférences</string>
     <string name="pref_all">Préférences</string>

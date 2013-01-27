@@ -264,6 +264,7 @@
     <string name="main_service_disconnecting">Trenne...</string>
     <string name="main_service_waiting">Wartend...</string>
     <string name="main_service_waiting_to_connect">Warte auf Verbindung...</string>
+    <string name="main_service_notification_stop_ringing">TO TRANSLATE: Click here to stop the \"ring\" command</string>
     <string name="or">&#xA0;oder&#xA0;</string>
     <string name="preference_panel">Anwendungsoptionen</string>
     <string name="pref_all">Einstellungen</string>

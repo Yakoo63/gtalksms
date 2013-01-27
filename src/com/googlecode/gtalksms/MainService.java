@@ -9,6 +9,8 @@ import java.util.Set;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ping.PingManager;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -67,8 +69,9 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class MainService extends Service {
-    public final static int ID = 1;
-
+    private final static int NOTIFICATION_CONNECTION = 1;
+    private final static int NOTIFICATION_STOP_RINGING = 2;
+    
     // The following actions are documented and registered in our manifest
     public final static String ACTION_CONNECT = "com.googlecode.gtalksms.action.CONNECT";
     public final static String ACTION_DISCONNECT = "com.googlecode.gtalksms.action.DISCONNECT";
@@ -104,13 +107,15 @@ public class MainService extends Service {
     private static boolean sListenersActive = false;
 
     private static SettingsManager sSettingsMgr;
+    private static NotificationManager sNotificationManager;
     private static XmppManager sXmppMgr;
     private static BroadcastReceiver sXmppConChangedReceiver;
     private static BroadcastReceiver sStorageLowReceiver;
     private static KeyboardInputMethod sKeyboardInputMethod;
     private static PowerManager sPm;
     private static PowerManager.WakeLock sWl;
-    private static PendingIntent sContentIntent = null;
+    private static PendingIntent sPendingIntentLaunchApplication = null;
+    private static PendingIntent sPendingIntentStopRinging = null;
 
     private static Set<CommandHandlerBase> sAvailableCommandSet = new HashSet<CommandHandlerBase>();
     private static Map<String, CommandHandlerBase> sActiveCommands = Collections.synchronizedMap(new HashMap<String, CommandHandlerBase>());
@@ -400,8 +405,15 @@ public class MainService extends Service {
 
         sUiContext = this;
 
-        sContentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
-
+        Intent intent = new Intent(MainService.ACTION_COMMAND);
+        intent.putExtra("cmd", "ring");
+        intent.putExtra("args", "stop");
+        intent.setClass(getBaseContext(), MainService.class);
+        
+        sPendingIntentStopRinging = PendingIntent.getService(getBaseContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        sPendingIntentLaunchApplication = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
+        sNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        
         Log.i("onCreate(): service thread created - IsRunning is set to true");
         IsRunning = true;
 
@@ -609,11 +621,34 @@ public class MainService extends Service {
                     break;
             }
         } catch (Exception e) {
+            Log.e("Failed to retrieve Image Status: color=" + color + ", index=" + index + ". Ex: ", e);
         }
 
         return res;
     }
 
+    /**
+     * Displays an notification in the status bar to send the command ring:stop
+     */
+    public void displayRingingNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setWhen(System.currentTimeMillis());
+        builder.setContentTitle(Tools.APP_NAME);
+        builder.setContentText(getString(R.string.main_service_notification_stop_ringing));
+        builder.setSmallIcon(R.drawable.ring_0);
+        builder.setContentIntent(sPendingIntentStopRinging);
+        builder.setOngoing(true);
+        
+        sNotificationManager.notify(NOTIFICATION_STOP_RINGING, builder.getNotification());
+    }
+    
+    /**
+     * Hides the stop ringing notification
+     */
+    public void hideRingingNotification() {
+        sNotificationManager.cancel(NOTIFICATION_STOP_RINGING);
+    }
+    
     /** Updates the status about the service state (and the status bar) */
     private void onConnectionStatusChanged(int oldStatus, int status) {
         if (sSettingsMgr.showStatusIcon) {
@@ -632,7 +667,7 @@ public class MainService extends Service {
                 case XmppManager.DISCONNECTED:
                     builder.setContentText(getString(R.string.main_service_disconnected));
                     builder.setSmallIcon(getImageStatus(STATUS_ICON_RED));
-                    break;
+                	break;
                 case XmppManager.DISCONNECTING:
                     builder.setContentText(getString(R.string.main_service_disconnecting));
                     builder.setSmallIcon(getImageStatus(STATUS_ICON_ORANGE));
@@ -643,11 +678,13 @@ public class MainService extends Service {
                     builder.setSmallIcon(getImageStatus(STATUS_ICON_BLUE));
                     break;
                 default:
-                    throw new IllegalStateException("onConnectionSTatusChanged: Unkown status int");
+                    return;
             }
-            builder.setContentIntent(sContentIntent);
+            builder.setContentIntent(sPendingIntentLaunchApplication);
             builder.setContentTitle(Tools.APP_NAME);
-            startForeground(ID, builder.getNotification());
+            
+            Notification notif = builder.getNotification();
+            startForeground(NOTIFICATION_CONNECTION, notif);
         }
     }
 

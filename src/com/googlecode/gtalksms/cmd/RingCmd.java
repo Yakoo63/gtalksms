@@ -103,6 +103,11 @@ public class RingCmd extends CommandHandlerBase {
             mVibrator.vibrate(VIB_PATTERN, 0);
             res = true;
         }
+        
+        if (res == true) {
+            sMainService.displayRingingNotification();
+        }
+        
         return res;
     }
 
@@ -151,6 +156,7 @@ public class RingCmd extends CommandHandlerBase {
     public void stop() {
         clearMediaPlayer();        
         mVibrator.cancel();
+        sMainService.hideRingingNotification();
     }
 
     @Override
