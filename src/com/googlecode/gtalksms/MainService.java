@@ -581,7 +581,9 @@ public class MainService extends Service {
 
     private void executeCommand(String cmd, String args, String answerTo) {
         assert (cmd != null);
-        if (sActiveCommands.containsKey(cmd.toLowerCase())) {
+        cmd = cmd.toLowerCase();
+        
+        if (sActiveCommands.containsKey(cmd)) {
             Log.d("MainService executing command: \"" + cmd + ":" + Tools.shortenMessage(args) + "\"");
             try {
                 CommandHandlerBase exec = sActiveCommands.get(cmd);
@@ -596,6 +598,9 @@ public class MainService extends Service {
                 Log.e("executeCommand() Exception", e);
                 send(getString(R.string.chat_error, error), answerTo);
             }
+        } else if (cmd.equals("stop")) {
+            send(getString(R.string.chat_stop_actions), answerTo);
+            stopCommands();
         } else {
             send(getString(R.string.chat_error_unknown_cmd, cmd), answerTo);
         }
@@ -705,15 +710,7 @@ public class MainService extends Service {
             args = "";
         }
 
-        // Not case sensitive commands
-        command = command.toLowerCase();
-
-        if (command.equals("stop")) {
-            send(getString(R.string.chat_stop_actions), from);
-            stopCommands();
-        } else {
-            executeCommand(command, args, from);
-        }
+        executeCommand(command, args, from);
     }
 
     /**
