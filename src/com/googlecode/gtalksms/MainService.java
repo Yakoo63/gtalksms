@@ -9,7 +9,6 @@ import java.util.Set;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ping.PingManager;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -667,7 +666,7 @@ public class MainService extends Service {
                 case XmppManager.DISCONNECTED:
                     builder.setContentText(getString(R.string.main_service_disconnected));
                     builder.setSmallIcon(getImageStatus(STATUS_ICON_RED));
-                	break;
+                    break;
                 case XmppManager.DISCONNECTING:
                     builder.setContentText(getString(R.string.main_service_disconnecting));
                     builder.setSmallIcon(getImageStatus(STATUS_ICON_ORANGE));
@@ -682,9 +681,8 @@ public class MainService extends Service {
             }
             builder.setContentIntent(sPendingIntentLaunchApplication);
             builder.setContentTitle(Tools.APP_NAME);
-            
-            Notification notif = builder.getNotification();
-            startForeground(NOTIFICATION_CONNECTION, notif);
+
+            startForeground(NOTIFICATION_CONNECTION, builder.getNotification());
         }
     }
 
