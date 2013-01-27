@@ -206,6 +206,7 @@
     <string name="chat_log_unavailable">Unavailable</string>
     <string name="chat_mark_as_read">Mark %s\'s SMS as read</string>
     <string name="chat_me">Me</string>
+    <string name="chat_mms_from">MMS from %s</string>
     <string name="chat_no_call">No phone call found</string>
     <string name="chat_no_match_for">No match for \"%s\"</string>
     <string name="chat_no_sms">No SMS found</string>
