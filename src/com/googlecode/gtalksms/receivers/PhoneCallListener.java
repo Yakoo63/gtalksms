@@ -41,17 +41,13 @@ public class PhoneCallListener extends PhoneStateListener {
                 manageIncoming = true;
                 break;
             case TelephonyManager.CALL_STATE_RINGING:
-                if (settingsMgr.debugLog)
-                    Log.d(Tools.LOG_TAG, "PhoneCallListener Call State Ringing with incomingNumber=" + incomingNumber + " manageIncoming=" + manageIncoming);
+                if (settingsMgr.debugLog) {
+                	Log.d(Tools.LOG_TAG, "PhoneCallListener Call State Ringing with incomingNumber=" + incomingNumber + " manageIncoming=" + manageIncoming);
+                }
+                
                 if (manageIncoming) {
                     manageIncoming = false;
                     String contact = ContactsManager.getContactName(svc, incomingNumber);
-                    // Display the incoming number with the contact name only
-                    // if it is not null (and therefore known) and if the contact
-                    // name could be determined
-                    if ((incomingNumber != null) && !contact.equals(incomingNumber)) {
-                        contact = contact + " ( " + incomingNumber + " )";
-                    }
                     svc.send(svc.getString(R.string.chat_is_calling, contact), null);
                 }
                 break;
