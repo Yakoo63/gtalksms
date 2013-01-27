@@ -206,7 +206,7 @@
     <string name="chat_log_unavailable">Nicht verfügbar</string>
     <string name="chat_mark_as_read">SMS von %s als gelesen markiert</string>
     <string name="chat_me">Ich</string>
-    <string name="chat_mms_from">MMS von %s</string>
+    <string name="chat_mms_from">MMS von %s:&#xA0;</string>
     <string name="chat_no_call">Kein passender Anruf gefunden</string>
     <string name="chat_no_match_for">Kein Treffer für \&quot;%s\&quot;</string>
     <string name="chat_no_sms">Keine SMS Nachrichten gefunden</string>

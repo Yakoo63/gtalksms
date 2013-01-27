@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms;
 
+import android.database.Cursor;
+
 import com.googlecode.gtalksms.tools.Tools;
 
 public class Log {
@@ -57,6 +59,30 @@ public class Log {
     public static void d(String msg, Exception e) {
         if (checkSettings() && sSettingsMgr.debugLog) {
             android.util.Log.d(Tools.LOG_TAG, msg, e);
+        }
+    }
+    
+    public static void dump(Cursor cursor) {
+        for (String name: cursor.getColumnNames()) {
+            int index = cursor.getColumnIndex(name);
+            switch (cursor.getType(index))
+            {
+                case Cursor.FIELD_TYPE_NULL:
+                    Log.d("MMS: Type null   - " + name);
+                    break; 
+                case Cursor.FIELD_TYPE_INTEGER:
+                    Log.d("MMS: Type int    - " + name + "=" + cursor.getInt(index));
+                    break;
+                case Cursor.FIELD_TYPE_FLOAT:
+                    Log.d("MMS: Type float  - " + name + "=" + cursor.getFloat(index));
+                    break;
+                case Cursor.FIELD_TYPE_STRING:
+                    Log.d("MMS: Type string - " + name + "=" + cursor.getString(index));
+                    break;
+                case Cursor.FIELD_TYPE_BLOB:
+                    Log.d("MMS: Type blob   - " + name + "=" + new String(cursor.getBlob(index)));
+                    break;
+            }
         }
     }
 }
