@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms.receivers;
 
+import java.util.ArrayList;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +12,6 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.smsCmd.Mms;
 import com.googlecode.gtalksms.cmd.smsCmd.MmsManager;
-import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 
@@ -28,23 +29,16 @@ public class MmsReceiver extends BroadcastReceiver {
                     String buffer = new String(bundle.getByteArray("data"));
                     Log.d(Tools.LOG_TAG, "MMS data = " + buffer);
                 
-                    // TODO: get the sender via the SmsMmsManager
-                    int indx = buffer.indexOf("/TYPE");
-                    if (indx > 0 && (indx - 15) > 0) {
-                        int newIndx = indx - 15;
-                        String incomingNumber = buffer.substring(newIndx, indx);
-                        indx = incomingNumber.indexOf("+");
-                        if (indx > 0) {
-                            incomingNumber = ContactsManager.getContactName(context, incomingNumber.substring(indx));
-                            
-                            MmsManager mmsManager = new MmsManager(context);
-                            Mms mms = mmsManager.getLastUnreadReceivedMmsDetails();
-                            
-                            // Check if the retrieved MMS is the good one
-                            if (mms != null && mms.getId() != null && buffer.contains(mms.getId())) {
-                                context.startService(Tools.newSvcIntent(context, MainService.ACTION_SEND, 
-                                		context.getString(R.string.chat_mms_from, incomingNumber) + mms.getSubject() + "\n" + mms.getMessage(), null));
-                            }
+                    MmsManager mmsManager = new MmsManager(context);
+                    
+                    // We assume that we don't received more than 10 messages at the same time
+                    ArrayList<Mms> allMms = mmsManager.getLastReceivedMmsDetails(10);
+                    
+                    for (Mms mms: allMms) {
+                        // Check if the retrieved MMS is the good one
+                        if (mms != null && mms.getId() != null && buffer.contains(mms.getId())) {
+                            context.startService(Tools.newSvcIntent(context, MainService.ACTION_SEND, 
+                            		context.getString(R.string.chat_mms_from, mms.getSender()) + mms.getSubject() + "\n" + mms.getMessage(), null));
                         }
                     }
                 }

@@ -62,25 +62,25 @@ public class Log {
         }
     }
     
-    public static void dump(Cursor cursor) {
+    public static void dump(String prefix, Cursor cursor) {
         for (String name: cursor.getColumnNames()) {
             int index = cursor.getColumnIndex(name);
             switch (cursor.getType(index))
             {
                 case Cursor.FIELD_TYPE_NULL:
-                    Log.d("MMS: Type null   - " + name);
+                    Log.d(prefix + "Type null   - " + name);
                     break; 
                 case Cursor.FIELD_TYPE_INTEGER:
-                    Log.d("MMS: Type int    - " + name + "=" + cursor.getInt(index));
+                    Log.d(prefix + "Type int    - " + name + "=" + cursor.getInt(index));
                     break;
                 case Cursor.FIELD_TYPE_FLOAT:
-                    Log.d("MMS: Type float  - " + name + "=" + cursor.getFloat(index));
+                    Log.d(prefix + "Type float  - " + name + "=" + cursor.getFloat(index));
                     break;
                 case Cursor.FIELD_TYPE_STRING:
-                    Log.d("MMS: Type string - " + name + "=" + cursor.getString(index));
+                    Log.d(prefix + "Type string - " + name + "=" + cursor.getString(index));
                     break;
                 case Cursor.FIELD_TYPE_BLOB:
-                    Log.d("MMS: Type blob   - " + name + "=" + new String(cursor.getBlob(index)));
+                    Log.d(prefix + "Type blob   - " + name + "=" + new String(cursor.getBlob(index)));
                     break;
             }
         }

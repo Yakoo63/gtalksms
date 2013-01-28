@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -14,6 +15,7 @@ import android.net.Uri;
 
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 /**
@@ -39,51 +41,61 @@ public class MmsManager {
         Log.initialize(_settings);
     }
     
-    // TODO: To be tested with older Android's SDK
-    public Mms getLastUnreadReceivedMmsDetails() {
-        String UNREAD_CONDITION = "read = 0";
-        int count = 0;
-        Mms mms = null;
+    /**
+     * Retrieve the X last MMS
+     * TODO: To be tested with older Android's SDK
+     * 
+     * @param nbMMS Number of MMS to retrieve
+     * @return The list of MMS
+     */
+    public ArrayList<Mms> getLastReceivedMmsDetails(int nbMMS) {
+        ArrayList<Mms> allMms = new ArrayList<Mms>();
         
         // Looking for the last unread MMS
-        Cursor cursor = _context.getContentResolver().query(MMS_INBOX_CONTENT_URI, new String[] { "_id", "sub", "read", "date", "m_id"}, UNREAD_CONDITION, null, SORT_ORDER);
+        Cursor cursor = _context.getContentResolver().query(MMS_INBOX_CONTENT_URI, new String[] { "_id", "sub", "read", "date", "m_id" }, null, null, SORT_ORDER);
         if (cursor != null) {
             try {
-                count = cursor.getCount();
-                if (count > 0) {
+                if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
-                    
-                    mms = new Mms(cursor.getString(1), Tools.getDateMilliSeconds(cursor, "date"), cursor.getString(4));
-                    
-                    // Read the content of the MMS
-                    Cursor cPart = _context.getContentResolver().query(MMS_PART_CONTENT_URI, null, "mid = " + cursor.getString(0), null, null);
-                    if (cPart.moveToFirst()) {
-                        do {
-                            // Dump all fields into the logs
-                            // Log.dump(cPart);
-                            String partId = cPart.getString(cPart.getColumnIndex("_id"));
-                            String type = cPart.getString(cPart.getColumnIndex("ct"));
-                            if ("text/plain".equals(type)) {
-                                String data = cPart.getString(cPart.getColumnIndex("_data"));
-                                if (data != null) {
-                                    mms.appendMessage(getMmsText(partId));
-                                } else {
-                                    mms.appendMessage(cPart.getString(cPart.getColumnIndex("text")));
+                    int count = 0;
+                    do {
+                    	Mms mms = new Mms(cursor.getString(1), Tools.getDateMilliSeconds(cursor, "date"), cursor.getString(4), getSender(cursor.getInt(0)));
+                        
+                        // Read the content of the MMS
+                        Cursor cPart = _context.getContentResolver().query(MMS_PART_CONTENT_URI, null, "mid = " + cursor.getString(0), null, null);
+                        if (cPart.moveToFirst()) {
+                            do {
+                                // Dump all fields into the logs
+                                // Log.dump("MMS: ", cPart);
+                                String partId = cPart.getString(cPart.getColumnIndex("_id"));
+                                String type = cPart.getString(cPart.getColumnIndex("ct"));
+                                if ("text/plain".equals(type)) {
+                                    String data = cPart.getString(cPart.getColumnIndex("_data"));
+                                    if (data != null) {
+                                        mms.appendMessage(getMmsText(partId));
+                                    } else {
+                                        mms.appendMessage(cPart.getString(cPart.getColumnIndex("text")));
+                                    }
+                                } else if ("image/jpeg".equals(type) || "image/bmp".equals(type) || "image/gif".equals(type) || "image/jpg".equals(type) || "image/png".equals(type)) {
+                                    Bitmap bitmap = getMmsImage(partId);
+                                    mms.setMessage("Image Size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
+                                    mms.setBitmap(bitmap);
                                 }
-                            } else if ("image/jpeg".equals(type) || "image/bmp".equals(type) || "image/gif".equals(type) || "image/jpg".equals(type) || "image/png".equals(type)) {
-                                Bitmap bitmap = getMmsImage(partId);
-                                mms.setMessage("Image Size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
-                                mms.setBitmap(bitmap);
-                            }
-                        } while (cPart.moveToNext());
-                    }
+                            } while (cPart.moveToNext());
+                        }
+                        if (cPart != null) {
+                            cPart.close();
+                        }
+                        
+                        allMms.add(mms);
+                    } while (cursor.moveToNext() && count++ < nbMMS);
                 }
             } finally {
                 cursor.close();
             }
         }
         
-        return mms;
+        return allMms;
     }
     
     private String getMmsText(String id) {
@@ -129,26 +141,15 @@ public class MmsManager {
         return bitmap;
     }
     
-    @SuppressWarnings("unused")
-    private String getAddressNumber(int id) {
-        String selectionAdd = new String("msg_id=" + id);
+    private String getSender(int id) {
+        String selectionAdd = new String("msg_id = " + id);
         String uriStr = MessageFormat.format("content://mms/{0}/addr", id);
         Uri uriAddress = Uri.parse(uriStr);
-        Cursor cAdd = _context.getContentResolver().query(uriAddress, null, selectionAdd, null, null);
+        Cursor cAdd = _context.getContentResolver().query(uriAddress, new String[] { "address" }, selectionAdd, null, null);
         String name = null;
         if (cAdd.moveToFirst()) {
             do {
-                String number = cAdd.getString(cAdd.getColumnIndex("address"));
-                if (number != null) {
-                    try {
-                        Long.parseLong(number.replace("-", ""));
-                        name = number;
-                    } catch (NumberFormatException nfe) {
-                        if (name == null) {
-                            name = number;
-                        }
-                    }
-                }
+            	name = ContactsManager.getContactName(_context, cAdd.getString(0));
             } while (cAdd.moveToNext());
         }
         if (cAdd != null) {
