@@ -13,7 +13,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.telephony.SmsManager;
 
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
@@ -21,7 +20,7 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.smsCmd.DeliveredIntentReceiver;
 import com.googlecode.gtalksms.cmd.smsCmd.SentIntentReceiver;
 import com.googlecode.gtalksms.cmd.smsCmd.Sms;
-import com.googlecode.gtalksms.cmd.smsCmd.SmsMmsManager;
+import com.googlecode.gtalksms.cmd.smsCmd.SmsManager;
 import com.googlecode.gtalksms.data.contacts.Contact;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsResolver;
@@ -41,7 +40,7 @@ public class SmsCmd extends CommandHandlerBase {
     private static Integer sSmsID;
 
     private ContactsResolver mContactsResolver;
-    private SmsMmsManager mSmsMmsManager;
+    private SmsManager mSmsManager;
     
     // synchronizedMap because the worker thread and the intent receivers work with this map
     private static Map<Integer, Sms> mSmsMap; 
@@ -52,7 +51,7 @@ public class SmsCmd extends CommandHandlerBase {
           
     public SmsCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MESSAGE, "SMS", new Cmd("sms", "s"), new Cmd("reply", "r"), new Cmd("findsms", "fs"), new Cmd("markasread", "mar"), new Cmd("chat", "c"), new Cmd("delsms"));
-        mSmsMmsManager = new SmsMmsManager(sSettingsMgr, sContext);
+        mSmsManager = new SmsManager(sSettingsMgr, sContext);
         mSmsHelper = SMSHelper.getSMSHelper(sContext);
         mAliasHelper = AliasHelper.getAliasHelper(sContext);
         mKeyValueHelper = KeyValueHelper.getKeyValueHelper(sContext);
@@ -171,7 +170,7 @@ public class SmsCmd extends CommandHandlerBase {
                 send(R.string.chat_error_no_recipient);
             } else {
                 if (sSettingsMgr.markSmsReadOnReply) {
-                    mSmsMmsManager.markAsRead(RecipientCmd.getLastRecipientNumber());
+                    mSmsManager.markAsRead(RecipientCmd.getLastRecipientNumber());
                 }
                 sendSMS(args, RecipientCmd.getLastRecipientNumber());
             }
@@ -192,9 +191,9 @@ public class SmsCmd extends CommandHandlerBase {
     private void deleteSMS(String cmd, String search) {    
         int nbDeleted = -2;
         if (cmd.equals("all")) {
-            nbDeleted = mSmsMmsManager.deleteAllSms();
+            nbDeleted = mSmsManager.deleteAllSms();
         } else if (cmd.equals("sent")) {
-            nbDeleted = mSmsMmsManager.deleteSentSms();
+            nbDeleted = mSmsManager.deleteSentSms();
         } else if (cmd.startsWith("last")) {
             Integer number = Tools.parseInt(search);
             if (number == null) {
@@ -202,11 +201,11 @@ public class SmsCmd extends CommandHandlerBase {
             }
             
             if (cmd.equals("last")) { 
-                nbDeleted = mSmsMmsManager.deleteLastSms(number);
+                nbDeleted = mSmsManager.deleteLastSms(number);
             } else if (cmd.equals("lastin")) { 
-                nbDeleted = mSmsMmsManager.deleteLastInSms(number);
+                nbDeleted = mSmsManager.deleteLastInSms(number);
             } else if (cmd.equals("lastout")) { 
-                nbDeleted = mSmsMmsManager.deleteLastOutSms(number);
+                nbDeleted = mSmsManager.deleteLastOutSms(number);
             } else {
                 send(R.string.chat_del_sms_error);
             }
@@ -223,13 +222,13 @@ public class SmsCmd extends CommandHandlerBase {
             } else if (contacts.size() == 1) {
                 Contact contact = contacts.get(0);
                 send(R.string.chat_del_sms_from, contact.name);
-                nbDeleted = mSmsMmsManager.deleteSmsByContact(contact.rawIds);
+                nbDeleted = mSmsManager.deleteSmsByContact(contact.rawIds);
             } else {
                 send(R.string.chat_no_match_for, search);
             }
         } else if (cmd.equals("number") && search != null) {
             send(R.string.chat_del_sms_from, search);
-            nbDeleted = mSmsMmsManager.deleteSmsByNumber(search);
+            nbDeleted = mSmsManager.deleteSmsByNumber(search);
             if (nbDeleted <= 0) {
                 send(R.string.chat_no_match_for, search);
             }
@@ -285,16 +284,16 @@ public class SmsCmd extends CommandHandlerBase {
         
         // TODO There is an issue if we are looking for a number
         if (sSettingsMgr.showSentSms) {
-            sentSms = mSmsMmsManager.getAllSentSms(message);
+            sentSms = mSmsManager.getAllSentSms(message);
         }
         
         if (contacts.size() > 0) {
             send(R.string.chat_sms_search, message, contacts.size());
             
             for (Contact contact : contacts) {
-                ArrayList<Sms> smsArrayList = mSmsMmsManager.getSms(contact.rawIds, contact.name, message);
+                ArrayList<Sms> smsArrayList = mSmsManager.getSms(contact.rawIds, contact.name, message);
                 if (sentSms != null) {
-                    smsArrayList.addAll(mSmsMmsManager.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
+                    smsArrayList.addAll(mSmsManager.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
                 }
                 Collections.sort(smsArrayList);
 
@@ -382,7 +381,7 @@ public class SmsCmd extends CommandHandlerBase {
         if (rc == null) {
             // this is a special case, where the user wants to mark a message
             // with a named-operator string as read, see issue 149 
-            if (mSmsMmsManager.markAsRead(contactInformation)) {
+            if (mSmsManager.markAsRead(contactInformation)) {
                 send(R.string.chat_mark_as_read, contactInformation);
             } else {
                 send(R.string.chat_no_match_for, contactInformation);
@@ -400,7 +399,7 @@ public class SmsCmd extends CommandHandlerBase {
      * @param the name of the contact, use null if no name is known
      */
     private void markSmsAsReadByNumber(String number, String name) {
-        if (!mSmsMmsManager.markAsRead(number)) {
+        if (!mSmsManager.markAsRead(number)) {
             send("Error marking SMS as read from number: " + number);
         } else {
             // Inform the user about the success
@@ -424,7 +423,7 @@ public class SmsCmd extends CommandHandlerBase {
         ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, namePattern);
         ArrayList<Sms> sentSms = new ArrayList<Sms>();
         if (sSettingsMgr.showSentSms) {
-            sentSms = mSmsMmsManager.getAllSentSms();
+            sentSms = mSmsManager.getAllSentSms();
         }
 
         if (contacts.size() > 0) {
@@ -432,9 +431,9 @@ public class SmsCmd extends CommandHandlerBase {
             XmppMsg noSms = new XmppMsg();
             boolean hasMatch = false;
             for (Contact contact : contacts) {
-                ArrayList<Sms> smsArrayList = mSmsMmsManager.getSms(contact.rawIds, contact.name);
+                ArrayList<Sms> smsArrayList = mSmsManager.getSms(contact.rawIds, contact.name);
                 if (sSettingsMgr.showSentSms) {
-                    smsArrayList.addAll(mSmsMmsManager.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
+                    smsArrayList.addAll(mSmsManager.getSentSms(ContactsManager.getPhones(sContext, contact.ids), sentSms));
                 }
                 Collections.sort(smsArrayList);
 
@@ -470,7 +469,7 @@ public class SmsCmd extends CommandHandlerBase {
     /** reads unread SMS from all contacts */
     private void readUnreadSMS() {
 
-        ArrayList<Sms> smsArrayList = mSmsMmsManager.getAllUnreadSms();
+        ArrayList<Sms> smsArrayList = mSmsManager.getAllUnreadSms();
         XmppMsg allSms = new XmppMsg();
 
         List<Sms> smsList = Tools.getLastElements(smsArrayList, sSettingsMgr.smsNumber);
@@ -487,10 +486,10 @@ public class SmsCmd extends CommandHandlerBase {
     /** reads last (count) SMS from all contacts */
     private void readLastSMS() {
 
-        ArrayList<Sms> smsArrayList = mSmsMmsManager.getAllReceivedSms();
+        ArrayList<Sms> smsArrayList = mSmsManager.getAllReceivedSms();
 
         if (sSettingsMgr.showSentSms) {
-            smsArrayList.addAll(mSmsMmsManager.getAllSentSms());
+            smsArrayList.addAll(mSmsManager.getAllSentSms());
         }
         Collections.sort(smsArrayList);
 
@@ -529,12 +528,12 @@ public class SmsCmd extends CommandHandlerBase {
         }
         
         if (sSettingsMgr.markSmsReadOnReply) {
-            mSmsMmsManager.markAsRead(phoneNumber);
+            mSmsManager.markAsRead(phoneNumber);
         }
         
         ArrayList<PendingIntent> SentPenIntents = null;
         ArrayList<PendingIntent> DelPenIntents = null;
-        SmsManager smsManager = SmsManager.getDefault();
+        android.telephony.SmsManager smsManager = android.telephony.SmsManager.getDefault();
         ArrayList<String> messages = smsManager.divideMessage(message);
 
         if(sSettingsMgr.notifySmsSentDelivered) {
@@ -555,7 +554,7 @@ public class SmsCmd extends CommandHandlerBase {
 
         smsManager.sendMultipartTextMessage(phoneNumber, null, messages, SentPenIntents, DelPenIntents);
         RecipientCmd.setLastRecipient(phoneNumber);
-        mSmsMmsManager.addSmsToSentBox(message, phoneNumber);
+        mSmsManager.addSmsToSentBox(message, phoneNumber);
     }
     
     private ArrayList<PendingIntent> createSPendingIntents(int size, int smsID) {

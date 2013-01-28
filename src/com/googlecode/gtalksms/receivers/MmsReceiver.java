@@ -9,13 +9,13 @@ import android.util.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.smsCmd.Mms;
-import com.googlecode.gtalksms.cmd.smsCmd.SmsMmsManager;
+import com.googlecode.gtalksms.cmd.smsCmd.MmsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 
 public class MmsReceiver extends BroadcastReceiver {
-    
+	
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(Tools.LOG_TAG, "New MMS");
@@ -37,9 +37,13 @@ public class MmsReceiver extends BroadcastReceiver {
                         if (indx > 0) {
                             incomingNumber = ContactsManager.getContactName(context, incomingNumber.substring(indx));
                             
-                            Mms mms = SmsMmsManager.getMmsDetails(context);
+                            MmsManager mmsManager = new MmsManager(context);
+                            Mms mms = mmsManager.getLastUnreadReceivedMmsDetails();
+                            
+                            // Check if the retrieved MMS is the good one
                             if (mms != null && mms.getId() != null && buffer.contains(mms.getId())) {
-                                context.startService(Tools.newSvcIntent(context, MainService.ACTION_SEND, context.getString(R.string.chat_mms_from, incomingNumber) + mms.getSubject() + "\n" + mms.getMessage(), null));
+                                context.startService(Tools.newSvcIntent(context, MainService.ACTION_SEND, 
+                                		context.getString(R.string.chat_mms_from, incomingNumber) + mms.getSubject() + "\n" + mms.getMessage(), null));
                             }
                         }
                     }
