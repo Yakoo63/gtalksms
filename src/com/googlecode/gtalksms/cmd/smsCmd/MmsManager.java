@@ -16,6 +16,7 @@ import android.net.Uri;
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
+import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 /**
@@ -59,14 +60,22 @@ public class MmsManager {
                     cursor.moveToFirst();
                     int count = 0;
                     do {
-                    	Mms mms = new Mms(cursor.getString(1), Tools.getDateMilliSeconds(cursor, "date"), cursor.getString(4), getSender(cursor.getInt(0)));
+                    	Log.dump("MMS: inbox ", cursor);
+                        String subject;
+                        try {
+                    		subject = new String(cursor.getString(1).getBytes("ISO-8859-1"));
+                    	} catch (Exception e) {
+                    		subject = cursor.getString(1);
+                    	}
+                        
+                        Mms mms = new Mms(subject, Tools.getDateSeconds(cursor, "date"), cursor.getString(4), getSender(cursor.getInt(0)));
                         
                         // Read the content of the MMS
                         Cursor cPart = _context.getContentResolver().query(MMS_PART_CONTENT_URI, null, "mid = " + cursor.getString(0), null, null);
                         if (cPart.moveToFirst()) {
                             do {
                                 // Dump all fields into the logs
-                                // Log.dump("MMS: ", cPart);
+                                Log.dump("MMS: part ", cPart);
                                 String partId = cPart.getString(cPart.getColumnIndex("_id"));
                                 String type = cPart.getString(cPart.getColumnIndex("ct"));
                                 if ("text/plain".equals(type)) {
@@ -142,19 +151,22 @@ public class MmsManager {
     }
     
     private String getSender(int id) {
+    	ArrayList<String> names = new ArrayList<String>();
         String selectionAdd = new String("msg_id = " + id);
         String uriStr = MessageFormat.format("content://mms/{0}/addr", id);
         Uri uriAddress = Uri.parse(uriStr);
         Cursor cAdd = _context.getContentResolver().query(uriAddress, new String[] { "address" }, selectionAdd, null, null);
-        String name = null;
+
         if (cAdd.moveToFirst()) {
             do {
-            	name = ContactsManager.getContactName(_context, cAdd.getString(0));
+            	Log.dump("MMS: addr ", cAdd);
+                
+            	names.add(ContactsManager.getContactName(_context, cAdd.getString(0)));
             } while (cAdd.moveToNext());
         }
         if (cAdd != null) {
             cAdd.close();
         }
-        return name;
+        return StringFmt.join(names, ", ");
     }
 }

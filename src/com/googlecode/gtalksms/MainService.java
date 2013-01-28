@@ -42,6 +42,7 @@ import com.googlecode.gtalksms.cmd.GeoCmd;
 import com.googlecode.gtalksms.cmd.HelpCmd;
 import com.googlecode.gtalksms.cmd.KeyboardCmd;
 import com.googlecode.gtalksms.cmd.LogsCmd;
+import com.googlecode.gtalksms.cmd.MmsCmd;
 import com.googlecode.gtalksms.cmd.RebootCmd;
 import com.googlecode.gtalksms.cmd.RecipientCmd;
 import com.googlecode.gtalksms.cmd.RingCmd;
@@ -735,6 +736,7 @@ public class MainService extends Service {
                 UrlsCmd.class,
                 RingCmd.class,
                 FileCmd.class,
+                MmsCmd.class,
                 SmsCmd.class,
                 ExitCmd.class,
                 AliasCmd.class,
