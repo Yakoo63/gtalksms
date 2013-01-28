@@ -594,9 +594,20 @@ public class MainService extends Service {
                     send(getString(R.string.chat_command_disabled), answerTo);
                 }
             } catch (Exception e) {
-                String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
-                Log.e("executeCommand() Exception", e);
-                send(getString(R.string.chat_error, error), answerTo);
+				String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
+				String chatError = getString(R.string.chat_error, error);
+
+				Log.e("executeCommand() Exception", e);
+
+				// Display the user detailed information about the exception if debugLog is enabled
+				if (sSettingsMgr.debugLog) {
+					XmppMsg msg = new XmppMsg();
+					msg.appendBold(chatError);
+					msg.append(Tools.STMArrayToString(e.getStackTrace()));
+					send(msg, answerTo);
+				} else {
+					send(chatError, answerTo);
+				}
             }
         } else if (cmd.equals("stop")) {
             send(getString(R.string.chat_stop_actions), answerTo);
