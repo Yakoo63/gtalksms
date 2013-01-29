@@ -53,25 +53,26 @@ public class MmsManager {
         ArrayList<Mms> allMms = new ArrayList<Mms>();
         
         // Looking for the last unread MMS
-        Cursor cursor = _context.getContentResolver().query(MMS_INBOX_CONTENT_URI, new String[] { "_id", "sub", "read", "date", "m_id" }, null, null, SORT_ORDER);
-        if (cursor != null) {
+        Cursor c = _context.getContentResolver().query(MMS_INBOX_CONTENT_URI, null, null, null, SORT_ORDER);
+        if (c != null) {
             try {
-                if (cursor.getCount() > 0) {
-                    cursor.moveToFirst();
+                if (c.getCount() > 0) {
+                    c.moveToFirst();
                     int count = 0;
                     do {
-                    	Log.dump("MMS: inbox ", cursor);
-                        String subject;
-                        try {
-                    		subject = new String(cursor.getString(1).getBytes("ISO-8859-1"));
-                    	} catch (Exception e) {
-                    		subject = cursor.getString(1);
-                    	}
+                    	Log.dump("MMS: inbox ", c);
                         
-                        Mms mms = new Mms(subject, Tools.getDateSeconds(cursor, "date"), cursor.getString(4), getSender(cursor.getInt(0)));
+                        // TODO: check with other languages
+                    	String subject = c.getString(c.getColumnIndex("sub"));
+                    	int id = c.getInt(c.getColumnIndex("_id"));
+                        try {
+                    		subject = new String(subject.getBytes("ISO-8859-1"));
+                    	} catch (Exception e) {}
+                        
+                        Mms mms = new Mms(subject, Tools.getDateSeconds(c, "date"), c.getString(c.getColumnIndex("m_id")), getSender(id));
                         
                         // Read the content of the MMS
-                        Cursor cPart = _context.getContentResolver().query(MMS_PART_CONTENT_URI, null, "mid = " + cursor.getString(0), null, null);
+                        Cursor cPart = _context.getContentResolver().query(MMS_PART_CONTENT_URI, null, "mid = " + id, null, null);
                         if (cPart.moveToFirst()) {
                             do {
                                 // Dump all fields into the logs
@@ -97,10 +98,10 @@ public class MmsManager {
                         }
                         
                         allMms.add(mms);
-                    } while (cursor.moveToNext() && count++ < nbMMS);
+                    } while (c.moveToNext() && count++ < nbMMS);
                 }
             } finally {
-                cursor.close();
+                c.close();
             }
         }
         
@@ -155,13 +156,13 @@ public class MmsManager {
         String selectionAdd = new String("msg_id = " + id);
         String uriStr = MessageFormat.format("content://mms/{0}/addr", id);
         Uri uriAddress = Uri.parse(uriStr);
-        Cursor cAdd = _context.getContentResolver().query(uriAddress, new String[] { "address" }, selectionAdd, null, null);
+        Cursor cAdd = _context.getContentResolver().query(uriAddress, null, selectionAdd, null, null);
 
         if (cAdd.moveToFirst()) {
             do {
             	Log.dump("MMS: addr ", cAdd);
                 
-            	names.add(ContactsManager.getContactName(_context, cAdd.getString(0)));
+            	names.add(ContactsManager.getContactName(_context, cAdd.getString(cAdd.getColumnIndex("address"))));
             } while (cAdd.moveToNext());
         }
         if (cAdd != null) {
