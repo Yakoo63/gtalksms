@@ -13,16 +13,18 @@ import android.graphics.Bitmap;
 public class Mms implements Comparable<Mms> {
     private String subject;          
     private String sender;
+    private String recipients;
     private String message = "";
     private Bitmap bitmap;
     private String id;
     private Date date;
     
-    public Mms(String subject, Date date, String id, String sender) {
+    public Mms(String subject, Date date, String id, String sender, String recipients) {
         this.setSubject(subject);
         this.date = date;
         this.id = id;
         this.sender = sender;
+        this.recipients = recipients;
     }
 
     @Override
@@ -66,6 +68,14 @@ public class Mms implements Comparable<Mms> {
         return sender;
     }
 
+    public void setRecipients(String recipients) {
+        this.recipients = recipients;
+    }
+
+    public String getRecipients() {
+        return recipients;
+    }
+    
     public Date getDate() {
         return date;
     }

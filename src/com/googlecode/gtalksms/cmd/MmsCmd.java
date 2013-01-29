@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.cmd.smsCmd.Mms;
 import com.googlecode.gtalksms.cmd.smsCmd.MmsManager;
+import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MmsCmd extends CommandHandlerBase {
@@ -19,23 +20,27 @@ public class MmsCmd extends CommandHandlerBase {
     @Override
     protected void execute(String command, String args) {
         if (isMatchingCmd("mms", command)) {
-        	readLastMms(20);
+            String[] arg = splitArgs(args);
+            if (arg[0].equals("sent")) {
+                printMmsList(mMmsManager.getLastSentMmsDetails(Tools.parseInt(arg, 1, 10)));
+            } else {
+                printMmsList(mMmsManager.getLastReceivedMmsDetails(Tools.parseInt(arg, 0, 10)));
+            }
         }
     }  
     
-    private void readLastMms(int nb) {
-    	ArrayList<Mms> allMms = mMmsManager.getLastReceivedMmsDetails(nb);
-        
-    	XmppMsg mmsMsg = new XmppMsg();
-   	 	for (Mms mms: allMms) {
-   	 		mmsMsg.append(DateFormat.getDateTimeInstance().format(mms.getDate()));
-   	 		mmsMsg.append(" - ");
-   	 		mmsMsg.appendBold(mms.getSender());
-        	mmsMsg.append(" - ");
-        	mmsMsg.appendItalicLine(mms.getSubject() == null || mms.getSubject().isEmpty() ? "<No subject>" : mms.getSubject());
-        	mmsMsg.appendLine(mms.getMessage());
+    private void printMmsList(ArrayList<Mms> allMms) {
+        XmppMsg mmsMsg = new XmppMsg();
+            for (Mms mms: allMms) {
+                mmsMsg.append(DateFormat.getDateTimeInstance().format(mms.getDate()));
+                mmsMsg.append(" - ");
+             mmsMsg.appendBold(mms.getSender());
+             mmsMsg.append(" --> ");
+                mmsMsg.appendBold(mms.getRecipients());
+            mmsMsg.appendItalicLine(mms.getSubject() == null || mms.getSubject().isEmpty() ? "" : "\n<" + mms.getSubject() + ">");
+            mmsMsg.appendLine(mms.getMessage());
         }
-   	 	send(mmsMsg);
+            send(mmsMsg);
     }
 
     @Override

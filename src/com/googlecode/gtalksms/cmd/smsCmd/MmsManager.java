@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 
 import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.tools.StringFmt;
@@ -29,9 +30,15 @@ public class MmsManager {
 
     private Context _context;
     private SettingsManager _settings;
+
+    private static final int MMS_TYPE_SENT = 128;
+    private static final int MMS_TYPE_RECEIVED = 132;
+    private static final int MMS_TYPE_ADDR_RECIPIENT = 151;
+    private static final int MMS_TYPE_ADDR_SENDER = 137;
     
     private static final Uri MMS_CONTENT_URI = Uri.parse("content://mms");
     private static final Uri MMS_INBOX_CONTENT_URI = Uri.withAppendedPath(MMS_CONTENT_URI, "inbox");
+    private static final Uri MMS_SENTBOX_CONTENT_URI = Uri.withAppendedPath(MMS_CONTENT_URI, "sent");
     private static final Uri MMS_PART_CONTENT_URI = Uri.withAppendedPath(MMS_CONTENT_URI, "part");
     
     private static final String SORT_ORDER = "date DESC";
@@ -50,55 +57,37 @@ public class MmsManager {
      * @return The list of MMS
      */
     public ArrayList<Mms> getLastReceivedMmsDetails(int nbMMS) {
+        return getLastMmsDetails(MMS_INBOX_CONTENT_URI, nbMMS);
+    }
+    
+    public ArrayList<Mms> getLastSentMmsDetails(int nbMMS) {
+        return getLastMmsDetails(MMS_SENTBOX_CONTENT_URI, nbMMS);
+    }
+    
+    public ArrayList<Mms> getLastMmsDetails(Uri uri, int nbMMS) {
         ArrayList<Mms> allMms = new ArrayList<Mms>();
         
         // Looking for the last unread MMS
-        Cursor c = _context.getContentResolver().query(MMS_INBOX_CONTENT_URI, null, null, null, SORT_ORDER);
+        Cursor c = _context.getContentResolver().query(uri, null, "m_type in (" + MMS_TYPE_RECEIVED + "," + MMS_TYPE_SENT + ")", null, SORT_ORDER);
         if (c != null) {
             try {
                 if (c.getCount() > 0) {
                     c.moveToFirst();
                     int count = 0;
                     do {
-                    	Log.dump("MMS: inbox ", c);
+                        // Log.dump("MMS: inbox ", c);
                         
                         // TODO: check with other languages
-                    	String subject = c.getString(c.getColumnIndex("sub"));
-                    	int id = c.getInt(c.getColumnIndex("_id"));
+                        String subject = Tools.getString(c, "sub");
+                        int id = Tools.getInt(c, "_id");
                         try {
-                    		subject = new String(subject.getBytes("ISO-8859-1"));
-                    	} catch (Exception e) {}
+                            subject = new String(subject.getBytes("ISO-8859-1"));
+                        } catch (Exception e) {}
                         
-                        Mms mms = new Mms(subject, Tools.getDateSeconds(c, "date"), c.getString(c.getColumnIndex("m_id")), getSender(id));
-                        
-                        // Read the content of the MMS
-                        Cursor cPart = _context.getContentResolver().query(MMS_PART_CONTENT_URI, null, "mid = " + id, null, null);
-                        if (cPart.moveToFirst()) {
-                            do {
-                                // Dump all fields into the logs
-                                Log.dump("MMS: part ", cPart);
-                                String partId = cPart.getString(cPart.getColumnIndex("_id"));
-                                String type = cPart.getString(cPart.getColumnIndex("ct"));
-                                if ("text/plain".equals(type)) {
-                                    String data = cPart.getString(cPart.getColumnIndex("_data"));
-                                    if (data != null) {
-                                        mms.appendMessage(getMmsText(partId));
-                                    } else {
-                                        mms.appendMessage(cPart.getString(cPart.getColumnIndex("text")));
-                                    }
-                                } else if ("image/jpeg".equals(type) || "image/bmp".equals(type) || "image/gif".equals(type) || "image/jpg".equals(type) || "image/png".equals(type)) {
-                                    Bitmap bitmap = getMmsImage(partId);
-                                    mms.setMessage("Image Size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
-                                    mms.setBitmap(bitmap);
-                                }
-                            } while (cPart.moveToNext());
-                        }
-                        if (cPart != null) {
-                            cPart.close();
-                        }
-                        
+                        Mms mms = new Mms(subject, Tools.getDateSeconds(c, "date"), Tools.getString(c, "m_id"), getAddress(id, MMS_TYPE_ADDR_SENDER), getAddress(id, MMS_TYPE_ADDR_RECIPIENT));
+                        fillMms(id, mms);
                         allMms.add(mms);
-                    } while (c.moveToNext() && count++ < nbMMS);
+                    } while (c.moveToNext() && ++count < nbMMS);
                 }
             } finally {
                 c.close();
@@ -107,7 +96,36 @@ public class MmsManager {
         
         return allMms;
     }
-    
+
+    private void fillMms(int id, Mms mms) {
+        // Read the content of the MMS
+        Cursor cPart = _context.getContentResolver().query(MMS_PART_CONTENT_URI, null, "mid = " + id, null, null);
+        if (cPart.moveToFirst()) {
+            do {
+                // Dump all fields into the logs
+                // Log.dump("MMS: part ", cPart);
+                
+                String partId = Tools.getString(cPart, "_id");
+                String type = Tools.getString(cPart, "ct");
+                if ("text/plain".equals(type)) {
+                    String data = Tools.getString(cPart, "_data");
+                    if (data != null) {
+                        mms.appendMessage(getMmsText(partId));
+                    } else {
+                        mms.appendMessage(Tools.getString(cPart, "text"));
+                    }
+                } else if ("image/jpeg".equals(type) || "image/bmp".equals(type) || "image/gif".equals(type) || "image/jpg".equals(type) || "image/png".equals(type)) {
+                    Bitmap bitmap = getMmsImage(partId);
+                    mms.appendMessage("Image Size: " + bitmap.getWidth() + "x" + bitmap.getHeight() + "\n");
+                    mms.setBitmap(bitmap);
+                }
+            } while (cPart.moveToNext());
+        }
+        if (cPart != null) {
+            cPart.close();
+        }
+    }
+
     private String getMmsText(String id) {
         InputStream is = null;
         StringBuilder sb = new StringBuilder();
@@ -151,18 +169,23 @@ public class MmsManager {
         return bitmap;
     }
     
-    private String getSender(int id) {
-    	ArrayList<String> names = new ArrayList<String>();
-        String selectionAdd = new String("msg_id = " + id);
+    
+    private String getAddress(int id, int mmsType) {
+        ArrayList<String> names = new ArrayList<String>();
+        String selectionAdd = new String("msg_id = " + id + " and type = " + mmsType);
         String uriStr = MessageFormat.format("content://mms/{0}/addr", id);
         Uri uriAddress = Uri.parse(uriStr);
         Cursor cAdd = _context.getContentResolver().query(uriAddress, null, selectionAdd, null, null);
 
         if (cAdd.moveToFirst()) {
             do {
-            	Log.dump("MMS: addr ", cAdd);
-                
-            	names.add(ContactsManager.getContactName(_context, cAdd.getString(cAdd.getColumnIndex("address"))));
+                // Log.dump("MMS: addr ", cAdd);
+                String address = Tools.getString(cAdd, "address");
+                if (address.equals("insert-address-token")) {
+                    names.add(_context.getString(R.string.chat_me));
+                } else {
+                    names.add(ContactsManager.getContactName(_context, address));
+                }
             } while (cAdd.moveToNext());
         }
         if (cAdd != null) {
