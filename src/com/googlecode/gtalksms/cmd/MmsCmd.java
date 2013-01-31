@@ -11,7 +11,7 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MmsCmd extends CommandHandlerBase {
     private MmsManager mMmsManager;
-              
+
     public MmsCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MESSAGE, "MMS", new Cmd("mms", "m"));
         mMmsManager = new MmsManager(sContext);
@@ -27,20 +27,20 @@ public class MmsCmd extends CommandHandlerBase {
                 printMmsList(mMmsManager.getLastReceivedMmsDetails(Tools.parseInt(arg, 0, 10)));
             }
         }
-    }  
-    
+    }
+
     private void printMmsList(ArrayList<Mms> allMms) {
         XmppMsg mmsMsg = new XmppMsg();
-            for (Mms mms: allMms) {
-                mmsMsg.append(DateFormat.getDateTimeInstance().format(mms.getDate()));
-                mmsMsg.append(" - ");
-             mmsMsg.appendBold(mms.getSender());
-             mmsMsg.append(" --> ");
-                mmsMsg.appendBold(mms.getRecipients());
+        for (Mms mms : allMms) {
+            mmsMsg.append(DateFormat.getDateTimeInstance().format(mms.getDate()));
+            mmsMsg.append(" - ");
+            mmsMsg.appendBold(mms.getSender());
+            mmsMsg.append(" --> ");
+            mmsMsg.appendBold(mms.getRecipients());
             mmsMsg.appendItalicLine(mms.getSubject() == null || mms.getSubject().isEmpty() ? "" : "\n<" + mms.getSubject() + ">");
             mmsMsg.appendLine(mms.getMessage());
         }
-            send(mmsMsg);
+        send(mmsMsg);
     }
 
     @Override

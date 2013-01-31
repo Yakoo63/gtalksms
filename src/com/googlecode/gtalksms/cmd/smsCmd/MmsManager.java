@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -94,6 +95,7 @@ public class MmsManager {
             }
         }
         
+        Collections.reverse(allMms);
         return allMms;
     }
 
