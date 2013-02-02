@@ -272,24 +272,51 @@ public class SettingsManager {
         }
     }
     
+    private String getString(String key, String defaultValue) {
+        try {
+            return mSharedPreferences.getString(key, defaultValue);
+        } catch (ClassCastException  e) {
+            Log.e(Tools.LOG_TAG, "Failed to retrive setting " + key, e);
+        }
+        return defaultValue;
+    }
+    
+    private int getInt(String key, int defaultValue) {
+        try {
+            return mSharedPreferences.getInt(key, defaultValue);
+        } catch (ClassCastException  e) {
+            Log.e(Tools.LOG_TAG, "Failed to retrive setting " + key, e);
+        }
+        return defaultValue;
+    }
+    
+    private boolean getBoolean(String key, boolean defaultValue) {
+        try {
+            return mSharedPreferences.getBoolean(key, defaultValue);
+        } catch (ClassCastException  e) {
+            Log.e(Tools.LOG_TAG, "Failed to retrive setting " + key, e);
+        }
+        return defaultValue;
+    }
+    
     /** imports the preferences */
     private void importPreferences() {
-        serverHost = mSharedPreferences.getString("serverHost", "");
-        serverPort = mSharedPreferences.getInt("serverPort", 0);
+        serverHost = getString("serverHost", "");
+        serverPort = getInt("serverPort", 0);
         
-        _notifiedAddress = mSharedPreferences.getString("notifiedAddress", "");
+        _notifiedAddress = getString("notifiedAddress", "");
         updateNotifiedAddresses();
-        _login = mSharedPreferences.getString("login", "");
+        _login = getString("login", "");
         
-        manuallySpecifyServerSettings = mSharedPreferences.getBoolean("manuallySpecifyServerSettings", false);
+        manuallySpecifyServerSettings = getBoolean("manuallySpecifyServerSettings", false);
         if (manuallySpecifyServerSettings) {
-            serviceName = mSharedPreferences.getString("serviceName", "");
+            serviceName = getString("serviceName", "");
         } else {
             serviceName = StringUtils.parseServer(_login);
         }
         
-        _password =  mSharedPreferences.getString("password", "");
-        xmppSecurityMode = mSharedPreferences.getString("xmppSecurityMode", "opt");
+        _password =  getString("password", "");
+        xmppSecurityMode = getString("xmppSecurityMode", "opt");
         if(xmppSecurityMode.equals("req")) {
             xmppSecurityModeInt = XMPPSecurityRequired;
         } else if (xmppSecurityMode.equals("dis")) {
@@ -297,41 +324,41 @@ public class SettingsManager {
         } else {
             xmppSecurityModeInt = XMPPSecurityOptional;
         }
-        useCompression = mSharedPreferences.getBoolean("useCompression", false);
+        useCompression = getBoolean("useCompression", false);
         
-        useGoogleMapUrl = mSharedPreferences.getBoolean("useGoogleMapUrl", true);
-        useOpenStreetMapUrl = mSharedPreferences.getBoolean("useOpenStreetMapUrl", false);
+        useGoogleMapUrl = getBoolean("useGoogleMapUrl", true);
+        useOpenStreetMapUrl = getBoolean("useOpenStreetMapUrl", false);
         
-        showStatusIcon = mSharedPreferences.getBoolean("showStatusIcon", false);
+        showStatusIcon = getBoolean("showStatusIcon", false);
         
-        notifyApplicationConnection = mSharedPreferences.getBoolean("notifyApplicationConnection", false);
-        notifyBattery = mSharedPreferences.getBoolean("notifyBattery", false);
-        notifyBatteryInStatus = mSharedPreferences.getBoolean("notifyBatteryInStatus", true);
-        batteryNotificationInterval = mSharedPreferences.getString("batteryNotificationInterval", "10");
+        notifyApplicationConnection = getBoolean("notifyApplicationConnection", false);
+        notifyBattery = getBoolean("notifyBattery", false);
+        notifyBatteryInStatus = getBoolean("notifyBatteryInStatus", true);
+        batteryNotificationInterval = getString("batteryNotificationInterval", "10");
         batteryNotificationIntervalInt = Integer.parseInt(batteryNotificationInterval);
-        notifySmsSent = mSharedPreferences.getBoolean("notifySmsSent", true);
-        notifySmsDelivered = mSharedPreferences.getBoolean("notifySmsDelivered", false);
+        notifySmsSent = getBoolean("notifySmsSent", true);
+        notifySmsDelivered = getBoolean("notifySmsDelivered", false);
         notifySmsSentDelivered = notifySmsSent || notifySmsDelivered;
-        ringtone = mSharedPreferences.getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
-        markSmsReadOnReply = mSharedPreferences.getBoolean("markSmsReadOnReply", false);
-        smsNumber = mSharedPreferences.getInt("smsNumber", 5);
-        callLogsNumber = mSharedPreferences.getInt("callLogsNumber", 10);
-        formatResponses = mSharedPreferences.getBoolean("formatResponses", false);
-        displayContactNumber = mSharedPreferences.getBoolean("displayContactNumber", false);
-        notifyIncomingCalls = mSharedPreferences.getBoolean("notifyIncomingCalls", false);
-        displayIconIndex = mSharedPreferences.getString("displayIconIndex", "0");
+        ringtone = getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
+        markSmsReadOnReply = getBoolean("markSmsReadOnReply", false);
+        smsNumber = getInt("smsNumber", 5);
+        callLogsNumber = getInt("callLogsNumber", 10);
+        formatResponses = getBoolean("formatResponses", false);
+        displayContactNumber = getBoolean("displayContactNumber", false);
+        notifyIncomingCalls = getBoolean("notifyIncomingCalls", false);
+        displayIconIndex = getString("displayIconIndex", "0");
         
-        String localeStr = mSharedPreferences.getString("locale", "default");
+        String localeStr = getString("locale", "default");
         if (localeStr.equals("default")) {
             locale = Locale.getDefault();
         } else {
             locale = new Locale(localeStr);
         }
         
-        roomPassword = mSharedPreferences.getString("roomPassword", "gtalksms");
-        forceMucServer = mSharedPreferences.getBoolean("forceMucServer", false);
-        mucServer = mSharedPreferences.getString("mucServer", "conference.jwchat.org");
-        String notificationIncomingSmsType = mSharedPreferences.getString("notificationIncomingSmsType", "same");
+        roomPassword = getString("roomPassword", "gtalksms");
+        forceMucServer = getBoolean("forceMucServer", false);
+        mucServer = getString("mucServer", "conference.jwchat.org");
+        String notificationIncomingSmsType = getString("notificationIncomingSmsType", "same");
         
         if (notificationIncomingSmsType.equals("both")) {
             notifySmsInChatRooms = true;
@@ -346,25 +373,25 @@ public class SettingsManager {
             notifySmsInSameConversation = true;
             notifySmsInChatRooms = false;
         }
-        smsMagicWord = mSharedPreferences.getString("smsMagicWord", "GTalkSMS");
-        notifyInMuc = mSharedPreferences.getBoolean("notifyInMuc", false); 
-        smsReplySeparate = mSharedPreferences.getBoolean("smsReplySeparate", false);
-        framebufferMode = mSharedPreferences.getString("framebufferMode", "ARGB_8888");
-        _connectOnMainScreenStartup = mSharedPreferences.getBoolean("connectOnMainscreenShow", false);
-        debugLog = mSharedPreferences.getBoolean("debugLog", false);
+        smsMagicWord = getString("smsMagicWord", "GTalkSMS");
+        notifyInMuc = getBoolean("notifyInMuc", false); 
+        smsReplySeparate = getBoolean("smsReplySeparate", false);
+        framebufferMode = getString("framebufferMode", "ARGB_8888");
+        _connectOnMainScreenStartup = getBoolean("connectOnMainscreenShow", false);
+        debugLog = getBoolean("debugLog", false);
         
         // auto start and stop settings
-        startOnBoot = mSharedPreferences.getBoolean("startOnBoot", false);
-        startOnPowerConnected = mSharedPreferences.getBoolean("startOnPowerConnected", false);
-        startOnWifiConnected = mSharedPreferences.getBoolean("startOnWifiConnected", false);
-        stopOnPowerDisconnected = mSharedPreferences.getBoolean("stopOnPowerDisconnected", false);
-        stopOnWifiDisconnected = mSharedPreferences.getBoolean("stopOnWifiDisconnected", false);
-        stopOnPowerDelay = mSharedPreferences.getInt("stopOnPowerDelay", 1);
+        startOnBoot = getBoolean("startOnBoot", false);
+        startOnPowerConnected = getBoolean("startOnPowerConnected", false);
+        startOnWifiConnected = getBoolean("startOnWifiConnected", false);
+        stopOnPowerDisconnected = getBoolean("stopOnPowerDisconnected", false);
+        stopOnWifiDisconnected = getBoolean("stopOnWifiDisconnected", false);
+        stopOnPowerDelay = getInt("stopOnPowerDelay", 1);
         
         // pulic intent settings
-        publicIntentsEnabled = mSharedPreferences.getBoolean("publicIntentsEnabled", false);
-        publicIntentTokenRequired = mSharedPreferences.getBoolean("publicIntentTokenRequired", false);
-        publicIntentToken = mSharedPreferences.getString("publicIntentToken", "secret");
+        publicIntentsEnabled = getBoolean("publicIntentsEnabled", false);
+        publicIntentTokenRequired = getBoolean("publicIntentTokenRequired", false);
+        publicIntentToken = getString("publicIntentToken", "secret");
         
         // reply command settings
         dontDisplayRecipient = false;
