@@ -46,17 +46,17 @@ public class SettingsManager {
     
     private String _login;
     public String getLogin() { return _login; }
-    public void setLogin(String value) { _login = saveStringSetting("login", value); }
+    public void setLogin(String value) { _login = saveSetting("login", value); }
     
     private String _password;
     public String getPassword() { return _password; }
-    public void setPassword(String value) { _password = saveStringSetting("password", value); }
+    public void setPassword(String value) { _password = saveSetting("password", value); }
 
     private String _notifiedAddress;
     private ArrayList<String> _notifiedAddresses = new ArrayList<String>();
     public String[] getNotifiedAddresses() { return _notifiedAddresses.toArray(new String[_notifiedAddresses.size()]); }
     public void setNotifiedAddress(String value) { 
-        _notifiedAddress = saveStringSetting("notifiedAddress", value);
+        _notifiedAddress = saveSetting("notifiedAddress", value);
         updateNotifiedAddresses();
     }
     
@@ -71,27 +71,27 @@ public class SettingsManager {
         return _notifiedAddresses.contains(value.toLowerCase());
     }
 
-	/**
-	 * Checks if the given fromJid is part of the notified Address set. fromJid can either be a fullJid or a bareJid
-	 * 
-	 * @param fromJid
-	 *            The JID we received a message from
-	 * @return true if the given JID is part of the notified Address set, otherwise false
-	 */
-	public boolean cameFromNotifiedAddress(String fromJid) {
-		String sanitizedNotifiedAddress = null;
-		String sanitizedJid = fromJid.toLowerCase();
-		for (String notifiedAddress : _notifiedAddresses) {
-			sanitizedNotifiedAddress = notifiedAddress.toLowerCase();
-			// If it's a fullJID, append a slash for security reasons
-			if (sanitizedJid.startsWith(sanitizedNotifiedAddress + "/")
-			// A bare JID should be equals to one of the notified Address set
-			        || sanitizedNotifiedAddress.equals(sanitizedJid)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * Checks if the given fromJid is part of the notified Address set. fromJid can either be a fullJid or a bareJid
+     * 
+     * @param fromJid
+     *            The JID we received a message from
+     * @return true if the given JID is part of the notified Address set, otherwise false
+     */
+    public boolean cameFromNotifiedAddress(String fromJid) {
+        String sanitizedNotifiedAddress = null;
+        String sanitizedJid = fromJid.toLowerCase();
+        for (String notifiedAddress : _notifiedAddresses) {
+            sanitizedNotifiedAddress = notifiedAddress.toLowerCase();
+            // If it's a fullJID, append a slash for security reasons
+            if (sanitizedJid.startsWith(sanitizedNotifiedAddress + "/")
+            // A bare JID should be equals to one of the notified Address set
+                    || sanitizedNotifiedAddress.equals(sanitizedJid)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     public void addNotifiedAddress(String value) { 
         if (! containsNotifiedAddress(value)) {
@@ -108,8 +108,14 @@ public class SettingsManager {
     }
     
     private boolean _connectOnMainScreenStartup;
-    public boolean getConnectOnMainScreenStartup() { return _connectOnMainScreenStartup; }
-    public void setConnectOnMainScreenStartup(boolean value) { _connectOnMainScreenStartup = saveBooleanSetting("connectOnMainscreenShow", value); }
+    
+    public boolean getConnectOnMainScreenStartup() { 
+        return _connectOnMainScreenStartup; 
+    }
+
+    public void setConnectOnMainScreenStartup(boolean value) { 
+        _connectOnMainScreenStartup = saveSetting("connectOnMainscreenShow", value); 
+    }
     
     public String roomPassword;
     public String mucServer;
@@ -192,7 +198,11 @@ public class SettingsManager {
             if (debugLog) {
                 Log.i(Tools.LOG_TAG, "Preferences updated: key=" + key);
             }
-            importPreferences();
+            try {
+                importPreferences();
+            } catch (Exception e) {
+                Log.e(Tools.LOG_TAG, "Failed to load settings", e);
+            }
             OnPreferencesUpdated(key);
         }
     };
@@ -202,7 +212,11 @@ public class SettingsManager {
         mSharedPreferences = mContext.getSharedPreferences(Tools.APP_NAME, 0);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mChangeListener);
         
-        importPreferences();
+        try {
+            importPreferences();
+        } catch (Exception e) {
+            Log.e(Tools.LOG_TAG, "Failed to load settings", e);
+        }
     }
     
     public static SettingsManager getSettingsManager(Context context) {
@@ -220,13 +234,18 @@ public class SettingsManager {
         return mSharedPreferences.edit();
     }
     
-    public String saveStringSetting(String key, String value) {
-        getEditor().putString(key, value).commit();
+    public Boolean saveSetting(String key, Boolean value) {
+        getEditor().putBoolean(key, (Boolean)value).commit();
         return value;
     }
     
-    public boolean saveBooleanSetting(String key, boolean value) {
-        getEditor().putBoolean(key, value).commit();
+    public String saveSetting(String key, String value) {
+        getEditor().putString(key, (String)value).commit();
+        return value;
+    }
+    
+    public Integer saveSetting(String key, Integer value) {
+        getEditor().putInt(key, (Integer)value).commit();
         return value;
     }
     
@@ -254,7 +273,7 @@ public class SettingsManager {
     }
     
     /** imports the preferences */
-    private void importPreferences() {       
+    private void importPreferences() {
         serverHost = mSharedPreferences.getString("serverHost", "");
         serverPort = mSharedPreferences.getInt("serverPort", 0);
         
@@ -348,6 +367,6 @@ public class SettingsManager {
         publicIntentToken = mSharedPreferences.getString("publicIntentToken", "secret");
         
         // reply command settings
-        dontDisplayRecipient = false; // TODO
+        dontDisplayRecipient = false;
     }
 }

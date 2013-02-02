@@ -124,6 +124,15 @@ public class Tools {
         return false;
     }
     
+    public final static Boolean parseBool(String value) {
+        Boolean res = null;
+        try { 
+            res = Boolean.parseBoolean(value); 
+        } catch(Exception e) {}
+        
+        return res;
+    }
+    
     public final static Integer parseInt(String value) {
         Integer res = null;
         try { 
