@@ -311,9 +311,9 @@ public class SmsCmd extends CommandHandlerBase {
      * @param sms
      */
     private static void appendSMS(XmppMsg msg, Sms sms) {
-        msg.appendItalic(DateFormat.getDateTimeInstance().format(sms.getDate()) + " - ");
+        msg.append(DateFormat.getDateTimeInstance().format(sms.getDate()) + " - ");
         msg.appendBold(sms.getSender());
-        msg.appendItalic(" --> ");
+        msg.append(" --> ");
         msg.appendBoldLine(sms.getReceiver());
         msg.appendLine(sms.getMessage());
         msg.appendLine("");
