@@ -73,17 +73,9 @@ public class Phone {
                      .replace(" ", "");
     }
 
-//    public void setContactName(String contactName) {
-//        this.contactName = contactName;
-//    }
-
     public String getContactName() {
         return mContactName;
     }
-
-//    public void setNumber(String number) {
-//        this.number = number;
-//    }
 
     public String getNumber() {
         return mNumber;
@@ -93,33 +85,17 @@ public class Phone {
         return mCleanNumber;
     }
 
-//    public void setLabel(String label) {
-//        this.label = label;
-//    }
-
     public String getLabel() {
         return mLabel;
     }
-
-//    public void setType(int type) {
-//        this.type = type;
-//    }
 
     public int getType() {
         return mType;
     }
 
-//    public void setCellPhoneNumber(boolean isCellPhoneNumber) {
-//        this.isCellPhoneNumber = isCellPhoneNumber;
-//    }
-
     public boolean isCellPhoneNumber() {
         return mIsCellPhoneNumber;
     }
-
-//    public void setDefaultNumber(boolean isDefaultNumber) {
-//        this.isDefaultNumber = isDefaultNumber;
-//    }
 
     public boolean isDefaultNumber() {
         return mIsDefaultNumber;

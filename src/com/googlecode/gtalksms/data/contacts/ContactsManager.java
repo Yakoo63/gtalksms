@@ -64,7 +64,7 @@ public class ContactsManager {
                 if (c != null && c.moveToFirst()) {
                     res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);      
                     if (SettingsManager.getSettingsManager(ctx).displayContactNumber) {
-                    	res += " " + phoneNumber;
+                    	res += " " + Phone.cleanPhoneNumber(phoneNumber);
                     }
                     c.close();
                 }

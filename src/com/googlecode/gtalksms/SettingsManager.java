@@ -142,7 +142,6 @@ public class SettingsManager {
 
     // sms
     public int smsNumber;
-    public boolean showSentSms;
     public boolean notifySmsSent;
     public boolean notifySmsDelivered;
     public boolean notifySmsSentDelivered;
@@ -295,7 +294,6 @@ public class SettingsManager {
         notifySmsDelivered = mSharedPreferences.getBoolean("notifySmsDelivered", false);
         notifySmsSentDelivered = notifySmsSent || notifySmsDelivered;
         ringtone = mSharedPreferences.getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
-        showSentSms = mSharedPreferences.getBoolean("showSentSms", false);
         markSmsReadOnReply = mSharedPreferences.getBoolean("markSmsReadOnReply", false);
         smsNumber = mSharedPreferences.getInt("smsNumber", 5);
         callLogsNumber = mSharedPreferences.getInt("callLogsNumber", 10);

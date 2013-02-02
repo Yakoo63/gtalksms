@@ -305,8 +305,6 @@
     <string name="pref_app_ringtone_help">Sonnerie pour la commande ring</string>
     <string name="pref_app_select_status_icon">Icônes de la barre de notifications</string>
     <string name="pref_app_select_status_icon_help">Choisir les icônes à afficher dans la barre de notifications</string>
-    <string name="pref_app_show_sent_sms">Afficher les SMS envoyés</string>
-    <string name="pref_app_show_sent_sms_help">Cocher pour afficher les SMS envoyés</string>
     <string name="pref_app_show_status_icon">Icône de notification de l\'état de connexion</string>
     <string name="pref_app_show_status_icon_help">Cocher pour afficher GTalkSMS dans la barre de notifications</string>
     <string name="pref_app_sms_number">Nombre de SMS</string>

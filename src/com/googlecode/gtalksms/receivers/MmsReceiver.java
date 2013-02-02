@@ -16,7 +16,7 @@ import com.googlecode.gtalksms.tools.Tools;
 
 
 public class MmsReceiver extends BroadcastReceiver {
-	
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(Tools.LOG_TAG, "New MMS");
@@ -38,7 +38,7 @@ public class MmsReceiver extends BroadcastReceiver {
                         // Check if the retrieved MMS is the good one
                         if (mms != null && mms.getId() != null && buffer.contains(mms.getId())) {
                             context.startService(Tools.newSvcIntent(context, MainService.ACTION_SEND, 
-                            		context.getString(R.string.chat_mms_from, mms.getSender()) + mms.getSubject() + "\n" + mms.getMessage(), null));
+                            context.getString(R.string.chat_mms_from, mms.getSender()) + mms.getSubject() + "\n" + mms.getMessage(), null));
                         }
                     }
                 }

@@ -305,8 +305,6 @@
     <string name="pref_app_ringtone_help">Klingelton der durch den \"ring\" Befehl abgespielt wird</string>
     <string name="pref_app_select_status_icon">Benachrichtigungsleiste Symbole</string>
     <string name="pref_app_select_status_icon_help">Design der Statussysmbole wählen</string>
-    <string name="pref_app_show_sent_sms">Zeige gesendete SMS</string>
-    <string name="pref_app_show_sent_sms_help">Gibt die gerade gesendete SMS aus</string>
     <string name="pref_app_show_status_icon">Zeige Icon</string>
     <string name="pref_app_show_status_icon_help">Zeigt das GTalkSMS Status Icon im Benachrichtigungsbalken an</string>
     <string name="pref_app_sms_number">Anzahl der SMS</string>
