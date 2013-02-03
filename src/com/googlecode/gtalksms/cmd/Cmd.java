@@ -25,7 +25,9 @@ public class Cmd {
                 mAlias[i] = alias[i].toString().toLowerCase();  
             }
             
-            mHelpMsg = getString(resHelp);
+            if (resHelp > 0) {
+                mHelpMsg = getString(resHelp);
+            }
             mHelpArgs = args;
             mHelp = buildHelp(baseCmd, mName, mAlias, resHelp, args);
         }
@@ -139,7 +141,7 @@ public class Cmd {
     }
     
     public String getHelpMsg() {
-        if (mResHelp != 0) {
+        if (mResHelp > 0) {
             return getString(mResHelp);
         } else {
             return "";

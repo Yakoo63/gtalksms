@@ -79,5 +79,24 @@ public class MusicCmd extends CommandHandlerBase {
 
     @Override
     protected void initializeSubCommands() {
+        Cmd music = mCommandMap.get("music");
+        music.setHelp(-1, null);
+        music.AddSubCmd("play", -1, null);
+        music.AddSubCmd("pause", -1, null);
+        music.AddSubCmd("playpause", -1, null);
+        music.AddSubCmd("stop", -1, null);
+        music.AddSubCmd("next", -1, null);
+        music.AddSubCmd("previous", -1, null);
+        music.AddSubCmd("up", -1, null);
+        music.AddSubCmd("down", -1, null);
+        music.AddSubCmd("mute", -1, null);
+        music.AddSubCmd("unmute", -1, null);
+
+        Cmd volume = mCommandMap.get("music");
+        volume.setHelp(-1, null);
+        volume.AddSubCmd("up", -1, null);
+        volume.AddSubCmd("down", -1, null);
+        volume.AddSubCmd("mute", -1, null);
+        volume.AddSubCmd("unmute", -1, null);
     }
 }
