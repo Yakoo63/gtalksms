@@ -66,7 +66,7 @@ public class ShellCmd extends CommandHandlerBase {
                 // and send the message to the notification address
                 XmppMsg msgError = new XmppMsg();
                 msgError.appendLine(getString(R.string.chat_shell_error_muc_write, e.getLocalizedMessage()));
-                msgError.appendBold(getString(R.string.chat_sms_from, sRoomName + " " + id));
+                msgError.appendBold(sRoomName + " " + id);
                 msgError.append(msg);
                 send(msgError);
             }
