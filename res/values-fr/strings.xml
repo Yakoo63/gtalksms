@@ -228,9 +228,9 @@
     <string name="chat_sms_delivered_to">SMS \"%1$s\" pour %2$s délivré.</string>
     <string name="chat_sms_failure">Erreur</string>
     <string name="chat_sms_failure_to">SMS \"%1$s\" pour %2$s non envoyé.</string>  
-    <string name="chat_sms_from">SMS de %s :&#xA0;</string>
-    <string name="chat_sms_muc_conf_error">SMS entrant: Impossible de configurer la salle de conférence. Ex: %s</string>
-    <string name="chat_sms_muc_error">SMS entrant: Erreur lors de la création de la salle de conférence. Ex: %s</string>
+    <string name="chat_sms_from">Message de %s :&#xA0;</string>
+    <string name="chat_sms_muc_conf_error">Message entrant: Impossible de configurer la salle de conférence. Ex: %s</string>
+    <string name="chat_sms_muc_error">Message entrant: Erreur lors de la création de la salle de conférence. Ex: %s</string>
     <string name="chat_sms_not_delivered">SMS non délivré</string>
     <string name="chat_sms_not_delivered_to">SMS \"%1$s\" pour %2$s non délivré.</string>    
     <string name="chat_sms_no_service">Pas de service</string>

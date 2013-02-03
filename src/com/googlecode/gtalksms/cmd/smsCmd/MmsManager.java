@@ -18,7 +18,6 @@ import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
-import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 /**
@@ -82,7 +81,10 @@ public class MmsManager {
                             subject = new String(subject.getBytes("ISO-8859-1"));
                         } catch (Exception e) {}
                         
-                        Mms mms = new Mms(subject, Tools.getDateSeconds(c, "date"), Tools.getString(c, "m_id"), getAddress(id, MMS_TYPE_ADDR_SENDER), getAddress(id, MMS_TYPE_ADDR_RECIPIENT));
+                        Mms mms = new Mms(subject, Tools.getDateSeconds(c, "date"), Tools.getString(c, "m_id"));
+                        retrieveAddress(mms, id, MMS_TYPE_ADDR_SENDER);
+                        retrieveAddress(mms, id, MMS_TYPE_ADDR_RECIPIENT);
+                        
                         fillMms(id, mms);
                         allMms.add(mms);
                     } while (c.moveToNext() && ++count < nbMMS);
@@ -175,8 +177,7 @@ public class MmsManager {
         return result;
     }
     
-    private String getAddress(int id, int mmsType) {
-        ArrayList<String> names = new ArrayList<String>();
+    private void retrieveAddress(Mms mms, int id, int mmsType) {
         String selectionAdd = new String("msg_id = " + id + " and type = " + mmsType);
         String uriStr = MessageFormat.format("content://mms/{0}/addr", id);
         Uri uriAddress = Uri.parse(uriStr);
@@ -186,16 +187,19 @@ public class MmsManager {
             do {
                 // Log.dump("MMS: addr ", cAdd);
                 String address = Tools.getString(cAdd, "address");
-                if (address.equals("insert-address-token")) {
-                    names.add(_context.getString(R.string.chat_me));
-                } else {
-                    names.add(ContactsManager.getContactName(_context, address));
+                if (!address.equals("insert-address-token")) {
+                    if (mmsType == MMS_TYPE_ADDR_SENDER) {
+                        mms.setSender(address, ContactsManager.getContactName(_context, address));
+                    } else {
+                        mms.addRecipient(address, ContactsManager.getContactName(_context, address));
+                    }
+                } else if (mmsType == MMS_TYPE_ADDR_SENDER) {
+                    mms.setSender(null, _context.getString(R.string.chat_me));
                 }
             } while (cAdd.moveToNext());
         }
         if (cAdd != null) {
             cAdd.close();
         }
-        return StringFmt.join(names, ", ");
     }
 }

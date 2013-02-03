@@ -1,8 +1,11 @@
 package com.googlecode.gtalksms.cmd.smsCmd;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import android.graphics.Bitmap;
+
+import com.googlecode.gtalksms.tools.StringFmt;
 
 /**
  * This is "our" internal class for holding MMS information in memory
@@ -11,20 +14,20 @@ import android.graphics.Bitmap;
  *
  */
 public class Mms implements Comparable<Mms> {
-    private String subject;          
+    private String subject;
     private String sender;
-    private String recipients;
+    private String senderNumber;
+    private ArrayList<String> recipients = new ArrayList<String>();
+    private ArrayList<String> recipientsNumber = new ArrayList<String>();
     private String message = "";
     private Bitmap bitmap;
     private String id;
     private Date date;
     
-    public Mms(String subject, Date date, String id, String sender, String recipients) {
+    public Mms(String subject, Date date, String id) {
         this.setSubject(subject);
         this.date = date;
         this.id = id;
-        this.sender = sender;
-        this.recipients = recipients;
     }
 
     @Override
@@ -60,20 +63,26 @@ public class Mms implements Comparable<Mms> {
         return subject;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
     public String getSender() {
         return sender;
     }
 
-    public void setRecipients(String recipients) {
-        this.recipients = recipients;
+    public void setSender(String senderNumber, String sender) {
+        this.senderNumber = senderNumber;
+        this.sender = sender;
+    }
+
+    public String getSenderNumber() {
+        return senderNumber;
+    }
+
+    public void addRecipient(String recipientNumber, String name) {
+        recipientsNumber.add(recipientNumber);
+        recipients.add(name);
     }
 
     public String getRecipients() {
-        return recipients;
+        return StringFmt.join(recipients, ", ");
     }
     
     public Date getDate() {

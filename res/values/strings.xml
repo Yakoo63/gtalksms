@@ -228,9 +228,9 @@
     <string name="chat_sms_delivered_to">SMS delivered. SMS \"%1$s\" to %2$s</string>
     <string name="chat_sms_failure">Generic failure</string>
     <string name="chat_sms_failure_to">Generic failure. SMS \"%1$s\" to %2$s</string>  
-    <string name="chat_sms_from">SMS from %s:&#xA0;</string>
-    <string name="chat_sms_muc_conf_error">Incoming SMS: Unable to send conference room configuration form. Ex: %s</string>
-    <string name="chat_sms_muc_error">Incoming SMS: Error on creating conference room. Ex: %s</string>
+    <string name="chat_sms_from">Message from %s:&#xA0;</string>
+    <string name="chat_sms_muc_conf_error">Incoming Message: Unable to send conference room configuration form. Ex: %s</string>
+    <string name="chat_sms_muc_error">Incoming Message: Error on creating conference room. Ex: %s</string>
     <string name="chat_sms_not_delivered">SMS not delivered</string>
     <string name="chat_sms_not_delivered_to">SMS not delivered. SMS \"%1$s\" to %2$s</string>    
     <string name="chat_sms_no_service">No service</string>

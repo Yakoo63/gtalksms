@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
-import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.smsCmd.Mms;
 import com.googlecode.gtalksms.cmd.smsCmd.MmsManager;
 import com.googlecode.gtalksms.tools.Tools;
@@ -42,8 +41,11 @@ public class MmsReceiver extends BroadcastReceiver {
                         for (Mms mms: allMms) {
                             // Check if the retrieved MMS is the good one
                             if (mms != null && mms.getId() != null && buffer.contains(mms.getId())) {
-                                context.startService(Tools.newSvcIntent(context, MainService.ACTION_SEND, 
-                                context.getString(R.string.chat_mms_from, mms.getSender()) + mms.getSubject() + "\n" + mms.getMessage(), null));
+                                String msg = mms.getSubject() + "\n" + mms.getMessage();
+                                Intent svcintent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg, null);
+                                svcintent.putExtra("sender", mms.getSenderNumber());
+                                Log.i(Tools.LOG_TAG, "MmsReceiver: Issuing service intent for incoming MMS. sender=" + mms.getSenderNumber() + " message=" + Tools.shortenMessage(msg));
+                                context.startService(svcintent);
                                 return;
                             }
                         }
