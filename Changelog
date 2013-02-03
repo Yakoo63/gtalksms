@@ -1,4 +1,9 @@
 upcoming
+* MMS notifications
+* MMS command to read MMS stored in the phone
+* Music command to control the Music application of the phone (play/stop/next/previous/volume...)
+* Settings command to update GTalkSMS settings via Xmpp
+
 4.3
 * Commands can be completely disabled to save resources,  e.g. TTS (Issue 287)
 * Added "Ping Server" button (does not work always) (Issue 292)
