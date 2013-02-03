@@ -83,7 +83,7 @@ public class MainService extends Service {
     // The following actions are undocumented and internal to our implementation.
     public final static String ACTION_BROADCAST_STATUS = "com.googlecode.gtalksms.action.BROADCAST_STATUS";
     public final static String ACTION_SMS_RECEIVED = "com.googlecode.gtalksms.action.SMS_RECEIVED";
-	public final static String ACTION_NETWORK_STATUS_CHANGED = "com.googlecode.gtalksms.action.NETWORK_STATUS_CHANGED";
+    public final static String ACTION_NETWORK_STATUS_CHANGED = "com.googlecode.gtalksms.action.NETWORK_STATUS_CHANGED";
     public final static String ACTION_SMS_SENT = "com.googlecode.gtalksms.action.SMS_SENT";
     public final static String ACTION_SMS_DELIVERED = "com.googlecode.gtalksms.action.SMS_DELIVERED";
     public final static String ACTION_WIDGET_ACTION = "com.googlecode.gtalksms.action.widget.ACTION";
@@ -211,30 +211,30 @@ public class MainService extends Service {
                 default:
                     throw new IllegalStateException("Unkown initialState while handling" + MainService.ACTION_TOGGLE);
             }
-		} else if (action.equals(ACTION_NETWORK_STATUS_CHANGED)) {
-			boolean networkChanged = intent.getBooleanExtra("networkChanged", false);
-			boolean connectedOrConnecting = intent.getBooleanExtra("connectedOrConnecting", true);
-			boolean connected = intent.getBooleanExtra("connected", true);
-			Log.i("NETWORK_CHANGED networkChanged=" + networkChanged + " connected=" + connected
-			        + " connectedOrConnecting=" + connectedOrConnecting + " state="
-			        + XmppManager.statusAsString(initialState));
+        } else if (action.equals(ACTION_NETWORK_STATUS_CHANGED)) {
+            boolean networkChanged = intent.getBooleanExtra("networkChanged", false);
+            boolean connectedOrConnecting = intent.getBooleanExtra("connectedOrConnecting", true);
+            boolean connected = intent.getBooleanExtra("connected", true);
+            Log.i("NETWORK_CHANGED networkChanged=" + networkChanged + " connected=" + connected
+                    + " connectedOrConnecting=" + connectedOrConnecting + " state="
+                    + XmppManager.statusAsString(initialState));
 
-			if (!connectedOrConnecting
-			        && (initialState == XmppManager.CONNECTED || initialState == XmppManager.CONNECTING)) {
-				// We are connected but the network has gone down - disconnect
-				// and go into WAITING state so we auto-connect when we get a future
-				// notification that a network is available.
-				sXmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
-			} else if (connected
-			        && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
-				sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
-			} else if (networkChanged && initialState == XmppManager.CONNECTED) {
-				// The network has changed (WiFi <-> GSM switch) and we are connected
-				// reconnect now
-				sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
-				sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
-			}
-		}
+            if (!connectedOrConnecting
+                    && (initialState == XmppManager.CONNECTED || initialState == XmppManager.CONNECTING)) {
+                // We are connected but the network has gone down - disconnect
+                // and go into WAITING state so we auto-connect when we get a future
+                // notification that a network is available.
+                sXmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
+            } else if (connected
+                    && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
+                sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+            } else if (networkChanged && initialState == XmppManager.CONNECTED) {
+                // The network has changed (WiFi <-> GSM switch) and we are connected
+                // reconnect now
+                sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+                sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+            }
+        }
 
         // Now that the connection state may has changed either because of a
         // Intent Action or because of connection changes that happened "externally"
@@ -249,7 +249,7 @@ public class MainService extends Service {
             }
             sXmppMgr.send(xmppMsg, intent.getStringExtra("to"));
         } else if (action.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
-			maybeAquireWakelock();
+            maybeAquireWakelock();
             String message = intent.getStringExtra("message");
             if (message != null) {
                 handleCommandFromXMPP(message, intent.getStringExtra("from"));
@@ -263,8 +263,7 @@ public class MainService extends Service {
             String message = intent.getStringExtra("message");
             boolean roomExists = XmppMuc.getInstance(this).roomExists(number);
 
-            Log.i(MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists + "notifySame="
-                    + sSettingsMgr.notifySmsInSameConversation);
+            Log.i(MainService.ACTION_SMS_RECEIVED + ": number=" + number + " message=" + message + " roomExists=" + roomExists + "notifySame=" + sSettingsMgr.notifySmsInSameConversation);
 
             // The user wants to be notified in the same conversation window,
             // which just means that we do not notify a MUC but the default
@@ -315,7 +314,7 @@ public class MainService extends Service {
                 && !action.equals(ACTION_CONNECT)
                 && !action.equals(ACTION_DISCONNECT)
                 && !action.equals(ACTION_TOGGLE)
-		        && !action.equals(ACTION_NETWORK_STATUS_CHANGED)) {
+                && !action.equals(ACTION_NETWORK_STATUS_CHANGED)) {
             Log.w("Unexpected intent: " + action);
         }
         Log.i("handled action '" + action + "' - state now: " + sXmppMgr.statusString());
@@ -345,7 +344,6 @@ public class MainService extends Service {
 
     public static Set<CommandHandlerBase> getActiveCommandSet() {
         return sActiveCommandSet;
-//        return new HashSet<CommandHandlerBase>(sActiveCommandSet);
     }
 
     public boolean getTLSStatus() {
@@ -387,7 +385,7 @@ public class MainService extends Service {
     public void onCreate() {
         super.onCreate();
 
-		NetworkConnectivityReceiver.setLastActiveNetworkName(this);
+        NetworkConnectivityReceiver.setLastActiveNetworkName(this);
 
         sPm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         sWl = sPm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, Tools.APP_NAME + " WakeLock");
@@ -596,20 +594,20 @@ public class MainService extends Service {
                     send(getString(R.string.chat_command_disabled), answerTo);
                 }
             } catch (Exception e) {
-				String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
-				String chatError = getString(R.string.chat_error, error);
+                String error = cmd + ":" + args + " Exception: " + e.getLocalizedMessage();
+                String chatError = getString(R.string.chat_error, error);
 
-				Log.e("executeCommand() Exception", e);
+                Log.e("executeCommand() Exception", e);
 
-				// Display the user detailed information about the exception if debugLog is enabled
-				if (sSettingsMgr.debugLog) {
-					XmppMsg msg = new XmppMsg();
-					msg.appendBold(chatError);
-					msg.append(Tools.STMArrayToString(e.getStackTrace()));
-					send(msg, answerTo);
-				} else {
-					send(chatError, answerTo);
-				}
+                // Display the user detailed information about the exception if debugLog is enabled
+                if (sSettingsMgr.debugLog) {
+                    XmppMsg msg = new XmppMsg();
+                    msg.appendBold(chatError);
+                    msg.append(Tools.STMArrayToString(e.getStackTrace()));
+                    send(msg, answerTo);
+                } else {
+                    send(chatError, answerTo);
+                }
             }
         } else if (cmd.equals("stop")) {
             send(getString(R.string.chat_stop_actions), answerTo);
@@ -893,8 +891,9 @@ public class MainService extends Service {
         return sendToServiceHandler(0, intent);
     }
 
-	public static void maybeAquireWakelock() {
-		if (!sWl.isHeld())
-			sWl.acquire();
-	}
+    public static void maybeAquireWakelock() {
+        if (!sWl.isHeld()) {
+            sWl.acquire();
+        }
+    }
 }
