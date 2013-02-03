@@ -50,19 +50,16 @@ public class MmsManager {
         Log.initialize(_settings);
     }
     
-    /**
-     * Retrieve the X last MMS
-     * TODO: To be tested with older Android's SDK
-     * 
-     * @param nbMMS Number of MMS to retrieve
-     * @return The list of MMS
-     */
     public ArrayList<Mms> getLastReceivedMmsDetails(int nbMMS) {
         return getLastMmsDetails(MMS_INBOX_CONTENT_URI, nbMMS);
     }
     
     public ArrayList<Mms> getLastSentMmsDetails(int nbMMS) {
         return getLastMmsDetails(MMS_SENTBOX_CONTENT_URI, nbMMS);
+    }
+    
+    public ArrayList<Mms> getLastMmsDetails(int nbMMS) {
+        return getLastMmsDetails(MMS_CONTENT_URI, nbMMS);
     }
     
     public ArrayList<Mms> getLastMmsDetails(Uri uri, int nbMMS) {
@@ -117,9 +114,9 @@ public class MmsManager {
                         mms.appendMessage(Tools.getString(cPart, "text"));
                     }
                 } else if ("image/jpeg".equals(type) || "image/bmp".equals(type) || "image/gif".equals(type) || "image/jpg".equals(type) || "image/png".equals(type)) {
-                    Bitmap bitmap = getMmsImage(partId);
-                    mms.appendMessage("Image Size: " + bitmap.getWidth() + "x" + bitmap.getHeight() + "\n");
-                    mms.setBitmap(bitmap);
+                    if (getMmsImage(mms, partId, false)) {
+                        mms.appendMessage("[Image]\n");
+                    }
                 }
             } while (cPart.moveToNext());
         }
@@ -153,13 +150,18 @@ public class MmsManager {
         return sb.toString();
     }
 
-    private Bitmap getMmsImage( String _id) {
-        Uri partURI = Uri.parse("content://mms/part/" + _id);
+    private boolean getMmsImage(Mms mms, String id, boolean retrieveContent) {
+        boolean result = false;
+        
+        Uri partURI = Uri.parse("content://mms/part/" + id);
         InputStream is = null;
         Bitmap bitmap = null;
         try {
-            is = _context.getContentResolver().openInputStream(partURI);
-            bitmap = BitmapFactory.decodeStream(is);
+            if (retrieveContent) {
+                is = _context.getContentResolver().openInputStream(partURI);
+                bitmap = BitmapFactory.decodeStream(is);
+            }
+            result = true;
         } catch (IOException e) {
         } finally {
             if (is != null) {
@@ -168,9 +170,10 @@ public class MmsManager {
                 } catch (IOException e) {}
             }
         }
-        return bitmap;
+        mms.setBitmap(bitmap);
+        
+        return result;
     }
-    
     
     private String getAddress(int id, int mmsType) {
         ArrayList<String> names = new ArrayList<String>();

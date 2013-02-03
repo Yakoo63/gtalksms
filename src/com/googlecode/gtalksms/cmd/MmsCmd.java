@@ -21,26 +21,55 @@ public class MmsCmd extends CommandHandlerBase {
     protected void execute(String command, String args) {
         if (isMatchingCmd("mms", command)) {
             String[] arg = splitArgs(args);
-            if (arg[0].equals("sent")) {
-                printMmsList(mMmsManager.getLastSentMmsDetails(Tools.parseInt(arg, 1, 10)));
-            } else {
-                printMmsList(mMmsManager.getLastReceivedMmsDetails(Tools.parseInt(arg, 0, 10)));
-            }
+            sendMmsListOnXmpp(mMmsManager.getLastMmsDetails(Tools.parseInt(arg, 0, 10)), null, null);
         }
     }
 
-    private void printMmsList(ArrayList<Mms> allMms) {
-        XmppMsg mmsMsg = new XmppMsg();
-        for (Mms mms : allMms) {
-            mmsMsg.append(DateFormat.getDateTimeInstance().format(mms.getDate()));
-            mmsMsg.append(" - ");
-            mmsMsg.appendBold(mms.getSender());
-            mmsMsg.append(" --> ");
-            mmsMsg.appendBold(mms.getRecipients());
-            mmsMsg.appendItalicLine(mms.getSubject() == null || mms.getSubject().isEmpty() ? "" : "\n<" + mms.getSubject() + ">");
-            mmsMsg.appendLine(mms.getMessage());
+    private void appendMms(XmppMsg mmsMsg, Mms mms) {
+        mmsMsg.append(DateFormat.getDateTimeInstance().format(mms.getDate()));
+        mmsMsg.append(" - ");
+        mmsMsg.appendBold(mms.getSender());
+        mmsMsg.append(" --> ");
+        mmsMsg.appendBold(mms.getRecipients());
+        mmsMsg.appendItalicLine(mms.getSubject() == null || mms.getSubject().isEmpty() ? "" : "\n<" + mms.getSubject() + ">");
+        String msg = mms.getMessage();
+        if (msg != null && !msg.isEmpty()) {
+            mmsMsg.appendLine(msg);
         }
-        send(mmsMsg);
+        mmsMsg.appendLine("");
+    }
+    
+    /** Helper to send messages via xmpp according to the settings */
+    private void sendMmsListOnXmpp(ArrayList<Mms> mmsList, String preMsg, String postMsg) {
+        XmppMsg message = new XmppMsg();
+        if (sSettingsMgr.smsReplySeparate) {
+            if (preMsg != null) {
+                message.appendBold(preMsg);
+                sendAndClear(message);
+            }
+            for (Mms mms : mmsList) {
+                appendMms(message, mms);
+                sendAndClear(message);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {}
+            }
+            if (postMsg != null) {
+                message.appendItalicLine(postMsg);
+                sendAndClear(message);
+            }
+        } else {
+            if (preMsg != null) {
+                message.appendBoldLine(preMsg);
+            }
+            for (Mms mms : mmsList) {
+                appendMms(message, mms);
+            }
+            if (postMsg != null) {
+                message.appendItalicLine(postMsg);
+            }
+            send(message);
+        }
     }
 
     @Override

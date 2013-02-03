@@ -26,19 +26,26 @@ public class MmsReceiver extends BroadcastReceiver {
             if (bundle != null) {
                 byte[] dataBytes = bundle.getByteArray("data");
                 if (dataBytes != null) {
+                    MmsManager mmsManager = new MmsManager(context);
                     String buffer = new String(bundle.getByteArray("data"));
                     Log.d(Tools.LOG_TAG, "MMS data = " + buffer);
-                
-                    MmsManager mmsManager = new MmsManager(context);
                     
-                    // We assume that we don't received more than 10 messages at the same time
-                    ArrayList<Mms> allMms = mmsManager.getLastReceivedMmsDetails(10);
-                    
-                    for (Mms mms: allMms) {
-                        // Check if the retrieved MMS is the good one
-                        if (mms != null && mms.getId() != null && buffer.contains(mms.getId())) {
-                            context.startService(Tools.newSvcIntent(context, MainService.ACTION_SEND, 
-                            context.getString(R.string.chat_mms_from, mms.getSender()) + mms.getSubject() + "\n" + mms.getMessage(), null));
+                    // Ensure that the MMS is managed by the stock application
+                    for (int i = 0; i < 10; ++i) {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (Exception e) {}
+                        
+                        // We assume that we don't received more than 10 messages at the same time
+                        ArrayList<Mms> allMms = mmsManager.getLastReceivedMmsDetails(10);
+                        
+                        for (Mms mms: allMms) {
+                            // Check if the retrieved MMS is the good one
+                            if (mms != null && mms.getId() != null && buffer.contains(mms.getId())) {
+                                context.startService(Tools.newSvcIntent(context, MainService.ACTION_SEND, 
+                                context.getString(R.string.chat_mms_from, mms.getSender()) + mms.getSubject() + "\n" + mms.getMessage(), null));
+                                return;
+                            }
                         }
                     }
                 }
