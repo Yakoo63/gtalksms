@@ -146,6 +146,11 @@ public abstract class CommandHandlerBase {
         send(message, mAnswerTo);
     }
     
+    protected void sendAndClear(XmppMsg message) {
+        send(message, mAnswerTo);
+        message.clear();
+    }
+    
     protected void send(String message, String to) {
         sMainService.send(message, to);
     }

@@ -42,6 +42,12 @@ public class XmppMsg implements Parcelable {
     public XmppMsg(XmppFont font) {
         mMainFont = font;
     }
+    
+    public void clear() {
+        mMainFont = DEFAULT_FONT;
+        mMessage.setLength(0);
+        mFonts.clear();
+    }
 
     public static String makeBold(String in) {
         return BOLD_BEGIN + in + BOLD_END;
