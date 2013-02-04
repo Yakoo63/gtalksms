@@ -250,9 +250,9 @@ public class SystemCmd extends CommandHandlerBase {
     
     private static void appendNullIntentStartCounter(XmppMsg msg) {
         msg.appendBoldLine("Null Intents Starts");
-        msg.appendLine("Hot often was " + Tools.APP_NAME + " restarted by Android");
+        msg.appendLine("How often was " + Tools.APP_NAME + " restarted by Android");
         long[] values = sNullIntentStartCounter.getLastValues(7);
-        String line = "";        
+        String line = "";
         for (int i = 0; i < values.length; i++) {
             line += values[i] + " ";
         }

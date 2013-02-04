@@ -50,13 +50,13 @@ public class SettingsCmd extends CommandHandlerBase {
                         sSettingsMgr.saveSetting(key, newval);
                     }
                 } else {
-                    c.respond(key + " setting is protected.");
+                    send(key + " setting is protected.");
                 }
             } else {
-                c.respond(key + ":" + settings.get(key));
+                send(key + ":" + settings.get(key));
             }
         } else {
-            c.respond("Unknown setting: " + key);
+            send("Unknown setting: " + key);
         }
     }
     
