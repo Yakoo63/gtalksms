@@ -187,8 +187,11 @@ public class SettingsManager {
     
     private static SettingsManager sSettingsManager = null;
     
+    private ArrayList<String> mProtectedSettings = new ArrayList<String>();
+    private ArrayList<String> mHiddenSettings = new ArrayList<String>();
     private SharedPreferences mSharedPreferences;
     private Context mContext;
+    
     private OnSharedPreferenceChangeListener mChangeListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -209,6 +212,18 @@ public class SettingsManager {
         mSharedPreferences = mContext.getSharedPreferences(Tools.APP_NAME, 0);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mChangeListener);
         
+        mProtectedSettings.add("serverHost");
+        mProtectedSettings.add("serverPort");
+        mProtectedSettings.add("notifiedAddress");
+        mProtectedSettings.add("login");
+        mProtectedSettings.add("manuallySpecifyServerSettings");
+        mProtectedSettings.add("serviceName");
+        mProtectedSettings.add("password");
+        mProtectedSettings.add("xmppSecurityMode");
+        mProtectedSettings.add("useCompression");
+        
+        mHiddenSettings.add("password");
+        
         try {
             importPreferences();
         } catch (Exception e) {
@@ -225,6 +240,14 @@ public class SettingsManager {
     
     public void Destroy() {
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mChangeListener);
+    }
+    
+    public ArrayList<String> getProtectedSettings() {
+        return new ArrayList<String>(mProtectedSettings);
+    }
+    
+    public ArrayList<String> getHiddenSettings() {
+        return new ArrayList<String>(mHiddenSettings);
     }
     
     public SharedPreferences.Editor getEditor() {
@@ -247,7 +270,11 @@ public class SettingsManager {
     }
     
     public Map<String, ?> getAllSharedPreferences() {
-        return mSharedPreferences.getAll();
+        Map<String, ?> result = mSharedPreferences.getAll();
+        for (String key: mHiddenSettings) {
+            result.remove(key);
+        }
+        return result;
     }
     
     public boolean SharedPreferencesContains(String key) {

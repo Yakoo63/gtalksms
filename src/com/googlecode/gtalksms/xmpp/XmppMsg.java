@@ -82,9 +82,13 @@ public class XmppMsg implements Parcelable {
     public void insertLineBegin(String msg) {
         mMessage.insert(0, msg + Tools.LineSep);
     }
-    
+
     public void appendBold(String msg) {
         mMessage.append(makeBold(msg));
+    }
+
+    public void appendBoldItalic(String msg) {
+        mMessage.append(makeBold(makeItalic(msg)));
     }
     
     public void appendBoldLine(String msg) {

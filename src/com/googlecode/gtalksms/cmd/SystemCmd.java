@@ -220,11 +220,7 @@ public class SystemCmd extends CommandHandlerBase {
         msg.appendBoldLine(Tools.APP_NAME + " Preferences");
         Map<String, ?> allSharedPrefs = sSettingsMgr.getAllSharedPreferences();
         for(Map.Entry<String, ?> pairs : allSharedPrefs.entrySet()) {
-            String key = pairs.getKey();
-            String value = pairs.getValue().toString();
-            if (!key.equals("password")) {
-                msg.appendLine(key + ": " + value);
-            }
+            msg.appendLine(pairs.getKey() + ": " + pairs.getValue().toString());
         }
     }
     

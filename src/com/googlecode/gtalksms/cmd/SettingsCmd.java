@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class SettingsCmd extends CommandHandlerBase {
     
@@ -16,28 +17,40 @@ public class SettingsCmd extends CommandHandlerBase {
     @Override
     public void execute(Command c) {
         Map<String, ?> settings = sSettingsMgr.getAllSharedPreferences();
+        ArrayList<String> protectedSettings = sSettingsMgr.getProtectedSettings();
         String key = c.get1();
         
         if(key.equals("")) {
-            StringBuffer buf = new StringBuffer();
+            XmppMsg msg = new XmppMsg();
             ArrayList<String> keys = new ArrayList<String>(settings.keySet());
             Collections.sort(keys);
+            msg.appendLine("Settings are:");
             for(String k : keys) {
-                buf.append("\n").append(k + ":" + settings.get(k));
+                if (!protectedSettings.contains(k)) {
+                    msg.appendBold(k);
+                    msg.appendLine(":" + settings.get(k));
+                } else {
+                    msg.appendBold("[" + k + "]");
+                    msg.appendLine(":" + settings.get(k));
+                }
             }
-            c.respond("Settings are: " + buf);
+            send(msg);
         }
         else if(settings.containsKey(key)) {
             String newval = c.get2();
             if(!"".equals(newval)) {
-                Integer intValue = Tools.parseInt(newval);
-                Boolean boolValue = Tools.parseBool(newval);
-                if (intValue != null) {
-                    sSettingsMgr.saveSetting(key, intValue);
-                } else if (boolValue != null) {
-                    sSettingsMgr.saveSetting(key, boolValue);
+                if (!protectedSettings.contains(key)) {
+                    Integer intValue = Tools.parseInt(newval);
+                    Boolean boolValue = Tools.parseBool(newval);
+                    if (intValue != null) {
+                        sSettingsMgr.saveSetting(key, intValue);
+                    } else if (boolValue != null) {
+                        sSettingsMgr.saveSetting(key, boolValue);
+                    } else {
+                        sSettingsMgr.saveSetting(key, newval);
+                    }
                 } else {
-                    sSettingsMgr.saveSetting(key, newval);
+                    c.respond(key + " setting is protected.");
                 }
             } else {
                 c.respond(key + ":" + settings.get(key));

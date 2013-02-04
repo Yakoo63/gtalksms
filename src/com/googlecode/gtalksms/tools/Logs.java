@@ -148,11 +148,7 @@ public class Logs {
         SettingsManager settings = SettingsManager.getSettingsManager(ctx);
         Map<String, ?> allSharedPrefs = settings.getAllSharedPreferences();
         for (Map.Entry<String, ?> pairs : allSharedPrefs.entrySet()) {
-            String key = pairs.getKey();
-            String value = pairs.getValue().toString();
-            if (!key.equals("password")) {
-                res.append(key + ": " + value + LINE_SEPARATOR);
-            }
+            res.append(pairs.getKey() + ": " + pairs.getValue().toString() + LINE_SEPARATOR);
         }
         return res.toString();
     }
