@@ -273,8 +273,6 @@
     <string name="pref_app_advanced">Paramètres avancés</string>
     <string name="pref_app_auto_start_options">Lancement auto.</string>
     <string name="pref_app_auto_stop_options">Arrêt auto.</string>
-    <string name="pref_app_call_logs_number">Nombre d\'appel pour l\'historique</string>
-    <string name="pref_app_call_logs_number_help">Nombre d\'appel à afficher dans l\'historique</string>
     <string name="pref_app_connect_mainscreen">Connexion de GTalkSMS au démarrage</string>
     <string name="pref_app_connect_mainscreen_help">Connexion de GTalkSMS quand l\'écran d\'accueil est affiché</string>    
     <string name="pref_app_display_contact_number">Afficher le N°</string>

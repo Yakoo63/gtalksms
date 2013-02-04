@@ -162,9 +162,6 @@ public class SettingsManager {
     // screen shots
     public String framebufferMode;
     
-    // calls
-    public int callLogsNumber;
-    
     // locale
     public Locale locale;
     
@@ -342,7 +339,6 @@ public class SettingsManager {
         ringtone = getString("ringtone", Settings.System.DEFAULT_RINGTONE_URI.toString());
         markSmsReadOnReply = getBoolean("markSmsReadOnReply", false);
         smsNumber = getInt("smsNumber", 5);
-        callLogsNumber = getInt("callLogsNumber", 10);
         formatResponses = getBoolean("formatResponses", false);
         displayContactNumber = getBoolean("displayContactNumber", false);
         notifyIncomingCalls = getBoolean("notifyIncomingCalls", false);

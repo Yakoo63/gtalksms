@@ -76,17 +76,7 @@ public class CallCmd extends CommandHandlerBase {
 
         ArrayList<Call> arrayList = _phoneMgr.getPhoneLogs();
         XmppMsg all = new XmppMsg();
-        int callLogsNumber;
-        if (args.equals("")) {
-            callLogsNumber = sSettingsMgr.callLogsNumber;
-        } else {
-            try {
-            	callLogsNumber = Integer.parseInt(args);
-            } catch (Exception e) {
-                callLogsNumber = sSettingsMgr.callLogsNumber;
-            }
-        }
-        
+        int callLogsNumber = Tools.parseInt(args, 10);
         List<Call> callList = Tools.getLastElements(arrayList, callLogsNumber);
         if (callList.size() > 0) {
             for (Call call : callList) {

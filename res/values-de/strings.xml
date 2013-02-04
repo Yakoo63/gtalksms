@@ -273,8 +273,6 @@
     <string name="pref_app_advanced">Erweiterte Einstellungen</string>    
     <string name="pref_app_auto_start_options">Auto-Start Optionen</string>
     <string name="pref_app_auto_stop_options">Auto-Stop Optionen</string>
-    <string name="pref_app_call_logs_number">Größe des Anruf Logs</string>
-    <string name="pref_app_call_logs_number_help">Anzahl der auf Befehl angezeigeten Anrufe</string>
     <string name="pref_app_connect_mainscreen">Verbinde bei Anwendungsstart</string>
     <string name="pref_app_connect_mainscreen_help">Verbindet GTalkSMS automatisch wenn die Anwedung gestartet wird</string>    
     <string name="pref_app_display_contact_number">TO TRANSLATE: Display Phone Number</string>
