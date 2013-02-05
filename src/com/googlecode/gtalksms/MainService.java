@@ -386,7 +386,7 @@ public class MainService extends Service {
         super.onCreate();
 
         NetworkConnectivityReceiver.setLastActiveNetworkName(this);
-
+        
         sPm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         sWl = sPm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, Tools.APP_NAME + " WakeLock");
 
@@ -880,9 +880,7 @@ public class MainService extends Service {
             sServiceHandler.sendMessage(msg);
             return true;
         } else {
-            Log.w("sendToServiceHandler() called with " 
-                    + intent.getAction() 
-                    + " when service handler is null");
+            Log.w("sendToServiceHandler() called with " + intent.getAction() + " when service handler is null");
             return false;
         }
     }
