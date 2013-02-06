@@ -30,56 +30,65 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        String appName = getApplicationName(event.getPackageName().toString());
         Log.d(Tools.LOG_TAG, "onAccessibilityEvent");
-        Log.d(Tools.LOG_TAG, "[PackageName]         " + event.getPackageName());
-        Log.d(Tools.LOG_TAG, "[Application]         " + appName);
-        Log.d(Tools.LOG_TAG, "[EventTime]           " + event.getEventTime());
-        
-        // Dump the notification into a local view to parse it
-        Notification notification = (Notification) event.getParcelableData();
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ViewGroup localView = (ViewGroup) inflater.inflate(notification.contentView.getLayoutId(), null);
-        notification.contentView.reapply(getApplicationContext(), localView);
-        
-        // Find all texts of the notification
-        String message = "";
-        ArrayList<TextView> views = new ArrayList<TextView>();
-        getAllTextView(views, localView);
-        for (TextView v: views) {
-            String text = v.getText().toString();
-            if (!text.isEmpty()) {
-                Log.d(Tools.LOG_TAG, "[Text]                " + text);
-                message += text + "\n";
-            }
-        }
-        if (message.isEmpty()) {
-            message = getEventText(event.getText());
-        }
-        
-        // Format the result
-        XmppMsg msg = new XmppMsg();
-        msg.append("New notification from  ");
-        msg.appendBoldLine(appName);
-        msg.append(message.trim());
-        
-        boolean ignore = false;
-        // Avoid duplicated notifications sent in less than 2s (ie download manager)
-        if (mLastMessage.containsKey(appName) && mLastMessage.get(appName).equals(msg.generateTxt())) {
-            long old = mLastTimeStamp.get(appName);
-            if (event.getEventTime() - old < 2000) {
-                ignore = true;
-            }
-        }
+        try {
+            String appName = getApplicationName(event.getPackageName().toString());
+            Log.d(Tools.LOG_TAG, "[PackageName]         " + event.getPackageName());
+            Log.d(Tools.LOG_TAG, "[Application]         " + appName);
+            Log.d(Tools.LOG_TAG, "[EventTime]           " + event.getEventTime());
             
-        // Ignore GTalkSMS notifications and send others
-        if (!ignore && !event.getPackageName().equals(getBaseContext().getPackageName())) {
-            Tools.send(msg, null, getBaseContext());
+            String message = "";
+            try {
+                // Dump the notification into a local view to parse it
+                Notification notification = (Notification) event.getParcelableData();
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                ViewGroup localView = (ViewGroup) inflater.inflate(notification.contentView.getLayoutId(), null);
+                notification.contentView.reapply(getApplicationContext(), localView);
+                
+                // Find all texts of the notification
+                ArrayList<TextView> views = new ArrayList<TextView>();
+                getAllTextView(views, localView);
+                for (TextView v: views) {
+                    String text = v.getText().toString();
+                    if (!text.isEmpty()) {
+                        Log.d(Tools.LOG_TAG, "[Text]                " + text);
+                        message += text + "\n";
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(Tools.LOG_TAG, "Failed to parse the notification.", e);
+            }
+            
+            if (message.isEmpty()) {
+                message = getEventText(event.getText());
+            }
+            
+            // Format the result
+            XmppMsg msg = new XmppMsg();
+            msg.append("New notification from  ");
+            msg.appendBoldLine(appName);
+            msg.append(message.trim());
+            
+            boolean ignore = false;
+            // Avoid duplicated notifications sent in less than 2s (ie download manager)
+            if (mLastMessage.containsKey(appName) && mLastMessage.get(appName).equals(msg.generateTxt())) {
+                long old = mLastTimeStamp.get(appName);
+                if (event.getEventTime() - old < 2000) {
+                    ignore = true;
+                }
+            }
+                
+            // Ignore GTalkSMS notifications and send others
+            if (!ignore && !event.getPackageName().equals(getBaseContext().getPackageName())) {
+                Tools.send(msg, null, getBaseContext());
+            }
+            
+            // Keep last message reference
+            mLastMessage.put(appName, msg.generateTxt());
+            mLastTimeStamp.put(appName, event.getEventTime());
+        } catch (Exception e) {
+            Log.e(Tools.LOG_TAG, "Failed to process notification", e);
         }
-        
-        // Keep last message reference
-        mLastMessage.put(appName, msg.generateTxt());
-        mLastTimeStamp.put(appName, event.getEventTime());
     }
     
     private String getApplicationName(String packageName) {
@@ -97,15 +106,6 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         return name;
     }
     
-    private void refreshApplicationList() {
-        final PackageManager pm = getBaseContext().getPackageManager();
-        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        
-        for (ApplicationInfo packageInfo : packages) {
-            mInstalledApplications.put(packageInfo.packageName, packageInfo.loadLabel(pm).toString());
-        }
-    }
- 
     @Override
     public void onInterrupt() {
         Log.v(Tools.LOG_TAG, "onInterrupt");
@@ -116,15 +116,19 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         super.onServiceConnected();
         Log.v(Tools.LOG_TAG, "onServiceConnected");
 
-        refreshApplicationList();
-        mLastMessage.clear();
-        mLastTimeStamp.clear();
-        
-        AccessibilityServiceInfo info = new AccessibilityServiceInfo();
-        info.flags = AccessibilityServiceInfo.DEFAULT;
-        info.eventTypes = AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED;
-        info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
-        setServiceInfo(info);
+        try {
+            refreshApplicationList();
+            mLastMessage.clear();
+            mLastTimeStamp.clear();
+            
+            AccessibilityServiceInfo info = new AccessibilityServiceInfo();
+            info.flags = AccessibilityServiceInfo.DEFAULT;
+            info.eventTypes = AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED;
+            info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
+            setServiceInfo(info);
+        } catch (Exception e) {
+            Log.e(Tools.LOG_TAG, "Failed to configure accessibility service", e);
+        }
     }
     
     private String getEventText(List<CharSequence> msg) {
@@ -154,4 +158,12 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         }
     }
     
+    private void refreshApplicationList() {
+        final PackageManager pm = getBaseContext().getPackageManager();
+        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+        
+        for (ApplicationInfo packageInfo : packages) {
+            mInstalledApplications.put(packageInfo.packageName, packageInfo.loadLabel(pm).toString());
+        }
+    } 
 }
