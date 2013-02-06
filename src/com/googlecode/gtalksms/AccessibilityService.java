@@ -34,24 +34,14 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
  
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        Log.d(Tools.LOG_TAG, "onAccessibilityEvent");
-        Log.d(Tools.LOG_TAG, "[ClassName]           " + event.getClassName());
-        Log.d(Tools.LOG_TAG, "[PackageName]         " + event.getPackageName());
-
         String appName = getApplicationName(event.getPackageName().toString());
+        Log.d(Tools.LOG_TAG, "onAccessibilityEvent");
+        Log.d(Tools.LOG_TAG, "[PackageName]         " + event.getPackageName());
         Log.d(Tools.LOG_TAG, "[Application]         " + appName);
-
-        Log.d(Tools.LOG_TAG, "[ContentDescription]  " + event.getContentDescription());
         Log.d(Tools.LOG_TAG, "[EventTime]           " + event.getEventTime());
         Log.d(Tools.LOG_TAG, "[BeforeText]          " + event.getBeforeText());
         Log.d(Tools.LOG_TAG, "[Text]                " + getEventText(event.getText()));
-        Log.d(Tools.LOG_TAG, "[ItemCount]           " + event.getItemCount());
-        Log.d(Tools.LOG_TAG, "[RecordCount]         " + event.getRecordCount());
-        for (int i = 0; i < event.getRecordCount(); ++i) {
-            Log.d(Tools.LOG_TAG, "[RecordText " + i + "]                  " + getEventText(event.getRecord(i).getText()));
-            Log.d(Tools.LOG_TAG, "[getContentDescription " + i + "]       " + event.getRecord(i).getContentDescription());
-        }
-
+       
         XmppMsg msg = new XmppMsg();
         msg.append("New notification from  ");
         msg.appendBold(appName + ": ");

@@ -143,6 +143,14 @@
             </intent-filter>
             <meta-data android:name="android.view.im" android:resource="@xml/method" />
         </service>
+        <service android:name="com.googlecode.gtalksms.AccessibilityService"
+            android:label="@string/accessibility_service_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
+        
         <meta-data 
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAI8M6AdV8LJxkmMhej-2G7N_JLe-1BbFB-qOoM7Q" />
