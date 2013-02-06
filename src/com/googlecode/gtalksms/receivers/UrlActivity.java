@@ -14,8 +14,10 @@ public class UrlActivity extends Activity {
         
         Intent intent = getIntent();       
         Uri uri = intent.getData();
-        Tools.send(uri.toString(), null, this);
-
+        if (uri != null) {
+            Tools.send(uri.toString(), null, this);
+        }
+        
         finish();
     }
 }
