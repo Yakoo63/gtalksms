@@ -36,14 +36,11 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         Log.d(Tools.LOG_TAG, "[Application]         " + appName);
         Log.d(Tools.LOG_TAG, "[EventTime]           " + event.getEventTime());
         
+        // Dump the notification into a local view to parse it
         Notification notification = (Notification) event.getParcelableData();
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ViewGroup localView = (ViewGroup) inflater.inflate(notification.contentView.getLayoutId(), null);
         notification.contentView.reapply(getApplicationContext(), localView);
-        
-        XmppMsg msg = new XmppMsg();
-        msg.append("New notification from  ");
-        msg.appendBoldLine(appName);
         
         // Find all texts of the notification
         String message = "";
@@ -60,8 +57,14 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             message = getEventText(event.getText());
         }
         
+        // Format the result
+        XmppMsg msg = new XmppMsg();
+        msg.append("New notification from  ");
+        msg.appendBoldLine(appName);
+        msg.append(message.trim());
+        
         boolean ignore = false;
-        // Avoid duplicated notifications sent in less than 1s
+        // Avoid duplicated notifications sent in less than 2s (ie download manager)
         if (mLastMessage.containsKey(appName) && mLastMessage.get(appName).equals(msg.generateTxt())) {
             long old = mLastTimeStamp.get(appName);
             if (event.getEventTime() - old < 2000) {
@@ -74,6 +77,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             Tools.send(msg, null, getBaseContext());
         }
         
+        // Keep last message reference
         mLastMessage.put(appName, msg.generateTxt());
         mLastTimeStamp.put(appName, event.getEventTime());
     }
