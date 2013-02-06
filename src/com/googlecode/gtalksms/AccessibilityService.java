@@ -1,22 +1,26 @@
 package com.googlecode.gtalksms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.Notification;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
+import android.widget.TextView;
 
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
-// TODO: auto activate this service in accessibity options of Android
-// TODO: add a desc for the service
-// TODO: manage all messages even for GTalkSMS
-// TODO: filter package messages to avoid flooding like download package
-// TODO: manage parcelable data of the event
+// TODO: auto activate this service in accessibility options of Android
+// TODO: add a description for the service
+// TODO: add shortcut button to accessibility panel Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS); startActivityForResult(intent, 0);
 
 public class AccessibilityService extends android.accessibilityservice.AccessibilityService {
 
@@ -24,14 +28,6 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     HashMap<String, String> mLastMessage = new HashMap<String, String>();
     HashMap<String, Long> mLastTimeStamp = new HashMap<String, Long>();
 
-    private String getEventText(List<CharSequence> msg) {
-        StringBuilder sb = new StringBuilder();
-        for (CharSequence s : msg) {
-            sb.append(s);
-        }
-        return sb.toString();
-    }
- 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         String appName = getApplicationName(event.getPackageName().toString());
@@ -39,19 +35,36 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         Log.d(Tools.LOG_TAG, "[PackageName]         " + event.getPackageName());
         Log.d(Tools.LOG_TAG, "[Application]         " + appName);
         Log.d(Tools.LOG_TAG, "[EventTime]           " + event.getEventTime());
-        Log.d(Tools.LOG_TAG, "[BeforeText]          " + event.getBeforeText());
-        Log.d(Tools.LOG_TAG, "[Text]                " + getEventText(event.getText()));
-       
+        
+        Notification notification = (Notification) event.getParcelableData();
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ViewGroup localView = (ViewGroup) inflater.inflate(notification.contentView.getLayoutId(), null);
+        notification.contentView.reapply(getApplicationContext(), localView);
+        
         XmppMsg msg = new XmppMsg();
         msg.append("New notification from  ");
-        msg.appendBold(appName + ": ");
-        msg.append(getEventText(event.getText()));
-
+        msg.appendBoldLine(appName);
+        
+        // Find all texts of the notification
+        String message = "";
+        ArrayList<TextView> views = new ArrayList<TextView>();
+        getAllTextView(views, localView);
+        for (TextView v: views) {
+            String text = v.getText().toString();
+            if (!text.isEmpty()) {
+                Log.d(Tools.LOG_TAG, "[Text]                " + text);
+                message += text + "\n";
+            }
+        }
+        if (message.isEmpty()) {
+            message = getEventText(event.getText());
+        }
+        
         boolean ignore = false;
         // Avoid duplicated notifications sent in less than 1s
         if (mLastMessage.containsKey(appName) && mLastMessage.get(appName).equals(msg.generateTxt())) {
             long old = mLastTimeStamp.get(appName);
-            if (event.getEventTime() - old < 1000) {
+            if (event.getEventTime() - old < 2000) {
                 ignore = true;
             }
         }
@@ -109,4 +122,32 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
         setServiceInfo(info);
     }
+    
+    private String getEventText(List<CharSequence> msg) {
+        StringBuilder sb = new StringBuilder();
+        for (CharSequence s : msg) {
+            sb.append(s);
+        }
+        return sb.toString();
+    }
+ 
+    private void getAllTextView(ArrayList<TextView> views, ViewGroup v)
+    {
+        if (null == views) {
+            return;
+        }
+        for (int i = 0; i < v.getChildCount(); i++)
+        {
+            Object child = v.getChildAt(i); 
+            if (child instanceof TextView)
+            {
+                views.add((TextView)child);
+            }
+            else if(child instanceof ViewGroup)
+            {
+                getAllTextView(views, (ViewGroup)child);  // Recursive call.
+            }
+        }
+    }
+    
 }
