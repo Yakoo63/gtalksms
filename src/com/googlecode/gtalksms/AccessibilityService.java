@@ -19,6 +19,7 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 // TODO: auto activate this service in accessibility options of Android
 // TODO: add a description for the service
+// TODO: add black/white lists to let the user choose which notifications he wants
 // TODO: add shortcut button to accessibility panel Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS); startActivityForResult(intent, 0);
 
 public class AccessibilityService extends android.accessibilityservice.AccessibilityService {
@@ -160,7 +161,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         for (int i = 0; i < v.getChildCount(); i++)
         {
             Object child = v.getChildAt(i); 
-            if (child instanceof TextView)
+            if (child.getClass().equals(TextView.class))
             {
                 views.add((TextView)child);
             }
