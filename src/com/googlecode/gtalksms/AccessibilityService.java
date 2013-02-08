@@ -9,7 +9,6 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
@@ -27,15 +26,16 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     HashMap<String, String> mInstalledApplications = new HashMap<String, String>();
     HashMap<String, String> mLastMessage = new HashMap<String, String>();
     HashMap<String, Long> mLastTimeStamp = new HashMap<String, Long>();
+    static ArrayList<Integer> sHiddenNotifItem = new ArrayList<Integer>();
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        Log.d(Tools.LOG_TAG, "onAccessibilityEvent");
+        Log.d("onAccessibilityEvent");
         try {
             String appName = getApplicationName(event.getPackageName().toString());
-            Log.d(Tools.LOG_TAG, "[PackageName]         " + event.getPackageName());
-            Log.d(Tools.LOG_TAG, "[Application]         " + appName);
-            Log.d(Tools.LOG_TAG, "[EventTime]           " + event.getEventTime());
+            Log.d("[PackageName]         " + event.getPackageName());
+            Log.d("[Application]         " + appName);
+            Log.d("[EventTime]           " + event.getEventTime());
             
             String message = "";
             try {
@@ -51,12 +51,18 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 for (TextView v: views) {
                     String text = v.getText().toString();
                     if (!text.isEmpty()) {
-                        Log.d(Tools.LOG_TAG, "[Text]                " + text);
-                        message += text + "\n";
+                        if (sHiddenNotifItem.contains(v.getId())) {
+                            Log.d("[ItemId] Hidden       " + v.getId());
+                            Log.d("[Text]   Hidden       " + text);
+                        } else {
+                            Log.d("[ItemId]              " + v.getId());
+                            Log.d("[Text]                " + text);
+                            message += text + "\n";
+                        }
                     }
                 }
             } catch (Exception e) {
-                Log.e(Tools.LOG_TAG, "Failed to parse the notification.", e);
+                Log.e("Failed to parse the notification.", e);
             }
             
             if (message.isEmpty()) {
@@ -87,7 +93,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             mLastMessage.put(appName, msg.generateTxt());
             mLastTimeStamp.put(appName, event.getEventTime());
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "Failed to process notification", e);
+            Log.e("Failed to process notification", e);
         }
     }
     
@@ -108,13 +114,20 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     
     @Override
     public void onInterrupt() {
-        Log.v(Tools.LOG_TAG, "onInterrupt");
+        Log.d("AccessibilityService: onInterrupt");
     }
  
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-        Log.v(Tools.LOG_TAG, "onServiceConnected");
+        
+        Log.initialize(SettingsManager.getSettingsManager(this));
+        Log.d("AccessibilityService: onServiceConnected");
+
+        // Removed parts of notifications
+        sHiddenNotifItem.clear();
+        sHiddenNotifItem.add(16908388); // Time of the notification
+        sHiddenNotifItem.add(16909096); // Number of items
 
         try {
             refreshApplicationList();
@@ -127,7 +140,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
             setServiceInfo(info);
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "Failed to configure accessibility service", e);
+            Log.e("Failed to configure accessibility service", e);
         }
     }
     
