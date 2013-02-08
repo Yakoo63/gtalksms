@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="android_version_incompatible">Android version not compatible, %s needed.</string>
+    <string name="accessibility_service_description">Allows GTalkSMS to send you a message for every notifications.</string>
     <string name="panel_buddies">Buddies</string>
     <string name="panel_buddies_add_hint">buddy@jabber.org</string>
     <string name="panel_buddies_add_button">Add</string>
