@@ -13,19 +13,20 @@ import java.net.URLConnection;
 import org.apache.http.util.ByteArrayBuffer;
 
 import android.content.Context;
-import android.util.Log;
+
+import com.googlecode.gtalksms.Log;
 
 public class Web {
     public static String DownloadFromUrl(String urlStr) throws MalformedURLException {
-            URL url = new URL(urlStr);
-            return DownloadFromUrl(url);
+        URL url = new URL(urlStr);
+        return DownloadFromUrl(url);
     }
     
     public static String DownloadFromUrl(URL url) {
         StringBuffer baf = new StringBuffer(1024);
         try {
             long startTime = System.currentTimeMillis();
-            Log.d(Tools.LOG_TAG, "Downloading URL: " + url);
+            Log.d("Downloading URL: " + url);
 
             HttpURLConnection ucon = (HttpURLConnection) url.openConnection();
             InputStream is = ucon.getInputStream();
@@ -35,10 +36,10 @@ public class Web {
             while ((current = bis.read()) != -1) {
                 baf.append((char) current);
             }
-            Log.d(Tools.LOG_TAG, "Downloaded " + url + " in " + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
+            Log.d("Downloaded " + url + " in " + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
 
         } catch (IOException e) {
-            Log.d(Tools.LOG_TAG, "IOException in DownloadFromUrl(): " + e);
+            Log.e("IOException in DownloadFromUrl(): " + e);
         }
         return baf.toString();
     }
@@ -51,7 +52,7 @@ public class Web {
             File file = new File(path + fileName);
 
             long startTime = System.currentTimeMillis();
-            Log.d(Tools.LOG_TAG, "Download begins. url:" + url + " file name:" + fileName);
+            Log.d("Download begins. url:" + url + " file name:" + fileName);
 
             URLConnection ucon = url.openConnection();
             InputStream is = ucon.getInputStream();
@@ -66,10 +67,10 @@ public class Web {
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(baf.toByteArray());
             fos.close();
-            Log.d(Tools.LOG_TAG, "Downloaded in " + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
+            Log.d("Downloaded in " + ((System.currentTimeMillis() - startTime) / 1000) + " sec");
 
         } catch (IOException e) {
-            Log.d(Tools.LOG_TAG, "Error: " + e);
+            Log.e("Error: " + e);
         }
     }
 }

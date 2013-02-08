@@ -8,11 +8,10 @@ import android.os.Build.VERSION_CODES;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.EngineInfo;
 import android.speech.tts.TextToSpeech.OnInitListener;
-import android.util.Log;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
-import com.googlecode.gtalksms.tools.Tools;
 
 public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListener {
 
@@ -47,7 +46,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
         }
     }
     protected void execute(String cmd, String args) {
-        Log.i(Tools.LOG_TAG, "TTS: " + cmd + " (" + args + ")");
+        Log.i("TTS: " + cmd + " (" + args + ")");
         
         if (isMatchingCmd("tts", cmd)) {
             if (mTtsAvailable) {
@@ -117,11 +116,11 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS && mTts != null) {
-            Log.i(Tools.LOG_TAG, "TTS initialized!");
+            Log.i("TTS initialized!");
             mTts.setLanguage(mLocale);
             mTtsAvailable = true;
         } else {
-            Log.e(Tools.LOG_TAG, "Can't initialise TTS!");
+            Log.e("Can't initialise TTS!");
             mTtsAvailable = false;
         }
     }
