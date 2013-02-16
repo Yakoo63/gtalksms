@@ -132,6 +132,8 @@ public class SettingsManager {
     public boolean formatResponses;
     public boolean showStatusIcon;
     public boolean displayContactNumber;
+    public String hiddenNotifications;
+    public int notificationIgnoreDelay;
     
     // geo location
     public boolean useGoogleMapUrl;
@@ -256,16 +258,19 @@ public class SettingsManager {
     
     public Boolean saveSetting(String key, Boolean value) {
         getEditor().putBoolean(key, (Boolean)value).commit();
+        OnPreferencesUpdated(key);
         return value;
     }
     
     public String saveSetting(String key, String value) {
         getEditor().putString(key, (String)value).commit();
+        OnPreferencesUpdated(key);
         return value;
     }
     
     public Integer saveSetting(String key, Integer value) {
         getEditor().putInt(key, (Integer)value).commit();
+        OnPreferencesUpdated(key);
         return value;
     }
     
@@ -415,6 +420,10 @@ public class SettingsManager {
         publicIntentsEnabled = getBoolean("publicIntentsEnabled", false);
         publicIntentTokenRequired = getBoolean("publicIntentTokenRequired", false);
         publicIntentToken = getString("publicIntentToken", "secret");
+        
+        // Manage notifications
+        hiddenNotifications = getString("hiddenNotifications", "GTalkSMS");
+        notificationIgnoreDelay = getInt("notificationIgnoreDelay", 1000);
         
         // reply command settings
         dontDisplayRecipient = false;

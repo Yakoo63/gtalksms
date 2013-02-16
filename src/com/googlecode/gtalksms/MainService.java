@@ -44,6 +44,7 @@ import com.googlecode.gtalksms.cmd.KeyboardCmd;
 import com.googlecode.gtalksms.cmd.LogsCmd;
 import com.googlecode.gtalksms.cmd.MmsCmd;
 import com.googlecode.gtalksms.cmd.MusicCmd;
+import com.googlecode.gtalksms.cmd.NotificationsCmd;
 import com.googlecode.gtalksms.cmd.RebootCmd;
 import com.googlecode.gtalksms.cmd.RecipientCmd;
 import com.googlecode.gtalksms.cmd.RingCmd;
@@ -730,6 +731,7 @@ public class MainService extends Service {
     private void setupCommands() {
         
         Class<?>[] cmds = new Class[] { 
+                NotificationsCmd.class,
                 ApplicationsCmd.class,
                 LogsCmd.class,
                 TextToSpeechCmd.class,

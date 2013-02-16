@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
@@ -18,12 +20,11 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 // TODO: auto activate this service in accessibility options of Android
-// TODO: add a description for the service
-// TODO: add black/white lists to let the user choose which notifications he wants
 // TODO: add shortcut button to accessibility panel Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS); startActivityForResult(intent, 0);
 
 public class AccessibilityService extends android.accessibilityservice.AccessibilityService {
 
+    SettingsManager mSettingMgr;
     HashMap<String, String> mInstalledApplications = new HashMap<String, String>();
     HashMap<String, String> mLastMessage = new HashMap<String, String>();
     HashMap<String, Long> mLastTimeStamp = new HashMap<String, Long>();
@@ -80,13 +81,14 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             // Avoid duplicated notifications sent in less than 2s (ie download manager)
             if (mLastMessage.containsKey(appName) && mLastMessage.get(appName).equals(msg.generateTxt())) {
                 long old = mLastTimeStamp.get(appName);
-                if (event.getEventTime() - old < 2000) {
+                if (event.getEventTime() - old < mSettingMgr.notificationIgnoreDelay) {
                     ignore = true;
                 }
             }
                 
             // Ignore GTalkSMS notifications and send others
-            if (!ignore && !event.getPackageName().equals(getBaseContext().getPackageName())) {
+            List<String> apps = Arrays.asList(TextUtils.split(mSettingMgr.hiddenNotifications, "#sep#"));
+            if (!ignore && !apps.contains(appName)) {
                 Tools.send(msg, null, getBaseContext());
             }
             
@@ -122,9 +124,11 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     protected void onServiceConnected() {
         super.onServiceConnected();
         
-        Log.initialize(SettingsManager.getSettingsManager(this));
+        mSettingMgr = SettingsManager.getSettingsManager(this);
+        
+        Log.initialize(mSettingMgr);
         Log.d("AccessibilityService: onServiceConnected");
-
+        
         // Removed parts of notifications
         sHiddenNotifItem.clear();
         sHiddenNotifItem.add(16908388); // Time of the notification
@@ -158,15 +162,11 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         if (null == views) {
             return;
         }
-        for (int i = 0; i < v.getChildCount(); i++)
-        {
+        for (int i = 0; i < v.getChildCount(); i++) {
             Object child = v.getChildAt(i); 
-            if (child.getClass().equals(TextView.class))
-            {
+            if (child.getClass().equals(TextView.class)) {
                 views.add((TextView)child);
-            }
-            else if(child instanceof ViewGroup)
-            {
+            } else if(child instanceof ViewGroup) {
                 getAllTextView(views, (ViewGroup)child);  // Recursive call.
             }
         }
