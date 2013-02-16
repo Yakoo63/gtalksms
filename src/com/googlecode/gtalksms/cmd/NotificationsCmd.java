@@ -6,6 +6,7 @@ import java.util.Arrays;
 import android.text.TextUtils;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class NotificationsCmd extends CommandHandlerBase {
@@ -53,5 +54,11 @@ public class NotificationsCmd extends CommandHandlerBase {
     
     @Override
     protected void initializeSubCommands() {
+        Cmd notif = mCommandMap.get("notification");
+        notif.setHelp(R.string.chat_help_notif_general, null);
+        
+        notif.AddSubCmd("hide", R.string.chat_help_notif_hide, "#appname#");
+        notif.AddSubCmd("unhide",R.string.chat_help_notif_unhide, "#appname#");
+        notif.AddSubCmd("ignoreDelay",R.string.chat_help_notif_ignore_delay, "#timeInMs#");
     }
 }

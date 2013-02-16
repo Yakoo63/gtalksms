@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.smsCmd.Mms;
 import com.googlecode.gtalksms.cmd.smsCmd.MmsManager;
 import com.googlecode.gtalksms.tools.Tools;
@@ -74,5 +75,7 @@ public class MmsCmd extends CommandHandlerBase {
 
     @Override
     protected void initializeSubCommands() {
+        Cmd mms = mCommandMap.get("mms");
+        mms.setHelp(R.string.chat_help_mms_general, null);
     }
 }

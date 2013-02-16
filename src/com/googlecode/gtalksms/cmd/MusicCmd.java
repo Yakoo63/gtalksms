@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class MusicCmd extends CommandHandlerBase {
@@ -80,23 +81,23 @@ public class MusicCmd extends CommandHandlerBase {
     @Override
     protected void initializeSubCommands() {
         Cmd music = mCommandMap.get("music");
-        music.setHelp(-1, null);
-        music.AddSubCmd("play", -1, null);
-        music.AddSubCmd("pause", -1, null);
-        music.AddSubCmd("playpause", -1, null);
-        music.AddSubCmd("stop", -1, null);
-        music.AddSubCmd("next", -1, null);
-        music.AddSubCmd("previous", -1, null);
-        music.AddSubCmd("up", -1, null);
-        music.AddSubCmd("down", -1, null);
-        music.AddSubCmd("mute", -1, null);
-        music.AddSubCmd("unmute", -1, null);
+        music.setHelp(R.string.chat_help_music_general, null);
+        music.AddSubCmd("play", R.string.chat_help_music_play, null);
+        music.AddSubCmd("pause", R.string.chat_help_music_pause, null);
+        music.AddSubCmd("playpause", R.string.chat_help_music_playpause, null);
+        music.AddSubCmd("stop", R.string.chat_help_music_stop, null);
+        music.AddSubCmd("next", R.string.chat_help_music_next, null);
+        music.AddSubCmd("previous", R.string.chat_help_music_previous, null);
+        music.AddSubCmd("up", R.string.chat_help_volume_up, null);
+        music.AddSubCmd("down", R.string.chat_help_volume_down, null);
+        music.AddSubCmd("mute", R.string.chat_help_volume_mute, null);
+        music.AddSubCmd("unmute", R.string.chat_help_volume_unmute, null);
 
-        Cmd volume = mCommandMap.get("music");
-        volume.setHelp(-1, null);
-        volume.AddSubCmd("up", -1, null);
-        volume.AddSubCmd("down", -1, null);
-        volume.AddSubCmd("mute", -1, null);
-        volume.AddSubCmd("unmute", -1, null);
+        Cmd volume = mCommandMap.get("volume");
+        volume.setHelp(R.string.chat_help_volume_general, "#volumeLevel#");
+        volume.AddSubCmd("up", R.string.chat_help_volume_up, null);
+        volume.AddSubCmd("down", R.string.chat_help_volume_down, null);
+        volume.AddSubCmd("mute", R.string.chat_help_volume_mute, null);
+        volume.AddSubCmd("unmute", R.string.chat_help_volume_unmute, null);
     }
 }
