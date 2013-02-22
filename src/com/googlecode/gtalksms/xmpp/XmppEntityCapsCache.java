@@ -3,14 +3,14 @@ package com.googlecode.gtalksms.xmpp;
 import java.io.File;
 import java.io.IOException;
 
-import org.jivesoftware.smackx.entitycaps.Base32Encoder;
+import org.jivesoftware.smack.util.Base32Encoder;
 import org.jivesoftware.smackx.entitycaps.EntityCapsManager;
-import org.jivesoftware.smackx.entitycaps.EntityCapsPersistentCache;
-import org.jivesoftware.smackx.entitycaps.SimpleDirectoryPersistentCache;
-
-import com.googlecode.gtalksms.Log;
+import org.jivesoftware.smackx.entitycaps.cache.EntityCapsPersistentCache;
+import org.jivesoftware.smackx.entitycaps.cache.SimpleDirectoryPersistentCache;
 
 import android.content.Context;
+
+import com.googlecode.gtalksms.Log;
 
 public class XmppEntityCapsCache {
     private static final String CACHE_DIR = "EntityCapsCacheBase32";
@@ -23,7 +23,7 @@ public class XmppEntityCapsCache {
             if (!cacheDir.mkdir())
                 throw new IllegalStateException("Can not create entity caps cache dir");
 
-        sCache = new SimpleDirectoryPersistentCache(cacheDir, new Base32Encoder());
+        sCache = new SimpleDirectoryPersistentCache(cacheDir, Base32Encoder.getInstance());
         try {
             EntityCapsManager.setPersistentCache(sCache);
         } catch (IOException e) {

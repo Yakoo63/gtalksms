@@ -152,6 +152,7 @@ public class XmppManager {
         SmackConfiguration.setPacketReplyTimeout(1000 * 40);      // 40 sec
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         SmackConfiguration.setLocalSocks5ProxyPort(-7777);        // negative number means try next port if already in use
+        SmackConfiguration.setAutoEnableEntityCaps(true);
         
 		// Roster settings
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
@@ -496,8 +497,7 @@ public class XmppManager {
             return true;
         }
         
-        ServiceDiscoveryManager serviceDiscoMgr = ServiceDiscoveryManager.getInstanceFor(connection);
-        mPingManager = PingManager.getInstaceFor(connection);
+        mPingManager = PingManager.getInstanceFor(connection);
         mPingManager.registerPingFailedListener(new PingFailedListener() {
             
             @Override
@@ -511,9 +511,7 @@ public class XmppManager {
             }
         });
         
-        XHTMLManager.setServiceEnabled(connection, false);   
-        serviceDiscoMgr.addFeature("http://jabber.org/protocol/disco#info");
-        serviceDiscoMgr.addFeature("bug-fix-gtalksms");
+        XHTMLManager.setServiceEnabled(connection, false);
         
         try {
             connection.login(mSettings.getLogin(), mSettings.getPassword(), Tools.APP_NAME);

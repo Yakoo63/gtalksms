@@ -9,9 +9,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Debug.MemoryInfo;
 import android.os.Process;
 import android.os.SystemClock;
-import android.os.Debug.MemoryInfo;
 import android.telephony.TelephonyManager;
 
 import com.googlecode.gtalksms.MainService;
@@ -143,6 +143,8 @@ public class SystemCmd extends CommandHandlerBase {
         int total = reused + newcons;
         msg.appendBoldLine("XMPP Connection Data");
         msg.appendLine("Total connections: " + total + " thereof " + reused + " reused and " + newcons + " new");
+        msg.appendLine("Connection compression: " + sMainService.getCompressionStatus());
+        msg.appendLine("Connection encryption: " + sMainService.getTLSStatus());
     }
     
     private static void appendSystemUptimeData(XmppMsg msg) {
