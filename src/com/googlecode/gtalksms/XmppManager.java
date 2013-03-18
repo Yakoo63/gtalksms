@@ -148,12 +148,11 @@ public class XmppManager {
         XmppEntityCapsCache.enableEntityCapsCache(context);
         
         // Smack Settings
-        SmackConfiguration.setKeepAliveInterval(1000 * 60 * 12);  // 12 min
         SmackConfiguration.setPacketReplyTimeout(1000 * 40);      // 40 sec
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         SmackConfiguration.setLocalSocks5ProxyPort(-7777);        // negative number means try next port if already in use
         SmackConfiguration.setAutoEnableEntityCaps(true);
-        
+
 		// Roster settings
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
 
