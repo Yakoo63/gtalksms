@@ -50,10 +50,8 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
     }
     
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.tab_connection_status, container,
-                false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.tab_connection_status, container, false);
 
         mSendPingButton = (Button) view.findViewById(R.id.sendPing);
         mPingStatus = (ImageView) view.findViewById(R.id.pingState);
