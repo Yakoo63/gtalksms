@@ -52,12 +52,51 @@ public class CommandsTabFragment extends SherlockFragment {
         mListViewCommands = (ListView)view.findViewById(R.id.ListViewCommands);
         mListViewCommands.setOnItemClickListener( new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cmd cmd = (Cmd)parent.getItemAtPosition(position);
-                boolean isActive = !cmd.isActive();
-                cmd.setActive(isActive);
-                MainService.updateCommandState();
-                ImageView imageView = (ImageView) view.findViewById(R.id.State);
-                imageView.setImageResource(isActive ? R.drawable.buddy_available : R.drawable.buddy_offline);
+                final Cmd cmd = (Cmd)parent.getItemAtPosition(position);
+                final Dialog dialog = new Dialog(getSherlockActivity());
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.tab_commands_dialog);
+                
+                TextView cmdName = (TextView) dialog.findViewById(R.id.textViewCmd);
+                cmdName.setText(cmd.getName());
+
+                final EditText cmdArgs = (EditText) dialog.findViewById(R.id.editTextArgs);
+                final Button buttonSend = (Button) dialog.findViewById(R.id.buttonSend);
+                
+                if (cmd.getHelpArgs() == null || cmd.getHelpArgs().equals("")) {
+                    cmdArgs.setVisibility(View.INVISIBLE);
+                } else {
+                    cmdArgs.setHint(cmd.getHelpArgs());
+                    cmdArgs.setOnEditorActionListener(new AutoClickEditorActionListener(buttonSend));
+                }
+                
+                buttonSend.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        sendCommandAndVibrate(cmd.getName(), cmdArgs.getText().toString(), v);
+                    }
+                });
+
+                TextView cmdHelp = (TextView) dialog.findViewById(R.id.textViewCmdHelp);
+                cmdHelp.setText(cmd.getHelpMsg());
+                
+                ListView subCommands = (ListView) dialog.findViewById(R.id.ListViewCommands);
+                subCommands.setAdapter(new SubCmdListAdapter(getSherlockActivity(), R.layout.tab_commands_sub_item, cmd));
+
+                Button buttonClose = (Button) dialog.findViewById(R.id.buttonOk);
+                buttonClose.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                
+                // TODO backup the command args somewhere
+//                dialog.setOnDismissListener(new OnDismissListener() {
+//                     public void onDismiss(DialogInterface dialog) {
+//                    }
+//                });
+                
+                dialog.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+                dialog.show();
             }
         });
         
@@ -138,6 +177,15 @@ public class CommandsTabFragment extends SherlockFragment {
             
             ImageView imageView = (ImageView) row.findViewById(R.id.State);
             imageView.setImageResource(cmd.isActive() ? R.drawable.buddy_available : R.drawable.buddy_offline);
+            imageView.setOnClickListener(new OnClickListener() {
+                public void onClick(View view) {
+                    boolean isActive = !cmd.isActive();
+                    cmd.setActive(isActive);
+                    MainService.updateCommandState();
+                    ImageView imageView = (ImageView) view.findViewById(R.id.State);
+                    imageView.setImageResource(isActive ? R.drawable.buddy_available : R.drawable.buddy_offline);
+                }
+            });
             
             TextView textView = (TextView) row.findViewById(R.id.Name);
             textView.setText(cmd.getName());
@@ -148,57 +196,6 @@ public class CommandsTabFragment extends SherlockFragment {
             
             textView = (TextView) row.findViewById(R.id.Help);
             textView.setText(cmd.getHelpSummary() + " "); // Adding space because italic text is truncated...
-            
-            ImageView buttonSend = (ImageView) row.findViewById(R.id.SendCommand);
-            buttonSend.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    
-                    final Dialog dialog = new Dialog(getSherlockActivity());
-                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialog.setContentView(R.layout.tab_commands_dialog);
-                    
-                    TextView cmdName = (TextView) dialog.findViewById(R.id.textViewCmd);
-                    cmdName.setText(cmd.getName());
-
-                    final EditText cmdArgs = (EditText) dialog.findViewById(R.id.editTextArgs);
-                    final Button buttonSend = (Button) dialog.findViewById(R.id.buttonSend);
-                    
-                    if (cmd.getHelpArgs() == null || cmd.getHelpArgs().equals("")) {
-                        cmdArgs.setVisibility(View.INVISIBLE);
-                    } else {
-                        cmdArgs.setHint(cmd.getHelpArgs());
-                        cmdArgs.setOnEditorActionListener(new AutoClickEditorActionListener(buttonSend));
-                    }
-                    
-                    buttonSend.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            sendCommandAndVibrate(cmd.getName(), cmdArgs.getText().toString(), v);
-                        }
-                    });
-
-                    TextView cmdHelp = (TextView) dialog.findViewById(R.id.textViewCmdHelp);
-                    cmdHelp.setText(cmd.getHelpMsg());
-                    
-                    ListView subCommands = (ListView) dialog.findViewById(R.id.ListViewCommands);
-                    subCommands.setAdapter(new SubCmdListAdapter(getSherlockActivity(), R.layout.tab_commands_sub_item, cmd));
-
-                    Button buttonClose = (Button) dialog.findViewById(R.id.buttonOk);
-                    buttonClose.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            dialog.dismiss();
-                        }
-                    });
-                    
-                    // TODO backup the command args somewhere
-//                    dialog.setOnDismissListener(new OnDismissListener() {
-//                         public void onDismiss(DialogInterface dialog) {
-//                        }
-//                    });
-                    
-                    dialog.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-                    dialog.show();
-                }
-            });
             
             return row;
         }
