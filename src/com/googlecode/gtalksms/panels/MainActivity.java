@@ -136,19 +136,6 @@ public class MainActivity extends SherlockFragmentActivity {
             mConnectionStatusTabFragment.unsetMainService();
         }
     };
-
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        LinearLayout statusBar = (LinearLayout) findViewById(R.id.StatusBar);
-        LinearLayout linksBar = (LinearLayout) findViewById(R.id.LinksBar);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            statusBar.setOrientation(LinearLayout.HORIZONTAL);
-            linksBar.setOrientation(LinearLayout.VERTICAL);
-        } else {
-            statusBar.setOrientation(LinearLayout.VERTICAL);
-            linksBar.setOrientation(LinearLayout.HORIZONTAL);
-        }
-    }
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
