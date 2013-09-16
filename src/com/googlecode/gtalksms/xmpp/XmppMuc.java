@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.Vector;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.Form;
+import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
@@ -274,6 +276,13 @@ public class XmppMuc {
             // Since this is a private room, make the room not public and set
             // user as owner of the room.
             Form submitForm = multiUserChat.getConfigurationForm().createAnswerForm();
+
+            Vector<String> fieldNames = new Vector<String>();
+            Iterator<FormField> iFields = submitForm.getFields();
+            while (iFields.hasNext()) {
+                fieldNames.add(iFields.next().getType());
+            }
+
             submitForm.setAnswer("muc#roomconfig_publicroom", false);
             submitForm.setAnswer("muc#roomconfig_roomname", room);
 
@@ -287,13 +296,15 @@ public class XmppMuc {
             } catch (Exception ex) {
                 // Password protected MUC fallback code begins here
                 Log.w("Unable to configure room owners on Server " + getMUCServer() + ". Falling back to room passwords", ex);
-                // Seee http://xmpp.org/registrar/formtypes.html#http:--jabber.org-protocol-mucroomconfig
+                // See http://xmpp.org/registrar/formtypes.html#http:--jabber.org-protocol-mucroomconfig
                 try {
-                    submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
+                    if (fieldNames.contains("muc#roomconfig_passwordprotectedroom")) {
+                        submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
+                    }
                     submitForm.setAnswer("muc#roomconfig_roomsecret", mSettings.roomPassword);
                 } catch (IllegalArgumentException iae) {
                     // If a server doesn't provide even password protected MUC, the setAnswer
-                    // call will result in an IllegalARgumentException, which we wrap into an XMPPException
+                    // call will result in an IllegalArgumentException, which we wrap into an XMPPException
                     // See also Issue 247 http://code.google.com/p/gtalksms/issues/detail?id=247
                     throw new XMPPException(iae);
                 }
