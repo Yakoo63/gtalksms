@@ -10,13 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.Vector;
-
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.Form;
-import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
@@ -276,13 +273,6 @@ public class XmppMuc {
             // Since this is a private room, make the room not public and set
             // user as owner of the room.
             Form submitForm = multiUserChat.getConfigurationForm().createAnswerForm();
-
-            Vector<String> fieldNames = new Vector<String>();
-            Iterator<FormField> iFields = submitForm.getFields();
-            while (iFields.hasNext()) {
-                fieldNames.add(iFields.next().getType());
-            }
-
             submitForm.setAnswer("muc#roomconfig_publicroom", false);
             submitForm.setAnswer("muc#roomconfig_roomname", room);
 
@@ -298,7 +288,7 @@ public class XmppMuc {
                 Log.w("Unable to configure room owners on Server " + getMUCServer() + ". Falling back to room passwords", ex);
                 // See http://xmpp.org/registrar/formtypes.html#http:--jabber.org-protocol-mucroomconfig
                 try {
-                    if (fieldNames.contains("muc#roomconfig_passwordprotectedroom")) {
+                    if (submitForm.getField("muc#roomconfig_passwordprotectedroom") != null) {
                         submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
                     }
                     submitForm.setAnswer("muc#roomconfig_roomsecret", mSettings.roomPassword);
