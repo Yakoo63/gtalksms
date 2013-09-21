@@ -120,7 +120,7 @@ public class LogCollector extends Activity {
         mProgressDialog.setCancelable(true);
         mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
             public void onCancel(DialogInterface dialog){
-                cancellCollectTask();
+                cancelCollectTask();
                 finish();
             }
         });
@@ -135,7 +135,7 @@ public class LogCollector extends Activity {
         }
     }
    
-    void cancellCollectTask(){
+    void cancelCollectTask(){
         if (mCollectLogTask != null && mCollectLogTask.getStatus() == AsyncTask.Status.RUNNING)
         {
             mCollectLogTask.cancel(true);
@@ -145,7 +145,7 @@ public class LogCollector extends Activity {
    
     @Override
     protected void onPause(){
-        cancellCollectTask();
+        cancelCollectTask();
         dismissProgressDialog();
        
         super.onPause();

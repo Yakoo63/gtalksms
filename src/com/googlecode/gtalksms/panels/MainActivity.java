@@ -91,7 +91,8 @@ public class MainActivity extends SherlockFragmentActivity {
             return mFragments.get(position);
         }
     }
-    
+
+    private SettingsManager mSettingsManager;
     private MainService mMainService;
     private ActionBar mActionBar;
     private ViewPager mPager;
@@ -117,7 +118,7 @@ public class MainActivity extends SherlockFragmentActivity {
                 updateStatus(intent.getIntExtra("new_state", 0));
             }
         }
-    };;
+    };
     
     private ServiceConnection mMainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -141,9 +142,10 @@ public class MainActivity extends SherlockFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         this.setTheme(com.actionbarsherlock.R.style.Theme_Sherlock);
         super.onCreate(savedInstanceState);
-        
-        Log.initialize(SettingsManager.getSettingsManager(getApplicationContext()));
-        
+
+        mSettingsManager = SettingsManager.getSettingsManager(getApplicationContext());
+        Log.initialize(mSettingsManager);
+
         setTitle(StringFmt.Style("GTalkSMS " + Tools.getVersionName(getBaseContext()), Typeface.BOLD));
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
  
@@ -274,7 +276,9 @@ public class MainActivity extends SherlockFragmentActivity {
             mCommandsTabFragment.updateCommands();
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_buddies)).setTabListener(new TabListener(mPager, 2)));
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_commands)).setTabListener(new TabListener(mPager, 3)));
-            mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_connectionstatus)).setTabListener(new TabListener(mPager, 4)));
+            if (mSettingsManager.debugLog) {
+                mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_connectionstatus)).setTabListener(new TabListener(mPager, 4)));
+            }
         } else if (b1 || b2 || b3) {
             mActionBar.setSelectedNavigationItem(0);
             mPager.setCurrentItem(0);
