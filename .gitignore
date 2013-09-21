@@ -3,3 +3,4 @@ gen/
 local.properties
 /Releases
 out/
+.idea/workspace.xml
