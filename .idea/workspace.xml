@@ -1,23 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SCOPE_TYPE" value="8" />
+    <option name="CUSTOM_SCOPE_NAME" value="Unnamed" />
+  </component>
+  <component name="AndroidLayoutPreviewToolWindow">
+    <option name="state">
+      <GlobalState />
+    </option>
+  </component>
   <component name="AndroidLayouts">
     <shared>
       <config />
     </shared>
+    <layouts>
+      <layout url="file://$PROJECT_DIR$/res/layout/tab_container.xml">
+        <config>
+          <device>Nexus 4</device>
+          <theme>@android:style/Theme.Holo</theme>
+        </config>
+      </layout>
+    </layouts>
+  </component>
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="smack" />
+  </component>
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/NFCActivity.java" line="14" mnemonic="1" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="750d96a9-29b3-4e35-9f0e-310ddac6dcb3" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/GTalkSMS.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/android_support_v4.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/asmack_android_7_0_8.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/initProject.bat" />
-      <change type="DELETED" beforePath="D:\Android\Dev\GTalkSMS\.hgignore" afterPath="" />
-      <change type="DELETED" beforePath="D:\Android\Dev\GTalkSMS\.hgtags" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/external-libs/ActionBarSherlock" afterPath="$PROJECT_DIR$/external-libs/ActionBarSherlock" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Donors" afterPath="$PROJECT_DIR$/Donors" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/googlecode/gtalksms/MainService.java" afterPath="$PROJECT_DIR$/src/com/googlecode/gtalksms/MainService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/external-libs/ActionBarSherlock/library/test/com/actionbarsherlock/internal/ManifestParsingTest.java" afterPath="$PROJECT_DIR$/external-libs/ActionBarSherlock/library/test/com/actionbarsherlock/internal/ManifestParsingTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AndroidManifest.xml" afterPath="$PROJECT_DIR$/AndroidManifest.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GTalkSMS.iml" afterPath="$PROJECT_DIR$/GTalkSMS.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/LogCollector.java" afterPath="$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/LogCollector.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/MainActivity.java" afterPath="$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/MainActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/googlecode/gtalksms/XmppManager.java" afterPath="$PROJECT_DIR$/src/com/googlecode/gtalksms/XmppManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/googlecode/gtalksms/xmpp/XmppOfflineMessages.java" afterPath="$PROJECT_DIR$/src/com/googlecode/gtalksms/xmpp/XmppOfflineMessages.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/asmack_android_7_0_8.xml" afterPath="$PROJECT_DIR$/.idea/libraries/asmack_android_7_0_8.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project.properties" afterPath="$PROJECT_DIR$/project.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/external-libs/ActionBarSherlock/library/project.properties" afterPath="$PROJECT_DIR$/external-libs/ActionBarSherlock/library/project.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="GTalkSMS.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,6 +53,7 @@
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CompilerWorkspaceConfiguration">
     <option name="USE_COMPILE_SERVER" value="false" />
+    <option name="COMPILER_PROCESS_HEAP_SIZE" value="1000" />
     <option name="REBUILD_ON_DEPENDENCY_CHANGE" value="false" />
   </component>
   <component name="CreatePatchCommitExecutor">
@@ -39,7 +63,6 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -76,6 +99,7 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -85,28 +109,86 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="GTalkSMS.iml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/GTalkSMS.iml">
+      <file leaf-file-name="AndroidManifest.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="476">
+            <state line="69" column="75" selection-start="4051" selection-end="4051" vertical-scroll-proportion="0.0" vertical-offset="1054" max-vertical-offset="3128">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Donors" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Donors">
+      <file leaf-file-name="MmsReceiver.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/receivers/MmsReceiver.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="0" selection-start="638" selection-end="638" vertical-scroll-proportion="0.0" vertical-offset="52" max-vertical-offset="714">
+            <state line="16" column="16" selection-start="434" selection-end="445" vertical-scroll-proportion="0.0" vertical-offset="43" max-vertical-offset="918">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
+      <file leaf-file-name="NFCActivity.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/NFCActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="4" selection-start="41" selection-end="41" vertical-scroll-proportion="0.11447811" vertical-offset="0" max-vertical-offset="594">
+            <state line="2" column="28" selection-start="69" selection-end="69" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="408">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="XmppManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/XmppManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="595" column="36" selection-start="23847" selection-end="23847" vertical-scroll-proportion="0.0" vertical-offset="10115" max-vertical-offset="12053">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConnectionConfiguration.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/libs-sources/asmack-android-7-source-0.8.zip!/org/jivesoftware/smack/ConnectionConfiguration.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="592" column="34" selection-start="21668" selection-end="21683" vertical-scroll-proportion="0.0" vertical-offset="10064" max-vertical-offset="13481">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="XMPPConnection.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/libs-sources/asmack-android-7-source-0.8.zip!/org/jivesoftware/smack/XMPPConnection.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="558" column="17" selection-start="20412" selection-end="20412" vertical-scroll-proportion="0.0" vertical-offset="8568" max-vertical-offset="18292">
+              <folding>
+                <element signature="n#!!doc" expanded="false" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#20664#20677#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MainActivity.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/MainActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="145" column="87" selection-start="5967" selection-end="5967" vertical-scroll-proportion="0.32258064" vertical-offset="1520" max-vertical-offset="4403">
+              <folding>
+                <element signature="e#6601#6637#0" expanded="true" />
+                <element signature="e#6738#6768#0" expanded="true" />
+                <element signature="e#11158#11191#0" expanded="true" />
+                <element signature="e#11225#11259#0" expanded="true" />
+                <element signature="e#11293#11335#0" expanded="true" />
+                <element signature="e#11523#11556#0" expanded="true" />
+                <element signature="e#11661#11695#0" expanded="true" />
+                <element signature="e#11849#11891#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BuddiesTabFragment.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/tabs/BuddiesTabFragment.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="59" column="8" selection-start="2042" selection-end="2120" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5015">
               <folding />
             </state>
           </provider>
@@ -118,6 +200,11 @@
     <FindUsagesManager>
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
+  </component>
+  <component name="GenerateSignedApkSettings">
+    <option name="KEY_STORE_PATH" value="D:\Android\Dev\AndroidKey" />
+    <option name="KEY_ALIAS" value="androidkey" />
+    <option name="REMEMBER_PASSWORDS" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -134,14 +221,44 @@
         <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/MainService.java" />
         <option value="$PROJECT_DIR$/Donors" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/Changelog" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/cmd/HelpCmd.java" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/receivers/NFCReceiver.java" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/NFCReceiver.java" />
+        <option value="$PROJECT_DIR$/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/xmpp/XmppOfflineMessages.java" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/xmpp/XmppMuc.java" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/NFCActivity.java" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/XmppManager.java" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/LogCollector.java" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/MainActivity.java" />
       </list>
     </option>
+  </component>
+  <component name="NamedScopeManager">
+    <scope name="Unnamed" pattern="" />
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1936" />
     <option name="height" value="1056" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Abstraction issues</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -233,7 +350,37 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="cmd" />
+              <option name="myItemId" value="panels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GTalkSMS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GTalkSMS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="gtalksms" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="panels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tabs" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -255,28 +402,70 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GTalkSMS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GTalkSMS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs-sources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="71" />
     <property name="project.structure.proportion" value="0.15" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="116" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="MemberChooser.sorted" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="72" />
     <property name="recentsLimit" value="5" />
-    <property name="options.lastSelected" value="project.propCompiler" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/external-libs/ActionBarSherlock/library" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="ExportedApkPath" value="D:\Android\Dev\GTalkSMS\Releases\GTalkSMS-v4.4-signed.apk" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="ExportedModule" value="GTalkSMS" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/libs-sources/asmack-android-7-source-0.8.zip!/" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="71" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="715" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="658" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="67" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="62" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="FullScreen" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="options.lastSelected" value="editor.preferences.appearance" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="AndroidRunProguardForReleaseBuild" value="false" />
+    <property name="TODO_SCOPE" value="Project Files" />
     <property name="restartRequiresConfirmation" value="true" />
-    <property name="MemberChooser.showClasses" value="true" />
-    <property name="FullScreen" value="false" />
-    <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.searchVisible" value="true" />
-    <property name="options.splitter.details.proportions" value="0.2" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.googlecode.gtalksms.receivers" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.googlecode.gtalksms" />
+    </key>
   </component>
   <component name="RunManager" selected="Android Application.GTalkSMS">
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
@@ -303,6 +492,33 @@
       <option name="SHMEM_ADDRESS" value="javadebug" />
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
       <method />
     </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -474,12 +690,6 @@
       <item index="4" class="java.lang.String" itemvalue="Android Application.fragments" />
       <item index="5" class="java.lang.String" itemvalue="Android Application.styled" />
     </list>
-    <configuration name="&lt;template&gt;" type="TestNG" default="true" selected="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    </configuration>
     <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
     </configuration>
@@ -489,6 +699,11 @@
     </configuration>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SliceManager">
+    <option name="analysisUIOptions">
+      <AnalysisUIOptions />
+    </option>
+  </component>
   <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="all">
     <option name="USER" value="" />
     <option name="PASSWORD" value="" />
@@ -517,41 +732,73 @@
       <workItem from="1377460719071" duration="892000" />
       <workItem from="1377461833981" duration="283000" />
       <workItem from="1379114737357" duration="477000" />
-      <workItem from="1379115312518" duration="3554000" />
+      <workItem from="1379115312518" duration="4039000" />
+      <workItem from="1379253274064" duration="2530000" />
+      <workItem from="1379257219803" duration="3824000" />
+      <workItem from="1379279719866" duration="208000" />
+      <workItem from="1379279957129" duration="1399000" />
+      <workItem from="1379281381589" duration="7309000" />
+      <workItem from="1379365978857" duration="3611000" />
+      <workItem from="1379535564141" duration="50000" />
+      <workItem from="1379535693262" duration="2310000" />
+      <workItem from="1379539501604" duration="2472000" />
+      <workItem from="1379759741007" duration="3395000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7540000" />
+    <option name="totallyTimeSpent" value="35133000" />
+  </component>
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32925472" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32900432" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32925472" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32900432" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30743617" sideWeight="0.32070437" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32814237" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32900432" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32900432" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32703003" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3070078" sideWeight="0.6792956" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3381535" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2497332" sideWeight="0.69256383" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.67099565" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32900432" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.255603" sideWeight="0.6929922" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32703003" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3296875" sideWeight="0.67099565" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32814237" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39933258" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -566,111 +813,125 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/external-libs/ActionBarSherlock/library/test/com/actionbarsherlock/internal/ManifestParsingTest.java">
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/xmpp/XmppOfflineMessages.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="17" selection-start="58" selection-end="58" vertical-scroll-proportion="0.05831904" vertical-offset="0" max-vertical-offset="714" />
+        <state line="43" column="28" selection-start="1500" selection-end="1500" vertical-scroll-proportion="0.9127517" vertical-offset="0" max-vertical-offset="697" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitmodules">
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/xmpp/XmppMuc.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="583" />
+        <state line="298" column="21" selection-start="11231" selection-end="11231" vertical-scroll-proportion="1.4848993" vertical-offset="3603" max-vertical-offset="8364" />
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/libs/asmack-android-7-0.8.jar!/org/jivesoftware/smack/XMPPConnection.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="55" selection-start="3661" selection-end="3661" vertical-scroll-proportion="0.0" vertical-offset="1387" max-vertical-offset="1972" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/layout/tab_container.xml">
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="35" selection-start="918" selection-end="926" vertical-scroll-proportion="0.0" vertical-offset="339" max-vertical-offset="986" />
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/libs-sources/asmack-android-7-source-0.8.zip!/org/jivesoftware/smack/ConnectionConfiguration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="592" column="34" selection-start="21668" selection-end="21683" vertical-scroll-proportion="0.0" vertical-offset="10064" max-vertical-offset="13481">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/libs-sources/asmack-android-7-source-0.8.zip!/org/jivesoftware/smack/PacketWriter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="150" column="27" selection-start="4565" selection-end="4565" vertical-scroll-proportion="-0.42742857" vertical-offset="2550" max-vertical-offset="3808">
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/cmd/HelpCmd.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="13" selection-start="396" selection-end="396" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3332">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/GeoPopup.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="52" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="306">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/libs-sources/asmack-android-7-source-0.8.zip!/org/jivesoftware/smack/XMPPConnection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="558" column="17" selection-start="20412" selection-end="20412" vertical-scroll-proportion="0.0" vertical-offset="7995" max-vertical-offset="18292">
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#20664#20677#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="69" column="75" selection-start="4051" selection-end="4051" vertical-scroll-proportion="0.0" vertical-offset="1054" max-vertical-offset="3128">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/receivers/MmsReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="16" selection-start="434" selection-end="445" vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="918">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/NFCActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="28" selection-start="69" selection-end="69" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="408">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/XmppManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="595" column="36" selection-start="23847" selection-end="23847" vertical-scroll-proportion="0.0" vertical-offset="10115" max-vertical-offset="12988">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/LogCollector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="122" column="22" selection-start="4508" selection-end="4508" vertical-scroll-proportion="2.0446734" vertical-offset="0" max-vertical-offset="2397">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/tabs/BuddiesTabFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="59" column="8" selection-start="2042" selection-end="2120" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5015">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/panels/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="29" selection-start="450" selection-end="450" vertical-scroll-proportion="0.029259896" vertical-offset="221" max-vertical-offset="5287">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/external-libs/ActionBarSherlock/library/src/com/actionbarsherlock/internal/app/ActionBarImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="29" selection-start="1022" selection-end="1022" vertical-scroll-proportion="0.028619528" vertical-offset="221" max-vertical-offset="17204">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/googlecode/gtalksms/MainService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="22" selection-start="746" selection-end="746" vertical-scroll-proportion="0.0" vertical-offset="244" max-vertical-offset="15402">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/initProject.bat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="594">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/project.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="594">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="594">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/update_asmack">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="0" selection-start="620" selection-end="745" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="884">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/initProject.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="37" selection-start="308" selection-end="346" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="425">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/local.properties.example">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="594">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.project">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="663">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.classpath">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="594">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GTalkSMS.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="594">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Donors">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="0" selection-start="638" selection-end="638" vertical-scroll-proportion="0.0" vertical-offset="52" max-vertical-offset="714">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="4" selection-start="41" selection-end="41" vertical-scroll-proportion="0.11447811" vertical-offset="0" max-vertical-offset="594">
-          <folding />
+        <state line="145" column="87" selection-start="5967" selection-end="5967" vertical-scroll-proportion="0.32258064" vertical-offset="1520" max-vertical-offset="4403">
+          <folding>
+            <element signature="e#6601#6637#0" expanded="true" />
+            <element signature="e#6738#6768#0" expanded="true" />
+            <element signature="e#11158#11191#0" expanded="true" />
+            <element signature="e#11225#11259#0" expanded="true" />
+            <element signature="e#11293#11335#0" expanded="true" />
+            <element signature="e#11523#11556#0" expanded="true" />
+            <element signature="e#11661#11695#0" expanded="true" />
+            <element signature="e#11849#11891#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -758,6 +1019,21 @@
               </list>
             </option>
           </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <last-edited>Unnamed</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+          <order>
+            <scope name="Unnamed" />
+          </order>
         </settings>
       </state>
     </states>
