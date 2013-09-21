@@ -159,6 +159,8 @@
     <string name="chat_help_geo">Ouvri Google Map, Google Navigation ou Google Street View pour l\'adresse spécifiée.</string>
     <string name="chat_help_help">Affiche cette aide.</string>
     <string name="chat_help_help_all">Affiche toute l\'aide.</string>
+    <string name="chat_help_help_about">Affiche des informations sur l\'application.</string>
+    <string name="chat_help_help_changelog">Affiche l\'historique des changements.</string>
     <string name="chat_help_help_categories">Affiche les catégories d\'aide.</string>
     <string name="chat_help_ignore">Ignore l\'appel entrant.</string>
     <string name="chat_help_ls">Affiche les fichiers et les sous-répertoires du dossier passé en paramètre.</string>

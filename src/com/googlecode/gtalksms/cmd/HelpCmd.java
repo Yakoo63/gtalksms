@@ -5,17 +5,20 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
+import com.googlecode.gtalksms.tools.Web;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class HelpCmd extends CommandHandlerBase {
     private static XmppMsg _msg;  // brief help message
-    private static XmppMsg _msgAll;   // full help message    
+    private static XmppMsg _msgAll;   // full help message
+    private static XmppMsg _msgAbout;
     private Map<String, CommandHandlerBase> commands;
     
     private static XmppMsg _msgContact;
@@ -64,7 +67,9 @@ public class HelpCmd extends CommandHandlerBase {
         _msg.appendLine(getString(R.string.chat_help_title));
         _msg.appendLine(format(R.string.chat_help_help, "\"help\""));
         _msg.appendLine(format(R.string.chat_help_help_all, "\"help:all\""));
-        _msg.appendLine(format(R.string.chat_help_help_categories, "\"help:categories\"", "\"help:cat\""));    
+        _msg.appendLine(format(R.string.chat_help_help_about, "\"help:about\""));
+        _msg.appendLine(format(R.string.chat_help_help_changelog, "\"help:changelog\""));
+        _msg.appendLine(format(R.string.chat_help_help_categories, "\"help:categories\"", "\"help:cat\""));
         _msg.appendLine("- " + makeBold("\"help:#command#\"") + " - " + makeBold("\"help:#category#\""));
         
         for (CommandHandlerBase c : commandSet) {
@@ -112,10 +117,10 @@ public class HelpCmd extends CommandHandlerBase {
                     internalHelp.addAll(helpLines);
                     break;
                 default:
-                    Log.w(Tools.LOG_TAG, "help command unkown command type");           
+                    Log.w(Tools.LOG_TAG, "help command unknown command type");
             }
         }
-        
+
         _msgAll = new XmppMsg(getString(R.string.chat_help_title), true);
         _msgContact = new XmppMsg(getString(R.string.chat_help_title), true);
         _msgMessage = new XmppMsg(getString(R.string.chat_help_title), true);
@@ -134,7 +139,9 @@ public class HelpCmd extends CommandHandlerBase {
         addLinesToMsg(_msgCopy, copyHelp);
         addLinesToMsg(_msgMedia, mediaHelp);
         addLinesToMsg(_msgInternal, internalHelp);
-        
+
+        _msgAbout = new XmppMsg("GTalkSMS " + Tools.getVersionName(sContext), true);
+
         _msgInternal.appendLine(makeBold("Internal commands") + ": " + StringFmt.delLastChar(internalCmds, 2));
         _msgCategories.appendLine("- " + makeBold("\"help:contacts\"") + ": " + StringFmt.delLastChar(contactCmds, 2));
         _msgCategories.appendLine("- " + makeBold("\"help:text\"") + ": " + StringFmt.delLastChar(copyCmds, 2));               
@@ -148,6 +155,20 @@ public class HelpCmd extends CommandHandlerBase {
     protected void execute(String cmd, String args) {
         if (args.equals("all")) {
             send(_msgAll);
+        } else if (args.equals("about")) {
+            send(_msgAbout);
+            try {
+                send(getString(R.string.about_change_log) + "\n" + TextUtils.split(Web.DownloadFromUrl(Tools.CHANGELOG_URL), "\n\n")[0]);
+                send(getString(R.string.about_authors) + "\n" + TextUtils.split(Web.DownloadFromUrl(Tools.AUTHORS_URL), "\n\n")[0]);
+            } catch (Exception e) {
+                Log.w(Tools.LOG_TAG, "failed to access to remote files.");
+            }
+        } else if (args.equals("changelog")) {
+            try {
+                send(getString(R.string.about_change_log) + "\n" + Web.DownloadFromUrl(Tools.CHANGELOG_URL));
+            } catch (Exception e) {
+                Log.w(Tools.LOG_TAG, "failed to access to remote files.");
+            }
         } else if (commands.containsKey(args)) {
         	ArrayList<String> helpLines = commands.get(args).help();
             if (!helpLines.isEmpty()) {

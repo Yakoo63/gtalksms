@@ -16,22 +16,19 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.StringFmt;
+import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.tools.UrlToStringDownloader;
 
 public class HelpTabFragment extends SherlockFragment {
-    private static final String AUTHORS_URL = "http://gtalksms.googlecode.com/git/AUTHORS";
-    private static final String DONORS_URL = "http://gtalksms.googlecode.com/git/Donors";
-    private static final String CHANGELOG_URL = "http://gtalksms.googlecode.com/git/Changelog";
-    
     private static URL[] sUrls;
     private TextView mTextViewConsole;
     
     static {
         sUrls = new URL[3];
         try {
-            sUrls[0] = new URL(AUTHORS_URL);
-            sUrls[1] = new URL(DONORS_URL);
-            sUrls[2] = new URL(CHANGELOG_URL);
+            sUrls[0] = new URL(Tools.AUTHORS_URL);
+            sUrls[1] = new URL(Tools.DONORS_URL);
+            sUrls[2] = new URL(Tools.CHANGELOG_URL);
         } catch (MalformedURLException e) {
             throw new IllegalStateException(e);
         }
@@ -79,17 +76,17 @@ public class HelpTabFragment extends SherlockFragment {
         mTextViewConsole.append(StringFmt.Url("\tgtalksms-dev for development\n", "mailto:gtalksms-dev@googlegroups.com"));
         
         mTextViewConsole.append(StringFmt.Fmt("\n" + getString(R.string.about_authors) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
-        mTextViewConsole.append(appendURL(AUTHORS_URL));
+        mTextViewConsole.append(appendURL(Tools.AUTHORS_URL));
         
         mTextViewConsole.append(StringFmt.Fmt("\n" + getString(R.string.about_donors) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
         mTextViewConsole.append(getString(R.string.about_donate_string));
         mTextViewConsole.append(StringFmt.Url(getString(R.string.about_donate_paypal), "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"));
         mTextViewConsole.append(StringFmt.Url(getString(R.string.about_donate_market), "market://details?id=com.googlecode.gtalksmsdonate"));
         
-        mTextViewConsole.append(appendURL(DONORS_URL));
+        mTextViewConsole.append(appendURL(Tools.DONORS_URL));
         
         mTextViewConsole.append(StringFmt.Fmt("\n" + getString(R.string.about_change_log) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
-        mTextViewConsole.append(appendURL(CHANGELOG_URL));
+        mTextViewConsole.append(appendURL(Tools.CHANGELOG_URL));
         
         MovementMethod m = mTextViewConsole.getMovementMethod();
         if ((m == null) || !(m instanceof LinkMovementMethod))

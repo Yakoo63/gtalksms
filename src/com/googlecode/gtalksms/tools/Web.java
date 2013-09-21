@@ -17,9 +17,13 @@ import android.content.Context;
 import com.googlecode.gtalksms.Log;
 
 public class Web {
-    public static String DownloadFromUrl(String urlStr) throws MalformedURLException {
-        URL url = new URL(urlStr);
-        return DownloadFromUrl(url);
+    public static String DownloadFromUrl(String urlStr) {
+        try {
+            URL url = new URL(urlStr);
+            return DownloadFromUrl(url);
+        } catch (MalformedURLException e) {
+            return "";
+        }
     }
     
     public static String DownloadFromUrl(URL url) {

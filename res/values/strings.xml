@@ -159,6 +159,8 @@
     <string name="chat_help_geo">Open Maps or Navigation or Street view on specific address.</string>
     <string name="chat_help_help">shows this help.</string>
     <string name="chat_help_help_all">shows full help.</string>
+    <string name="chat_help_help_about">displays information about the application.</string>
+    <string name="chat_help_help_changelog">displays the change logs.</string>
     <string name="chat_help_help_categories">shows the help categories.</string>
     <string name="chat_help_ignore">ignore the incoming phone call</string>
     <string name="chat_help_ls">Displays the list of files and folders in the specified folder.</string>
