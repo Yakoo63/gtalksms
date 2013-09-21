@@ -17,7 +17,7 @@ public class XmppOfflineMessages {
 
 	public static void handleOfflineMessages(XMPPConnection connection, String[] notifiedAddresses, Context ctx)
 	        throws XMPPException {
-		Log.i("Begin retrival of offline messages from server");
+		Log.i("Begin retrieval of offline messages from server");
 		OfflineMessageManager offlineMessageManager = new OfflineMessageManager(connection);
 
 		if (!offlineMessageManager.supportsFlexibleRetrieval())
@@ -33,7 +33,7 @@ public class XmppOfflineMessages {
 			String fullJid = msg.getFrom();
 			String bareJid = StringUtils.parseBareAddress(fullJid);
 			String messageBody = msg.getBody();
-			Log.d("Retrived offline message from " + fullJid + " with content: " + messageBody.substring(0, 40));
+			Log.d("Retrieved offline message from " + fullJid + " with content: " + messageBody.substring(0, 40));
 			for (String notifiedAddress : notifiedAddresses) {
 				if (bareJid.equals(notifiedAddress) && (messageBody != null)) {
 					Tools.startSvcXMPPMsg(ctx, messageBody, fullJid);
@@ -41,6 +41,6 @@ public class XmppOfflineMessages {
 			}
 		}
 		offlineMessageManager.deleteMessages();
-		Log.i("End of retrival of offline messages from server");
+		Log.i("End of retrieval of offline messages from server");
 	}
 }
