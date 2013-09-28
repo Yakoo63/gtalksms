@@ -510,10 +510,9 @@ public class XmppManager {
                 
             }
         });
-        
-        XHTMLManager.setServiceEnabled(connection, false);
-        
+
         try {
+            XHTMLManager.setServiceEnabled(connection, false);
             connection.login(mSettings.getLogin(), mSettings.getPassword(), Tools.APP_NAME);
         } catch (Exception e) {
             cleanupConnection();
