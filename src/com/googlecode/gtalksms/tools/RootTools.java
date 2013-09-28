@@ -18,10 +18,7 @@ public class RootTools {
             os.writeBytes("exit\n");
             os.flush();
             p.waitFor();
-            if (p.exitValue() != 255) {
-                return true;
-            }
-            return false;
+            return p.exitValue() != 255;
         } catch (Exception e) {
             return false;
         }

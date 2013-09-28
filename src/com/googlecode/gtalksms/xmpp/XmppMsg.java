@@ -11,16 +11,16 @@ import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMsg implements Parcelable {
-    public final static String BOLD_BEGIN = "##BOLD_BEGIN##";
-    public final static String BOLD_END = "##BOLD_END##";
-    public final static String ITALIC_BEGIN = "##ITALIC_BEGIN##";
-    public final static String ITALIC_END = "##ITALIC_END##";
-    public final static String FONT_BEGIN = "##FONT_BEGIN##";
+    private final static String BOLD_BEGIN = "##BOLD_BEGIN##";
+    private final static String BOLD_END = "##BOLD_END##";
+    private final static String ITALIC_BEGIN = "##ITALIC_BEGIN##";
+    private final static String ITALIC_END = "##ITALIC_END##";
+    private final static String FONT_BEGIN = "##FONT_BEGIN##";
     
     private static final XmppFont DEFAULT_FONT = new XmppFont();
     private XmppFont mMainFont;
-    private StringBuilder mMessage = new StringBuilder();
-    private ArrayList<XmppFont> mFonts = new ArrayList<XmppFont>();
+    private final StringBuilder mMessage = new StringBuilder();
+    private final ArrayList<XmppFont> mFonts = new ArrayList<XmppFont>();
     
     public XmppMsg() {
         mMainFont = DEFAULT_FONT;
@@ -53,7 +53,7 @@ public class XmppMsg implements Parcelable {
         return BOLD_BEGIN + in + BOLD_END;
     }
 
-    public static String makeItalic(String in) {
+    private static String makeItalic(String in) {
         return ITALIC_BEGIN + in + ITALIC_END;
     }
     

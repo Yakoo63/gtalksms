@@ -11,13 +11,13 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class SetLastRecipientRunnable implements Runnable {
 
-    public static final int sleepTime = 10;
+    private static final int sleepTime = 10;
     
-    private RecipientCmd mRecipientCmd;
-    private SettingsManager mSettings;
+    private final RecipientCmd mRecipientCmd;
+    private final SettingsManager mSettings;
     private boolean mIsOutdated;  // avoiding atomic boolean, because there is only one setter
-    private String mNumber;
-	private WakeLock mWl;
+    private final String mNumber;
+	private final WakeLock mWl;
 
     private static final int sleepTimeMs = sleepTime * 1000;
     

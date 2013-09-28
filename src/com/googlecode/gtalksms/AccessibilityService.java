@@ -24,11 +24,11 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class AccessibilityService extends android.accessibilityservice.AccessibilityService {
 
-    SettingsManager mSettingMgr;
-    HashMap<String, String> mInstalledApplications = new HashMap<String, String>();
-    HashMap<String, String> mLastMessage = new HashMap<String, String>();
-    HashMap<String, Long> mLastTimeStamp = new HashMap<String, Long>();
-    static ArrayList<Integer> sHiddenNotifItem = new ArrayList<Integer>();
+    private SettingsManager mSettingMgr;
+    private final HashMap<String, String> mInstalledApplications = new HashMap<String, String>();
+    private final HashMap<String, String> mLastMessage = new HashMap<String, String>();
+    private final HashMap<String, Long> mLastTimeStamp = new HashMap<String, Long>();
+    private static final ArrayList<Integer> sHiddenNotifItem = new ArrayList<Integer>();
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -52,7 +52,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 getAllTextView(views, localView);
                 for (TextView v: views) {
                     String text = v.getText().toString();
-                    if (!text.isEmpty()) {
+                    if (!text.equals("")) {
                         if (sHiddenNotifItem.contains(v.getId())) {
                             Log.d("[ItemId] Hidden       " + v.getId());
                             Log.d("[Text]   Hidden       " + text);
@@ -67,7 +67,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 Log.e("Failed to parse the notification.", e);
             }
             
-            if (message.isEmpty()) {
+            if (!message.equals("")) {
                 message = getEventText(event.getText());
             }
             

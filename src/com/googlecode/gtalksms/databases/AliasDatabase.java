@@ -11,7 +11,7 @@ import android.database.Cursor;
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
  *
  */
-public class AliasDatabase extends Database {
+class AliasDatabase extends Database {
     
     public AliasDatabase(Context ctx) {
         super(ctx);

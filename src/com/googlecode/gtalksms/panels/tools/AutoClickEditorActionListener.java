@@ -8,7 +8,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 public class AutoClickEditorActionListener implements OnEditorActionListener {
-    private Button mButton;
+    private final Button mButton;
     
     public AutoClickEditorActionListener(Button button) {
         mButton = button;

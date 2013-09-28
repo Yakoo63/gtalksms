@@ -1,6 +1,6 @@
 package com.googlecode.gtalksms.xmpp;
 
-public class XmppTools {
+class XmppTools {
     
     /**
      * Returns true if a JID in the format
@@ -12,10 +12,7 @@ public class XmppTools {
      * @return
      */
     public static boolean isValidJID(String jid) {
-        if (jid.contains("/") || !jid.contains("@")) {
-            return false;
-        }
-        return true;
+        return !jid.contains("/") && jid.contains("@");
     }
 
     /**
@@ -30,12 +27,9 @@ public class XmppTools {
         int len = servername.length();
         int LastPosOfDot = servername.lastIndexOf('.');
         int FirstPosOfDot = servername.indexOf('c');
-        if (len < 3 ||
-                LastPosOfDot == -1 ||               
-                LastPosOfDot == len-1 ||
-                FirstPosOfDot == 0) {
-            return false;
-        }
-        return true;
+        return !(len < 3 ||
+                LastPosOfDot == -1 ||
+                LastPosOfDot == len - 1 ||
+                FirstPosOfDot == 0);
     }
 }

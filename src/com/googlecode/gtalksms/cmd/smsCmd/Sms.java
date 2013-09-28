@@ -17,7 +17,7 @@ public class Sms implements Comparable<Sms> {
     private String to;
     private String answerTo;
     private String receiver;
-    private Date date;
+    private final Date date;
     private int resSentIntent;
     private int resDelIntent;
     private boolean[] sentIntents;
@@ -62,7 +62,7 @@ public class Sms implements Comparable<Sms> {
     }
     
     public Sms(int smsID, String phoneNumber, String name, String shortendMessage, String answerTo, String dIntents, String sIntents, int resSIntent, int resDIntent, long date) {
-        this.id = Integer.valueOf(smsID);
+        this.id = smsID;
         this.number = phoneNumber;
         this.to = name;
         this.shortendMessage = shortendMessage;
@@ -78,25 +78,21 @@ public class Sms implements Comparable<Sms> {
         boolean[] res = new boolean[string.length()];
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            if (c == 'X') {
-                res[i] = true;
-            } else {
-                res[i] = false;
-            }
+            res[i] = c == 'X';
         }
         return res;
     }
 
     public boolean sentIntentsComplete() {
-        for (int i = 0; i < sentIntents.length; i++) {
-            if (sentIntents[i] == false) return false;
+        for (boolean sentIntent : sentIntents) {
+            if (!sentIntent) return false;
         }
         return true;
     }
     
     public boolean delIntentsComplete() {
-        for (int i = 0; i < delIntents.length; i++) {
-            if (delIntents[i] == false) return false;
+        for (boolean delIntent : delIntents) {
+            if (!delIntent) return false;
         }
         return true;
     }
@@ -114,7 +110,7 @@ public class Sms implements Comparable<Sms> {
         sentIntents[partNumber] = true;
     }
 
-    public void setMessage(String message) {
+    void setMessage(String message) {
         this.message = message;
     }
 
@@ -122,7 +118,7 @@ public class Sms implements Comparable<Sms> {
         return message;
     }
 
-    public void setShortendMessage(String shortendMessage) {
+    void setShortendMessage(String shortendMessage) {
         this.shortendMessage = shortendMessage;
     }
 
@@ -130,7 +126,7 @@ public class Sms implements Comparable<Sms> {
         return shortendMessage;
     }
 
-    public void setNumber(String number) {
+    void setNumber(String number) {
         this.number = number;
     }
 
@@ -155,7 +151,7 @@ public class Sms implements Comparable<Sms> {
         return receiver;
     }
 
-    public void setTo(String to) {
+    void setTo(String to) {
         this.to = to;
     }
 
@@ -163,7 +159,7 @@ public class Sms implements Comparable<Sms> {
         return to;
     }
 
-    public void setAnswerTo(String answerTo) {
+    void setAnswerTo(String answerTo) {
         this.answerTo = answerTo;
     }
 
@@ -179,7 +175,7 @@ public class Sms implements Comparable<Sms> {
         return resSentIntent;
     }
 
-    public void setResDelIntent(int resDelIntent) {
+    void setResDelIntent(int resDelIntent) {
         this.resDelIntent = resDelIntent;
     }
 
@@ -202,7 +198,7 @@ public class Sms implements Comparable<Sms> {
     public String getDelIntents() {
         StringBuilder res = new StringBuilder(delIntents.length);
         for (boolean b : delIntents) {
-            if (b == true) {
+            if (b) {
                 res.append('X');
             } else {
                 res.append('O');
@@ -214,7 +210,7 @@ public class Sms implements Comparable<Sms> {
     public String getSentIntents() {
         StringBuilder res = new StringBuilder(sentIntents.length);
         for (boolean b : sentIntents) {
-            if (b == true) {
+            if (b) {
                 res.append('X');
             } else {
                 res.append('O');

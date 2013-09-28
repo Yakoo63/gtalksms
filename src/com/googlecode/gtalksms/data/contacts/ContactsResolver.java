@@ -55,7 +55,7 @@ public class ContactsResolver {
      * @return The resolvedContact or null if there is none.
      */
     public ResolvedContact resolveContact(String contactInformation, int searchType) {
-        String resolvedName = contactInformation;
+        String resolvedName;
         String number = sAliasHelper.convertAliasToNumber(contactInformation);
         
         // Best that can happen, we were able to resolve a distinct number via

@@ -6,9 +6,9 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 
 public class SwitchCheckBoxCompat {
-    Switch mSwitch;
-    CheckBox mCheckBox;
-    boolean mIsSwitchSupported;
+    private Switch mSwitch;
+    private CheckBox mCheckBox;
+    private boolean mIsSwitchSupported;
     
     public SwitchCheckBoxCompat (View v, int id) {
         try {

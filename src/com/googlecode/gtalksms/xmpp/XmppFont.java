@@ -1,8 +1,8 @@
 package com.googlecode.gtalksms.xmpp;
 
 public class XmppFont {
-    String mFont = null;
-    String mColor = null;
+    private String mFont = null;
+    private String mColor = null;
     String mSize = null;
     
     public XmppFont() {

@@ -128,7 +128,7 @@ public class WifiCmd extends CommandHandlerBase {
         }
     }
     
-    public void sendStatus() {
+    void sendStatus() {
         send(getStatus());
     }
     

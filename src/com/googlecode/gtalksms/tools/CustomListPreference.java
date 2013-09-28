@@ -24,14 +24,14 @@ import com.googlecode.gtalksms.R;
 
 public class CustomListPreference extends ListPreference
 {   
-    CustomListPreferenceAdapter customListPreferenceAdapter = null;
-    Context mContext;
-    private LayoutInflater mInflater;
-    ArrayList<ArrayList<Integer>> entries;
-    ArrayList<RadioButton> rButtonList;
-    SharedPreferences prefs;
-    SharedPreferences.Editor editor;
-    int entriesSize;
+    private CustomListPreferenceAdapter customListPreferenceAdapter = null;
+    private final Context mContext;
+    private final LayoutInflater mInflater;
+    private ArrayList<ArrayList<Integer>> entries;
+    private final ArrayList<RadioButton> rButtonList;
+    private final SharedPreferences prefs;
+    private final SharedPreferences.Editor editor;
+    private int entriesSize;
     
     public CustomListPreference(Context context, AttributeSet attrs)
     {
@@ -102,7 +102,7 @@ public class CustomListPreference extends ListPreference
         public View getView(final int position, View convertView, ViewGroup parent)
         {  
             View row = convertView;
-            CustomHolder holder = null;
+            CustomHolder holder;
 
             if(row == null)
             {                                                                   
@@ -123,9 +123,9 @@ public class CustomListPreference extends ListPreference
             {    
                 layout = (LinearLayout)row.findViewById(R.id.custom_list_view_row_layout);
                 if (layout.getChildCount() == 0) {
-                    for (int i = 0 ; i < entries.size() ; ++i) {
+                    for (ArrayList<Integer> entry : entries) {
                         ImageView img = new ImageView(getContext());
-                        img.setImageResource(entries.get(i).get(position));
+                        img.setImageResource(entry.get(position));
                         img.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                         img.setPadding(5, 0, 0, 0);
                         layout.addView(img);

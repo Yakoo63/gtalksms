@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -20,7 +19,6 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -48,8 +46,8 @@ import com.googlecode.gtalksms.xmpp.XmppFriend;
 public class MainActivity extends SherlockFragmentActivity {
     
     public class TabListener implements ActionBar.TabListener {
-        private ViewPager mPager;
-        private int mIndex;
+        private final ViewPager mPager;
+        private final int mIndex;
 
         public TabListener(ViewPager pager, int index) {
             mPager = pager;
@@ -65,8 +63,8 @@ public class MainActivity extends SherlockFragmentActivity {
     }
     
     public static class TabAdapter extends FragmentPagerAdapter {
-        ActionBar mActionBar;
-        ArrayList<SherlockFragment> mFragments;
+        final ActionBar mActionBar;
+        final ArrayList<SherlockFragment> mFragments;
         
         public TabAdapter(FragmentManager fm, ActionBar actionBar, ArrayList<SherlockFragment> fragments) {
             super(fm);
@@ -96,14 +94,14 @@ public class MainActivity extends SherlockFragmentActivity {
     private MainService mMainService;
     private ActionBar mActionBar;
     private ViewPager mPager;
-    private ConnectionTabFragment mConnectionTabFragment = new ConnectionTabFragment();
-    private BuddiesTabFragment mBuddiesTabFragment = new BuddiesTabFragment();
-    private CommandsTabFragment mCommandsTabFragment = new CommandsTabFragment();
-    private HelpTabFragment mHelpTabFragment = new HelpTabFragment();
-    private ConnectionStatusTabFragment mConnectionStatusTabFragment = new ConnectionStatusTabFragment();
-    private ArrayList<SherlockFragment> mFragments = new ArrayList<SherlockFragment>();
+    private final ConnectionTabFragment mConnectionTabFragment = new ConnectionTabFragment();
+    private final BuddiesTabFragment mBuddiesTabFragment = new BuddiesTabFragment();
+    private final CommandsTabFragment mCommandsTabFragment = new CommandsTabFragment();
+    private final HelpTabFragment mHelpTabFragment = new HelpTabFragment();
+    private final ConnectionStatusTabFragment mConnectionStatusTabFragment = new ConnectionStatusTabFragment();
+    private final ArrayList<SherlockFragment> mFragments = new ArrayList<SherlockFragment>();
     
-    private BroadcastReceiver mXmppreceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mXmppreceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(MainService.ACTION_XMPP_PRESENCE_CHANGED)) {
@@ -120,7 +118,7 @@ public class MainActivity extends SherlockFragmentActivity {
         }
     };
     
-    private ServiceConnection mMainServiceConnection = new ServiceConnection() {
+    private final ServiceConnection mMainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("MainActivity: MainService connected");
             LocalBinder binder = (LocalBinder) service;

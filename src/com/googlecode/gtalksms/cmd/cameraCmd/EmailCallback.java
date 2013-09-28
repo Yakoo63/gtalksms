@@ -8,7 +8,7 @@ import android.net.Uri;
 
 public class EmailCallback extends ExtentedPictureCallback {
 
-    protected String[] mRecipient;
+    private final String[] mRecipient;
     
     public EmailCallback(File path, Context ctx, String[] recipient) {
         super(path, ctx);

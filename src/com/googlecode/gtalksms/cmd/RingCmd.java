@@ -20,7 +20,7 @@ public class RingCmd extends CommandHandlerBase {
     
     private static AudioManager sAudioManager;
     private MediaPlayer mMediaPlayer;
-    private Vibrator mVibrator;
+    private final Vibrator mVibrator;
     private boolean mCanRing;
    
     public RingCmd(MainService mainService) {
@@ -104,7 +104,7 @@ public class RingCmd extends CommandHandlerBase {
             res = true;
         }
         
-        if (res == true) {
+        if (res) {
             sMainService.displayRingingNotification();
         }
         

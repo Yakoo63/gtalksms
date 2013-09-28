@@ -16,9 +16,9 @@ import com.googlecode.gtalksms.R;
 public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListener {
 
     // TODO ADD Global Settings for Locale and Engine
-    TextToSpeech mTts;
-    Locale mLocale;
-    boolean mTtsAvailable;
+    private TextToSpeech mTts;
+    private Locale mLocale;
+    private boolean mTtsAvailable;
 
     public TextToSpeechCmd(MainService mainService) {
         super(mainService, 
@@ -61,7 +61,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
             } else {
                 StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_engines));
                 for (EngineInfo engine : mTts.getEngines()) {
-                    sb.append(engine.label + " - " + engine.name + "\n");
+                    sb.append(engine.label).append(" - ").append(engine.name).append("\n");
                 }
                 send(sb.substring(0, Math.max(0,sb.length() - 1)));
             }
@@ -72,12 +72,12 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
                     case TextToSpeech.LANG_AVAILABLE:
                         sb.append(locale.getDisplayLanguage());
                         if (locale.getDisplayCountry() != null && locale.getDisplayCountry().length() > 0)  {
-                            sb.append(" (" + locale.getDisplayCountry() + ")");
+                            sb.append(" (").append(locale.getDisplayCountry()).append(")");
                         }
-                        sb.append(" - " + locale.getLanguage());
+                        sb.append(" - ").append(locale.getLanguage());
                         
                         if (locale.getDisplayCountry() != null && locale.getDisplayCountry().length() > 0)  {
-                            sb.append(":" + locale.getCountry());
+                            sb.append(":").append(locale.getCountry());
                         }
                         sb.append("\n");
                         break;

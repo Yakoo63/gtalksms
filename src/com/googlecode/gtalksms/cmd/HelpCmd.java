@@ -19,7 +19,7 @@ public class HelpCmd extends CommandHandlerBase {
     private static XmppMsg _msg;  // brief help message
     private static XmppMsg _msgAll;   // full help message
     private static XmppMsg _msgAbout;
-    private Map<String, CommandHandlerBase> commands;
+    private final Map<String, CommandHandlerBase> commands;
     
     private static XmppMsg _msgContact;
     private static XmppMsg _msgMessage;
@@ -204,7 +204,7 @@ public class HelpCmd extends CommandHandlerBase {
      * @param msg
      * @param lines - can be null
      */
-    private static final void addLinesToMsg(XmppMsg msg, ArrayList<String> lines) {
+    private static void addLinesToMsg(XmppMsg msg, ArrayList<String> lines) {
         if (lines == null) {
         	return;
         }

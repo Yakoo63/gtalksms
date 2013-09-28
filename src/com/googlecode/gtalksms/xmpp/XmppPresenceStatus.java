@@ -14,7 +14,7 @@ public class XmppPresenceStatus {
     private static XmppPresenceStatus sXmppPresenceStatus;
     
     private XMPPConnection mConnection;
-    private XmppBuddies mXmppBuddies;
+    private final XmppBuddies mXmppBuddies;
     private String mBatteryPercentage;
     private String mPowerSource;
     

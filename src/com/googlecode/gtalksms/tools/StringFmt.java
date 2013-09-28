@@ -73,7 +73,7 @@ public class StringFmt {
         return format(str, new URLSpan(link.toString()));
     }
     
-    public static CharSequence format(CharSequence text, CharacterStyle... cs) {
+    private static CharSequence format(CharSequence text, CharacterStyle... cs) {
         // Copy the spannable string to a mutable spannable string
         SpannableStringBuilder ssb = new SpannableStringBuilder(text);
         for (CharacterStyle c : cs) {

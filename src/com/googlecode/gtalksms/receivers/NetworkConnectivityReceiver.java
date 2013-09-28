@@ -60,7 +60,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
 			context.startService(svcintent);
 		}
 
-        network = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+        network = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
         if (network.getTypeName().equals("WIFI") && network.isConnected() && prefs.getBoolean("startOnWifiConnected", false)) {
             // Start GTalkSMS
             if (debugLog) {

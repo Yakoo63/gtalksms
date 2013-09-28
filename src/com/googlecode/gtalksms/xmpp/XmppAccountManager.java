@@ -11,7 +11,7 @@ import android.content.SharedPreferences.Editor;
 
 import com.googlecode.gtalksms.SettingsManager;
 
-public class XmppAccountManager {
+class XmppAccountManager {
     // some servers need the username to be a full JID
     // define them here (currently only Google services)
     private static final String[] USERNAME_IS_FULL_JID = new String[] {"gmail.com", "googlemail.com"};                                
@@ -22,7 +22,6 @@ public class XmppAccountManager {
      * Returns the XMPPConnection on success, 
      * otherwise throws an XMPPException
      * 
-     * @param jid
      * @param host
      * @param password
      * @return
@@ -75,7 +74,7 @@ public class XmppAccountManager {
      * @param password
      * @param settings
      */
-    public static void savePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) {
+    private static void savePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) {
         Editor editor = settings.getEditor();
         boolean useDifferentAccount;
         
@@ -85,12 +84,8 @@ public class XmppAccountManager {
         editor.putBoolean("manuallySpecifyServerSettings", false);
         editor.putString("login", jid);
         editor.putString("password", password);
-        
-        if (jid.equals(notifiedAddress)) {
-            useDifferentAccount = false;
-        } else {
-            useDifferentAccount = true;
-        }
+
+        useDifferentAccount = !jid.equals(notifiedAddress);
         editor.putBoolean("useDifferentAccount", useDifferentAccount);
         
         editor.commit();

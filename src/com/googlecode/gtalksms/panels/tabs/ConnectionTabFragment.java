@@ -20,14 +20,14 @@ import com.googlecode.gtalksms.widgets.SwitchCheckBoxCompat;
 
 public class ConnectionTabFragment extends SherlockFragment {
     
-    SettingsManager mSettingsMgr;
-    EditText mEditTextLogin;
-    EditText mEditNotificationAddress;
-    EditText mEditTextPassword;
-    SwitchCheckBoxCompat mSwitchConnection;
-    Button mStartStopButton;
-    String mCurrentAction = MainService.ACTION_CONNECT;
-    int mCurrentStatus = XmppManager.DISCONNECTED;
+    private SettingsManager mSettingsMgr;
+    private EditText mEditTextLogin;
+    private EditText mEditNotificationAddress;
+    private EditText mEditTextPassword;
+    private SwitchCheckBoxCompat mSwitchConnection;
+    private Button mStartStopButton;
+    private String mCurrentAction = MainService.ACTION_CONNECT;
+    private int mCurrentStatus = XmppManager.DISCONNECTED;
     
     @Override
     public void onResume() {

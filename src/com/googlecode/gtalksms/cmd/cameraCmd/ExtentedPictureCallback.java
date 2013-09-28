@@ -10,17 +10,15 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.tools.Tools;
 
-public abstract class ExtentedPictureCallback implements PictureCallback {
-    private File path;
-    protected Context ctx;
+abstract class ExtentedPictureCallback implements PictureCallback {
+    private final File path;
+    final Context ctx;
     
     /**
      * 
      * @param path the path were the picture will be saved in
-     * @param ctx
-     * @param recipient
      */
-    public ExtentedPictureCallback(File path, Context ctx) {
+    ExtentedPictureCallback(File path, Context ctx) {
         this.path = path;
         this.ctx = ctx;
     }

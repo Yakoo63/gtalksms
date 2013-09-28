@@ -24,7 +24,7 @@ import com.android.internal.telephony.ITelephony;
 
 public class CallCmd extends CommandHandlerBase {
     private static boolean sListenerActive = false;
-    private PhoneManager _phoneMgr;
+    private final PhoneManager _phoneMgr;
     private PhoneCallListener mPhoneListener = null;
     private TelephonyManager mTelephonyMgr = null;
     private ContactsResolver mContactsResolver = null;
@@ -153,7 +153,7 @@ public class CallCmd extends CommandHandlerBase {
     
     private ITelephony getTelephonyService() {
         TelephonyManager tm = (TelephonyManager) sContext.getSystemService(Context.TELEPHONY_SERVICE);
-        com.android.internal.telephony.ITelephony telephonyService = null;
+        com.android.internal.telephony.ITelephony telephonyService;
         try {
             Class<?> c = Class.forName(tm.getClass().getName());
             Method m = c.getDeclaredMethod("getITelephony");

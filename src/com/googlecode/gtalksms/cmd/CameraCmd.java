@@ -115,7 +115,7 @@ public class CameraCmd extends CommandHandlerBase {
             if (id == null || id < 0 || id >= Camera.getNumberOfCameras()) {
                 listCameras();
             } else {
-                cameraId = id.intValue(); 
+                cameraId = id;
                 CameraInfo info = new CameraInfo(); 
                 Camera.getCameraInfo(cameraId, info);
                 
@@ -140,9 +140,9 @@ public class CameraCmd extends CommandHandlerBase {
                 
                 res.append(i);
                 if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
-                    res.append(sContext.getString(R.string.chat_camera_back) + Tools.LineSep);
+                    res.append(sContext.getString(R.string.chat_camera_back)).append(Tools.LineSep);
                 } else if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
-                    res.append(sContext.getString(R.string.chat_camera_front) + Tools.LineSep);
+                    res.append(sContext.getString(R.string.chat_camera_front)).append(Tools.LineSep);
                 }    
             }
             send(res.toString());
@@ -220,7 +220,7 @@ public class CameraCmd extends CommandHandlerBase {
         releaseResources();
     }
     
-    public void setLight(boolean turnOn) {
+    void setLight(boolean turnOn) {
         if (sCamera == null) {
             sCamera = Camera.open();
         }

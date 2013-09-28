@@ -11,10 +11,10 @@ public class XmppFriend {
     public static final int FFC = 4;
     public static final int OFFLINE = 5;
     
-    public String mId;
-    public String mName;
-    public String mStatus;
-    public int mState;
+    public final String mId;
+    public final String mName;
+    public final String mStatus;
+    public final int mState;
 
     public XmppFriend(String userID, String username, String retrieveStatus, int retrieveState) {
         mId = userID;

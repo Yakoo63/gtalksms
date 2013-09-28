@@ -116,6 +116,7 @@ public class XmppBuddies implements RosterListener {
             if (roster.contains(userID)) {
                 RosterEntry entry  = roster.getEntry(userID);
                 entry.setName(name);
+                return true;
             }
         }
         return false;
@@ -135,8 +136,8 @@ public class XmppBuddies implements RosterListener {
 
         if (sConnection != null && sConnection.isAuthenticated()) {
             try {
-                String userID = null;
-                String status = null;
+                String userID;
+                String status;
                 Roster roster = sConnection.getRoster();
 
                 for (RosterEntry r : roster.getEntries()) {
@@ -160,7 +161,7 @@ public class XmppBuddies implements RosterListener {
      * 
      * @param list
      */
-    public void sendFriendList(ArrayList<XmppFriend> list) {
+    void sendFriendList(ArrayList<XmppFriend> list) {
         
         for (XmppFriend xmppFriend : list) {
             Intent intent = new Intent(MainService.ACTION_XMPP_PRESENCE_CHANGED);
@@ -178,8 +179,8 @@ public class XmppBuddies implements RosterListener {
      * @param userID
      * @return
      */
-    public String retrieveStatusMessage(String userID) {
-        String userStatus = ""; // default return value
+    String retrieveStatusMessage(String userID) {
+        String userStatus; // default return value
 
         try {
             userStatus = sConnection.getRoster().getPresence(userID).getStatus();
@@ -195,9 +196,9 @@ public class XmppBuddies implements RosterListener {
         return userStatus;
     }
 
-    public int retrieveState(String userID) {
+    int retrieveState(String userID) {
         int userState = XmppFriend.OFFLINE; // default return value
-        Presence userFromServer = null;
+        Presence userFromServer;
 
         try {
             userFromServer = sConnection.getRoster().getPresence(userID);
@@ -218,7 +219,7 @@ public class XmppBuddies implements RosterListener {
      */
     // TODO do we need the isOnline boolean?
     // Mode.available should be an equivalent
-    public int retrieveState(Mode userMode, boolean isOnline) {
+    int retrieveState(Mode userMode, boolean isOnline) {
         int userState = XmppFriend.OFFLINE; // default return value
         
         if (userMode == Mode.dnd) {
@@ -312,7 +313,7 @@ public class XmppBuddies implements RosterListener {
      * @param jid
      * @param connection
      */
-    public static void requestSubscription(String jid, XMPPConnection connection) {
+    private static void requestSubscription(String jid, XMPPConnection connection) {
         Presence presence = new Presence(Presence.Type.subscribe);
         sendPresenceTo(jid, presence, connection);
     }

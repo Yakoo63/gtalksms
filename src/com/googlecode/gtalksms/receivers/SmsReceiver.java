@@ -23,7 +23,6 @@ public class SmsReceiver extends BroadcastReceiver {
 
         if (msg == null) {
             // unable to retrieve SMS
-            return;
         } else if (MainService.IsRunning) {
             // send all SMS via XMPP by sender
             for (String sender : msg.keySet()) {
@@ -49,7 +48,7 @@ public class SmsReceiver extends BroadcastReceiver {
     
     private static Map<String, String> RetrieveMessages(Intent intent) {
         Map<String, String> msg = null; 
-        SmsMessage[] msgs = null;
+        SmsMessage[] msgs;
         Bundle bundle = intent.getExtras();
         
         if (bundle != null && bundle.containsKey("pdus")) {

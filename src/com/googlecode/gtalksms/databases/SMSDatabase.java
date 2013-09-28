@@ -13,7 +13,7 @@ import android.database.Cursor;
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
  *
  */
-public class SMSDatabase extends Database {
+class SMSDatabase extends Database {
     private static final long OLD_SMS_THRESHOLD = 1000 * 60 * 60 * 24 * 5; // 5 days
     
     public SMSDatabase(Context ctx) {

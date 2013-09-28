@@ -10,8 +10,8 @@ import android.content.Intent;
 
 public class BluetoothStateReceiver extends BroadcastReceiver {
     
-    private MainService mMainService;
-    private String mAnswerTo;
+    private final MainService mMainService;
+    private final String mAnswerTo;
     
     public BluetoothStateReceiver(MainService mainService, String answerTo) {
         this.mMainService = mainService;

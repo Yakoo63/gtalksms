@@ -38,7 +38,7 @@ public class CommandsTabFragment extends SherlockFragment {
     private ListView mListViewCommands;
     private EditText mEditTextCommand;
     private Button mButtonSend;
-    private List<Cmd> mListCommands = new ArrayList<Cmd>();
+    private final List<Cmd> mListCommands = new ArrayList<Cmd>();
     
     @Override
     public void onResume() {
@@ -127,9 +127,7 @@ public class CommandsTabFragment extends SherlockFragment {
             mListCommands.clear();
             for (CommandHandlerBase cmdBase : commands) {
                 if (cmdBase.getType() != CommandHandlerBase.TYPE_INTERNAL) {
-                    for (Cmd cmd : cmdBase.getCommands()) {
-                        mListCommands.add(cmd);
-                    }
+                    Collections.addAll(mListCommands, cmdBase.getCommands());
                 }
             }
             Collections.sort(mListCommands, new Comparator<Cmd>() {
@@ -144,7 +142,7 @@ public class CommandsTabFragment extends SherlockFragment {
         }
     }
     
-    public void sendCommandAndVibrate(String cmd, String args, View view) {
+    void sendCommandAndVibrate(String cmd, String args, View view) {
         Intent intent = new Intent(MainService.ACTION_COMMAND);
         intent.putExtra("cmd", cmd);
         if (args != null) {
@@ -158,7 +156,7 @@ public class CommandsTabFragment extends SherlockFragment {
     
     public class CmdListAdapter extends ArrayAdapter<Cmd> {
         
-        LayoutInflater mInflater;
+        final LayoutInflater mInflater;
         
         public CmdListAdapter(Activity activity, int textViewResourceId, List<Cmd> list) {
             super(activity, textViewResourceId, list);
@@ -203,8 +201,8 @@ public class CommandsTabFragment extends SherlockFragment {
     
     public class SubCmdListAdapter extends ArrayAdapter<Cmd.SubCmd> {
         
-        LayoutInflater mInflater;
-        Cmd mCmd;
+        final LayoutInflater mInflater;
+        final Cmd mCmd;
         
         public SubCmdListAdapter(Activity activity, int textViewResourceId, Cmd cmd) {
             super(activity, textViewResourceId, cmd.getSubCmds());

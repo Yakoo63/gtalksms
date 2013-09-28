@@ -29,13 +29,13 @@ public class XmppFileManager implements FileTransferListener {
     
     private static XmppFileManager xmppFileManager;
     
-    private SettingsManager mSettings;
+    private final SettingsManager mSettings;
     private XMPPConnection mConnection;
     private FileTransferManager mFileTransferManager = null;
     private String mAnswerTo;
-    private File mExternalFilesDir;
-    private File mLandingDir;
-    private Context mCtx;
+    private final File mExternalFilesDir;
+    private final File mLandingDir;
+    private final Context mCtx;
             
     private XmppFileManager(Context context) {
         mSettings = SettingsManager.getSettingsManager(context);
@@ -108,7 +108,7 @@ public class XmppFileManager implements FileTransferListener {
         try {
             transfer.recieveFile(saveTo);
             send(R.string.chat_file_transfer_file, saveTo.getName(), transfer.getStatus());
-            double percents = 0.0;
+            double percents;
             
             // We allow 30s before that status go to in progress
             int currentCycle = 0; 

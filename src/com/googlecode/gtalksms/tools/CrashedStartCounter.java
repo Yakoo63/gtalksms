@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import com.googlecode.gtalksms.files.Datefile;
-import com.googlecode.gtalksms.files.NullIntentStartCounterDatefile;
+
+import com.googlecode.gtalksms.files.DateFile;
+import com.googlecode.gtalksms.files.NullIntentStartCounterDateFile;
 
 import android.content.Context;
 import java.text.ParseException;
@@ -37,9 +38,9 @@ public class CrashedStartCounter {
     }
     
     public boolean count() {
-        NullIntentStartCounterDatefile df;
+        NullIntentStartCounterDateFile df;
         try {
-            df = NullIntentStartCounterDatefile.construct(sDirFile);
+            df = NullIntentStartCounterDateFile.construct(sDirFile);
             df.count();
         } catch (IOException e) {
             return false;
@@ -56,28 +57,28 @@ public class CrashedStartCounter {
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, i*(-1));
             Date date = cal.getTime();
-            NullIntentStartCounterDatefile df = NullIntentStartCounterDatefile.reconstruct(sDirFile, date);
+            NullIntentStartCounterDateFile df = NullIntentStartCounterDateFile.reconstruct(sDirFile, date);
             res[i] = df.getCount();
         }
         return res;
     }
     
     private static void cleanUp() {
-        List<NullIntentStartCounterDatefile>  datefiles = getDatefiles();
+        List<NullIntentStartCounterDateFile>  datefiles = getDatefiles();
         
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -7);
         Date date = cal.getTime();
         
-        Datefile.deleteDatefilesOlderThan(datefiles, date);
+        DateFile.deleteDatefilesOlderThan(datefiles, date);
     }
     
-    private static List<NullIntentStartCounterDatefile>  getDatefiles() {
+    private static List<NullIntentStartCounterDateFile>  getDatefiles() {
         File[] files = sDirFile.listFiles();
-        List<NullIntentStartCounterDatefile> datefiles = new ArrayList<NullIntentStartCounterDatefile>();
+        List<NullIntentStartCounterDateFile> datefiles = new ArrayList<NullIntentStartCounterDateFile>();
         for (File f : files) {
             try {
-                NullIntentStartCounterDatefile df = NullIntentStartCounterDatefile.reconstruct(f);
+                NullIntentStartCounterDateFile df = NullIntentStartCounterDateFile.reconstruct(f);
                 datefiles.add(df);
             } catch (ParseException e) {} 
         }

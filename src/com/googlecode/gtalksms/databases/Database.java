@@ -3,9 +3,9 @@ package com.googlecode.gtalksms.databases;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-public abstract class Database {
-    protected static SQLiteDatabase database;
-    protected static SQLiteDatabase databaseRO;
+abstract class Database {
+    static SQLiteDatabase database;
+    static SQLiteDatabase databaseRO;
 
     
     Database(Context ctx) {

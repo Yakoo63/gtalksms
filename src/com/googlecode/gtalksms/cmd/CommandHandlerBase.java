@@ -20,23 +20,23 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public abstract class CommandHandlerBase {
     
-    public static final int TYPE_MESSAGE = 1;
-    public static final int TYPE_CONTACTS = 2;
-    public static final int TYPE_GEO = 3;
-    public static final int TYPE_SYSTEM = 4;
-    public static final int TYPE_COPY = 5;
-    public static final int TYPE_MEDIA = 6;
+    static final int TYPE_MESSAGE = 1;
+    static final int TYPE_CONTACTS = 2;
+    static final int TYPE_GEO = 3;
+    static final int TYPE_SYSTEM = 4;
+    static final int TYPE_COPY = 5;
+    static final int TYPE_MEDIA = 6;
     public static final int TYPE_INTERNAL = 7;
     
-    protected static SettingsManager sSettingsMgr;
-    protected static Context sContext;
-    protected static MainService sMainService = null;
-    protected final HashMap<String,Cmd> mCommandMap;
-    protected final int mCmdType;
-    protected String mAnswerTo;
+    static SettingsManager sSettingsMgr;
+    static Context sContext;
+    static MainService sMainService = null;
+    final HashMap<String,Cmd> mCommandMap;
+    final int mCmdType;
+    String mAnswerTo;
     
     private boolean mIsActivated;
-    private String mName;
+    private final String mName;
         
     CommandHandlerBase(MainService mainService, int cmdType, String name, Cmd... commands) {
         if (sMainService == null) {
@@ -64,7 +64,7 @@ public abstract class CommandHandlerBase {
      * GTalkSMS to be active (meaning connected) and if the command is
      * activated
      */
-    public void activate() {
+    void activate() {
         Map<String, CommandHandlerBase> activeCommands = MainService.getActiveCommands();
         Set<CommandHandlerBase> activeCommandSet = MainService.getActiveCommandSet(); 
         
@@ -119,7 +119,7 @@ public abstract class CommandHandlerBase {
         return mIsActivated;
     }
 
-    protected String getString(int id, Object... args) {
+    String getString(int id, Object... args) {
         return sContext.getString(id, args);
     }
     
@@ -134,28 +134,28 @@ public abstract class CommandHandlerBase {
      * @param id
      * @param args
      */
-    protected void send(int id, Object... args) {
+    void send(int id, Object... args) {
         send(getString(id, args));
     }    
     
-    protected void send(String message) {
+    void send(String message) {
         send(message, mAnswerTo);
     }
     
-    protected void send(XmppMsg message) {
+    void send(XmppMsg message) {
         send(message, mAnswerTo);
     }
     
-    protected void sendAndClear(XmppMsg message) {
+    void sendAndClear(XmppMsg message) {
         send(message, mAnswerTo);
         message.clear();
     }
     
-    protected void send(String message, String to) {
+    void send(String message, String to) {
         sMainService.send(message, to);
     }
 
-    protected void send(XmppMsg message, String to) {
+    void send(XmppMsg message, String to) {
         sMainService.send(message, to);
     }
     
@@ -164,7 +164,7 @@ public abstract class CommandHandlerBase {
      * also logs this exception with info level
      * @param e
      */
-    protected void send(Exception e) {
+    void send(Exception e) {
         send("Exception: " + e.toString(), mAnswerTo);
         Log.i("Exception", e);
     }
@@ -191,16 +191,16 @@ public abstract class CommandHandlerBase {
         return null;
     } 
     
-    public boolean isMatchingCmd(String cmdName, String input) {
+    boolean isMatchingCmd(String cmdName, String input) {
         Cmd cmd = getCommand(input);        
         return cmd != null && cmd.getName().equals(cmdName);
     }
     
-    protected void executeNewCmd(String cmd) {
+    void executeNewCmd(String cmd) {
         executeNewCmd(cmd, null);
     }
     
-    protected void executeNewCmd(String cmd, String args) {
+    void executeNewCmd(String cmd, String args) {
         Intent i = new Intent(MainService.ACTION_COMMAND);
         i.putExtra("cmd", cmd);
         if (args != null) {
@@ -247,7 +247,7 @@ public abstract class CommandHandlerBase {
         
     }
     
-    public void execute(Command userCommand) {
+    void execute(Command userCommand) {
         /*
          * Default implementation is to fall back to old behavior with
          * _answerTo variable and Xmpp awareness in sub classes.
@@ -265,11 +265,10 @@ public abstract class CommandHandlerBase {
      * 
      * @param cmd the base command
      * @param args the arguments - substring after the first ":", if no other arguments where given this will be ""
-     * @param answerTo JID for command output, null to send to default notification address
      * @deprecated Use {@link #execute(Command)} instead
      */
     @Deprecated
-    protected void execute(String cmd, String args) {
+    void execute(String cmd, String args) {
         throw new RuntimeException("Must implement execute(UserCommand)");
     }
         
@@ -285,7 +284,7 @@ public abstract class CommandHandlerBase {
      * 
      * @return Help String array, null if there is no help available
      */
-    public ArrayList<String> help() {
+    ArrayList<String> help() {
         ArrayList<String> res = new ArrayList<String>();
         
         for (Cmd c : mCommandMap.values()) {
@@ -304,7 +303,7 @@ public abstract class CommandHandlerBase {
     
     protected abstract void initializeSubCommands();
     
-    protected String makeBold(String msg) {
+    String makeBold(String msg) {
         return XmppMsg.makeBold(msg);
     }
     
@@ -315,7 +314,7 @@ public abstract class CommandHandlerBase {
      * @param args
      * @return args split in an array or an array only containing the empty string
      */
-    protected String[] splitArgs(String args) {
+    String[] splitArgs(String args) {
         StringTokenizer strtok = new StringTokenizer(args, ":");
         int tokenCount = strtok.countTokens();
         String[] res;
@@ -334,7 +333,7 @@ public abstract class CommandHandlerBase {
      * 
      * @return
      */
-    protected final String getCommandsAsString() {
+    final String getCommandsAsString() {
         String res = "";
         for(Cmd c : mCommandMap.values()) {
             res += c.getName(); 
@@ -356,7 +355,7 @@ public abstract class CommandHandlerBase {
      * messages available
      * 
      */
-    protected final void sendHelp() {
+    final void sendHelp() {
     	ArrayList<String> help = help();
         if (help.isEmpty()) {
             return;
@@ -375,7 +374,7 @@ public abstract class CommandHandlerBase {
      * 
      * @param candidates
      */
-    protected void askForMoreDetails(ResolvedContact[] candidates) {
+    void askForMoreDetails(ResolvedContact[] candidates) {
         XmppMsg msg = new XmppMsg(getString(R.string.chat_specify_details));
         msg.newLine();
         for (ResolvedContact rc : candidates) {

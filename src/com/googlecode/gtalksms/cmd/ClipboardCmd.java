@@ -18,7 +18,7 @@ import com.googlecode.gtalksms.tools.Tools;
 
 
 public class ClipboardCmd extends CommandHandlerBase {
-    ClipboardManager mOldClipboardMgr;
+    private final ClipboardManager mOldClipboardMgr;
     
     public ClipboardCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_COPY, "Clipboard", new Cmd("clipboard", "copy"));

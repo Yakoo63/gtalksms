@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 
 public class KeyboardMainView extends KeyboardView {
 
-    static final int KEYCODE_OPTIONS = -100;
+    private static final int KEYCODE_OPTIONS = -100;
 
     public KeyboardMainView(Context context, AttributeSet attrs) {
         super(context, attrs);

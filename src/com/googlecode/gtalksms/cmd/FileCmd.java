@@ -22,8 +22,8 @@ public class FileCmd extends CommandHandlerBase {
     
     private File landingDir;
     private File sendDir;  // where the files come from if send:filename is given
-    private KeyValueHelper keyValueHelper;
-    private XmppFileManager mXmppFileManager;
+    private final KeyValueHelper keyValueHelper;
+    private final XmppFileManager mXmppFileManager;
 
     private Exception ex;
     
@@ -74,7 +74,7 @@ public class FileCmd extends CommandHandlerBase {
     
     class SendFileThread extends Thread {
         
-        private File mFile;
+        private final File mFile;
         
         public SendFileThread(File file) {
             this.mFile = file;

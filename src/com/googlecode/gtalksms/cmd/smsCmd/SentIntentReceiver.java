@@ -49,7 +49,7 @@ public class SentIntentReceiver extends SmsPendingIntentReceiver {
             }
             s.setResSentIntent(res);
         }
-        if (settings.notifySmsDelivered == false && sentIntComplete) {
+        if (!settings.notifySmsDelivered && sentIntComplete) {
             removeSms(smsID);  
         }        
     }

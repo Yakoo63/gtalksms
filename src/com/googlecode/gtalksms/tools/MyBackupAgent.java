@@ -26,9 +26,9 @@ import com.googlecode.gtalksms.SettingsManager;
 
 public class MyBackupAgent extends BackupAgent {
     public static final int KEYTYPE_UNKOWN = 0;
-    public static final int KEYTYPE_STRING = 1;
-    public static final int KEYTYPE_INT = 2;
-    public static final int KEYTYPE_BOOLEAN = 3;
+    private static final int KEYTYPE_STRING = 1;
+    private static final int KEYTYPE_INT = 2;
+    private static final int KEYTYPE_BOOLEAN = 3;
     
     private SettingsManager settingsManager;
     
@@ -90,7 +90,7 @@ public class MyBackupAgent extends BackupAgent {
         while (data.readNextHeader()) {
             String key = data.getKey();
             int dataSize = data.getDataSize();
-            int keytype = 0;            
+            int keytype;
             if (stringKeys.contains(key)) {
                 keytype = MyBackupAgent.KEYTYPE_STRING;
             } else if (intKeys.contains(key)) {
@@ -144,7 +144,7 @@ public class MyBackupAgent extends BackupAgent {
         keys = stringMap.keySet();
         i = keys.iterator();
         while(i.hasNext()) {
-            String key = (String) i.next();
+            String key = i.next();
             // skip the key if its not saved in the xml file
             // e.g. the settingsManager calculates the value of some keys from 
             // other keys
@@ -167,7 +167,7 @@ public class MyBackupAgent extends BackupAgent {
         keys = intMap.keySet();
         i = keys.iterator();
         while(i.hasNext()) {
-            String key = (String) i.next();
+            String key = i.next();
             int value = (Integer) intMap.get(key);
             ByteArrayOutputStream bufStream = new ByteArrayOutputStream();
             DataOutputStream outWriter = new DataOutputStream(bufStream);
@@ -185,7 +185,7 @@ public class MyBackupAgent extends BackupAgent {
         keys = booleanMap.keySet();
         i = keys.iterator();
         while(i.hasNext()) {
-            String key = (String) i.next();
+            String key = i.next();
             boolean value = (Boolean) booleanMap.get(key);
             ByteArrayOutputStream bufStream = new ByteArrayOutputStream();
             DataOutputStream outWriter = new DataOutputStream(bufStream);
@@ -203,8 +203,7 @@ public class MyBackupAgent extends BackupAgent {
         ArrayList<Field> typeFields = new ArrayList<Field>();
         try {
             Field fieldList[] = fromCls.getFields();
-            for (int i = 0; i < fieldList.length; i++) {
-                Field fld = fieldList[i];
+            for (Field fld : fieldList) {
                 if (fld.getType().getName().equals(typeCls.getName()))
                     typeFields.add(fld);
             }
@@ -215,9 +214,7 @@ public class MyBackupAgent extends BackupAgent {
     
     private Map<String, Object> convertToMap(ArrayList<Field> fieldArray) {
         HashMap<String, Object> map = new HashMap<String, Object>();
-        Iterator<Field> i = fieldArray.iterator();
-        while(i.hasNext()) {
-            Field f = i.next();
+        for (Field f : fieldArray) {
             try {
                 map.put(f.getName(), f.get(settingsManager));
             } catch (IllegalArgumentException e) {

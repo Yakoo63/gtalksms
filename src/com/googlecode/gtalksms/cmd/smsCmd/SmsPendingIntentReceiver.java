@@ -11,15 +11,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-public abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
+abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
     
-    private Map<Integer, Sms> smsMap;
-    protected SMSHelper smsHelper;
-    private MainService mainService;
-    protected String answerTo;
-    protected SettingsManager settings;
+    private final Map<Integer, Sms> smsMap;
+    final SMSHelper smsHelper;
+    private final MainService mainService;
+    String answerTo;
+    final SettingsManager settings;
     
-    public SmsPendingIntentReceiver(MainService mainService, Map<Integer, Sms> smsMap, SMSHelper smsHelper) {
+    SmsPendingIntentReceiver(MainService mainService, Map<Integer, Sms> smsMap, SMSHelper smsHelper) {
         this.mainService = mainService;
         this.settings = SettingsManager.getSettingsManager(mainService);
         this.smsMap = smsMap;
@@ -42,21 +42,21 @@ public abstract class SmsPendingIntentReceiver extends BroadcastReceiver {
         }
     }
     
-    public abstract void onReceiveWithSms(Context context, Sms s, int partNum, int res, int smsID);
+    protected abstract void onReceiveWithSms(Context context, Sms s, int partNum, int res, int smsID);
     
-    public abstract void onReceiveWithoutSms(Context context, int partNum, int res);
+    protected abstract void onReceiveWithoutSms(Context context, int partNum, int res);
     
-    protected void send(String s) {
+    void send(String s) {
         mainService.send(s, answerTo);
     }   
     
-    protected Sms getSms(int smsId) {
-        Integer i = Integer.valueOf(smsId);
+    Sms getSms(int smsId) {
+        Integer i = smsId;
         return smsMap.get(i);
     }
     
-    protected void removeSms(int smsId) {
-        Integer i = Integer.valueOf(smsId);
+    void removeSms(int smsId) {
+        Integer i = smsId;
         smsMap.remove(i);
         smsHelper.deleteSMS(smsId);
     }    

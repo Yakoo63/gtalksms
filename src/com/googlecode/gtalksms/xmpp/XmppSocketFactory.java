@@ -3,17 +3,15 @@ package com.googlecode.gtalksms.xmpp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import javax.net.SocketFactory;
 
 public class XmppSocketFactory extends SocketFactory {
-    private static SocketFactory defaultFactory = SocketFactory.getDefault();
+    private static final SocketFactory defaultFactory = SocketFactory.getDefault();
     
     private Socket socket;    
     @Override
-    public Socket createSocket(String arg0, int arg1) throws IOException,
-            UnknownHostException {
+    public Socket createSocket(String arg0, int arg1) throws IOException {
         socket = defaultFactory.createSocket(arg0, arg1);
         setSockOpt(socket);
         return socket;
@@ -28,7 +26,7 @@ public class XmppSocketFactory extends SocketFactory {
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost,
-            int localPort) throws IOException, UnknownHostException {
+            int localPort) throws IOException {
         socket = defaultFactory.createSocket(host, port, localHost, localPort);
         setSockOpt(socket);
         return socket;

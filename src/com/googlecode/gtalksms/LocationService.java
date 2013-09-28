@@ -66,16 +66,16 @@ public class LocationService extends Service {
             }
             boolean networkProviderStatus = allowedLocationProviders.contains(LocationManager.NETWORK_PROVIDER);
             allowedLocationProviders = "";
-            if (networkProviderStatus == true) {
+            if (networkProviderStatus) {
                 allowedLocationProviders += LocationManager.NETWORK_PROVIDER;
             }
-            if (newGPSStatus == true) {
+            if (newGPSStatus) {
                 allowedLocationProviders += "," + LocationManager.GPS_PROVIDER;
             }
             Settings.System.putString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
             Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
             m.setAccessible(true);
-            m.invoke(_locationManager, new Object[] {});
+            m.invoke(_locationManager);
         // use the secuirty hole from http://code.google.com/p/android/issues/detail?id=7890
         } else {
             // the GPS is not in the requested state
@@ -93,7 +93,7 @@ public class LocationService extends Service {
      * Sends the location to the user.
      * @param location the location to send.
      */
-    public void sendLocationUpdate(Location location) {
+    void sendLocationUpdate(Location location) {
         XmppMsg msg = new XmppMsg();
         if (_settingsManager.useGoogleMapUrl) {
             msg.appendLine("http://maps.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude());
@@ -196,7 +196,7 @@ public class LocationService extends Service {
      * @param currentBestLocation  The current Location fix, to which you want to compare the new one
      * @return true if the location is better then the currentBestLocation
      */
-    protected static boolean isBetterLocation(Location location, Location currentBestLocation) {
+    private static boolean isBetterLocation(Location location, Location currentBestLocation) {
         if (currentBestLocation == null) {
             // A new location is always better than no location
             return true;

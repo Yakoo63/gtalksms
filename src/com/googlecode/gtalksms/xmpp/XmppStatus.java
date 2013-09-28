@@ -21,8 +21,8 @@ public class XmppStatus {
     
     private static XmppStatus sXmppStatus;
     
-    private File mStatefile;
-    private KeyValueHelper mKeyValueHelper;
+    private final File mStatefile;
+    private final KeyValueHelper mKeyValueHelper;
     
     
     private XmppStatus(Context ctx) {

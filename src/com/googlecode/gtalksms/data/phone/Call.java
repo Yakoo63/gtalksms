@@ -11,8 +11,7 @@ public class Call {
     public int type;
     public long duration;
     public Date date;
-    public boolean isNew;
-    
+
     public String duration() {
         long minutes = duration / 60;
         long seconds = duration % 60;

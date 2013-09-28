@@ -12,11 +12,11 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class Cmd {
     public class SubCmd {
-        private String mName;
-        private String mHelp;
+        private final String mName;
+        private final String mHelp;
         private String mHelpMsg;
-        private String mHelpArgs;
-        private String [] mAlias;
+        private final String mHelpArgs;
+        private final String [] mAlias;
         
         SubCmd(String name, Cmd baseCmd, int resHelp, String args, Object... alias) {
             mName = name.toLowerCase();
@@ -53,18 +53,18 @@ public class Cmd {
         }
     }
     
-    private String mName;
+    private final String mName;
     private int mResHelp;
     private String mHelpArgs;
-    private String [] mAlias;
-    private ArrayList<SubCmd> mSubCmds;
+    private final String [] mAlias;
+    private final ArrayList<SubCmd> mSubCmds;
     private static Context sContext;
     
     Cmd(String name, String... alias) {
         mName = name.toLowerCase();
         mAlias = new String[alias.length];
         for (int i = 0 ; i < alias.length ; ++i) {
-            mAlias[i] = alias[i].toString().toLowerCase();  
+            mAlias[i] = alias[i].toLowerCase();
         }
         mSubCmds = new ArrayList<SubCmd>();
     }
@@ -89,11 +89,11 @@ public class Cmd {
         return XmppMsg.makeBold(msg);
     }
     
-    protected static String getString(int id, Object... args) {
+    private static String getString(int id, Object... args) {
         return sContext.getString(id, args);
     }
     
-    protected static String buildHelp(Cmd root, String name, String [] alias, int resHelp, String args ) {
+    private static String buildHelp(Cmd root, String name, String[] alias, int resHelp, String args) {
         if (resHelp <= 0) {
             return null;
         }

@@ -11,7 +11,7 @@ import android.content.IntentFilter;
 
 public class PublicIntentReceiver extends BroadcastReceiver {
     private static PublicIntentReceiver sPublicIntentReceiver;
-    private static IntentFilter sIntentFilter;
+    private static final IntentFilter sIntentFilter;
     private static Context sContext;
     
     private static SettingsManager sSettings;
@@ -43,7 +43,7 @@ public class PublicIntentReceiver extends BroadcastReceiver {
         getReceiver(ctx);
     }
 
-    public static PublicIntentReceiver getReceiver(Context ctx) {
+    private static PublicIntentReceiver getReceiver(Context ctx) {
         if (sPublicIntentReceiver == null) {
             sPublicIntentReceiver = new PublicIntentReceiver(ctx);
             ctx.registerReceiver(sPublicIntentReceiver, sIntentFilter);

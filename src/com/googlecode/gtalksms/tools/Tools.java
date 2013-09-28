@@ -32,9 +32,9 @@ public class Tools {
     public final static String LOG_TAG = "gtalksms";
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
-    public final static int shortenTo = 35;
+    private final static int shortenTo = 35;
     
-    public final static String getFileFormat(Calendar c) {
+    public static String getFileFormat(Calendar c) {
         return 
             c.get(Calendar.YEAR) + 
             "-" + 
@@ -50,7 +50,7 @@ public class Tools {
             "s";
     }
     
-    public final static String getVersionName(Context context) {
+    public static String getVersionName(Context context) {
 
         try {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
@@ -59,7 +59,7 @@ public class Tools {
         }
     }
     
-    public final static String getVersion(Context context, Class<?> cls) {
+    public static String getVersion(Context context, Class<?> cls) {
 
         try {
             ComponentName comp = new ComponentName(context, cls);
@@ -69,7 +69,7 @@ public class Tools {
         }
     }
     
-    public final static String getVersionCode(Context context, Class<?> cls) {
+    public static String getVersionCode(Context context, Class<?> cls) {
 
         try {
             ComponentName comp = new ComponentName(context, cls);
@@ -81,35 +81,35 @@ public class Tools {
         }
     }
     
-    public final static <T> List<T> getLastElements(ArrayList<T> list, int nbElems) {
+    public static <T> List<T> getLastElements(ArrayList<T> list, int nbElems) {
         return list.subList(Math.max(list.size() - nbElems, 0), list.size());
     }
     
-    public final static Long getLong(Cursor c, String col) {
+    public static Long getLong(Cursor c, String col) {
         return c.getLong(c.getColumnIndex(col));
     }
     
-    public final static int getInt(Cursor c, String col) {
+    public static int getInt(Cursor c, String col) {
         return c.getInt(c.getColumnIndex(col));
     }
 
-    public final static String getString(Cursor c, String col) {
+    public static String getString(Cursor c, String col) {
         return c.getString(c.getColumnIndex(col));
     }
 
-    public final static boolean getBoolean(Cursor c, String col) {
+    public static boolean getBoolean(Cursor c, String col) {
         return getInt(c, col) == 1;
     }
 
-    public final static Date getDateSeconds(Cursor c, String col) {
+    public static Date getDateSeconds(Cursor c, String col) {
         return new Date(Long.parseLong(Tools.getString(c, col)) * 1000);
     }
 
-    public final static Date getDateMilliSeconds(Cursor c, String col) {
+    public static Date getDateMilliSeconds(Cursor c, String col) {
         return new Date(Long.parseLong(Tools.getString(c, col)));
     }
     
-    public final static void setLocale(SettingsManager setting, Context context) {
+    public static void setLocale(SettingsManager setting, Context context) {
 
         Configuration config = new Configuration();
         config.setToDefaults();
@@ -117,7 +117,7 @@ public class Tools {
         context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
     }
     
-    public final static boolean isInt(String value) {
+    public static boolean isInt(String value) {
         try {
             Integer.parseInt(value);
             return true;
@@ -125,16 +125,17 @@ public class Tools {
         return false;
     }
     
-    public final static Boolean parseBool(String value) {
+    public static Boolean parseBool(String value) {
         Boolean res = null;
-        try { 
-            res = Boolean.parseBoolean(value); 
-        } catch(Exception e) {}
-        
+        if (value.compareToIgnoreCase("true") == 0) {
+            res = true;
+        } else if (value.compareToIgnoreCase("false") == 0) {
+            res = false;
+        }
         return res;
     }
     
-    public final static Integer parseInt(String value) {
+    public static Integer parseInt(String value) {
         Integer res = null;
         try { 
             res = Integer.parseInt(value); 
@@ -144,7 +145,7 @@ public class Tools {
     }
     
     
-    public final static Integer parseInt(String[] values, int index, Integer defaultValue) {
+    public static Integer parseInt(String[] values, int index, Integer defaultValue) {
         Integer res = defaultValue;
         try { 
             res = Integer.parseInt(values[index]); 
@@ -153,7 +154,7 @@ public class Tools {
         return res;
     }
     
-    public final static Integer parseInt(String value, Integer defaultValue) {
+    public static Integer parseInt(String value, Integer defaultValue) {
         Integer res = defaultValue;
         try { 
             res = Integer.parseInt(value); 
@@ -162,7 +163,7 @@ public class Tools {
         return res;
     }
     
-    public final static int getMinNonNeg(int... x) {
+    public static int getMinNonNeg(int... x) {
         int min = Integer.MAX_VALUE;
         for(int i : x) {
             if(i >= 0 && i < min)
@@ -171,11 +172,11 @@ public class Tools {
         return min;
     }
     
-    public final static boolean isDonateAppInstalled(Context context) {
+    public static boolean isDonateAppInstalled(Context context) {
         return 0 == context.getPackageManager().checkSignatures( context.getPackageName(), "com.googlecode.gtalksmsdonate");
     }
     
-    public final static boolean copyFile(File from, File to) {
+    public static boolean copyFile(File from, File to) {
         if (!from.isFile() || !to.isFile())
             return false;
 
@@ -212,7 +213,7 @@ public class Tools {
         return true;
     }
     
-    public final static boolean writeFile(byte[] data, File file) {
+    public static boolean writeFile(byte[] data, File file) {
         FileOutputStream fos;
         try {
             fos = new FileOutputStream(file);
@@ -224,18 +225,17 @@ public class Tools {
         }
     }
     
-    public final static String getAppBaseDir(Context ctx) {
+    private static String getAppBaseDir(Context ctx) {
         String filesDir = ctx.getFilesDir().toString();
         int index = filesDir.indexOf("/files");
-        String res = filesDir.substring(0, index);
-        return res;
+        return filesDir.substring(0, index);
     }
     
-    public final static String getSharedPrefDir(Context ctx) {
+    public static String getSharedPrefDir(Context ctx) {
         return getAppBaseDir(ctx) + "/shared_prefs";
     }
     
-    public final static String shortenString(String s) {
+    public static String shortenString(String s) {
         if (s.length() > 20) {
             return s.substring(0, 20);
         } else {
@@ -243,7 +243,7 @@ public class Tools {
         }
     }
     
-    public final static String shortenMessage(String message) {
+    public static String shortenMessage(String message) {
         String shortendMessage;
         if (message == null) {
             shortendMessage = "";
@@ -330,7 +330,7 @@ public class Tools {
         MainService.sendToServiceHandler(i);
     }
     
-    public final static void openLink(Context context, String url) {
+    public static void openLink(Context context, String url) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);

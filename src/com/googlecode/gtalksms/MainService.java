@@ -96,10 +96,10 @@ public class MainService extends Service {
 
     public static final String SERVICE_THREAD_NAME = Tools.APP_NAME + ".Service";
 
-    public static final int STATUS_ICON_GREEN = 0;
-    public static final int STATUS_ICON_ORANGE = 1;
-    public static final int STATUS_ICON_RED = 2;
-    public static final int STATUS_ICON_BLUE = 3;
+    private static final int STATUS_ICON_GREEN = 0;
+    private static final int STATUS_ICON_ORANGE = 1;
+    private static final int STATUS_ICON_RED = 2;
+    private static final int STATUS_ICON_BLUE = 3;
 
     // A bit of a hack to allow global receivers to know whether or not
     // the service is running, and therefore whether to tell the service
@@ -119,9 +119,9 @@ public class MainService extends Service {
     private static PendingIntent sPendingIntentLaunchApplication = null;
     private static PendingIntent sPendingIntentStopRinging = null;
 
-    private static Set<CommandHandlerBase> sAvailableCommandSet = new HashSet<CommandHandlerBase>();
-    private static Map<String, CommandHandlerBase> sActiveCommands = Collections.synchronizedMap(new HashMap<String, CommandHandlerBase>());
-    private static Set<CommandHandlerBase> sActiveCommandSet = Collections.synchronizedSet(new HashSet<CommandHandlerBase>());
+    private static final Set<CommandHandlerBase> sAvailableCommandSet = new HashSet<CommandHandlerBase>();
+    private static final Map<String, CommandHandlerBase> sActiveCommands = Collections.synchronizedMap(new HashMap<String, CommandHandlerBase>());
+    private static final Set<CommandHandlerBase> sActiveCommandSet = Collections.synchronizedSet(new HashSet<CommandHandlerBase>());
 
     // This is the object that receives interactions from clients. See
     // RemoteService for a more complete example.
@@ -164,7 +164,7 @@ public class MainService extends Service {
      * @param intent
      * @param id
      */
-    protected void onHandleIntent(final Intent intent, int id) {
+    void onHandleIntent(final Intent intent, int id) {
         // ensure XMPP manager is setup (but not yet connected)
         if (sXmppMgr == null)
             setupXmppManagerAndCommands();
@@ -244,7 +244,7 @@ public class MainService extends Service {
         updateListenersToCurrentState(getConnectionStatus());
         
         if (action.equals(ACTION_SEND)) {
-            XmppMsg xmppMsg = (XmppMsg) intent.getParcelableExtra("xmppMsg");
+            XmppMsg xmppMsg = intent.getParcelableExtra("xmppMsg");
             if (xmppMsg == null) {
                 xmppMsg = new XmppMsg(intent.getStringExtra("message"));
             }
@@ -349,12 +349,12 @@ public class MainService extends Service {
 
     public boolean getTLSStatus() {
         // null check necessary
-        return sXmppMgr == null ? false : sXmppMgr.getTLSStatus();
+        return sXmppMgr != null && sXmppMgr.getTLSStatus();
     }
 
     public boolean getCompressionStatus() {
         // null check necessary
-        return sXmppMgr == null ? false : sXmppMgr.getCompressionStatus();
+        return sXmppMgr != null && sXmppMgr.getCompressionStatus();
     }
     
     public PingManager getPingManager() {
@@ -537,7 +537,6 @@ public class MainService extends Service {
      *            The Text to show as toast
      * @param extraInfo can be null
      * @param showPrefix show the app name as prefix to the toast message
-     * @param ctx
      */
     public static void displayToast(String text, String extraInfo, boolean showPrefix) {
         sToastHandler.post(new DisplayToast(text, extraInfo, sUiContext, showPrefix));
@@ -714,7 +713,7 @@ public class MainService extends Service {
         String args;
 
         // Split the command and args from the commandLine String and trim these
-        if (commandLine.indexOf(":") != -1) {
+        if (commandLine.contains(":")) {
             command = commandLine.substring(0, commandLine.indexOf(":")).trim();
             args = commandLine.substring(commandLine.indexOf(":") + 1);
         } else {
@@ -866,7 +865,7 @@ public class MainService extends Service {
         cleanupCommands();
     }
 
-    protected static Looper getServiceLooper() {
+    static Looper getServiceLooper() {
         return sServiceLooper;
     }
 

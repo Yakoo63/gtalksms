@@ -10,7 +10,7 @@ import com.googlecode.gtalksms.tools.Tools;
 public class VoidCallback extends ExtentedPictureCallback {
 
     CommandHandlerBase _command;
-    String mRecipient;
+    private final String mRecipient;
     
     public VoidCallback(File path, Context ctx, String recipient) {
         super(path, ctx);

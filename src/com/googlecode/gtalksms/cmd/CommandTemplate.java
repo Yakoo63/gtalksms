@@ -24,21 +24,16 @@ public class CommandTemplate extends CommandHandlerBase {
         super.deactivate();
     }
     
-    protected void execute(String cmd, String args) {        
-       // TODO Start here        
+    protected void execute(String cmd, String args) {
         String[] sArgs = splitArgs(args);
         if (cmd.equals("Your command")) {
-            // TODO do something usefull
+            // do something useful
             if (sArgs[0].equals("firstArgument")) {
-                somethingUsefull();
+                // do something useful
             }
         } else {
             send("Unkown argument \"" + args + "\" for command \"" + cmd + "\"");
         }
-    }
-    
-    private void somethingUsefull() {
-          return;
     }
 
     @Override

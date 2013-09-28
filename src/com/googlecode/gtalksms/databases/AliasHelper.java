@@ -17,7 +17,7 @@ import com.googlecode.gtalksms.data.phone.Phone;
  *
  */
 public class AliasHelper {
-    private Context ctx;
+    private final Context ctx;
     private static AliasHelper aliasHelper;
     
     /**

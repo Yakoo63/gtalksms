@@ -75,7 +75,7 @@ public class BatteryCmd extends CommandHandlerBase {
     @Override
     public void deactivate() {
         super.deactivate();
-        if (sReceiverRegistered == true) {
+        if (sReceiverRegistered) {
             sContext.unregisterReceiver(sBatInfoReceiver);
             sReceiverRegistered = false;
         }
@@ -116,14 +116,10 @@ public class BatteryCmd extends CommandHandlerBase {
      * @return
      */
     private boolean mustNotifyUser() {
-        if (sSettingsMgr.notifyBattery
+        return sSettingsMgr.notifyBattery
                 && batteryInformationChanged()
                 && sLastKnownPercentage
-                        % sSettingsMgr.batteryNotificationIntervalInt == 0) {
-            return true;
-        } else {
-            return false;
-        }
+                % sSettingsMgr.batteryNotificationIntervalInt == 0;
     }
     
     private void updateBatteryInformation() {

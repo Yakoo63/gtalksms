@@ -37,18 +37,19 @@ public class SettingsCmd extends CommandHandlerBase {
             send(msg);
         }
         else if(settings.containsKey(key)) {
-            String newval = c.get2();
-            if(!"".equals(newval)) {
+            String newVal = c.get2();
+            if(!"".equals(newVal)) {
                 if (!protectedSettings.contains(key)) {
-                    Integer intValue = Tools.parseInt(newval);
-                    Boolean boolValue = Tools.parseBool(newval);
+                    Integer intValue = Tools.parseInt(newVal);
+                    Boolean boolValue = Tools.parseBool(newVal);
                     if (intValue != null) {
                         sSettingsMgr.saveSetting(key, intValue);
                     } else if (boolValue != null) {
                         sSettingsMgr.saveSetting(key, boolValue);
                     } else {
-                        sSettingsMgr.saveSetting(key, newval);
+                        sSettingsMgr.saveSetting(key, newVal);
                     }
+                    send(key + ":" + settings.get(key));
                 } else {
                     send(key + " setting is protected.");
                 }

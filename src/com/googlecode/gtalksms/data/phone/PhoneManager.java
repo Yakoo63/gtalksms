@@ -13,7 +13,7 @@ import com.googlecode.gtalksms.tools.Tools;
 
 public class PhoneManager {
 
-    private Context _context;
+    private final Context _context;
     
     public PhoneManager(Context baseContext) {
         _context = baseContext;

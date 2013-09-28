@@ -94,7 +94,7 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 throw new Exception("File doesn't exist");
             }
 
-            InputStream in = null;
+            InputStream in;
             in = new FileInputStream(rawTmpFile);
 
             Bitmap bitmap;
@@ -127,11 +127,10 @@ public class ScreenShotCmd extends CommandHandlerBase {
                 
                 int sBuffer2[] = new int[screenshotSize];
                 for (int i = 0; i < screenshotSize * 4; i += 4) {
-                    sBuffer2[i / 4] = (int) (
-                            ((0xFF000000 & ((int) sBuffer[i + 3]) << 24)) | 
-                            ((0x00FF0000 & ((int) sBuffer[i + 2]) << 16)) | 
-                            ((0x0000FF00 & ((int) sBuffer[i + 1]) << 8)) | 
-                            (0x000000FF & sBuffer[i]));
+                    sBuffer2[i / 4] = ((0xFF000000 & ((int) sBuffer[i + 3]) << 24)) |
+                    ((0x00FF0000 & ((int) sBuffer[i + 2]) << 16)) |
+                    ((0x0000FF00 & ((int) sBuffer[i + 1]) << 8)) |
+                    (0x000000FF & sBuffer[i]);
                 }
                 
                 bitmap = Bitmap.createBitmap(sBuffer2, displayWidth, displayHeight, Bitmap.Config.ARGB_8888);

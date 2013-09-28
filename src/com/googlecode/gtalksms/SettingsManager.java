@@ -27,7 +27,7 @@ import com.googlecode.gtalksms.tools.Tools;
  *
  */
 public class SettingsManager {
-    public static final String[] xmppConnectionSettings = { "serverHost", "serviceName", "serverPort", 
+    private static final String[] xmppConnectionSettings = { "serverHost", "serviceName", "serverPort",
                                                             "login", "password", "useDifferentAccount",
                                                             "xmppSecurityMode", "manuallySpecifyServerSettings",
                                                             "useCompression"};
@@ -53,14 +53,14 @@ public class SettingsManager {
     public void setPassword(String value) { _password = saveSetting("password", value); }
 
     private String _notifiedAddress;
-    private ArrayList<String> _notifiedAddresses = new ArrayList<String>();
+    private final ArrayList<String> _notifiedAddresses = new ArrayList<String>();
     public String[] getNotifiedAddresses() { return _notifiedAddresses.toArray(new String[_notifiedAddresses.size()]); }
     public void setNotifiedAddress(String value) { 
         _notifiedAddress = saveSetting("notifiedAddress", value);
         updateNotifiedAddresses();
     }
     
-    public void updateNotifiedAddresses() { 
+    void updateNotifiedAddresses() {
         _notifiedAddresses.clear();
         for (String str : TextUtils.split(_notifiedAddress, "\\|")) {
             _notifiedAddresses.add(str.toLowerCase());
@@ -79,7 +79,7 @@ public class SettingsManager {
      * @return true if the given JID is part of the notified Address set, otherwise false
      */
     public boolean cameFromNotifiedAddress(String fromJid) {
-        String sanitizedNotifiedAddress = null;
+        String sanitizedNotifiedAddress;
         String sanitizedJid = fromJid.toLowerCase();
         for (String notifiedAddress : _notifiedAddresses) {
             sanitizedNotifiedAddress = notifiedAddress.toLowerCase();
@@ -121,7 +121,7 @@ public class SettingsManager {
     public String mucServer;
     public boolean forceMucServer;
     public boolean useCompression;
-    public String xmppSecurityMode;
+    private String xmppSecurityMode;
     public int xmppSecurityModeInt;
     public boolean manuallySpecifyServerSettings;
 
@@ -146,7 +146,7 @@ public class SettingsManager {
     public boolean notifyBatteryInStatus;
     public boolean notifyBattery;
     public int batteryNotificationIntervalInt;
-    public String batteryNotificationInterval;
+    private String batteryNotificationInterval;
 
     // sms
     public int smsNumber;
@@ -172,11 +172,11 @@ public class SettingsManager {
     public String displayIconIndex;
     
     // auto start and stop settings
-    public boolean startOnBoot;
+    private boolean startOnBoot;
     public boolean startOnPowerConnected;
-    public boolean startOnWifiConnected;
+    private boolean startOnWifiConnected;
     public boolean stopOnPowerDisconnected;
-    public boolean stopOnWifiDisconnected;
+    private boolean stopOnWifiDisconnected;
     public int stopOnPowerDelay;
     
     // public intents settings
@@ -189,12 +189,12 @@ public class SettingsManager {
     
     private static SettingsManager sSettingsManager = null;
     
-    private ArrayList<String> mProtectedSettings = new ArrayList<String>();
-    private ArrayList<String> mHiddenSettings = new ArrayList<String>();
-    private SharedPreferences mSharedPreferences;
-    private Context mContext;
+    private final ArrayList<String> mProtectedSettings = new ArrayList<String>();
+    private final ArrayList<String> mHiddenSettings = new ArrayList<String>();
+    private final SharedPreferences mSharedPreferences;
+    private final Context mContext;
     
-    private OnSharedPreferenceChangeListener mChangeListener = new OnSharedPreferenceChangeListener() {
+    private final OnSharedPreferenceChangeListener mChangeListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (debugLog) {
@@ -257,19 +257,19 @@ public class SettingsManager {
     }
     
     public Boolean saveSetting(String key, Boolean value) {
-        getEditor().putBoolean(key, (Boolean)value).commit();
+        getEditor().putBoolean(key, value).commit();
         OnPreferencesUpdated(key);
         return value;
     }
     
     public String saveSetting(String key, String value) {
-        getEditor().putString(key, (String)value).commit();
+        getEditor().putString(key, value).commit();
         OnPreferencesUpdated(key);
         return value;
     }
     
     public Integer saveSetting(String key, Integer value) {
-        getEditor().putInt(key, (Integer)value).commit();
+        getEditor().putInt(key, value).commit();
         OnPreferencesUpdated(key);
         return value;
     }
@@ -286,7 +286,7 @@ public class SettingsManager {
         return mSharedPreferences.contains(key);
     }
 
-    public void OnPreferencesUpdated(String key) {
+    void OnPreferencesUpdated(String key) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
             BackupManager bm = new BackupManager(mContext);
             bm.dataChanged();

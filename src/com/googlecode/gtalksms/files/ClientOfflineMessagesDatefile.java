@@ -3,34 +3,33 @@ package com.googlecode.gtalksms.files;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 
 import org.jivesoftware.smack.packet.Message;
 
-public class ClientOfflineMessagesDatefile extends Datefile {
+public class ClientOfflineMessagesDateFile extends DateFile {
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
     private static final String DELIMITER = "_";
     
-    public static final int TYPE_NORMAL = 0;
-    public static final int TYPE_CHAT = 1;
-    public static final int TYPE_GROUPCHAT = 2;
-    public static final int TYPE_HEADLINE = 3;
-    public static final int TYPE_ERROR = 4;
+    private static final int TYPE_NORMAL = 0;
+    private static final int TYPE_CHAT = 1;
+    private static final int TYPE_GROUPCHAT = 2;
+    private static final int TYPE_HEADLINE = 3;
+    private static final int TYPE_ERROR = 4;
     
 //    private ClientOfflineMessagesFile(File parent, String child) {
 //        super(parent, child);
 //    }
     
-    private ClientOfflineMessagesDatefile(File parent, String child, Date date) {
+    private ClientOfflineMessagesDateFile(File parent, String child, Date date) {
         super(parent, child, date);
     }
     
-    public static ClientOfflineMessagesDatefile reconstruct(File f) throws NumberFormatException {
+    public static ClientOfflineMessagesDateFile reconstruct(File f) throws NumberFormatException {
         int delimiter = f.getName().indexOf(DELIMITER);
         String ms;
         if (delimiter > 0) {
@@ -40,11 +39,11 @@ public class ClientOfflineMessagesDatefile extends Datefile {
         }
         long msLong = Long.parseLong(ms);
         Date date = new Date(msLong);
-        return new ClientOfflineMessagesDatefile(f.getParentFile(), f.getName(), date);
+        return new ClientOfflineMessagesDateFile(f.getParentFile(), f.getName(), date);
     }
     
-    public static ClientOfflineMessagesDatefile construct(File parent) throws IOException {
-        ClientOfflineMessagesDatefile res;
+    public static ClientOfflineMessagesDateFile construct(File parent) throws IOException {
+        ClientOfflineMessagesDateFile res;
         Date date = new Date();
         long ms = date.getTime();
         String filename = Long.toString(ms);
@@ -57,15 +56,15 @@ public class ClientOfflineMessagesDatefile extends Datefile {
             f = new File(parent, newFilename);
         }
         f.createNewFile();
-        res = new ClientOfflineMessagesDatefile(parent, f.getName(), date);
+        res = new ClientOfflineMessagesDateFile(parent, f.getName(), date);
         return res;
     }
     
-    public void setMessage(Message msg) throws IOException, FileNotFoundException {
+    public void setMessage(Message msg) throws IOException {
         setMessage(msg.getBody(), msg.getTo(), msg.getType());
     }
     
-    public void setMessage(String body, String to, Message.Type type) throws IOException, FileNotFoundException {
+    void setMessage(String body, String to, Message.Type type) throws IOException {
         // make sure we have an empty file
         if (this.isFile() && this.length() > 0) {
             this.delete();
@@ -79,7 +78,7 @@ public class ClientOfflineMessagesDatefile extends Datefile {
         dos.close();        
     }
     
-    public Message getMessage() throws IOException, FileNotFoundException {
+    public Message getMessage() throws IOException {
         DataInputStream dis = getDataInputStream();
         String to = dis.readUTF();
         int typeInt = dis.readInt();
@@ -91,7 +90,7 @@ public class ClientOfflineMessagesDatefile extends Datefile {
     }
     
     private static int typeEnumToInt(Message.Type type) {
-        int res = -1;
+        int res;
         switch (type) {
         case chat:
             res = TYPE_CHAT;
@@ -115,7 +114,7 @@ public class ClientOfflineMessagesDatefile extends Datefile {
     }
     
     private static Message.Type intToTypeEnum(int type) {
-        Message.Type res = null;
+        Message.Type res;
         switch (type) {
         case TYPE_NORMAL:
             res = Message.Type.normal;

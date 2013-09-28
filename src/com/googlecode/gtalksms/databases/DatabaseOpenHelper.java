@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class DatabaseOpenHelper extends SQLiteOpenHelper {
+class DatabaseOpenHelper extends SQLiteOpenHelper {
     
     /* general database version gtalksms uses */
     private static final int DATABASE_VERSION = 4;
@@ -38,7 +38,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
          ")";
     
     public static final String SMS_TABLE_NAME = "sms";
-    public static final String SMS_TABLE_CREATE =
+    private static final String SMS_TABLE_CREATE =
         "Create TABLE " + SMS_TABLE_NAME + " (" +
             "smsID INTEGER NOT NULL, " +
             "phoneNumber TEXT NOT NULL, " +

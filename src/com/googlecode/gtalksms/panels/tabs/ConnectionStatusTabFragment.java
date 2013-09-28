@@ -33,7 +33,7 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
     
     private PingMyServerAsyncTask mPingMyServerAsyncTask;
 
-    final Handler mPingStatusHandler = new Handler() {
+    private final Handler mPingStatusHandler = new Handler() {
         public void handleMessage(Message msg) {
             int successful = msg.arg1;
             if (successful > 0) { 
@@ -44,10 +44,6 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
             }
         }
     };
-    
-    public void onResume() {
-        super.onResume();
-    }
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

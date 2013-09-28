@@ -125,7 +125,7 @@ public class SystemCmd extends CommandHandlerBase {
     }
     
     private static String getDataConnectionStatus() {
-        String res = null;
+        String res;
         
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         
@@ -255,8 +255,8 @@ public class SystemCmd extends CommandHandlerBase {
         msg.appendLine("How often was " + Tools.APP_NAME + " restarted by Android");
         long[] values = sNullIntentStartCounter.getLastValues(7);
         String line = "";
-        for (int i = 0; i < values.length; i++) {
-            line += values[i] + " ";
+        for (long value : values) {
+            line += value + " ";
         }
         msg.appendLine(line);
     }

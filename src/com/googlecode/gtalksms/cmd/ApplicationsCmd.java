@@ -27,7 +27,7 @@ public class ApplicationsCmd extends CommandHandlerBase {
         }
     }
     
-    protected void appsList(String args) {
+    void appsList(String args) {
         StringBuilder list = new StringBuilder();
         
         boolean doUser = true;
@@ -43,18 +43,18 @@ public class ApplicationsCmd extends CommandHandlerBase {
         
         if (doUser) {
             list.append(getString(R.string.chat_apps_user));
-            list.append(StringFmt.join(getPackages(false), "\n") + "\n");
+            list.append(StringFmt.join(getPackages(false), "\n")).append("\n");
         }
         
         if (doSystem) {
             list.append(getString(R.string.chat_apps_system));
-            list.append(StringFmt.join(getPackages(true), "\n") + "\n");
+            list.append(StringFmt.join(getPackages(true), "\n")).append("\n");
         }
         
         send(list.toString());
     }
     
-    protected void findApp(String args) {
+    void findApp(String args) {
         StringBuilder str = new StringBuilder();
         
         final PackageManager pm = sContext.getPackageManager();
@@ -71,7 +71,7 @@ public class ApplicationsCmd extends CommandHandlerBase {
         if (list.size() > 0) {
             Collections.sort(list);
             str.append(getString(R.string.chat_apps_find, args));
-            str.append(StringFmt.join(list, "\n") + "\n");
+            str.append(StringFmt.join(list, "\n")).append("\n");
         } else {
             str.append(getString(R.string.chat_apps_find_err, args));  
         }
@@ -96,10 +96,10 @@ public class ApplicationsCmd extends CommandHandlerBase {
     }
 
     private boolean isSystemPackage(ApplicationInfo packageInfo) {
-        return ((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) ? true : false;
+        return (packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
     }
     
-    protected void launchApp(String name) {
+    void launchApp(String name) {
         final PackageManager pm = sContext.getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         for (ApplicationInfo packageInfo : packages) {

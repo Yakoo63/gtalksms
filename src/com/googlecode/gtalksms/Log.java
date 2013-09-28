@@ -1,6 +1,8 @@
 package com.googlecode.gtalksms;
 
+import android.annotation.TargetApi;
 import android.database.Cursor;
+import android.os.Build;
 
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -62,6 +64,7 @@ public class Log {
         }
     }
     
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static void dump(String prefix, Cursor cursor) {
         for (String name: cursor.getColumnNames()) {
             int index = cursor.getColumnIndex(name);

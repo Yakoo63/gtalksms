@@ -20,7 +20,7 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.tools.UrlToStringDownloader;
 
 public class HelpTabFragment extends SherlockFragment {
-    private static URL[] sUrls;
+    private static final URL[] sUrls;
     private TextView mTextViewConsole;
     
     static {
@@ -61,7 +61,7 @@ public class HelpTabFragment extends SherlockFragment {
         return view;
     }
     
-    public void updateConsole() {
+    void updateConsole() {
         mTextViewConsole.setText("");
         mTextViewConsole.append(StringFmt.Fmt(getString(R.string.about_website) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
         mTextViewConsole.append(getString(R.string.about_website_help));

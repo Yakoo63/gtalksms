@@ -59,7 +59,7 @@ public class GeoCmd extends CommandHandlerBase {
     /** 
      * Starts the geolocation service 
      */
-    public void startLocatingPhone() {
+    void startLocatingPhone() {
         Intent intent = new Intent(sContext, LocationService.class);
         intent.setAction(LocationService.START_SERVICE);
         intent.putExtra("to", this.mAnswerTo);
@@ -69,14 +69,14 @@ public class GeoCmd extends CommandHandlerBase {
     /** 
      * Stops the geolocation service 
      */
-    public void stopLocatingPhone() {
+    void stopLocatingPhone() {
         Intent intent = new Intent(sContext, LocationService.class);
         intent.setAction(LocationService.STOP_SERVICE);
         sContext.startService(intent);
     }
 
     /** Return List of <Address> from searched location */
-    public List<Address> geoDecode(String searchedLocation) {
+    List<Address> geoDecode(String searchedLocation) {
         try {
             Geocoder geo = new Geocoder(sContext, Locale.getDefault());
             List<Address> addresses = geo.getFromLocationName(searchedLocation, 10);
@@ -91,7 +91,7 @@ public class GeoCmd extends CommandHandlerBase {
     }
     
     /** launches an activity on the url */
-    public void launchExternal(String url) {
+    void launchExternal(String url) {
         Intent popup = new Intent(sContext, GeoPopup.class);
         popup.putExtra("url", url);
         popup.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

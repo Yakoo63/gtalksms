@@ -18,8 +18,8 @@ public class XmppLocalS5BProxyManager {
     
     private static XmppLocalS5BProxyManager sS5BManager;
     
-    private WifiManager mWifiManager;
-    private Socks5Proxy mProxy;
+    private final WifiManager mWifiManager;
+    private final Socks5Proxy mProxy;
     
     
     private XmppLocalS5BProxyManager(Context ctx) {

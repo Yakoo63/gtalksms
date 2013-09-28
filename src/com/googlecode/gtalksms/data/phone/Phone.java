@@ -6,10 +6,10 @@ public class Phone {
     private final static String cellPhonePattern = "\\+*\\d+";
     
     private String mContactName;
-    private String mNumber;
-    private String mCleanNumber;
+    private final String mNumber;
+    private final String mCleanNumber;
     private String mLabel;
-    private int    mType;
+    private final int    mType;
     private boolean mIsCellPhoneNumber;
     private boolean mIsDefaultNumber;
 
@@ -38,11 +38,7 @@ public class Phone {
         this.mCleanNumber = cleanPhoneNumber(number);
         this.mLabel = label;
         this.mType = type;
-        if (super_primary > 0) {
-            mIsDefaultNumber = true;
-        } else {
-            mIsDefaultNumber = false;
-        }
+        mIsDefaultNumber = super_primary > 0;
     }
     
     public Boolean phoneMatch(String phone) {

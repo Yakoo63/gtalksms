@@ -27,7 +27,7 @@ public class Web {
     }
     
     public static String DownloadFromUrl(URL url) {
-        StringBuffer baf = new StringBuffer(1024);
+        StringBuilder baf = new StringBuilder(1024);
         try {
             long startTime = System.currentTimeMillis();
             Log.d("Downloading URL: " + url);
@@ -36,7 +36,7 @@ public class Web {
             InputStream is = ucon.getInputStream();
             BufferedInputStream bis = new BufferedInputStream(is);
 
-            int current = 0;
+            int current;
             while ((current = bis.read()) != -1) {
                 baf.append((char) current);
             }
@@ -63,7 +63,7 @@ public class Web {
             BufferedInputStream bis = new BufferedInputStream(is);
 
             ByteArrayBuffer baf = new ByteArrayBuffer(50);
-            int current = 0;
+            int current;
             while ((current = bis.read()) != -1) {
                 baf.append((byte) current);
             }

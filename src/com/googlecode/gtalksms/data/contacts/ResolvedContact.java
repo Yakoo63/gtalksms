@@ -8,12 +8,12 @@ public class ResolvedContact {
     
     private ResolvedContact[] mPossibleCandidates;
         
-    protected ResolvedContact(String name, String number) {
+    ResolvedContact(String name, String number) {
         mHumanReadableName = name;
         mCanonicalPhoneNumber = number;        
     }
     
-    protected ResolvedContact(List<ResolvedContact> candidates) {
+    ResolvedContact(List<ResolvedContact> candidates) {
         mPossibleCandidates = new ResolvedContact[candidates.size()];
         for (int i = 0; i < candidates.size(); i++) {
             mPossibleCandidates[i] = candidates.get(i);

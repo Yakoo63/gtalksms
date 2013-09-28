@@ -9,9 +9,9 @@ import com.googlecode.gtalksms.tools.Tools;
 public class LogsCmd extends CommandHandlerBase {
     
     class LogsThread implements Runnable {
-        Logs mLogs;
+        final Logs mLogs;
         boolean mStop;
-        int mLength;
+        final int mLength;
         
         public LogsThread() {
             this(null, 100);
@@ -44,12 +44,12 @@ public class LogsCmd extends CommandHandlerBase {
             try { 
                 send("Building Logs...");
                 String logs = mLogs.getLogs(sContext, mLength);
-                int index = 0;
+                int index;
                 while ((index = logs.indexOf(Logs.LINE_SEPARATOR, 1000)) != -1 && !mStop) {
                     send(logs.substring(0, index));
                     logs = logs.substring(index);
                 }
-                if (logs.length() > 0 && logs != "\n") {
+                if (logs.length() > 0 && !logs.equals("\n")) {
                     send(logs);
                 }
             } catch (Exception e) {
@@ -63,8 +63,8 @@ public class LogsCmd extends CommandHandlerBase {
     }
      
     // Execution thread
-    Thread mThread;
-    LogsThread mLogsThread;
+    private Thread mThread;
+    private LogsThread mLogsThread;
     
     public LogsCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Logs", new Cmd("logs", "log"));

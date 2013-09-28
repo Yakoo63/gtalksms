@@ -60,8 +60,6 @@ public interface ITelephony {
      * @param showDialpad if true, make the dialpad visible initially,
      *                    otherwise hide the dialpad initially.
      * @return true if the call screen was shown.
-     *
-     * @see showCallScreen
      */
     boolean showCallScreenWithDialpad(boolean showDialpad);
 

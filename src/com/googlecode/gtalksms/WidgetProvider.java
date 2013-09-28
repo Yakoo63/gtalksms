@@ -21,7 +21,7 @@ public class WidgetProvider extends AppWidgetProvider {
         doUpdate(context, appWidgetManager, appWidgetIds, -1);
     }
 
-    public void doUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, int state) {
+    void doUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, int state) {
         // Create an Intent to launch activity
         Intent intent = new Intent(MainService.ACTION_WIDGET_ACTION);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

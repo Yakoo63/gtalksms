@@ -14,10 +14,10 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class ShellCmd extends CommandHandlerBase {
     
-    ArrayList<Shell> mShells = new ArrayList<Shell>();
-    static final String sRoomName = "Shell";
+    private final ArrayList<Shell> mShells = new ArrayList<Shell>();
+    private static final String sRoomName = "Shell";
     XmppFont _font = new XmppFont("consolas", "red");
-    Integer sIndex = 0;
+    private Integer sIndex = 0;
     
     public ShellCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, "Shell", new Cmd("cmd"), new Cmd("shell"));

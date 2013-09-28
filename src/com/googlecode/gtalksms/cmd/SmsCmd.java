@@ -38,15 +38,15 @@ public class SmsCmd extends CommandHandlerBase {
     private static BroadcastReceiver sDeliveredSmsReceiver = null;
     private static Integer sSmsID;
 
-    private ContactsResolver mContactsResolver;
-    private SmsManager mSmsManager;
+    private final ContactsResolver mContactsResolver;
+    private final SmsManager mSmsManager;
 
     // synchronizedMap because the worker thread and the intent receivers work with this map
     private static Map<Integer, Sms> mSmsMap;
 
-    private AliasHelper mAliasHelper;
-    private KeyValueHelper mKeyValueHelper;
-    private SMSHelper mSmsHelper;
+    private final AliasHelper mAliasHelper;
+    private final KeyValueHelper mKeyValueHelper;
+    private final SMSHelper mSmsHelper;
 
     public SmsCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MESSAGE, "SMS", new Cmd("sms", "s"), new Cmd("reply", "r"), 
@@ -93,10 +93,9 @@ public class SmsCmd extends CommandHandlerBase {
 
     @Override
     protected void execute(String command, String args) {
-        String contactInformation;
+        String contactInformation = null;
         if (isMatchingCmd("sms", command)) {
             int separatorPos = args.indexOf(":");
-            contactInformation = null;
             String message = null;
 
             // There is more than 1 argument
@@ -120,8 +119,7 @@ public class SmsCmd extends CommandHandlerBase {
             }
         } else if (isMatchingCmd("findsms", command)) {
             int separatorPos = args.indexOf(":");
-            contactInformation = null;
-            String message = null;
+            String message;
             if (-1 != separatorPos) {
                 contactInformation = args.substring(0, separatorPos);
                 contactInformation = mAliasHelper.convertAliasToNumber(contactInformation);
@@ -337,8 +335,7 @@ public class SmsCmd extends CommandHandlerBase {
 
     /**
      * Marks all SMS from a given contact or number read
-     * 
-     * @param contactInfo
+     *
      */
     private void markSmsAsRead(String contactInformation) {
         ResolvedContact rc = mContactsResolver.resolveContact(contactInformation, ContactsResolver.TYPE_CELL);
@@ -362,8 +359,6 @@ public class SmsCmd extends CommandHandlerBase {
      * 
      * @param number
      *            The (cell) phone number, do not provide a contact name here!
-     * @param the
-     *            name of the contact, use null if no name is known
      */
     private void markSmsAsReadByNumber(String number, String name) {
         if (!mSmsManager.markAsRead(number)) {
@@ -571,7 +566,7 @@ public class SmsCmd extends CommandHandlerBase {
         int res = sSmsID;
         sSmsID++;
         mKeyValueHelper.addKey(KeyValueHelper.KEY_SMS_ID, sSmsID.toString());
-        return Integer.valueOf(res);
+        return res;
     }
 
     private int getSIntentStart(int size) {

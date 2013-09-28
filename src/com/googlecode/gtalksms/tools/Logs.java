@@ -21,9 +21,9 @@ import com.googlecode.gtalksms.SettingsManager;
 
 public class Logs {
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
-    boolean mStop = false;
-    boolean mIncludeContext = false;
-    String mTags = "";
+    private boolean mStop = false;
+    private boolean mIncludeContext = false;
+    private String mTags = "";
     
     public Logs(boolean includeContext) {
         mIncludeContext = includeContext;
@@ -39,10 +39,10 @@ public class Logs {
     }
     
     public String getLogs(Context ctx, int maxLength){
-        return getLogs(ctx, maxLength, Arrays.asList(new String[] {"-v", "time", "AndroidRuntime:E", "gtalksms:V", "*:S", mTags}));
+        return getLogs(ctx, maxLength, Arrays.asList("-v", "time", "AndroidRuntime:E", "gtalksms:V", "*:S", mTags));
     }
     
-    public String getLogs(Context ctx, int maxLength, List<String> list){
+    String getLogs(Context ctx, int maxLength, List<String> list){
         final StringBuilder log = new StringBuilder();
         log.append(LINE_SEPARATOR);
         try{
@@ -53,7 +53,7 @@ public class Logs {
                 commandLine.addAll(list);
             }
 
-            Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]));
+            Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[commandLine.size()]));
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
            
             String line;
@@ -97,7 +97,7 @@ public class Logs {
             PackageInfo packagInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             version = packagInfo.versionName;
         }
-        catch (PackageManager.NameNotFoundException e){};
+        catch (PackageManager.NameNotFoundException e){}
        
         return version;
     }
@@ -144,11 +144,11 @@ public class Logs {
     
     private String getPreferences(Context ctx) {
         StringBuilder res = new StringBuilder();
-        res.append(Tools.APP_NAME + " Preferences" + LINE_SEPARATOR);
+        res.append(Tools.APP_NAME + " Preferences").append(LINE_SEPARATOR);
         SettingsManager settings = SettingsManager.getSettingsManager(ctx);
         Map<String, ?> allSharedPrefs = settings.getAllSharedPreferences();
         for (Map.Entry<String, ?> pairs : allSharedPrefs.entrySet()) {
-            res.append(pairs.getKey() + ": " + pairs.getValue().toString() + LINE_SEPARATOR);
+            res.append(pairs.getKey()).append(": ").append(pairs.getValue().toString()).append(LINE_SEPARATOR);
         }
         return res.toString();
     }

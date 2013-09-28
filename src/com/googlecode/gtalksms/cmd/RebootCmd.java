@@ -20,7 +20,7 @@ import com.googlecode.gtalksms.MainService;
  */
 public class RebootCmd extends CommandHandlerBase {
     
-    private PowerManager mPowerManager;
+    private final PowerManager mPowerManager;
 
     public RebootCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Reboot", new Cmd("reboot"));

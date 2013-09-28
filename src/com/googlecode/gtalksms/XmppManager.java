@@ -56,10 +56,10 @@ public class XmppManager {
     // my first measuring showed that the disconnect in fact does not hang
     // but takes sometimes a lot of time
     // disconnectED xmpp connection. Took: 1048.576 s
-    public static final int DISCON_TIMEOUT = 1000 * 10; // 10s
+    private static final int DISCON_TIMEOUT = 1000 * 10; // 10s
     // The timeout for XMPP connections that get created with
     // DNS SRV information
-    public static final int DNSSRV_TIMEOUT = 1000 * 30; // 30s
+    private static final int DNSSRV_TIMEOUT = 1000 * 30; // 30s
     
     public static final int DISCONNECTED = 1;
     // A "transient" state - will only be CONNECTING *during* a call to start()
@@ -80,32 +80,32 @@ public class XmppManager {
     // Indicates the current state of the service (disconnected/connecting/connected)
     private int mStatus = DISCONNECTED;
     
-    private List<XmppConnectionChangeListener> mConnectionChangeListeners;
+    private final List<XmppConnectionChangeListener> mConnectionChangeListeners;
     private XMPPConnection mConnection = null;
 	private PacketListener mPacketListener = null;
     private PingManager mPingManager = null;
     private ConnectionListener mConnectionListener = null;    
-    private XmppMuc mXmppMuc;
-    private XmppBuddies mXmppBuddies;
-    private XmppFileManager mXmppFileMgr;
-    private ClientOfflineMessages mClientOfflineMessages;
-    private XmppStatus mXmppStatus;
-    private XmppPresenceStatus mXmppPresenceStatus;    
+    private final XmppMuc mXmppMuc;
+    private final XmppBuddies mXmppBuddies;
+    private final XmppFileManager mXmppFileMgr;
+    private final ClientOfflineMessages mClientOfflineMessages;
+    private final XmppStatus mXmppStatus;
+    private final XmppPresenceStatus mXmppPresenceStatus;
         
     // Our current retry attempt, plus a runnable and handler to implement retry
     private int mCurrentRetryCount = 0;
-    private Runnable mReconnectRunnable = new Runnable() {
+    private final Runnable mReconnectRunnable = new Runnable() {
         public void run() {
             Log.i("attempting reconnection by issuing intent " + MainService.ACTION_CONNECT);
             Tools.startSvcIntent(mContext, MainService.ACTION_CONNECT);
         }
     };
 
-    private Handler mReconnectHandler;
+    private final Handler mReconnectHandler;
 
-    private SettingsManager mSettings;
-    private Context mContext;
-    protected SmackAndroid mSmackAndroid;
+    private final SettingsManager mSettings;
+    private final Context mContext;
+    final SmackAndroid mSmackAndroid;
     
     /**
      * Constructor for an XmppManager instance, connection is optional. It 
@@ -152,6 +152,7 @@ public class XmppManager {
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         SmackConfiguration.setLocalSocks5ProxyPort(-7777);        // negative number means try next port if already in use
         SmackConfiguration.setAutoEnableEntityCaps(true);
+        //SmackConfiguration.DefaultParsingExceptionCallback();
 
 		// Roster settings
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
@@ -253,7 +254,7 @@ public class XmppManager {
      * wind up in is impossible to know (eg, a request to connect may wind up
      * with a state of CONNECTED, DISCONNECTED or WAITING_TO_CONNECT...
      */
-    protected void xmppRequestStateChange(int newState) {
+    void xmppRequestStateChange(int newState) {
         int currentState = getConnectionStatus();
         Log.i("xmppRequestStateChange " + statusAsString(currentState) + " => " + statusAsString(newState));
         switch (newState) {
@@ -523,7 +524,7 @@ public class XmppManager {
             // authoritative login errors (ie, bad password).  The only
             // differentiator is the message itself which starts with this
             // hard-coded string.
-            if (e.getMessage().indexOf("SASL authentication") == -1) {
+            if (!e.getMessage().contains("SASL authentication")) {
                 // doesn't look like a bad username/password, so retry
                 maybeStartReconnect();
             } else {
@@ -593,9 +594,9 @@ public class XmppManager {
         // disable the built-in ReconnectionManager since we handle this
         conf.setReconnectionAllowed(false);
         conf.setSendPresence(false);
+        //conf.setDebuggerEnabled(true);
         
-        XMPPConnection connection = new XMPPConnection(conf);
-        return connection;
+        return new XMPPConnection(conf);
     }
 
     /** returns the current connection state */
@@ -604,11 +605,11 @@ public class XmppManager {
     }
     
     public boolean getTLSStatus() {
-        return mConnection == null ? false : mConnection.isUsingTLS();
+        return mConnection != null && mConnection.isUsingTLS();
     }
     
     public boolean getCompressionStatus() {
-        return mConnection == null ? false : mConnection.isUsingCompression();
+        return mConnection != null && mConnection.isUsingCompression();
     }
     
     /**
@@ -669,7 +670,7 @@ public class XmppManager {
                         // Don't send messages to GTalk Android devices
                         // It would be nice if there was a better way to detect 
                         // an Android gTalk XMPP client, but currently there is none
-                        if (toResource != null && !toResource.equals("") && (false || !toResource.startsWith("android"))) {
+                        if (toResource != null && !toResource.equals("") && (!toResource.startsWith("android"))) {
                             toList.add(toPresence);
                         }
                     }
@@ -702,11 +703,11 @@ public class XmppManager {
         }
     }
     
-    public boolean isConnected() {
+    boolean isConnected() {
         return isXmppConnected() && mStatus == CONNECTED;
     }
     
-    public boolean isXmppConnected() {
+    boolean isXmppConnected() {
         return mConnection != null && mConnection.isConnected();
     }
     

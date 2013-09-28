@@ -8,9 +8,9 @@ import org.jivesoftware.smack.util.StringUtils;
 
 import com.googlecode.gtalksms.SettingsManager;
 
-public class PresencePacketListener implements PacketListener  {
-    private XMPPConnection mConnection;
-    private SettingsManager mSettings;
+class PresencePacketListener implements PacketListener  {
+    private final XMPPConnection mConnection;
+    private final SettingsManager mSettings;
     
     public PresencePacketListener(XMPPConnection connection, SettingsManager settings) {
         this.mConnection = connection;

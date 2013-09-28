@@ -27,10 +27,6 @@ public abstract class Command {
     }
 
     public abstract void respond(String message);
-    
-    public void respond(int id, Object... args) {
-        
-    }
 
     public String getReplyTo() {
         return replyTo;

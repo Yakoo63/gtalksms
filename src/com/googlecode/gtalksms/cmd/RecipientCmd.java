@@ -13,7 +13,7 @@ public class RecipientCmd extends CommandHandlerBase {
     private static RecipientCmd sRecipientCmd;
 
     private SetLastRecipientRunnable mSetLastrecipientRunnable;
-    private KeyValueHelper mKeyValueHelper;
+    private final KeyValueHelper mKeyValueHelper;
 
     public RecipientCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MESSAGE, "Recipient", new Cmd("recipient", "re"));

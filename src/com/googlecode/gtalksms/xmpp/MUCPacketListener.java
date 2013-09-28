@@ -18,14 +18,14 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 
 class MUCPacketListener implements PacketListener {
-    private String mNumber;
-    private String mName; // the name of GTalkSMS in this room
+    private final String mNumber;
+    private final String mName; // the name of GTalkSMS in this room
     private Date mLastDate;
-    private MultiUserChat mMuc;
-    private String mRoomName;
-    private SettingsManager mSettings;
-    private Context mCtx;
-    private int mMode;
+    private final MultiUserChat mMuc;
+    private final String mRoomName;
+    private final SettingsManager mSettings;
+    private final Context mCtx;
+    private final int mMode;
     
     /**
      * Creates a new MUCPacketListener

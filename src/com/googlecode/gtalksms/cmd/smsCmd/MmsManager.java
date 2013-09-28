@@ -28,8 +28,8 @@ import com.googlecode.gtalksms.tools.Tools;
  */
 public class MmsManager {
 
-    private Context _context;
-    private SettingsManager _settings;
+    private final Context _context;
+    private final SettingsManager _settings;
 
     private static final int MMS_TYPE_SENT = 128;
     private static final int MMS_TYPE_RECEIVED = 132;
@@ -61,7 +61,7 @@ public class MmsManager {
         return getLastMmsDetails(MMS_CONTENT_URI, nbMMS);
     }
     
-    public ArrayList<Mms> getLastMmsDetails(Uri uri, int nbMMS) {
+    ArrayList<Mms> getLastMmsDetails(Uri uri, int nbMMS) {
         ArrayList<Mms> allMms = new ArrayList<Mms>();
         
         // Looking for the last unread MMS
@@ -178,7 +178,7 @@ public class MmsManager {
     }
     
     private void retrieveAddress(Mms mms, int id, int mmsType) {
-        String selectionAdd = new String("msg_id = " + id + " and type = " + mmsType);
+        String selectionAdd = "msg_id = " + id + " and type = " + mmsType;
         String uriStr = MessageFormat.format("content://mms/{0}/addr", id);
         Uri uriAddress = Uri.parse(uriStr);
         Cursor cAdd = _context.getContentResolver().query(uriAddress, null, selectionAdd, null, null);

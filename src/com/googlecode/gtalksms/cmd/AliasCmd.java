@@ -16,7 +16,7 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
  * 
  */
 public class AliasCmd extends CommandHandlerBase {
-    private AliasHelper aliasHelper;
+    private final AliasHelper aliasHelper;
 
     public AliasCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_CONTACTS, "Alias", new Cmd("alias"));
@@ -91,13 +91,13 @@ public class AliasCmd extends CommandHandlerBase {
                 send(R.string.chat_alias_empty);
             } else {
                 XmppMsg msg = new XmppMsg();
-                for (int i = 0; i < aliases.length; i++) {
-                    msg.appendBold("Alias: " + aliases[i][0] + " ");
-                    if (aliases[i][2] == null) {
-                        msg.appendLine(aliases[i][1]);
+                for (String[] alias : aliases) {
+                    msg.appendBold("Alias: " + alias[0] + " ");
+                    if (alias[2] == null) {
+                        msg.appendLine(alias[1]);
                     } else {
-                        msg.append(aliases[i][1] + " - ");
-                        msg.appendLine(aliases[i][2]);
+                        msg.append(alias[1] + " - ");
+                        msg.appendLine(alias[2]);
                     }
                 }
                 send(msg);

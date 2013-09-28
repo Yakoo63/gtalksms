@@ -9,42 +9,36 @@ import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.List;
 
-public abstract class Datefile extends File {
+public abstract class DateFile extends File {
 
-    protected Date mDate;
+    private final Date mDate;
     private static final long serialVersionUID = 1L;
     
-    protected Datefile(File parent, String child, Date date) {
+    DateFile(File parent, String child, Date date) {
         super(parent, child);
         this.mDate = date;
     }
     
-    public long getTime() {
+    long getTime() {
         return mDate.getTime();
     }
-
-    public int compareTo(Datefile other) {
-        return mDate.compareTo(other.mDate);
-    }
     
-    protected DataInputStream getDataInputStream() throws FileNotFoundException {
+    DataInputStream getDataInputStream() throws FileNotFoundException {
         FileInputStream fis = new FileInputStream(this);
-        DataInputStream dis = new DataInputStream(fis);
-        return dis;
+        return new DataInputStream(fis);
     }
     
-    protected DataOutputStream getDataOutputStream(boolean append) throws FileNotFoundException {
+    DataOutputStream getDataOutputStream(boolean append) throws FileNotFoundException {
         FileOutputStream fos = new FileOutputStream(this, append);
-        DataOutputStream dos = new DataOutputStream(fos);
-        return dos;
+        return new DataOutputStream(fos);
     }
     
     public static void deleteDatefilesOlderThan(List<?> files, Date date) {
-        for (int i = 0; i < files.size(); i++) {
-            Datefile f = (Datefile) files.get(i);
-            if (f.getTime() < date.getTime())
+        for (Object file : files) {
+            DateFile f = (DateFile) file;
+            if (f.getTime() < date.getTime()) {
                 f.delete();
+            }
         }        
     }
-
 }

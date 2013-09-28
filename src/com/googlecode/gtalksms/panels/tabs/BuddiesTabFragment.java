@@ -42,8 +42,8 @@ public class BuddiesTabFragment extends SherlockFragment {
     private EditText mEditTextBuddy;
     private Button mButtonAdd;
     private BuddyAdapter mCurrentBuddyAdapter;
-    private ArrayList<Buddy> mAdapterArray = new ArrayList<Buddy>();
-    private TreeMap<String, Buddy> mFriends = new TreeMap<String, Buddy>();
+    private final ArrayList<Buddy> mAdapterArray = new ArrayList<Buddy>();
+    private final TreeMap<String, Buddy> mFriends = new TreeMap<String, Buddy>();
     private SettingsManager mSettingsMgr;
 
     @Override
@@ -140,10 +140,10 @@ public class BuddiesTabFragment extends SherlockFragment {
 
     public class Buddy {
         class Location {
-            String Name;
-            String Resource;
-            String StatusMsg;
-            int State;
+            final String Name;
+            final String Resource;
+            final String StatusMsg;
+            final int State;
 
             Location(String name, String statusMsg, int state) {
                 Name = name;
@@ -159,7 +159,7 @@ public class BuddiesTabFragment extends SherlockFragment {
         private String mUserId;
         private int mState;
 
-        TreeMap<String, Location> mLocations = new TreeMap<String, Location>();
+        final TreeMap<String, Location> mLocations = new TreeMap<String, Location>();
 
         public Buddy(String userId, String name, String statusMsg, int state) {
             mUserId = userId;
@@ -223,7 +223,7 @@ public class BuddiesTabFragment extends SherlockFragment {
     }
 
     public class BuddyAdapter extends ArrayAdapter<Buddy> {
-        private LayoutInflater mInflater;
+        private final LayoutInflater mInflater;
 
         public BuddyAdapter(Activity activity, int textViewResourceId, ArrayList<Buddy> buddies) {
             super(activity, textViewResourceId, buddies);

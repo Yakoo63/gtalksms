@@ -35,7 +35,7 @@ public class PowerReceiver extends BroadcastReceiver {
     }
     
     class DisconnectDelayed implements Runnable {
-        private Context mContext;
+        private final Context mContext;
         
         public DisconnectDelayed(Context ctx) {
             this.mContext = ctx;

@@ -11,7 +11,7 @@ import com.googlecode.gtalksms.R;
 
 public class GeoPopup extends Activity {
 
-    final String[] items = {"Maps", "Navigation", "Street View"};
+    private final String[] items = {"Maps", "Navigation", "Street View"};
 
     /** Called when the activity is first created. */
     @Override

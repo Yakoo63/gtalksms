@@ -23,9 +23,9 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Logs;
 import com.googlecode.gtalksms.tools.Tools;
 
-public class LogTabFragment extends SherlockFragment {
+class LogTabFragment extends SherlockFragment {
 
-    public final static String LINE_SEPARATOR = System.getProperty("line.separator");
+    private final static String LINE_SEPARATOR = System.getProperty("line.separator");
     private Button mButtonStartStop;
     private Button mButtonClear;
     private Button mButtonAutoScroll;
@@ -111,20 +111,20 @@ public class LogTabFragment extends SherlockFragment {
     class LogsThread implements Runnable {
         Logs mLogs;
         boolean mStop;
-        Thread mLogCatThread;
+        final Thread mLogCatThread;
         List<String> mLines = new ArrayList<String>();
         
         public LogsThread() {
             mStop = false;
             mLogCatThread = new Thread(new Runnable() {
                 public void run() {
-                    List<String> list = Arrays.asList(new String[] {"AndroidRuntime:E", "gtalksms:V"});
+                    List<String> list = Arrays.asList("AndroidRuntime:E", "gtalksms:V");
                     ArrayList<String> commandLine = new ArrayList<String>();
                     commandLine.add("logcat");//$NON-NLS-1$
                     commandLine.addAll(list);
                    
                     try {
-                        Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]));
+                        Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[commandLine.size()]));
                         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                        
                         String line;
@@ -164,8 +164,8 @@ public class LogTabFragment extends SherlockFragment {
                 // Manage live logs
                 while (!mStop) {
                     mIsAvailable.acquire();
-                    for(int i = 0 ; i < mLines.size() ; ++i) {
-                        writeLine(mLines.get(i));
+                    for (String mLine : mLines) {
+                        writeLine(mLine);
                     }
                     mLines.clear();
                     mIsAvailable.release();

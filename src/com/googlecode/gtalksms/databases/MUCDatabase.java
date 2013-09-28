@@ -11,7 +11,7 @@ import android.database.Cursor;
  * @author Florian Schmaus fschmaus@gmail.com - on behalf of the GTalkSMS Team
  *
  */
-public class MUCDatabase extends Database {
+class MUCDatabase extends Database {
     
     public MUCDatabase(Context ctx) {
         super(ctx); 

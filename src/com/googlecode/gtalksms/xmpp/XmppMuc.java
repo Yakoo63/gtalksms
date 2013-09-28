@@ -3,6 +3,7 @@ package com.googlecode.gtalksms.xmpp;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,14 +44,14 @@ public class XmppMuc {
 
     private static XmppMuc sXmppMuc;
     
-    private Map<String, MultiUserChat> mRooms = new HashMap<String, MultiUserChat>();
-    private Set<Integer> mRoomNumbers = new HashSet<Integer>();
-    private Context mCtx;
-    private SettingsManager mSettings;
+    private final Map<String, MultiUserChat> mRooms = new HashMap<String, MultiUserChat>();
+    private final Set<Integer> mRoomNumbers = new HashSet<Integer>();
+    private final Context mCtx;
+    private final SettingsManager mSettings;
     private XMPPConnection mConnection;
-    private Random mRndGen = new Random();
-    private MUCHelper mMucHelper;
-    private DiscussionHistory mDiscussionHistory;
+    private final Random mRndGen = new Random();
+    private final MUCHelper mMucHelper;
+    private final DiscussionHistory mDiscussionHistory;
     private String mMucServer;
     
     private XmppMuc(Context context) {
@@ -145,7 +146,6 @@ public class XmppMuc {
      * if the user (or someone else) writes to this room, a SMS is send to the number
      * 
      * @param number
-     * @param mName
      * @return true if successful, otherwise false
      * @throws XMPPException 
      */
@@ -180,7 +180,6 @@ public class XmppMuc {
      * Checks if a room for the specific number
      * 
      * @param number
-     * @param contact
      * @return true if the room exists and gtalksms is in it, otherwise false
      */
     public boolean roomExists(String number) {
@@ -218,7 +217,7 @@ public class XmppMuc {
      */
     private MultiUserChat createRoom(String number, String name, int mode) throws XMPPException {
         String room = getRoomString(number, name);
-        MultiUserChat multiUserChat = null;
+        MultiUserChat multiUserChat;
         boolean passwordMode = false;
         Integer randomInt;
  
@@ -279,9 +278,7 @@ public class XmppMuc {
             try {
                 List<String> owners = new ArrayList<String>();
                 owners.add(mSettings.getLogin());
-                for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
-                    owners.add(notifiedAddress);
-                }
+                Collections.addAll(owners, mSettings.getNotifiedAddresses());
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
                 // Password protected MUC fallback code begins here
@@ -433,18 +430,18 @@ public class XmppMuc {
             String[][] mucDB = mMucHelper.getAllMUC();
             if (mucDB == null)
                 return;
-                
-            for (int i = 0; i < mucDB.length; i++) {
+
+            for (String[] aMucDB : mucDB) {
                 if (!mConnection.isAuthenticated())
                     return;
 
-                RoomInfo info = getRoomInfo(mucDB[i][0]);
+                RoomInfo info = getRoomInfo(aMucDB[0]);
                 // if info is not null, the room exists on the server
                 // so lets check if we can reuse it
                 if (info != null) {
-                    MultiUserChat muc = new MultiUserChat(mConnection, mucDB[i][0]);
+                    MultiUserChat muc = new MultiUserChat(mConnection, aMucDB[0]);
                     String name = ContactsManager.getContactName(mCtx,
-                            mucDB[i][1]);
+                            aMucDB[1]);
                     try {
                         if (info.isPasswordProtected()) {
                             muc.join(name, mSettings.roomPassword, mDiscussionHistory, JOIN_TIMEOUT);
@@ -460,21 +457,21 @@ public class XmppMuc {
                             // check here if we are still owner of these room, in case somebody has taken over ownership
                             // sadly getOwners() throws sometimes a 403 on my openfire server
                             try {
-                            if (!affilateCheck(muc.getOwners())) {
-                                if (mSettings.debugLog) 
-                                    Log.i("rejoinRooms: leaving " + muc.getRoom() + " because affilateCheck failed");
-                                leaveRoom(muc);
-                                continue;
-                            }
+                                if (!affilateCheck(muc.getOwners())) {
+                                    if (mSettings.debugLog)
+                                        Log.i("rejoinRooms: leaving " + muc.getRoom() + " because affilateCheck failed");
+                                    leaveRoom(muc);
+                                    continue;
+                                }
 
-                            // TODO this shouldn't happen any more
-                            // catch the 403 that sometimes shows up and fall back to some easier check if the room
-                            // is still under our control
+                                // TODO this shouldn't happen any more
+                                // catch the 403 that sometimes shows up and fall back to some easier check if the room
+                                // is still under our control
                             } catch (XMPPException e) {
                                 Log.d("rejoinRooms: Exception, falling back", e);
                                 if (!(info.isMembersOnly() || info.isPasswordProtected())) {
                                     if (mSettings.debugLog)
-                                        Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of membersOnly=" 
+                                        Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of membersOnly="
                                                 + info.isMembersOnly() + " passwordProtected=" + info.isPasswordProtected());
                                     leaveRoom(muc);
                                     continue;
@@ -503,7 +500,7 @@ public class XmppMuc {
                     }
 
                     // MUC has passed all tests and is fully usable
-                    registerRoom(muc, mucDB[i][1], name);
+                    registerRoom(muc, aMucDB[1], name);
                 }
             }
         }

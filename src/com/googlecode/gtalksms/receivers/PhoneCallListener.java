@@ -17,8 +17,8 @@ public class PhoneCallListener extends PhoneStateListener {
         settingsMgr = SettingsManager.getSettingsManager(svc);
     }
 
-    private MainService svc;
-    private SettingsManager settingsMgr;
+    private final MainService svc;
+    private final SettingsManager settingsMgr;
     
     // Android seems to send the intent not only once per call
     // but every 10 seconds for ongoing ringing

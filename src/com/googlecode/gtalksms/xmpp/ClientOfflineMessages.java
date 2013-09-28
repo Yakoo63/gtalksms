@@ -14,8 +14,8 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
 import com.googlecode.gtalksms.XmppManager;
-import com.googlecode.gtalksms.files.ClientOfflineMessagesDatefile;
-import com.googlecode.gtalksms.files.Datefile;
+import com.googlecode.gtalksms.files.ClientOfflineMessagesDateFile;
+import com.googlecode.gtalksms.files.DateFile;
 
 import android.content.Context;
 
@@ -54,8 +54,8 @@ public class ClientOfflineMessages {
     }
     
     private static void sendOfflineMessages() {
-        List<ClientOfflineMessagesDatefile> files = getDatefiles();
-        for (ClientOfflineMessagesDatefile f : files) {
+        List<ClientOfflineMessagesDateFile> files = getDatefiles();
+        for (ClientOfflineMessagesDateFile f : files) {
             try {
                 Message msg = f.getMessage();
                 MultiUserChat muc = sXmppMuc.getRoomViaRoomName(msg.getTo());
@@ -75,9 +75,9 @@ public class ClientOfflineMessages {
     }
     
     public boolean addOfflineMessage(Message msg) {
-        ClientOfflineMessagesDatefile file;
+        ClientOfflineMessagesDateFile file;
         try {
-            file = ClientOfflineMessagesDatefile.construct(sDirFile);
+            file = ClientOfflineMessagesDateFile.construct(sDirFile);
             file.setMessage(msg);
         } catch (IOException e) {
             return false;
@@ -86,21 +86,21 @@ public class ClientOfflineMessages {
     }
     
     private static void cleanUp() {
-        List<ClientOfflineMessagesDatefile> datefiles = getDatefiles();
+        List<ClientOfflineMessagesDateFile> datefiles = getDatefiles();
         
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -7);
         Date date = cal.getTime();
         
-        Datefile.deleteDatefilesOlderThan(datefiles, date);
+        DateFile.deleteDatefilesOlderThan(datefiles, date);
     }
     
-    private static List<ClientOfflineMessagesDatefile> getDatefiles() {
+    private static List<ClientOfflineMessagesDateFile> getDatefiles() {
         File[] files = sDirFile.listFiles();
-        List<ClientOfflineMessagesDatefile> datefiles = new ArrayList<ClientOfflineMessagesDatefile>();
+        List<ClientOfflineMessagesDateFile> datefiles = new ArrayList<ClientOfflineMessagesDateFile>();
         for (File f : files) {
             try {
-                ClientOfflineMessagesDatefile df = ClientOfflineMessagesDatefile.reconstruct(f);
+                ClientOfflineMessagesDateFile df = ClientOfflineMessagesDateFile.reconstruct(f);
                 datefiles.add(df);
             } catch (NumberFormatException e) {} 
         }

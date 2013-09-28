@@ -9,7 +9,7 @@ import com.googlecode.gtalksms.MainService;
 
 public class XMPPTransferCallback extends ExtentedPictureCallback {
 
-    String mRecipient;
+    private final String mRecipient;
     
     public XMPPTransferCallback(File path, Context ctx, String recipient) {
         super(path, ctx);

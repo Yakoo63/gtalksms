@@ -13,8 +13,8 @@ import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class ChatPacketListener implements PacketListener {
-	private SettingsManager mSettings;
-	private Context mCtx;
+	private final SettingsManager mSettings;
+	private final Context mCtx;
 
 	public ChatPacketListener(Context ctx) {
 		this.mCtx = ctx;

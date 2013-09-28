@@ -17,12 +17,12 @@ public class Mms implements Comparable<Mms> {
     private String subject;
     private String sender;
     private String senderNumber;
-    private ArrayList<String> recipients = new ArrayList<String>();
-    private ArrayList<String> recipientsNumber = new ArrayList<String>();
+    private final ArrayList<String> recipients = new ArrayList<String>();
+    private final ArrayList<String> recipientsNumber = new ArrayList<String>();
     private String message = "";
     private Bitmap bitmap;
-    private String id;
-    private Date date;
+    private final String id;
+    private final Date date;
     
     public Mms(String subject, Date date, String id) {
         this.setSubject(subject);
@@ -55,7 +55,7 @@ public class Mms implements Comparable<Mms> {
         return bitmap;
     }
 
-    public void setSubject(String subject) {
+    void setSubject(String subject) {
         this.subject = subject;
     }
 
@@ -79,6 +79,10 @@ public class Mms implements Comparable<Mms> {
     public void addRecipient(String recipientNumber, String name) {
         recipientsNumber.add(recipientNumber);
         recipients.add(name);
+    }
+
+    public String getRecipientNumbers() {
+        return StringFmt.join(recipientsNumber, ", ");
     }
 
     public String getRecipients() {

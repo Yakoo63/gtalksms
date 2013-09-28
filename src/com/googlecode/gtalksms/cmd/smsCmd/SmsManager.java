@@ -20,8 +20,8 @@ import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class SmsManager {
-    private Context _context;
-    private SettingsManager _settings;
+    private final Context _context;
+    private final SettingsManager _settings;
     
     private static final Uri THREADS_CONTENT_URI = Uri.parse("content://mms-sms/threadID");
     private static final Uri SMS_CONTENT_URI = Uri.parse("content://sms");
@@ -225,7 +225,7 @@ public class SmsManager {
         return deleteLastSms(SMS_SENTBOX_CONTENT_URI, number);
     }
     
-    public int deleteLastSms(Uri deleteUri, int number) {
+    int deleteLastSms(Uri deleteUri, int number) {
         int result = 0;
 
         ContentResolver cr = _context.getContentResolver();

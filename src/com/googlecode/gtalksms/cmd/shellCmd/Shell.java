@@ -28,11 +28,11 @@ public class Shell {
             mResults.append(mCurrentCommand);
             mResults.append(Tools.LineSep);
             
-            Process myproc = null;
+            Process myproc;
             
             try { 
                 if (!RootTools.askRootAccess()) {
-                    mResults.append(mContext.getString(R.string.chat_error_root) + Tools.LineSep);
+                    mResults.append(mContext.getString(R.string.chat_error_root)).append(Tools.LineSep);
                     myproc = Runtime.getRuntime().exec(new String[] {"/system/bin/sh", "-c", mCurrentCommand});
                 } else {
                     myproc = Runtime.getRuntime().exec("su");
@@ -99,28 +99,28 @@ public class Shell {
     }
     
     // Id to identify the console/room (0 for main chat windows)
-    int mShellId;
+    private final int mShellId;
     
     // Execution thread
-    Thread mThread;
-    ShellThread mShellThread;
+    private Thread mThread;
+    private ShellThread mShellThread;
     
     // Buffered results
-    StringBuilder mResults = new StringBuilder();
+    private StringBuilder mResults = new StringBuilder();
     
     // Command
     // TODO an array ?
-    String mCurrentCommand;
+    private String mCurrentCommand;
 
     // Reference to shell command manager to manage results
-    ShellCmd mCmdBase;
+    private final ShellCmd mCmdBase;
     
     // Android context reference
-    Context mContext;
+    private final Context mContext;
     
     // Default result font
     // TODO allow modifications ?
-    XmppFont _font = new XmppFont("consolas", "red");
+    private final XmppFont _font = new XmppFont("consolas", "red");
 
     public Shell(int id, ShellCmd cmdBase, Context context) {
         mShellId = id;
