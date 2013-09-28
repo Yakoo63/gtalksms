@@ -1,3 +1,7 @@
+4.4.1
+* Fix connection issue introduced in 4.4 when having pending offline messages
+* Improve MUC creation
+
 4.4
 * UI enhancements for better usability
 * Get all notifications of your phone via the accessibility feature and new command notification
