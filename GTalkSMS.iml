@@ -15,7 +15,7 @@
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
     </content>
     <orderEntry type="library" name="android-support-v4" level="project" />
-    <orderEntry type="library" name="asmack-android-7-0.8" level="project" />
+    <orderEntry type="library" name="asmack-android-8-0.8.3" level="project" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="library" />
