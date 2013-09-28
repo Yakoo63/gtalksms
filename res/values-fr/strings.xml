@@ -40,11 +40,11 @@
     <string name="about_donors">Donateurs</string>
     <string name="about_help">\n\nSi vous ne trouvez pas les réponses sur le site, n\'hésitez pas à envoyer un mail à:\n</string>
     <string name="about_panel">A propos de GTalkSMS</string>
-    <string name="about_rate_help">\nNotez l\'application sur le Google Market:\n\</string>
+    <string name="about_rate_help">\nNotez l\'application sur Google Market:\n\</string>
     <string name="about_rate">\tGTalkSMS sur Google Market\n</string>
     <string name="about_rate_donate">\tGTalkSMS Donate sur Google Market\n</string>
     <string name="about_website">Site Web</string>
-    <string name="about_website_help">Visitez le site pour de \'aide ainsi que la liste des bugs et évolutions:\n</string>
+    <string name="about_website_help">Visitez le site pour de l\'aide ainsi que la liste des bugs et évolutions:\n</string>
     <string name="chat_addresses">Adresses</string>
     <string name="chat_alias_add_by_name">Ajout de l\'alias \'%1$s\' pour %2$s avec le numéro %3$s</string>
     <string name="chat_alias_add_by_number">Ajout de l\'alias \'%1$s\' avec le numéro %2$s</string>

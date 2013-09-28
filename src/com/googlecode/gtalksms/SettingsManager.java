@@ -305,8 +305,9 @@ public class SettingsManager {
         try {
             return mSharedPreferences.getString(key, defaultValue);
         } catch (ClassCastException  e) {
-            Log.e(Tools.LOG_TAG, "Failed to retrive setting " + key, e);
+            Log.e(Tools.LOG_TAG, "Failed to retrieve setting " + key, e);
         }
+        saveSetting(key, defaultValue);
         return defaultValue;
     }
     
@@ -314,8 +315,9 @@ public class SettingsManager {
         try {
             return mSharedPreferences.getInt(key, defaultValue);
         } catch (ClassCastException  e) {
-            Log.e(Tools.LOG_TAG, "Failed to retrive setting " + key, e);
+            Log.e(Tools.LOG_TAG, "Failed to retrieve setting " + key, e);
         }
+        saveSetting(key, defaultValue);
         return defaultValue;
     }
     
@@ -323,8 +325,9 @@ public class SettingsManager {
         try {
             return mSharedPreferences.getBoolean(key, defaultValue);
         } catch (ClassCastException  e) {
-            Log.e(Tools.LOG_TAG, "Failed to retrive setting " + key, e);
+            Log.e(Tools.LOG_TAG, "Failed to retrieve setting " + key, e);
         }
+        saveSetting(key, defaultValue);
         return defaultValue;
     }
     
@@ -385,7 +388,7 @@ public class SettingsManager {
         
         roomPassword = getString("roomPassword", "gtalksms");
         forceMucServer = getBoolean("forceMucServer", false);
-        mucServer = getString("mucServer", "conference.jwchat.org");
+        mucServer = getString("mucServer", "conference.jabber.org");
         String notificationIncomingSmsType = getString("notificationIncomingSmsType", "same");
         
         if (notificationIncomingSmsType.equals("both")) {
