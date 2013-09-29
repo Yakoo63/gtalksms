@@ -31,7 +31,7 @@ public class NotificationsCmd extends CommandHandlerBase {
                         apps.add(app);
                         sSettingsMgr.saveSetting("hiddenNotifications", TextUtils.join("#sep#", apps));
                     }
-                } else if (subCmd.equals("unhide")) {
+                } else if (subCmd.equals("unhide") || subCmd.equals("show")) {
                     if (apps.contains(app)) {
                         apps.remove(app);
                         sSettingsMgr.saveSetting("hiddenNotifications", TextUtils.join("#sep#", apps));
@@ -58,7 +58,7 @@ public class NotificationsCmd extends CommandHandlerBase {
         notif.setHelp(R.string.chat_help_notif_general, null);
         
         notif.AddSubCmd("hide", R.string.chat_help_notif_hide, "#appname#");
-        notif.AddSubCmd("unhide",R.string.chat_help_notif_unhide, "#appname#");
+        notif.AddSubCmd("unhide",R.string.chat_help_notif_unhide, "#appname#", "show");
         notif.AddSubCmd("ignoreDelay",R.string.chat_help_notif_ignore_delay, "#timeInMs#");
     }
 }
