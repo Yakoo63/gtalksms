@@ -67,7 +67,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 Log.e("Failed to parse the notification.", e);
             }
             
-            if (!message.equals("")) {
+            if (message.equals("")) {
                 message = getEventText(event.getText());
             }
             
