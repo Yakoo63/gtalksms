@@ -694,7 +694,7 @@ public class MainService extends Service {
                     break;
                 case XmppManager.WAITING_TO_CONNECT:
                 case XmppManager.WAITING_FOR_NETWORK:
-                    builder.setContentText(getString(R.string.main_service_waiting_to_connect));
+                    builder.setContentText(getString(R.string.main_service_waiting_to_connect) + "\n" + getConnectionStatusAction());
                     builder.setSmallIcon(getImageStatus(STATUS_ICON_BLUE));
                     break;
                 default:
