@@ -51,7 +51,7 @@ public class ConnectionTabFragment extends SherlockFragment {
         mSwitchConnection = new SwitchCheckBoxCompat(view, R.id.switchConnection);
 
         mEditTextLogin.setText(mSettingsMgr.getLogin());
-        mEditNotificationAddress.setText(TextUtils.join("|",mSettingsMgr.getNotifiedAddresses()));
+        mEditNotificationAddress.setText(mSettingsMgr.getNotifiedAddresses().get());
         mEditTextPassword.setText(mSettingsMgr.getPassword());
         mSwitchConnection.setChecked(mSettingsMgr.getConnectOnMainScreenStartup());
         
@@ -68,7 +68,7 @@ public class ConnectionTabFragment extends SherlockFragment {
         mStartStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mSettingsMgr.setLogin(mEditTextLogin.getText().toString());
-                mSettingsMgr.setNotifiedAddress(mEditNotificationAddress.getText().toString());
+                mSettingsMgr.getNotifiedAddresses().set(mEditNotificationAddress.getText().toString());
                 mSettingsMgr.setPassword(mEditTextPassword.getText().toString());
                 
                 if (!mSettingsMgr.getLogin().equals("")) {
@@ -114,7 +114,7 @@ public class ConnectionTabFragment extends SherlockFragment {
                     throw new IllegalStateException();
             }
             
-            mEditNotificationAddress.setText(TextUtils.join("|",mSettingsMgr.getNotifiedAddresses()));
+            mEditNotificationAddress.setText(mSettingsMgr.getNotifiedAddresses().get());
             if(mCurrentAction.equals(MainService.ACTION_CONNECT)) {
                 mStartStopButton.setEnabled(true);
                 mEditTextLogin.setEnabled(true);

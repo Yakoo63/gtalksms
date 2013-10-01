@@ -34,7 +34,7 @@ public class ChatPacketListener implements PacketListener {
 			if (!mSettings.cameFromNotifiedAddress(from)) {
 				Log.i("XMPP packet received - but from address \"" + from.toLowerCase()
 	                + "\" does not match notification address \""
-	                + TextUtils.join("|", mSettings.getNotifiedAddresses())
+	                + mSettings.getNotifiedAddresses().get()
 	                + "\"");
 			} else if (message.getBody() == null) {
 				Log.i("XMPP Packet received - but without body (body == null)");

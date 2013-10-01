@@ -159,7 +159,7 @@ public class XmppMuc {
             muc = mRooms.get(number);
             if (muc != null) {
                 Collection<Occupant> occupants = muc.getParticipants();
-                for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+                for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
                     boolean found = false;
                     for (Occupant occupant : occupants) {
                         if (occupant.getJid().startsWith(notifiedAddress + "/")) {
@@ -278,7 +278,7 @@ public class XmppMuc {
             try {
                 List<String> owners = new ArrayList<String>();
                 owners.add(mSettings.getLogin());
-                Collections.addAll(owners, mSettings.getNotifiedAddresses());
+                Collections.addAll(owners, mSettings.getNotifiedAddresses().getAll());
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
                 // Password protected MUC fallback code begins here
@@ -311,7 +311,7 @@ public class XmppMuc {
             throw e1;
         }
 
-        for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+        for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
             multiUserChat.invite(notifiedAddress, subjectInviteStr);
         }
         registerRoom(multiUserChat, number, name, randomInt, mode);

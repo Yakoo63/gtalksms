@@ -19,7 +19,7 @@ class PresencePacketListener implements PacketListener  {
 
     @Override
     public void processPacket(Packet packet) {
-        for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+        for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
             Presence presence = (Presence) packet;
             String fromJID = StringUtils.parseBareAddress(presence.getFrom());
             

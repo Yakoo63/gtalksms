@@ -457,7 +457,7 @@ public class XmppManager {
             mConnection.addPacketListener(mPacketListener, filter);
 
             // It is important that we query the server for offline messages BEFORE we send the first presence stanza
-			XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.getNotifiedAddresses(), mContext);
+			XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.getNotifiedAddresses().getAll(), mContext);
         } catch (Exception e) {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
@@ -685,7 +685,7 @@ public class XmppManager {
         if (isConnected()) {
             // Message has no destination information send to all known resources 
             if (muc == null && to == null) {
-                for (String notifiedAddress : mSettings.getNotifiedAddresses()) {
+                for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
                     Iterator<Presence> presences = mConnection.getRoster().getPresences(notifiedAddress);
                     List<String> toList = new LinkedList<String>();
                     while (presences.hasNext()) {
@@ -695,8 +695,22 @@ public class XmppManager {
                         // Don't send messages to GTalk Android devices
                         // It would be nice if there was a better way to detect 
                         // an Android gTalk XMPP client, but currently there is none
-                        if (toResource != null && !toResource.equals("") && (!toResource.startsWith("android"))) {
-                            toList.add(toPresence);
+                        if (toResource != null && !toResource.equals("")) {
+                            boolean found = false;
+                            for (String blockedResourcePrefix: mSettings.getBlockedResourcePrefixes().getAll()) {
+                                if (toResource.startsWith(blockedResourcePrefix)) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                Log.d("Sending message to " + toPresence);
+                                toList.add(toPresence);
+                            } else {
+                                Log.d("Message not sent to " + toPresence + " because resource is blacklisted");
+                            }
+                        } else {
+                            Log.d("Message not sent to " + toPresence + " because resource is empty");
                         }
                     }
                     if (toList.size() > 0) {

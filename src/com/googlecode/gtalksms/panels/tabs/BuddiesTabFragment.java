@@ -246,14 +246,14 @@ public class BuddiesTabFragment extends SherlockFragment {
             ImageView stateView = (ImageView) row.findViewById(R.id.buddyState);
             ImageView deleteView = (ImageView) row.findViewById(R.id.buddyToDelete);
 
-            starCheck.setChecked(mSettingsMgr.containsNotifiedAddress(buddy.getUserId()));
+            starCheck.setChecked(mSettingsMgr.getNotifiedAddresses().contains(buddy.getUserId()));
             starCheck.setOnCheckedChangeListener(new OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        mSettingsMgr.addNotifiedAddress(buddy.getUserId());
+                        mSettingsMgr.getNotifiedAddresses().add(buddy.getUserId());
                     } else {
-                        mSettingsMgr.removeNotifiedAddress(buddy.getUserId());
+                        mSettingsMgr.getNotifiedAddresses().remove(buddy.getUserId());
                     }
                 }
             });

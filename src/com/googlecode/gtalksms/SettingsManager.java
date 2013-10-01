@@ -12,9 +12,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Build;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.util.Log;
 
+import com.googlecode.gtalksms.tools.ArrayStringSetting;
 import com.googlecode.gtalksms.tools.Tools;
 /**
  * 
@@ -52,24 +52,11 @@ public class SettingsManager {
     public String getPassword() { return _password; }
     public void setPassword(String value) { _password = saveSetting("password", value); }
 
-    private String _notifiedAddress;
-    private final ArrayList<String> _notifiedAddresses = new ArrayList<String>();
-    public String[] getNotifiedAddresses() { return _notifiedAddresses.toArray(new String[_notifiedAddresses.size()]); }
-    public void setNotifiedAddress(String value) { 
-        _notifiedAddress = saveSetting("notifiedAddress", value);
-        updateNotifiedAddresses();
-    }
-    
-    void updateNotifiedAddresses() {
-        _notifiedAddresses.clear();
-        for (String str : TextUtils.split(_notifiedAddress, "\\|")) {
-            _notifiedAddresses.add(str.toLowerCase());
-        }
-    }
+    private ArrayStringSetting _blockedResourcePrefixes = new ArrayStringSetting("blockedResourcePrefixes", this);
+    public ArrayStringSetting getBlockedResourcePrefixes() { return _blockedResourcePrefixes; }
 
-    public boolean containsNotifiedAddress(String value) { 
-        return _notifiedAddresses.contains(value.toLowerCase());
-    }
+    private ArrayStringSetting _notifiedAddresses = new ArrayStringSetting("notifiedAddress", this);
+    public ArrayStringSetting getNotifiedAddresses() { return _notifiedAddresses; }
 
     /**
      * Checks if the given fromJid is part of the notified Address set. fromJid can either be a fullJid or a bareJid
@@ -81,7 +68,7 @@ public class SettingsManager {
     public boolean cameFromNotifiedAddress(String fromJid) {
         String sanitizedNotifiedAddress;
         String sanitizedJid = fromJid.toLowerCase();
-        for (String notifiedAddress : _notifiedAddresses) {
+        for (String notifiedAddress : _notifiedAddresses.getAll()) {
             sanitizedNotifiedAddress = notifiedAddress.toLowerCase();
             // If it's a fullJID, append a slash for security reasons
             if (sanitizedJid.startsWith(sanitizedNotifiedAddress + "/")
@@ -92,21 +79,7 @@ public class SettingsManager {
         }
         return false;
     }
-    
-    public void addNotifiedAddress(String value) { 
-        if (! containsNotifiedAddress(value)) {
-            _notifiedAddresses.add(value);
-        }
-        setNotifiedAddress(TextUtils.join("|", _notifiedAddresses));
-    }
 
-    public void removeNotifiedAddress(String value) { 
-        if (containsNotifiedAddress(value)) {
-            _notifiedAddresses.remove(value);
-        }
-        setNotifiedAddress(TextUtils.join("|", _notifiedAddresses));
-    }
-    
     private boolean _connectOnMainScreenStartup;
     
     public boolean getConnectOnMainScreenStartup() { 
@@ -335,9 +308,10 @@ public class SettingsManager {
     private void importPreferences() {
         serverHost = getString("serverHost", "");
         serverPort = getInt("serverPort", 0);
-        
-        _notifiedAddress = getString("notifiedAddress", "");
-        updateNotifiedAddresses();
+
+       // _blockedResourcePrefixes.set(getString("blockedResourcePrefixes", "android|messaging-smgmail|MessagingA"));
+        _blockedResourcePrefixes.set("android|messaging-smgmail|MessagingA|MessagingB|gmail");
+        _notifiedAddresses.set(getString("notifiedAddress", ""));
         _login = getString("login", "");
         
         manuallySpecifyServerSettings = getBoolean("manuallySpecifyServerSettings", false);
