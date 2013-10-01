@@ -113,7 +113,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
                 mBuddiesTabFragment.updateBuddy(userId, userFullId, name, status, stateInt);
             } else if (action.equals(MainService.ACTION_XMPP_CONNECTION_CHANGED)) {
-                updateStatus(intent.getIntExtra("new_state", 0));
+                updateStatus(intent.getIntExtra("new_state", 0), intent.getStringExtra("current_action"));
             }
         }
     };
@@ -125,7 +125,7 @@ public class MainActivity extends SherlockFragmentActivity {
             MainService mainService = binder.getService();
             mMainService = mainService;
             mMainService.updateBuddies();
-            updateStatus(mMainService.getConnectionStatus());
+            updateStatus(mMainService.getConnectionStatus(), mMainService.getConnectionStatusAction());
             mConnectionStatusTabFragment.setMainService(mainService);
         }
 
@@ -243,8 +243,8 @@ public class MainActivity extends SherlockFragmentActivity {
         return super.onKeyLongPress(keyCode, event);
     }
     
-    private void updateStatus(int status) {
-        mConnectionTabFragment.updateStatus(status);
+    private void updateStatus(int status, String action) {
+        mConnectionTabFragment.updateStatus(status, action);
         setSupportProgressBarIndeterminateVisibility(false);
         switch (status) {
             case XmppManager.CONNECTED:

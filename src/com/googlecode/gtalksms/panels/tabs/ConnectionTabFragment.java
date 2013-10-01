@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.googlecode.gtalksms.MainService;
@@ -26,13 +27,15 @@ public class ConnectionTabFragment extends SherlockFragment {
     private EditText mEditTextPassword;
     private SwitchCheckBoxCompat mSwitchConnection;
     private Button mStartStopButton;
+    private TextView mStatusActionTextView;
     private String mCurrentAction = MainService.ACTION_CONNECT;
     private int mCurrentStatus = XmppManager.DISCONNECTED;
-    
+    private String mCurrentStatusAction = "";
+
     @Override
     public void onResume() {
         super.onResume();
-        updateStatus(mCurrentStatus);
+        updateStatus(mCurrentStatus, mCurrentStatusAction);
     }
     
     @Override
@@ -44,6 +47,7 @@ public class ConnectionTabFragment extends SherlockFragment {
         mEditNotificationAddress = (EditText) view.findViewById(R.id.editTextNotificationAddress);
         mEditTextPassword = (EditText) view.findViewById(R.id.editTextPassword);
         mStartStopButton = (Button)  view.findViewById(R.id.buttonConnect);
+        mStatusActionTextView = (TextView)  view.findViewById(R.id.statusAction);
         mSwitchConnection = new SwitchCheckBoxCompat(view, R.id.switchConnection);
 
         mEditTextLogin.setText(mSettingsMgr.getLogin());
@@ -75,14 +79,19 @@ public class ConnectionTabFragment extends SherlockFragment {
         return view;
     }
     
-    public void updateStatus(int status) {
+    public void updateStatus(int status, String action) {
         mCurrentStatus = status;
+        mCurrentStatusAction = action;
         if (status == XmppManager.DISCONNECTED) {
             mCurrentAction = MainService.ACTION_CONNECT;
         } else {
             mCurrentAction = MainService.ACTION_DISCONNECT;
         }
-        
+
+        if (mStatusActionTextView != null) {
+            mStatusActionTextView.setText(action);
+        }
+
         if (mStartStopButton != null) {
             switch (status) {
                 case XmppManager.CONNECTED:

@@ -334,6 +334,10 @@ public class MainService extends Service {
     public int getConnectionStatus() {
         return sXmppMgr == null ? XmppManager.DISCONNECTED : sXmppMgr.getConnectionStatus();
     }
+
+    public String getConnectionStatusAction() {
+        return sXmppMgr == null ? "" : sXmppMgr.getConnectionStatusAction();
+    }
     
     public static Set<CommandHandlerBase> getAvailableCommandSet() {
         return sAvailableCommandSet; 
@@ -405,12 +409,13 @@ public class MainService extends Service {
 
         sUiContext = this;
 
+        // Setup the stop ringing intent
         Intent intent = new Intent(MainService.ACTION_COMMAND);
         intent.putExtra("cmd", "ring");
         intent.putExtra("args", "stop");
         intent.setClass(getBaseContext(), MainService.class);
-        
         sPendingIntentStopRinging = PendingIntent.getService(getBaseContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         sPendingIntentLaunchApplication = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
         sNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         
@@ -452,7 +457,7 @@ public class MainService extends Service {
         if (intent.getAction().equals(ACTION_BROADCAST_STATUS)) {
             // A request to broadcast our current status even if _xmpp is null.
             int state = getConnectionStatus();
-            XmppManager.broadcastStatus(this, state, state);
+            XmppManager.broadcastStatus(this, state, state, getConnectionStatusAction());
             // A real action request
         } else {
             // redirect the intent to the service handler thread

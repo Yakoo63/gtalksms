@@ -76,10 +76,13 @@ public class XmppManager {
     private static XmppManager sXmppManager = null;
     private static int sReusedConnectionCount = 0;
     private static int sNewConnectionCount = 0;
-    
+
     // Indicates the current state of the service (disconnected/connecting/connected)
     private int mStatus = DISCONNECTED;
-    
+
+    // Indicates the current action associated to the status (connect, identify, wait X seconds,...)
+    private String mStatusAction = "";
+
     private final List<XmppConnectionChangeListener> mConnectionChangeListeners;
     private XMPPConnection mConnection = null;
 	private PacketListener mPacketListener = null;
@@ -183,8 +186,10 @@ public class XmppManager {
                 initConnection();
                 break;
             case WAITING_TO_CONNECT:
+                updateStatus(initialState, "Waiting to connect");
+                break;
             case WAITING_FOR_NETWORK:
-                updateStatus(initialState);
+                updateStatus(initialState, "Waiting for network");
                 break;
             default:
                 throw new IllegalStateException("xmppMgr start() Invalid State: " + initialState);
@@ -196,9 +201,9 @@ public class XmppManager {
      * sets _status to DISCONNECTED
      */
     private void stop() {
-        updateStatus(DISCONNECTING);
+        updateStatus(DISCONNECTING, "");
         cleanupConnection();
-        updateStatus(DISCONNECTED);
+        updateStatus(DISCONNECTED, "");
         mConnection = null;
     }
     
@@ -290,14 +295,15 @@ public class XmppManager {
      * xmppMgr is not created yet
      * 
      * @param ctx
-     * @param old_state
-     * @param new_state
+     * @param oldState
+     * @param newState
      */
-    public static void broadcastStatus(Context ctx, int old_state, int new_state) {  
+    public static void broadcastStatus(Context ctx, int oldState, int newState, String currentAction) {
         Intent intent = new Intent(MainService.ACTION_XMPP_CONNECTION_CHANGED);                      
-        intent.putExtra("old_state", old_state);
-        intent.putExtra("new_state", new_state);
-        if (new_state == CONNECTED && sXmppManager != null && sXmppManager.mConnection != null) {
+        intent.putExtra("old_state", oldState);
+        intent.putExtra("new_state", newState);
+        intent.putExtra("current_action", currentAction);
+        if (newState == CONNECTED && sXmppManager != null && sXmppManager.mConnection != null) {
             intent.putExtra("TLS", sXmppManager.mConnection.isUsingTLS());
             intent.putExtra("Compression", sXmppManager.mConnection.isUsingCompression());
         }
@@ -310,33 +316,45 @@ public class XmppManager {
      * 
      * @param status
      */
-    private void updateStatus(int status) {
+    private void updateStatus(int status, String action) {
         if (status != mStatus) {
             // ensure _status is set before broadcast, just in-case
             // a receiver happens to wind up querying the state on
             // delivery.
             int old = mStatus;
-            mStatus = status;     
+            mStatus = status;
             mXmppStatus.setState(status);
+            mStatusAction = action;
             Log.i("broadcasting state transition from " + statusAsString(old) + " to " + statusAsString(status) + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
-            broadcastStatus(mContext, old, status);
+            broadcastStatus(mContext, old, status, action);
+        }
+    }
+
+    private void updateAction(String action) {
+        if (action != mStatusAction) {
+            // ensure action is set before broadcast, just in-case
+            // a receiver happens to wind up querying the state on
+            // delivery.
+            mStatusAction = action;
+            Log.i("broadcasting new action " + action + "for status " + statusAsString(mStatus) + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
+            broadcastStatus(mContext, mStatus, mStatus, action);
         }
     }
 
     private void maybeStartReconnect() {
-            int timeout;
-            updateStatus(WAITING_TO_CONNECT);
-            cleanupConnection();
-            mCurrentRetryCount += 1;
-            if (mCurrentRetryCount < 20) {
-                // a simple linear-backoff strategy.
-                timeout = 5000 * mCurrentRetryCount;
-            } else {
-                // every 5 min
-                timeout = 1000 * 60 * 5;
-            }
-            Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + mCurrentRetryCount);
-            mReconnectHandler.postDelayed(mReconnectRunnable, timeout);
+        int timeout;
+        cleanupConnection();
+        mCurrentRetryCount += 1;
+        if (mCurrentRetryCount < 20) {
+            // a simple linear-backoff strategy.
+            timeout = 5000 * mCurrentRetryCount;
+        } else {
+            // every 5 min
+            timeout = 1000 * 60 * 5;
+        }
+        updateStatus(WAITING_TO_CONNECT, "Attempt #" + mCurrentRetryCount + " in " + timeout / 1000 + "s");
+        Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + mCurrentRetryCount);
+        mReconnectHandler.postDelayed(mReconnectRunnable, timeout);
     }
     
 
@@ -357,7 +375,7 @@ public class XmppManager {
         assert (!Thread.currentThread().getName().equals(MainService.SERVICE_THREAD_NAME));
 
         // everything is ready for a connection attempt
-        updateStatus(CONNECTING);
+        updateStatus(CONNECTING, "");
 
         // create a new connection if the connection is obsolete or if the
         // old connection is still active
@@ -394,7 +412,8 @@ public class XmppManager {
     }
     
     private void onConnectionEstablished(XMPPConnection connection) {
-        mConnection = connection;               
+        mConnection = connection;
+        updateAction("Configuring listeners and retrieving offline messages");
         mConnectionListener = new ConnectionListener() {
             @Override
             public void connectionClosed() {
@@ -429,7 +448,7 @@ public class XmppManager {
                 throw new IllegalStateException("Reconnection Manager is running");
             }
         };
-        mConnection.addConnectionListener(mConnectionListener);            
+        mConnection.addConnectionListener(mConnectionListener);
 
         try {
             informListeners(mConnection);
@@ -458,7 +477,7 @@ public class XmppManager {
         }
         
         mCurrentRetryCount = 0;
-        updateStatus(CONNECTED);
+        updateStatus(CONNECTED, "");
     }
     
     private void informListeners(XMPPConnection connection) {
@@ -476,6 +495,7 @@ public class XmppManager {
      */
     private boolean connectAndAuth(XMPPConnection connection) {
         try {
+            updateAction("Connecting to " + mSettings.serverHost + ":" + mSettings.serverPort);
             connection.connect();
         } catch (Exception e) {
             Log.w("XMPP connection failed", e);
@@ -496,23 +516,24 @@ public class XmppManager {
         if (connection.isAuthenticated()) {
             return true;
         }
-        
+
+        updateAction("Service discovery");
         mPingManager = PingManager.getInstanceFor(connection);
         mPingManager.registerPingFailedListener(new PingFailedListener() {
             
             @Override
             public void pingFailed() {
-                // TODO remember that maybeStartReconnect is called from a 
-                // different thread (the PingTask) here, it may causes 
-                // synchronization problems
-                Log.d("PingManager reported failed ping, calling maybeStartReconnect()");
-                maybeStartReconnect();
-                
+            // TODO remember that maybeStartReconnect is called from a
+            // different thread (the PingTask) here, it may causes
+            // synchronization problems
+            Log.d("PingManager reported failed ping, calling maybeStartReconnect()");
+            maybeStartReconnect();
             }
         });
 
         try {
             XHTMLManager.setServiceEnabled(connection, false);
+            updateAction("Login with " + mSettings.getLogin());
             connection.login(mSettings.getLogin(), mSettings.getPassword(), Tools.APP_NAME);
         } catch (Exception e) {
             cleanupConnection();
@@ -601,6 +622,11 @@ public class XmppManager {
     /** returns the current connection state */
     public int getConnectionStatus() {
         return mStatus;
+    }
+
+    /** returns the current connection state */
+    public String getConnectionStatusAction() {
+        return mStatusAction;
     }
     
     public boolean getTLSStatus() {

@@ -104,6 +104,15 @@
             android:layout_gravity="right"
             android:text="@string/panel_connection_button_connect"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-        
+
+        <TextView
+            android:id="@+id/statusAction"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="right"
+            android:text="Test"
+            android:textSize="10dip"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
     </LinearLayout>
 </ScrollView>
