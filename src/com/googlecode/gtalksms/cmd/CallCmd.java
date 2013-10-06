@@ -103,8 +103,7 @@ public class CallCmd extends CommandHandlerBase {
                 send("error: last recipient not set");
             }
         } else {
-            ResolvedContact resolvedContact = mContactsResolver.resolveContact(
-                    contactInformation, ContactsResolver.TYPE_ALL);
+            ResolvedContact resolvedContact = mContactsResolver.resolveContact(contactInformation, ContactsResolver.TYPE_ALL);
             if (resolvedContact == null) {
                 send(R.string.chat_no_match_for, contactInformation);
             } else if (resolvedContact.isDistinct()) {

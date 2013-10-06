@@ -118,6 +118,14 @@ public class ContactsManager {
      * @return a ArrayList of <Contact> where the names/company match the argument
      */
     public static ArrayList<Contact> getMatchingContacts(Context ctx, String searchedName) {
+        ArrayList<Contact> res = getMatchingContacts(ctx, searchedName, true);
+        if (res.size() == 0) {
+            res = getMatchingContacts(ctx, searchedName, false);
+        }
+        return res;
+    }
+
+    private static ArrayList<Contact> getMatchingContacts(Context ctx, String searchedName, boolean isNameOnly) {
         ArrayList<Contact> res = new ArrayList<Contact>();
         HashMap<String, Contact> contacts = new HashMap<String, Contact>();
         
@@ -135,10 +143,10 @@ public class ContactsManager {
                     Long id = Tools.getLong(c, Contacts._ID);
                     String contactName = Tools.getString(c, Contacts.DISPLAY_NAME);
                     
-                    if (null == id || null == contactName) {
+                    if (null == id || null == contactName || (isNameOnly && !contactName.toLowerCase().contains(searchedName.toLowerCase()))) {
                         continue;
                     }
-                    
+
                     Contact contact;
                     if (contacts.containsKey(contactName)) {
                         contact = contacts.get(contactName);
