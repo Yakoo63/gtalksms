@@ -1,6 +1,10 @@
+upcoming
+* New setting to filter notified address resources
+* Adds more details during connection establishment
+
 4.4.1
-* Fix connection issue introduced in 4.4 when having pending offline messages
-* Improve MUC creation
+* Fixes connection issue introduced in 4.4 when having pending offline messages
+* Improves MUC creation
 
 4.4
 * UI enhancements for better usability
