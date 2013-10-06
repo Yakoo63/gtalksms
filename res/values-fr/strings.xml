@@ -371,6 +371,8 @@
     <string name="pref_con_use_compression_help">Activer la compression des données du protocole XMPP</string>
     <string name="pref_con_use_different_account">Utiliser un compte différent</string>
     <string name="pref_con_use_different_account_help">Cocher pour utiliser un compte différent</string>
+    <string name="pref_con_xmppBlockedResourcePrefixes">Ressources bloquées pour les adresses de notification</string>
+    <string name="pref_con_xmppBlockedResourcePrefixes_help">Ne pas notifier les adresses de notifications qui contiennent ces préfixes dans les ressources. Utiliser le saut de ligne en tant que séparateur. Pour plus d\'informations aller ici : https://code.google.com/p/gtalksms/wiki/xmppBlockedResourcePrefixes</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_application_connection">Connexion de l\'application</string>
     <string name="pref_notif_application_connection_help">Notification pour les connexions au service de messagerie</string>

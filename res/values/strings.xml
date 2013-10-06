@@ -350,7 +350,7 @@
     <string name="pref_con_muc_force">Enforce this MUC Server</string>
     <string name="pref_con_muc_force_help">Enforces the use of the configured MUC Server, even if the used XMPP server provides a MCU component</string>
     <string name="pref_con_muc_password">Room password</string>
-    <string name="pref_con_muc_password_help">Room password for SMS notifications (used only, if making the room private failes for some reason)</string>
+    <string name="pref_con_muc_password_help">Room password for SMS notifications (used only, if making the room private fails for some reason)</string>
     <string name="pref_con_muc_server">MUC Service</string>
     <string name="pref_con_muc_server_help">Service used for XMPP Groupchat. Leave the default if you don\'t know that this means! The MUC Service will only be used if you XMPP server doesn\'t provide one.</string>
     <string name="pref_con_notified_address">Address to notify</string>
@@ -371,6 +371,8 @@
     <string name="pref_con_use_compression_help">Enable compression of the XMPP Connection</string>
     <string name="pref_con_use_different_account">Use a different account</string>
     <string name="pref_con_use_different_account_help">Check if you want the phone to connect from a different account</string>
+    <string name="pref_con_xmppBlockedResourcePrefixes">Blocked resources for notified addresses</string>
+    <string name="pref_con_xmppBlockedResourcePrefixes_help">Do not notify addresses that use those resources when logged in. Use new line as separator. Check here for more details: https://code.google.com/p/gtalksms/wiki/xmppBlockedResourcePrefixes</string>
     <string name="pref_notif">Notification settings</string>
     <string name="pref_notif_application_connection">Application connection</string>
     <string name="pref_notif_application_connection_help">Phone reconnect notification</string>

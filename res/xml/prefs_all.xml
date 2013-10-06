@@ -15,6 +15,7 @@
             <CheckBoxPreference android:key="forceMucServer" android:defaultValue="true" android:summary="@string/pref_con_muc_force" android:title="@string/pref_con_muc_force_help" />
             <CheckBoxPreference android:key="useCompression" android:defaultValue="false" android:summary="@string/pref_con_use_compression_help" android:title="@string/pref_con_use_compression" />
             <ListPreference android:key="xmppSecurityMode" android:entries="@array/list_xmppConnectionSecurity_entries" android:entryValues="@array/list_xmppConnectionSecurity_entryValues" android:title="@string/pref_con_securityMode" android:summary="@string/pref_con_securityMode_help" />
+            <EditTextPreference android:key="xmppBlockedResourcePrefixes" android:defaultValue="android|MessagingA" android:title="@string/pref_con_xmppBlockedResourcePrefixes" android:summary="@string/pref_con_xmppBlockedResourcePrefixes_help" />
         </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen android:title="@string/pref_app">

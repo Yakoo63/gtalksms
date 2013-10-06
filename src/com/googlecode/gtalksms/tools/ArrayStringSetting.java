@@ -12,11 +12,18 @@ import java.util.ArrayList;
 public class ArrayStringSetting {
     private String _string;
     private String _key;
+    private String _separator;
     private SettingsManager _settingsManager;
     private final ArrayList<String> _strings = new ArrayList<String>();
 
-    public ArrayStringSetting(String key, SettingsManager settingsManager) {
+    public ArrayStringSetting(String key, SettingsManager settingsManager)
+    {
+        this(key, "|", settingsManager);
+    }
+
+    public ArrayStringSetting(String key, String separator, SettingsManager settingsManager) {
         _key = key;
+        _separator = separator;
         _settingsManager = settingsManager;
     }
 
@@ -35,7 +42,7 @@ public class ArrayStringSetting {
 
     void update() {
         _strings.clear();
-        for (String str : TextUtils.split(_string, "\\|")) {
+        for (String str : TextUtils.split(_string, "\\" + _separator)) {
             _strings.add(str);
         }
     }
@@ -54,13 +61,13 @@ public class ArrayStringSetting {
         if (! contains(value)) {
             _strings.add(value);
         }
-        set(TextUtils.join("|", _strings));
+        set(TextUtils.join(_separator, _strings));
     }
 
     public void remove(String value) {
         if (contains(value)) {
             _strings.remove(value);
         }
-        set(TextUtils.join("|", _strings));
+        set(TextUtils.join(_separator, _strings));
     }
 }

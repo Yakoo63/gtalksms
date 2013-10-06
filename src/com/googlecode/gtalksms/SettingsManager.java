@@ -52,7 +52,7 @@ public class SettingsManager {
     public String getPassword() { return _password; }
     public void setPassword(String value) { _password = saveSetting("password", value); }
 
-    private ArrayStringSetting _blockedResourcePrefixes = new ArrayStringSetting("blockedResourcePrefixes", this);
+    private ArrayStringSetting _blockedResourcePrefixes = new ArrayStringSetting("blockedResourcePrefixes", "\n", this);
     public ArrayStringSetting getBlockedResourcePrefixes() { return _blockedResourcePrefixes; }
 
     private ArrayStringSetting _notifiedAddresses = new ArrayStringSetting("notifiedAddress", this);
@@ -309,8 +309,7 @@ public class SettingsManager {
         serverHost = getString("serverHost", "");
         serverPort = getInt("serverPort", 0);
 
-       // _blockedResourcePrefixes.set(getString("blockedResourcePrefixes", "android|messaging-smgmail|MessagingA"));
-        _blockedResourcePrefixes.set("android|messaging-smgmail|MessagingA|MessagingB|gmail");
+        _blockedResourcePrefixes.set(getString("xmppBlockedResourcePrefixes", "android|MessagingA"));
         _notifiedAddresses.set(getString("notifiedAddress", ""));
         _login = getString("login", "");
         

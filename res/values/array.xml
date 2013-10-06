@@ -47,7 +47,7 @@
         <item>Disabled</item>
         <item>Required</item>
         <item>Optional</item>
-    </string-array>    
+    </string-array>
     <string-array name="list_xmppConnectionSecurity_entryValues">
        <item>dis</item>
        <item>req</item>
