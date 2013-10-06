@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-public class EmailCallback extends ExtentedPictureCallback {
+public class EmailCallback extends ExtendedPictureCallback {
 
     private final String[] mRecipient;
     

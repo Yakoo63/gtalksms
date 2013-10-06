@@ -4,12 +4,10 @@ import java.io.File;
 
 import android.content.Context;
 
-import com.googlecode.gtalksms.cmd.CommandHandlerBase;
 import com.googlecode.gtalksms.tools.Tools;
 
-public class VoidCallback extends ExtentedPictureCallback {
+public class VoidCallback extends ExtendedPictureCallback {
 
-    CommandHandlerBase _command;
     private final String mRecipient;
     
     public VoidCallback(File path, Context ctx, String recipient) {

@@ -7,7 +7,7 @@ import android.content.Intent;
 
 import com.googlecode.gtalksms.MainService;
 
-public class XMPPTransferCallback extends ExtentedPictureCallback {
+public class XMPPTransferCallback extends ExtendedPictureCallback {
 
     private final String mRecipient;
     

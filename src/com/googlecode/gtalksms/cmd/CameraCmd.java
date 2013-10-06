@@ -3,6 +3,7 @@ package com.googlecode.gtalksms.cmd;
 import java.io.File;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
@@ -185,20 +186,25 @@ public class CameraCmd extends CommandHandlerBase {
             } else {
                 sCamera = Camera.open();
             }
-            SurfaceView view = new SurfaceView(sContext);
-            sCamera.setPreviewDisplay(view.getHolder());
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                sCamera.setPreviewTexture(new SurfaceTexture(0));
+            } else {
+                sCamera.setPreviewDisplay(new SurfaceView(sContext).getHolder());
+            }
+
             sCamera.startPreview();
             
             switch (pCallbackMethod) {
-            case XMPP_CALLBACK:
-                pictureCallback = new XMPPTransferCallback(repository, sContext, mAnswerTo);
-                break;
-            case EMAIL_CALLBACK:
-                pictureCallback = new EmailCallback(repository, sContext, emailReceiving);
-                break;
-            case VOID_CALLBACK:
-            default:
-                pictureCallback = new VoidCallback(repository, sContext, mAnswerTo);
+                case XMPP_CALLBACK:
+                    pictureCallback = new XMPPTransferCallback(repository, sContext, mAnswerTo);
+                    break;
+                case EMAIL_CALLBACK:
+                    pictureCallback = new EmailCallback(repository, sContext, emailReceiving);
+                    break;
+                case VOID_CALLBACK:
+                default:
+                    pictureCallback = new VoidCallback(repository, sContext, mAnswerTo);
             }
             
             streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM); 
@@ -208,7 +214,7 @@ public class CameraCmd extends CommandHandlerBase {
                 
                 @Override
                 public void onShutter() {
-                    audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, streamVolume, 0); 
+                    audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, streamVolume, 0);
                 }
             };
             send("Taking picture");
@@ -216,8 +222,8 @@ public class CameraCmd extends CommandHandlerBase {
         } catch (Exception e) {
             Log.w("Error taking picture", e);
             send(R.string.chat_camera_error_picture, e.getLocalizedMessage());
+            releaseResources();
         }
-        releaseResources();
     }
     
     void setLight(boolean turnOn) {

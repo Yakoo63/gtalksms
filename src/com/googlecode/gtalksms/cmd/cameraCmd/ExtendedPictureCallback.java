@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.googlecode.gtalksms.tools.Tools;
 
-abstract class ExtentedPictureCallback implements PictureCallback {
+abstract class ExtendedPictureCallback implements PictureCallback {
     private final File path;
     final Context ctx;
     
@@ -18,7 +18,7 @@ abstract class ExtentedPictureCallback implements PictureCallback {
      * 
      * @param path the path were the picture will be saved in
      */
-    ExtentedPictureCallback(File path, Context ctx) {
+    ExtendedPictureCallback(File path, Context ctx) {
         this.path = path;
         this.ctx = ctx;
     }
@@ -32,9 +32,10 @@ abstract class ExtentedPictureCallback implements PictureCallback {
             Log.e(Tools.LOG_TAG, "Error writing file");
         }
         camera.stopPreview();
+        camera.setPreviewCallback(null);
+        camera.unlock();
         camera.release();
     }
     
     protected abstract boolean onPictureSaved(File picture);
-       
 }
