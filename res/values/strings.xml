@@ -279,7 +279,7 @@
     <string name="chat_welcome">Welcome to GTalkSMS %s. Send \"?\" for getting help.</string>
     <string name="log_panel_acquiring">Acquiring log</string>
     <string name="log_panel_collect">This will collect the GTalkSMS log and create a message for you to send. You will be presented with an editable message - you should send the message to yourself, then attach it to a GTalkSMS issue describing your problem.</string>
-    <string name="main_service_connected">Connected</string>
+    <string name="main_service_connected">Connected at %1$s</string>
     <string name="main_service_connecting">Connecting&#8230;</string>
     <string name="main_service_disconnected">Disconnected</string>
     <string name="main_service_disconnecting">Disconnecting&#8230;</string>

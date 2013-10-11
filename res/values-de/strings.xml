@@ -277,7 +277,7 @@
     <string name="chat_welcome">Willkommen bei GTalkSMS %s. \&quot;?\&quot; für Hilfe.</string>
     <string name="log_panel_acquiring">Erstelle Log</string>
     <string name="log_panel_collect">Erstellt eine E-Mail mit GTalkSMS Log-Informationen. Die Informationen in der E-Mail können zur Problembehebung verwendet werden und z.B. an einen Bugreport angehängt werden.</string>
-    <string name="main_service_connected">Verbunden</string>
+    <string name="main_service_connected">Verbunden mit %1$s</string>
     <string name="main_service_connecting">Verbinde...</string>
     <string name="main_service_disconnected">Getrennt</string>
     <string name="main_service_disconnecting">Trenne...</string>

@@ -677,7 +677,7 @@ public class MainService extends Service {
             
             switch (status) {
                 case XmppManager.CONNECTED:
-                    builder.setContentText(getString(R.string.main_service_connected));
+                    builder.setContentText(getString(R.string.main_service_connected, getConnectionStatusAction()));
                     builder.setSmallIcon(getImageStatus(STATUS_ICON_GREEN));
                     break;
                 case XmppManager.CONNECTING:
