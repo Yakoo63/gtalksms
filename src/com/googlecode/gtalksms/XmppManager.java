@@ -2,6 +2,7 @@ package com.googlecode.gtalksms;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,8 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
+import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
+import org.jivesoftware.smack.parsing.UnparsablePacket;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.MultipleRecipientManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
@@ -151,11 +154,19 @@ public class XmppManager {
         XmppEntityCapsCache.enableEntityCapsCache(context);
         
         // Smack Settings
-        SmackConfiguration.setPacketReplyTimeout(1000 * 40);      // 40 sec
+        SmackConfiguration.setPacketReplyTimeout(1000 * 20);      // 20 sec
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         SmackConfiguration.setLocalSocks5ProxyPort(-7777);        // negative number means try next port if already in use
         SmackConfiguration.setAutoEnableEntityCaps(true);
-        //SmackConfiguration.DefaultParsingExceptionCallback();
+        SmackConfiguration.setDefaultParsingExceptionCallback(new ParsingExceptionCallback() {
+            @Override
+            public void handleUnparsablePacket(UnparsablePacket stanzaData) throws Exception {
+                super.handleUnparsablePacket(stanzaData);
+
+                Log.e("handleUnparsablePacket reconnecting... ", stanzaData.getParsingException());
+                maybeStartReconnect();
+            }
+        });
 
 		// Roster settings
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
@@ -477,7 +488,8 @@ public class XmppManager {
         }
         
         mCurrentRetryCount = 0;
-        updateStatus(CONNECTED, "");
+        Date now = new Date();
+        updateStatus(CONNECTED, String.format("%tF  %tT", now, now));
     }
     
     private void informListeners(XMPPConnection connection) {
