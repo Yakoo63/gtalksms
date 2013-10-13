@@ -362,6 +362,8 @@
     <string name="pref_con_securityMode_help">Enable or Disable the connection encryption</string>
     <string name="pref_con_server_host">Server host</string>
     <string name="pref_con_server_host_help">Server host used by the phone</string>
+    <string name="pref_con_server_ping">Ping Interval</string>
+    <string name="pref_con_server_ping_help">Ping interval in seconds to keep the connection alive. A lower value may drain your battery faster</string>
     <string name="pref_con_server_port">Server port</string>
     <string name="pref_con_server_port_help">Server port used by the phone</string>
     <string name="pref_con_server_settings">Server settings</string>
@@ -372,7 +374,7 @@
     <string name="pref_con_use_different_account">Use a different account</string>
     <string name="pref_con_use_different_account_help">Check if you want the phone to connect from a different account</string>
     <string name="pref_con_xmppBlockedResourcePrefixes">Blocked resources for notified addresses</string>
-    <string name="pref_con_xmppBlockedResourcePrefixes_help">Do not notify addresses that use those resources when logged in. Use new line as separator. Check here for more details: https://code.google.com/p/gtalksms/wiki/xmppBlockedResourcePrefixes</string>
+    <string name="pref_con_xmppBlockedResourcePrefixes_help">Do not notify addresses that use those resources when logged in. Use new line as separator.</string>
     <string name="pref_notif">Notification settings</string>
     <string name="pref_notif_application_connection">Application connection</string>
     <string name="pref_notif_application_connection_help">Phone reconnect notification</string>

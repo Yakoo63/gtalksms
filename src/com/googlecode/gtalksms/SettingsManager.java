@@ -43,6 +43,7 @@ public class SettingsManager {
     public String serverHost;
     public String serviceName;
     public int serverPort;
+    public int pingIntervalInSec;
     
     private String _login;
     public String getLogin() { return _login; }
@@ -330,11 +331,12 @@ public class SettingsManager {
     private void importPreferences() {
         serverHost = getString("serverHost", "");
         serverPort = getInt("serverPort", 0);
+        pingIntervalInSec = getInt("pingIntervalInSec", 600);
 
         _blockedResourcePrefixes.set(getString("xmppBlockedResourcePrefixes", "android|MessagingA"));
         _notifiedAddresses.set(getString("notifiedAddress", ""));
         _login = getString("login", "");
-        
+
         manuallySpecifyServerSettings = getBoolean("manuallySpecifyServerSettings", false);
         if (manuallySpecifyServerSettings) {
             serviceName = getString("serviceName", "");

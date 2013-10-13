@@ -362,6 +362,8 @@
     <string name="pref_con_securityMode_help">Activer l\'encryptage de la connexion</string>
     <string name="pref_con_server_host">Nom du serveur</string>
     <string name="pref_con_server_host_help">Nom du serveur pour le compte utilisé pour le téléphone</string>
+    <string name="pref_con_server_ping">Ping</string>
+    <string name="pref_con_server_ping_help">Interval en secondes entre 2 pings pour garder la connexion ouverte. Une valeur trop basse peut impacter la batterie du téléphone</string>
     <string name="pref_con_server_port">Port du serveur</string>
     <string name="pref_con_server_port_help">Port du serveur pour le compte utilisé pour le téléphone</string>
     <string name="pref_con_server_settings">Paramètres du serveur</string>
@@ -372,7 +374,7 @@
     <string name="pref_con_use_different_account">Utiliser un compte différent</string>
     <string name="pref_con_use_different_account_help">Cocher pour utiliser un compte différent</string>
     <string name="pref_con_xmppBlockedResourcePrefixes">Ressources bloquées pour les adresses de notification</string>
-    <string name="pref_con_xmppBlockedResourcePrefixes_help">Ne pas notifier les adresses de notifications qui contiennent ces préfixes dans les ressources. Utiliser le saut de ligne en tant que séparateur. Pour plus d\'informations aller ici : https://code.google.com/p/gtalksms/wiki/xmppBlockedResourcePrefixes</string>
+    <string name="pref_con_xmppBlockedResourcePrefixes_help">Ne pas notifier les adresses de notifications qui contiennent ces préfixes dans les ressources. Utiliser le saut de ligne en tant que séparateur.</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_application_connection">Connexion de l\'application</string>
     <string name="pref_notif_application_connection_help">Notification pour les connexions au service de messagerie</string>

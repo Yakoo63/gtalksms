@@ -154,16 +154,18 @@ public class XmppManager {
         XmppEntityCapsCache.enableEntityCapsCache(context);
         
         // Smack Settings
-        SmackConfiguration.setPacketReplyTimeout(1000 * 20);      // 20 sec
+        SmackConfiguration.setPacketReplyTimeout(1000 * 40);      // 40 sec
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         SmackConfiguration.setLocalSocks5ProxyPort(-7777);        // negative number means try next port if already in use
         SmackConfiguration.setAutoEnableEntityCaps(true);
+
+        SmackConfiguration.setDefaultPingInterval(mSettings.pingIntervalInSec);
         SmackConfiguration.setDefaultParsingExceptionCallback(new ParsingExceptionCallback() {
             @Override
             public void handleUnparsablePacket(UnparsablePacket stanzaData) throws Exception {
                 super.handleUnparsablePacket(stanzaData);
 
-                Log.e("handleUnparsablePacket reconnecting... ", stanzaData.getParsingException());
+                Log.e("handle Unparsable Packet. Reconnecting... ", stanzaData.getParsingException());
                 maybeStartReconnect();
             }
         });
@@ -626,7 +628,7 @@ public class XmppManager {
         // disable the built-in ReconnectionManager since we handle this
         conf.setReconnectionAllowed(false);
         conf.setSendPresence(false);
-        //conf.setDebuggerEnabled(true);
+        // conf.setDebuggerEnabled(true);
         
         return new XMPPConnection(conf);
     }

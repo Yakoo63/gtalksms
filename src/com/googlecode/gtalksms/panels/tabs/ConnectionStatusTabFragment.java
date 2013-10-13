@@ -64,9 +64,7 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
                     switch (status) {
                     case PENDING:
                     case RUNNING:
-                        // no action if there is already an AsyncTask running
-                        Log.d("No ping action, since there is a ping async task pending");
-                        return;
+                        mPingMyServerAsyncTask.cancel(true);
                     default:
                         break;
                     }
