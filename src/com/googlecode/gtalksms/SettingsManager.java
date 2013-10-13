@@ -167,7 +167,7 @@ public class SettingsManager {
     private final SharedPreferences mSharedPreferences;
     private final Context mContext;
     
-    private final OnSharedPreferenceChangeListener mChangeListener = new OnSharedPreferenceChangeListener() {
+    private final OnSharedPreferenceChangeListener mSharedPreferenceChangeListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (debugLog) {
@@ -181,11 +181,25 @@ public class SettingsManager {
             OnPreferencesUpdated(key);
         }
     };
+
+    public interface OnSettingChangeListener {
+        public void OnSettingChanged(boolean connectionSettingsObsolete);
+    }
+
+    private ArrayList<OnSettingChangeListener> mSettingChangeListeners = new ArrayList<OnSettingChangeListener>();
+
+    public void addSettingChangeListener(OnSettingChangeListener listener) {
+        mSettingChangeListeners.add(listener);
+    }
+
+    public void delSettingChangeListener(OnSettingChangeListener listener) {
+        mSettingChangeListeners.remove(listener);
+    }
     
     private SettingsManager(Context context) {
         mContext = context;
         mSharedPreferences = mContext.getSharedPreferences(Tools.APP_NAME, 0);
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(mChangeListener);
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
         
         mProtectedSettings.add("serverHost");
         mProtectedSettings.add("serverPort");
@@ -214,7 +228,7 @@ public class SettingsManager {
     }
     
     public void Destroy() {
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mChangeListener);
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
     }
     
     public ArrayList<String> getProtectedSettings() {
@@ -271,6 +285,14 @@ public class SettingsManager {
         }
         if (key.equals("locale")) {
             Tools.setLocale(this, mContext);
+        }
+
+        for (OnSettingChangeListener listener : mSettingChangeListeners) {
+            try {
+                listener.OnSettingChanged(connectionSettingsObsolete);
+            } catch (Exception e) {
+                Log.e(Tools.LOG_TAG, "Failed to notified listener.", e);
+            }
         }
     }
     

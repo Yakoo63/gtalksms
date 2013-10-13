@@ -37,11 +37,29 @@ public class ConnectionTabFragment extends SherlockFragment {
         super.onResume();
         updateStatus(mCurrentStatus, mCurrentStatusAction);
     }
-    
+
+    SettingsManager.OnSettingChangeListener mSettingListerner = new SettingsManager.OnSettingChangeListener() {
+        @Override
+        public void OnSettingChanged(boolean connectionSettingsObsolete) {
+            mEditTextLogin.setText(mSettingsMgr.getLogin());
+            mEditNotificationAddress.setText(mSettingsMgr.getNotifiedAddresses().get());
+            mEditTextPassword.setText(mSettingsMgr.getPassword());
+            mSwitchConnection.setChecked(mSettingsMgr.getConnectOnMainScreenStartup());
+        }
+    };
+
+    public void onDestroyView() {
+        mSettingsMgr.delSettingChangeListener(mSettingListerner);
+
+        super.onDestroyView();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+
         View view = inflater.inflate(R.layout.tab_connection, container, false);
-        
+
         mSettingsMgr = SettingsManager.getSettingsManager(view.getContext());
         mEditTextLogin = (EditText) view.findViewById(R.id.editTextLogin);
         mEditNotificationAddress = (EditText) view.findViewById(R.id.editTextNotificationAddress);
@@ -50,11 +68,9 @@ public class ConnectionTabFragment extends SherlockFragment {
         mStatusActionTextView = (TextView)  view.findViewById(R.id.statusAction);
         mSwitchConnection = new SwitchCheckBoxCompat(view, R.id.switchConnection);
 
-        mEditTextLogin.setText(mSettingsMgr.getLogin());
-        mEditNotificationAddress.setText(mSettingsMgr.getNotifiedAddresses().get());
-        mEditTextPassword.setText(mSettingsMgr.getPassword());
-        mSwitchConnection.setChecked(mSettingsMgr.getConnectOnMainScreenStartup());
-        
+        mSettingsMgr.addSettingChangeListener(mSettingListerner);
+        mSettingListerner.OnSettingChanged(false);
+
         if (mSwitchConnection.isChecked()) {
              Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
         }
@@ -67,6 +83,8 @@ public class ConnectionTabFragment extends SherlockFragment {
         
         mStartStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                mSettingsMgr.delSettingChangeListener(mSettingListerner);
+
                 mSettingsMgr.setLogin(mEditTextLogin.getText().toString());
                 mSettingsMgr.getNotifiedAddresses().set(mEditNotificationAddress.getText().toString());
                 mSettingsMgr.setPassword(mEditTextPassword.getText().toString());
@@ -74,6 +92,8 @@ public class ConnectionTabFragment extends SherlockFragment {
                 if (!mSettingsMgr.getLogin().equals("")) {
                     Tools.startSvcIntent(getActivity().getBaseContext(), mCurrentAction);
                 }
+
+                mSettingsMgr.addSettingChangeListener(mSettingListerner);
             }
         });
         return view;

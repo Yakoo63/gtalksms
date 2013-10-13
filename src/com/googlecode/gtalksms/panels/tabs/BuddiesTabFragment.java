@@ -257,8 +257,8 @@ public class BuddiesTabFragment extends SherlockFragment {
                     }
                 }
             });
-
             nameView.setText(buddy.getName());
+
             statusView.setText(buddy.getStatusMsg());
             stateView.setImageResource(getStateRes(buddy.getState()));
 
@@ -327,6 +327,7 @@ public class BuddiesTabFragment extends SherlockFragment {
                             .setMessage(String.format(getString(R.string.panel_buddies_popup_button_delete), buddy.getName()))
                             .setPositiveButton(R.string.panel_buddies_popup_button_ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
+                                    mSettingsMgr.getNotifiedAddresses().remove(buddy.getUserId());
                                     mFriends.remove(buddy.getUserId());
                                     mAdapterArray.remove(buddy);
                                     updateBuddiesList();
