@@ -1,5 +1,8 @@
 upcoming
+* Enhance camera management
+* New ASmack library
 * New setting to filter notified address resources
+* New setting to configure the ping interval
 * Adds more details during connection establishment
 
 4.4.1
