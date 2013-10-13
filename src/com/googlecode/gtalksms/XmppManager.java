@@ -357,9 +357,8 @@ public class XmppManager {
     private void maybeStartReconnect() {
         int timeout;
         cleanupConnection();
-        mCurrentRetryCount += 1;
         if (mCurrentRetryCount < 20) {
-            // a simple linear-backoff strategy.
+            // a simple linear back off strategy.
             timeout = 5000 * mCurrentRetryCount;
         } else {
             // every 5 min
@@ -368,6 +367,7 @@ public class XmppManager {
         updateStatus(WAITING_TO_CONNECT, "Attempt #" + mCurrentRetryCount + " in " + timeout / 1000 + "s");
         Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + mCurrentRetryCount);
         mReconnectHandler.postDelayed(mReconnectRunnable, timeout);
+        mCurrentRetryCount++;
     }
     
 
