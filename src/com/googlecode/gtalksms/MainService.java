@@ -56,6 +56,7 @@ import com.googlecode.gtalksms.cmd.SystemCmd;
 import com.googlecode.gtalksms.cmd.TextToSpeechCmd;
 import com.googlecode.gtalksms.cmd.ToastCmd;
 import com.googlecode.gtalksms.cmd.UrlsCmd;
+import com.googlecode.gtalksms.cmd.VideoCmd;
 import com.googlecode.gtalksms.cmd.WifiCmd;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainActivity;
@@ -734,7 +735,8 @@ public class MainService extends Service {
      */
     private void setupCommands() {
         
-        Class<?>[] cmds = new Class[] { 
+        Class<?>[] cmds = new Class[] {
+                VideoCmd.class,
                 NotificationsCmd.class,
                 ApplicationsCmd.class,
                 LogsCmd.class,
