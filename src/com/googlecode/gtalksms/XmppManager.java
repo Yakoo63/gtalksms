@@ -163,10 +163,7 @@ public class XmppManager {
         SmackConfiguration.setDefaultParsingExceptionCallback(new ParsingExceptionCallback() {
             @Override
             public void handleUnparsablePacket(UnparsablePacket stanzaData) throws Exception {
-                super.handleUnparsablePacket(stanzaData);
-
-                Log.e("handle Unparsable Packet. Reconnecting... ", stanzaData.getParsingException());
-                maybeStartReconnect();
+                Log.e("Handling unparsable Packet. Reconnecting", stanzaData.getParsingException());
             }
         });
 
