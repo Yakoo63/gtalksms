@@ -1,5 +1,7 @@
 package com.googlecode.gtalksms.cmd;
 
+import android.text.TextUtils;
+
 /**
  * Strongly typed representation of the user's command.
  * 
@@ -10,10 +12,12 @@ public abstract class Command {
     private final String originalCommand;
     private final String replyTo;
     private final String separator = ":";
+    private String[] args;
     
     public Command(String originalCommand, String replyTo) {
         this.originalCommand = originalCommand == null ? "" : originalCommand.trim();
         this.replyTo = replyTo;
+        this.args = this.originalCommand == null ? new String[] { "" } : TextUtils.split(this.originalCommand, ":");
     }
 
     @Deprecated
@@ -24,6 +28,7 @@ public abstract class Command {
             this.originalCommand = cmd + ":" + args;
         }
         this.replyTo = replyTo;
+        this.args = this.originalCommand == null ? new String[] { "" } : TextUtils.split(this.originalCommand, ":");
     }
 
     public abstract void respond(String message);
@@ -50,44 +55,15 @@ public abstract class Command {
     }
 
     public String getCommand() {
-        int x = originalCommand.indexOf(separator);
-        if (x > -1) {
-            return originalCommand.substring(0, x).trim();
-        }
-        return originalCommand;
+        return args[0];
     }
 
     /**
-     * Get the first argument. Stops at separator.
-     * 
-     * @return first argument if any, otherwise empty string. Never returns null.
+     * Get the Nth argument. Stops at separator.
+     *
+     * @return Nth argument if any, otherwise empty string. Never returns null.
      */
-    public String get1() {
-        int x = originalCommand.indexOf(separator);
-        if (x < 0 || x == originalCommand.length()) {
-            return "";
-        }
-        int y = originalCommand.indexOf(separator, x+1);
-        if (y<0) { 
-            y = originalCommand.length();
-        }
-        return originalCommand.substring(x+1,y).trim();
-    }
-    
-    /**
-     * Get the second argument. Does NOT stop at separator.
-     * 
-     * @return second argument if any, otherwise empty string. Never returns null.
-     */
-    public String get2() {
-        int x = originalCommand.indexOf(separator);
-        if (x < 0) {
-            return "";
-        }
-        int y = originalCommand.indexOf(separator, x+1);
-        if (y<0) {
-            return "";
-        }
-        return originalCommand.substring(y+1);
-    }
+    public String get1() { return args.length > 1 ? args[1] : ""; }
+    public String get2() { return args.length > 2 ? args[2] : ""; }
+    public String get3() { return args.length > 3 ? args[3] : ""; }
 }

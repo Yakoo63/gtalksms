@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
@@ -315,21 +316,11 @@ public abstract class CommandHandlerBase {
      * @return args split in an array or an array only containing the empty string
      */
     String[] splitArgs(String args) {
-        StringTokenizer strtok = new StringTokenizer(args, ":");
-        int tokenCount = strtok.countTokens();
-        String[] res;
-        if (tokenCount != 0) {
-            res = new String[tokenCount];
-            for (int i = 0; i < tokenCount; i++)
-                res[i] = strtok.nextToken();
-        } else {
-            res = new String[] { "" };
-        }
-        return res;
+        return args == null ? new String[] { "" } : TextUtils.split(args, ":");
     }
     
     /**
-     * Returns a nice formated String of the Commands this class handles
+     * Returns a nice formatted String of the Commands this class handles
      * 
      * @return
      */
