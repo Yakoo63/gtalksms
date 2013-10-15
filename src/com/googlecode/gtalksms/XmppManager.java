@@ -558,7 +558,7 @@ public class XmppManager {
             // authoritative login errors (ie, bad password).  The only
             // differentiator is the message itself which starts with this
             // hard-coded string.
-            if (!e.getMessage().contains("SASL authentication")) {
+            if (e.getMessage() != null && !e.getMessage().contains("SASL authentication")) {
                 // doesn't look like a bad username/password, so retry
                 maybeStartReconnect();
             } else {
