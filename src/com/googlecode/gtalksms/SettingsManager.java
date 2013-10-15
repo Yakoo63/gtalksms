@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.jivesoftware.smack.util.StringUtils;
 
+import android.annotation.TargetApi;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
+import android.media.CamcorderProfile;
 
 import com.googlecode.gtalksms.tools.ArrayStringSetting;
 import com.googlecode.gtalksms.tools.Tools;
@@ -27,6 +29,7 @@ import com.googlecode.gtalksms.tools.Tools;
  *
  */
 public class SettingsManager {
+
     private static final String[] xmppConnectionSettings = { "serverHost", "serviceName", "serverPort",
                                                             "login", "password", "useDifferentAccount",
                                                             "xmppSecurityMode", "manuallySpecifyServerSettings",
@@ -160,7 +163,14 @@ public class SettingsManager {
     
     // recipient command settings
     public boolean dontDisplayRecipient;
-    
+
+    // Camera settings
+    public int cameraMaxDurationInMs;
+    public int cameraRotationInDegree;
+    public long cameraMaxFileSizeInBytes;
+    public String cameraProfile;
+
+
     private static SettingsManager sSettingsManager = null;
     
     private final ArrayList<String> mProtectedSettings = new ArrayList<String>();
@@ -299,7 +309,9 @@ public class SettingsManager {
     
     private String getString(String key, String defaultValue) {
         try {
-            return mSharedPreferences.getString(key, defaultValue);
+            if (mSharedPreferences.contains(key)) {
+                return mSharedPreferences.getString(key, defaultValue);
+            }
         } catch (ClassCastException  e) {
             Log.e(Tools.LOG_TAG, "Failed to retrieve setting " + key, e);
         }
@@ -309,7 +321,9 @@ public class SettingsManager {
     
     private int getInt(String key, int defaultValue) {
         try {
-            return mSharedPreferences.getInt(key, defaultValue);
+            if (mSharedPreferences.contains(key)) {
+                return mSharedPreferences.getInt(key, defaultValue);
+            }
         } catch (ClassCastException  e) {
             Log.e(Tools.LOG_TAG, "Failed to retrieve setting " + key, e);
         }
@@ -319,7 +333,9 @@ public class SettingsManager {
     
     private boolean getBoolean(String key, boolean defaultValue) {
         try {
-            return mSharedPreferences.getBoolean(key, defaultValue);
+            if (mSharedPreferences.contains(key)) {
+                return mSharedPreferences.getBoolean(key, defaultValue);
+            }
         } catch (ClassCastException  e) {
             Log.e(Tools.LOG_TAG, "Failed to retrieve setting " + key, e);
         }
@@ -424,8 +440,42 @@ public class SettingsManager {
         // Manage notifications
         hiddenNotifications = getString("hiddenNotifications", "GTalkSMS");
         notificationIgnoreDelay = getInt("notificationIgnoreDelay", 1000);
-        
+
+        // Manage camera settings
+        cameraMaxDurationInMs = getInt("cameraMaxDurationInMs", 0);
+        cameraMaxFileSizeInBytes = getInt("cameraMaxFileSizeInBytes", 0);
+        cameraRotationInDegree = getInt("cameraRotationInDegree", 90);
+        cameraProfile = getString("cameraProfile", "");
+
         // reply command settings
         dontDisplayRecipient = false;
+    }
+
+    @TargetApi(8)
+    public CamcorderProfile getCamcorderProfileApi8() {
+        int proId = CamcorderProfile.QUALITY_LOW;
+
+        if (cameraProfile.equals("High")) {
+            proId =  CamcorderProfile.QUALITY_HIGH;
+        }
+
+        return CamcorderProfile.get(proId);
+    }
+
+    @TargetApi(11)
+    public CamcorderProfile getCamcorderProfileApi11() {
+        int proId = CamcorderProfile.QUALITY_480P;
+
+        if (cameraProfile.equals("1080p")) {
+            proId =  CamcorderProfile.QUALITY_1080P;
+        } else if (cameraProfile.equals("720p")) {
+            proId =  CamcorderProfile.QUALITY_720P;
+        } else if (cameraProfile.equals("CIF")) {
+            proId =  CamcorderProfile.QUALITY_CIF;
+        } else if (cameraProfile.equals("QCIF")) {
+            proId =  CamcorderProfile.QUALITY_QCIF;
+        }
+
+        return CamcorderProfile.get(proId);
     }
 }

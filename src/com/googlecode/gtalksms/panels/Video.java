@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.media.AudioManager;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
@@ -20,6 +19,7 @@ import android.view.SurfaceView;
 
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class Video extends Activity implements SurfaceHolder.Callback {
@@ -33,6 +33,7 @@ public class Video extends Activity implements SurfaceHolder.Callback {
     private AudioManager mAudioManager;
     private int mStreamVolume;
     private boolean mIsRecording;
+    private static SettingsManager sSettingsMgr;
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -56,6 +57,7 @@ public class Video extends Activity implements SurfaceHolder.Callback {
             return;
         }
 
+        sSettingsMgr = SettingsManager.getSettingsManager(this);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         setContentView(R.layout.camera_surface);
@@ -124,7 +126,6 @@ public class Video extends Activity implements SurfaceHolder.Callback {
         // Do nothing
     }
 
-
     public boolean startMediaRecorder() {
         try {
             mIsRecording = true;
@@ -141,12 +142,9 @@ public class Video extends Activity implements SurfaceHolder.Callback {
 
             // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-//                sMediaRecorder.setProfile(_cameraSettings.getCamcorderProfileApi11());
-                mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
-
+                mMediaRecorder.setProfile(sSettingsMgr.getCamcorderProfileApi11());
             } else {
-//                sMediaRecorder.setProfile(_cameraSettings.getCamcorderProfileApi8());
-                mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+                mMediaRecorder.setProfile(sSettingsMgr.getCamcorderProfileApi8());
             }
 
             // Step 4: Set output file
@@ -155,21 +153,19 @@ public class Video extends Activity implements SurfaceHolder.Callback {
             // Step 5: Set the preview output
             mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
 
-            // To update ?
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-//                mMediaRecorder.setOrientationHint(_cameraSettings.RotationInDegree);
-                mMediaRecorder.setOrientationHint(90);
+                mMediaRecorder.setOrientationHint(sSettingsMgr.cameraRotationInDegree);
             } else {
                 // TODO find a way to change the orientation
             }
 
-//            if (_cameraSettings.MaxDurationInMs > 0) {
-//                mMediaRecorder.setMaxDuration(_cameraSettings.MaxDurationInMs);
-//            }
-//
-//            if (_cameraSettings.MaxFileSizeInBytes > 0) {
-//                mMediaRecorder.setMaxFileSize(_cameraSettings.MaxFileSizeInBytes);
-//            }
+            if (sSettingsMgr.cameraMaxDurationInMs > 0) {
+                mMediaRecorder.setMaxDuration(sSettingsMgr.cameraMaxDurationInMs);
+            }
+
+            if (sSettingsMgr.cameraMaxFileSizeInBytes > 0) {
+                mMediaRecorder.setMaxFileSize(sSettingsMgr.cameraMaxFileSizeInBytes);
+            }
 
             mMediaRecorder.setOnInfoListener(new OnInfoListener() {
                 @Override
