@@ -221,14 +221,12 @@ public class MainService extends Service {
                     + " connectedOrConnecting=" + connectedOrConnecting + " state="
                     + XmppManager.statusAsString(initialState));
 
-            if (!connectedOrConnecting
-                    && (initialState == XmppManager.CONNECTED || initialState == XmppManager.CONNECTING)) {
+            if (!connectedOrConnecting && (initialState == XmppManager.CONNECTED || initialState == XmppManager.CONNECTING)) {
                 // We are connected but the network has gone down - disconnect
                 // and go into WAITING state so we auto-connect when we get a future
                 // notification that a network is available.
                 sXmppMgr.xmppRequestStateChange(XmppManager.WAITING_FOR_NETWORK);
-            } else if (connected
-                    && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
+            } else if (connected && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
                 sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             } else if (networkChanged && initialState == XmppManager.CONNECTED) {
                 // The network has changed (WiFi <-> GSM switch) and we are connected

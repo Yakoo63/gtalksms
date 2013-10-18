@@ -53,9 +53,9 @@ import com.googlecode.gtalksms.xmpp.XmppSocketFactory;
 import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class XmppManager {
-    
+
     private static final boolean DEBUG = false;
-    
+
     // my first measuring showed that the disconnect in fact does not hang
     // but takes sometimes a lot of time
     // disconnectED xmpp connection. Took: 1048.576 s
@@ -352,15 +352,10 @@ public class XmppManager {
     }
 
     private void maybeStartReconnect() {
-        int timeout;
         cleanupConnection();
-        if (mCurrentRetryCount < 20) {
-            // a simple linear back off strategy.
-            timeout = 5000 * mCurrentRetryCount;
-        } else {
-            // every 5 min
-            timeout = 1000 * 60 * 5;
-        }
+
+        // a simple linear back off strategy with 5 min max
+        int timeout = mCurrentRetryCount < 20 ? 5000 * mCurrentRetryCount : 1000 * 60 * 5;
         updateStatus(WAITING_TO_CONNECT, "Attempt #" + mCurrentRetryCount + " in " + timeout / 1000 + "s");
         Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + mCurrentRetryCount);
         mReconnectHandler.postDelayed(mReconnectRunnable, timeout);
@@ -539,23 +534,20 @@ public class XmppManager {
             // synchronization problems
             Log.d("PingManager reported failed ping, calling maybeStartReconnect()");
             maybeStartReconnect();
-            }
-        });
+        }});
 
         try {
             XHTMLManager.setServiceEnabled(connection, false);
             updateAction("Login with " + mSettings.getLogin());
             connection.login(mSettings.getLogin(), mSettings.getPassword(), Tools.APP_NAME);
         } catch (Exception e) {
-            cleanupConnection();
-            
             Log.e("xmpp login failed: " + e.getMessage());
             // sadly, smack throws the same generic XMPPException for network
             // related messages (eg "no response from the server") as for
             // authoritative login errors (ie, bad password).  The only
             // differentiator is the message itself which starts with this
             // hard-coded string.
-            if (e.getMessage() != null && !e.getMessage().contains("SASL authentication")) {
+            if (e.getMessage() == null || !e.getMessage().contains("SASL authentication")) {
                 // doesn't look like a bad username/password, so retry
                 maybeStartReconnect();
             } else {
