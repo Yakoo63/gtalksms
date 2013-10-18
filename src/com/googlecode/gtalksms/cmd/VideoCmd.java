@@ -3,6 +3,7 @@ package com.googlecode.gtalksms.cmd;
 import android.content.Intent;
 
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.panels.Video;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -18,8 +19,8 @@ public class VideoCmd extends CommandHandlerBase {
     public VideoCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MEDIA, "Video", new Cmd("video"));
 
-        mParamList.add("cameraMaxDurationInMs");
-        mParamList.add("cameraMaxFileSizeInBytes");
+        mParamList.add("cameraMaxDurationInSec");
+        mParamList.add("cameraMaxFileSizeInMegaBytes");
         mParamList.add("cameraRotationInDegree");
         mParamList.add("cameraProfile");
         Collections.sort(mParamList);
@@ -39,7 +40,7 @@ public class VideoCmd extends CommandHandlerBase {
     public void execute(Command c) {
         String subCommand = c.get1();
         if (isMatchingCmd("video", c.getCommand())) {
-            if (subCommand.equals("")) {
+            if (subCommand.equals("") || subCommand.equals("start")) {
                 Intent intent = new Intent(Video.VIDEO_START, null, sContext, Video.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK + Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 sContext.startActivity(intent);
@@ -56,7 +57,7 @@ public class VideoCmd extends CommandHandlerBase {
                 if (param.equals("")) {
                     XmppMsg msg = new XmppMsg();
                     Map<String, ?> settings = sSettingsMgr.getAllSharedPreferences();
-                    msg.appendLine("Settings are:");
+                    msg.appendLine(sContext.getString(R.string.chat_video_settings));
                     for(String k : mParamList) {
                         msg.appendBold(k);
                         msg.appendLine(":" + settings.get(k));
@@ -79,17 +80,20 @@ public class VideoCmd extends CommandHandlerBase {
                     Map<String, ?> settings = sSettingsMgr.getAllSharedPreferences();
                     send(param + ":" + settings.get(param));
                 } else {
-                    send("Unknown parameter " + param);
+                    send(sContext.getString(R.string.chat_video_settings_unknown, param));
                 }
             }
         }
     }
 
-
     @Override
     protected void initializeSubCommands() {
-        // TODO ad help
-
-        // TODO add allowed values for CAMProfile
+        Cmd cam = mCommandMap.get("video");
+        cam.setHelp(R.string.chat_help_video, "start");
+        cam.AddSubCmd("stop", R.string.chat_help_video_stop, null);
+        cam.AddSubCmd("params", R.string.chat_help_video_maxDuration, "cameraMaxDurationInSec:[0-9999]");
+        cam.AddSubCmd("params", R.string.chat_help_video_maxSize, "cameraMaxFileSizeInMegaBytes:[0-9999]");
+        cam.AddSubCmd("params", R.string.chat_help_vdeo_orientation, "cameraRotationInDegree:[0-359]");
+        cam.AddSubCmd("params", R.string.chat_help_video_profile, "cameraProfile:[1080p|720p|CIF|QCIF]");
     }
 }

@@ -205,6 +205,12 @@
     <string name="chat_help_ttsengine">Change le moteur TTS avec le nom du namespace en paramètre (ex: com.google.android.tts).</string>
     <string name="chat_help_ttsenginelist">Affiche la liste des moteurs disponibles.</string>
     <string name="chat_help_urls">Envoie des liens pour les ouvrir dans le navigateur du téléphone.</string>
+    <string name="chat_help_video">Enregistrer une video</string>
+    <string name="chat_help_video_stop">Arrêter l\'enregistrement</string>
+    <string name="chat_help_video_maxDuration">Afficher ou mettre à jour la durée maximale de la vidéo en secondes. 0 = illimité</string>
+    <string name="chat_help_video_maxSize">Afficher ou mettre à jour la taille maximale de la vidéo en Mo. 0 = illimité</string>
+    <string name="chat_help_vdeo_orientation">Afficher ou mettre à jour l\'orientation de la vidéo</string>
+    <string name="chat_help_video_profile">Afficher ou mettre à jour le profile d\'enregistrement</string>
     <string name="chat_help_volume_general">Contrôle le volume de la musique.</string>
     <string name="chat_help_volume_up">Augmente le volume de la musique.</string>
     <string name="chat_help_volume_down">Diminue le volume de la musique.</string>
@@ -276,6 +282,10 @@
     <string name="chat_tts_languages">Les langues disponibles sont :\n</string>
     <string name="chat_tts_engine">Le moteur current est :&#xA0;</string>
     <string name="chat_tts_language">La langue currente est:&#xA0;</string>
+    <string name="chat_video_settings">Les paramètres sont:</string>
+    <string name="chat_video_settings_unknown">Paramètre %1$s inconnu</string>
+    <string name="chat_video_start">Démarrage de l\'enregistrement vidéo dans %1$s</string>
+    <string name="chat_video_stop">Arrêt de l\'enregistrement vidéo</string>
     <string name="chat_welcome">Bienvenue dans GTalkSMS %s. Envoyer \"?\" pour afficher l\'aide.</string>
     <string name="log_panel_acquiring">Acquisition des logs</string>
     <string name="log_panel_collect">Récupère les logs de GTalkSMS et compose un nouveau message. Vous pouvez vous envoyer ce message et le joindre à un bug décrivant votre problème.</string>

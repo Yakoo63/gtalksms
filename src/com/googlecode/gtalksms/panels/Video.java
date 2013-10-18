@@ -113,7 +113,7 @@ public class Video extends Activity implements SurfaceHolder.Callback {
             mCamera.release();
             mCamera = null;
         }
-        Tools.send("Video recording stopped", null, getBaseContext());
+        Tools.send(getString(R.string.chat_video_stop), null, getBaseContext());
     }
 
     @Override
@@ -148,23 +148,22 @@ public class Video extends Activity implements SurfaceHolder.Callback {
             }
 
             // Step 4: Set output file
-            mMediaRecorder.setOutputFile(getDestinationFile().getAbsolutePath());
+            String filename = getDestinationFile().getAbsolutePath();
+            mMediaRecorder.setOutputFile(filename);
 
             // Step 5: Set the preview output
             mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-                mMediaRecorder.setOrientationHint(sSettingsMgr.cameraRotationInDegree);
-            } else {
-                // TODO find a way to change the orientation
+                mMediaRecorder.setOrientationHint(sSettingsMgr.cameraRotationInDegree % 360);
             }
 
-            if (sSettingsMgr.cameraMaxDurationInMs > 0) {
-                mMediaRecorder.setMaxDuration(sSettingsMgr.cameraMaxDurationInMs);
+            if (sSettingsMgr.cameraMaxDurationInSec > 0) {
+                mMediaRecorder.setMaxDuration(sSettingsMgr.cameraMaxDurationInSec * 1000);
             }
 
-            if (sSettingsMgr.cameraMaxFileSizeInBytes > 0) {
-                mMediaRecorder.setMaxFileSize(sSettingsMgr.cameraMaxFileSizeInBytes);
+            if (sSettingsMgr.cameraMaxFileSizeInMegaBytes > 0) {
+                mMediaRecorder.setMaxFileSize(sSettingsMgr.cameraMaxFileSizeInMegaBytes * 1024 * 1024);
             }
 
             mMediaRecorder.setOnInfoListener(new OnInfoListener() {
@@ -196,7 +195,7 @@ public class Video extends Activity implements SurfaceHolder.Callback {
             mMediaRecorder.start();
             mAudioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, mStreamVolume, 0);
 
-            Tools.send("Video recording started", null, getBaseContext());
+            Tools.send(getString(R.string.chat_video_start, filename), null, getBaseContext());
 
             return true;
         } catch (Exception e) {

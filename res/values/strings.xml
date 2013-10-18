@@ -205,6 +205,12 @@
     <string name="chat_help_ttsengine">Set the TTS Engine with the engine namespace (ex: com.google.android.tts).</string>
     <string name="chat_help_ttsenginelist">Get the TTS Engine list.</string>
     <string name="chat_help_urls">Pastes links and open it with the appropriate application.</string>
+    <string name="chat_help_video">Starts recording the video</string>
+    <string name="chat_help_video_stop">Stop recording the video</string>
+    <string name="chat_help_video_maxDuration">Set or show the max duration of the video in seconds. 0 = unlimited</string>
+    <string name="chat_help_video_maxSize">Set or show the max length of the video in MB. 0 = unlimited</string>
+    <string name="chat_help_vdeo_orientation">Set or show the orientation of the video</string>
+    <string name="chat_help_video_profile">Set or show the profile of the video</string>
     <string name="chat_help_volume_general">controles the media volume of the phone.</string>
     <string name="chat_help_volume_up">increases the music volume.</string>
     <string name="chat_help_volume_down">decreases the music volume.</string>
@@ -276,6 +282,10 @@
     <string name="chat_tts_languages">Available languages are:\n</string>
     <string name="chat_tts_engine">Current engine is now:&#xA0;</string>
     <string name="chat_tts_language">Current language is now:&#xA0;</string>
+    <string name="chat_video_settings">Settings are:</string>
+    <string name="chat_video_settings_unknown">Unknown parameter %1$s</string>
+    <string name="chat_video_start">Starting recording video into %1$s</string>
+    <string name="chat_video_stop">Video recording stopped</string>
     <string name="chat_welcome">Welcome to GTalkSMS %s. Send \"?\" for getting help.</string>
     <string name="log_panel_acquiring">Acquiring log</string>
     <string name="log_panel_collect">This will collect the GTalkSMS log and create a message for you to send. You will be presented with an editable message - you should send the message to yourself, then attach it to a GTalkSMS issue describing your problem.</string>

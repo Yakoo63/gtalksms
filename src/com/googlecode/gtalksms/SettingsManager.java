@@ -165,9 +165,9 @@ public class SettingsManager {
     public boolean dontDisplayRecipient;
 
     // Camera settings
-    public int cameraMaxDurationInMs;
+    public int cameraMaxDurationInSec;
     public int cameraRotationInDegree;
-    public long cameraMaxFileSizeInBytes;
+    public long cameraMaxFileSizeInMegaBytes;
     public String cameraProfile;
 
 
@@ -442,8 +442,8 @@ public class SettingsManager {
         notificationIgnoreDelay = getInt("notificationIgnoreDelay", 1000);
 
         // Manage camera settings
-        cameraMaxDurationInMs = getInt("cameraMaxDurationInMs", 0);
-        cameraMaxFileSizeInBytes = getInt("cameraMaxFileSizeInBytes", 0);
+        cameraMaxDurationInSec = getInt("cameraMaxDurationInSec", 0);
+        cameraMaxFileSizeInMegaBytes = getInt("cameraMaxFileSizeInMegaBytes", 0);
         cameraRotationInDegree = getInt("cameraRotationInDegree", 90);
         cameraProfile = getString("cameraProfile", "");
 
