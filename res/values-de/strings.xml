@@ -235,9 +235,6 @@
     <string name="chat_ringer_normal">Telefon laut</string>   
     <string name="chat_ringer_silent">Telefon lautlos (Vibration deaktiviert)</string>
     <string name="chat_ringer_vibrate">Telefon lautlos (Vibration aktiviert)</string>
-    <string name="chat_sc_error">Fehler beim erstellen des Screenshots: %1$s</string>
-    <string name="chat_sc_error_framebuffer">Framebuffer Dekoder nicht konfiguriert</string>
-    <string name="chat_sc_saved">%1$s Screenshot gespeichert als %2$s</string>
     <string name="chat_send_sms">Sende SMS an %s</string>
     <string name="chat_shell_error_access">Fehler beim Zugriff auf die Shell #%1$d: %2$s</string>  
     <string name="chat_shell_error_instance">Fehler bei der Shell erstellung: %1$s</string>

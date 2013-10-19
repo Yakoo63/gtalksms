@@ -243,9 +243,6 @@
     <string name="chat_ringer_normal">Mode normal</string>          
     <string name="chat_ringer_silent">Mode silence</string>
     <string name="chat_ringer_vibrate">Mode vibreur</string>
-    <string name="chat_sc_error">Erreur lors de la récupération de l\'image : %1$s</string>
-    <string name="chat_sc_error_framebuffer">Décodeur FrameBuffer non sélectionné</string>
-    <string name="chat_sc_saved">%1$s capture d\'écran sauvée sous %2$s</string>
     <string name="chat_send_sms">SMS envoyé à %s</string>
     <string name="chat_shell_error_access">Erreur lors de l\'accès à la fenêtre de shell #%1$d: %2$s</string>    
     <string name="chat_shell_error_instance">Erreur lors de la création d\'une fenêtre de shell: %1$s</string>

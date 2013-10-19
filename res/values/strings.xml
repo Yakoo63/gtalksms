@@ -186,9 +186,6 @@
     <string name="chat_help_ringmode_silent">Set ringer mode to silent.</string>
     <string name="chat_help_ringmode_vibrate">Set ringer mode to vibrate.</string>
     <string name="chat_help_rm">Deletes the specified file.</string>
-    <string name="chat_help_sc">Takes a screenshot and stores it in the picture directory.</string>
-    <string name="chat_help_sc_email">Takes a screenshot, stores it and send it by email.</string>
-    <string name="chat_help_sc_xmpp">Takes a screenshot, stores it and send it through xmpp connection.</string>
     <string name="chat_help_send">Sends the specified file through XMPP. Use an absolut path, otherwise the last listed directory will be prefixed</string>
     <string name="chat_help_shell">Opens a new chat as a shell.</string>
     <string name="chat_help_sms_chat">Creates a new Chat with the contact and invites you to that chat. Leave contact empty to use last contact</string>
@@ -243,9 +240,6 @@
     <string name="chat_ringer_normal">Ringer Mode Normal</string>          
     <string name="chat_ringer_silent">Ringer Mode Silent</string>
     <string name="chat_ringer_vibrate">Ringer Mode Vibrate</string>
-    <string name="chat_sc_error">Error while getting picture: %1$s</string>
-    <string name="chat_sc_error_framebuffer">Framebuffer decoder not set</string>
-    <string name="chat_sc_saved">%1$s screenshot saved as %2$s</string>
     <string name="chat_send_sms">Sending SMS to %s</string>
     <string name="chat_shell_error_access">Failed to access to the shell #%1$d: %2$s</string>
     <string name="chat_shell_error_instance">Failed to create shell instance: %1$s</string>

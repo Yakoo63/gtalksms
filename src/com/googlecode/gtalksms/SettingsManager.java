@@ -138,9 +138,6 @@ public class SettingsManager {
     public boolean markSmsReadOnReply;
     public String smsMagicWord;
     
-    // screen shots
-    public String framebufferMode;
-    
     // locale
     public Locale locale;
     
@@ -420,7 +417,6 @@ public class SettingsManager {
         smsMagicWord = getString("smsMagicWord", "GTalkSMS");
         notifyInMuc = getBoolean("notifyInMuc", false); 
         smsReplySeparate = getBoolean("smsReplySeparate", false);
-        framebufferMode = getString("framebufferMode", "ARGB_8888");
         _connectOnMainScreenStartup = getBoolean("connectOnMainscreenShow", false);
         debugLog = getBoolean("debugLog", false);
         

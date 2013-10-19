@@ -52,7 +52,6 @@
             <CheckBoxPreference android:key="connectOnMainscreenShow" android:title="@string/pref_app_connect_mainscreen" android:summary="@string/pref_app_connect_mainscreen_help" android:defaultValue="false" />
             <EditTextPreference android:key="smsMagicWord" android:defaultValue="GTalkSMS" android:title="@string/pref_app_start_sms_key" android:summary="@string/pref_app_start_sms_key_help" />
             <RingtonePreference android:key="ringtone" android:title="@string/pref_app_ringtone" android:summary="@string/pref_app_ringtone_help" />
-            <ListPreference android:key="framebufferMode" android:entries="@array/list_framebufferMode_entries" android:entryValues="@array/list_framebufferMode_entryValues" android:title="@string/pref_app_framebufferMode" android:summary="@string/pref_app_framebufferMode_help" />
         </PreferenceScreen>
     </PreferenceScreen>
     <PreferenceScreen android:title="@string/pref_notif">
