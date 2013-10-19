@@ -17,6 +17,7 @@ public class ApplicationsCmd extends CommandHandlerBase {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, "Applications", new Cmd("applist", "apps"), new Cmd("appfind"), new Cmd("appstart", "start"));
     }
 
+    @Override
     protected void execute(Command cmd) {
         if (isMatchingCmd(cmd, "applist")) {
             appsList(cmd.getArg1());
@@ -25,6 +26,14 @@ public class ApplicationsCmd extends CommandHandlerBase {
         } else if (isMatchingCmd(cmd, "appfind")) {
             findApp(cmd.getArg1());
         }
+    }
+
+    @Override
+    protected void onCommandActivated() {
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
     }
     
     void appsList(String args) {

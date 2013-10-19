@@ -15,6 +15,14 @@ public class SettingsCmd extends CommandHandlerBase {
     }
 
     @Override
+    protected void onCommandActivated() {
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+    }
+
+    @Override
     public void execute(Command c) {
         Map<String, ?> settings = sSettingsMgr.getAllSharedPreferences();
         ArrayList<String> protectedSettings = sSettingsMgr.getProtectedSettings();

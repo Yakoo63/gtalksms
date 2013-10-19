@@ -20,13 +20,13 @@ import com.googlecode.gtalksms.MainService;
  */
 public class RebootCmd extends CommandHandlerBase {
     
-    private final PowerManager mPowerManager;
+    private PowerManager mPowerManager;
 
     public RebootCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Reboot", new Cmd("reboot"));
-        mPowerManager = (PowerManager) sContext.getSystemService(Context.POWER_SERVICE);
     }
 
+    @Override
     protected void execute(Command cmd) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.FROYO) {
             send("You need to run at last Froyo to issue the " + cmd + " command");
@@ -34,6 +34,16 @@ public class RebootCmd extends CommandHandlerBase {
         }
         
         mPowerManager.reboot(cmd.getArg1().equals("") ? null : cmd.getArg1());
+    }
+
+    @Override
+    protected void onCommandActivated() {
+        mPowerManager = (PowerManager) sContext.getSystemService(Context.POWER_SERVICE);
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+        mPowerManager = null;
     }
     
     @Override

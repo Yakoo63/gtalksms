@@ -11,11 +11,20 @@ import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class MmsCmd extends CommandHandlerBase {
-    private final MmsManager mMmsManager;
+    private MmsManager mMmsManager;
 
     public MmsCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MESSAGE, "MMS", new Cmd("mms", "m"));
+    }
+
+    @Override
+    protected void onCommandActivated() {
         mMmsManager = new MmsManager(sContext);
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+        mMmsManager = null;
     }
 
     @Override

@@ -21,10 +21,7 @@ public class ShellCmd extends CommandHandlerBase {
     
     public ShellCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, "Shell", new Cmd("cmd"), new Cmd("shell"));
-        
-        // Create the main shell
-        mShells.add(new Shell(0, this, sContext));
-    }   
+    }
         
     
     @Override
@@ -71,6 +68,19 @@ public class ShellCmd extends CommandHandlerBase {
                 send(msgError);
             }
         }
+    }
+
+    @Override
+    protected void onCommandActivated() {
+        mShells.add(new Shell(0, this, sContext));
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+        for (Shell s : mShells){
+            s.stop();
+        }
+        mShells.clear();
     }
 
     @Override

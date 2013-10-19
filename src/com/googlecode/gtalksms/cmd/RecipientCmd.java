@@ -12,17 +12,27 @@ public class RecipientCmd extends CommandHandlerBase {
     private static String sLastRecipientName = null;
     private static RecipientCmd sRecipientCmd;
 
-    private SetLastRecipientRunnable mSetLastrecipientRunnable;
-    private final KeyValueHelper mKeyValueHelper;
+    private SetLastRecipientRunnable setLastRecipientRunnable;
+    private KeyValueHelper mKeyValueHelper;
 
     public RecipientCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MESSAGE, "Recipient", new Cmd("recipient", "re"));
+    }
+
+    @Override
+    protected void onCommandActivated() {
         mKeyValueHelper = KeyValueHelper.getKeyValueHelper(sContext);
         restoreLastRecipient();
-        
         sRecipientCmd = this;
     }
 
+    @Override
+    protected void onCommandDeactivated() {
+        mKeyValueHelper = null;
+        sRecipientCmd = null;
+    }
+
+    @Override
     protected void execute(Command cmd) {
         if (isMatchingCmd(cmd, "recipient")) {
             displayLastRecipient(true);
@@ -45,10 +55,10 @@ public class RecipientCmd extends CommandHandlerBase {
 
     private void setLastRecipientInternal(String phoneNumber) {
 		SetLastRecipientRunnable slrRunnable = new SetLastRecipientRunnable(this, phoneNumber, sSettingsMgr, sContext);
-        if (mSetLastrecipientRunnable != null) {
-            mSetLastrecipientRunnable.setOutdated();
+        if (setLastRecipientRunnable != null) {
+            setLastRecipientRunnable.setOutdated();
         }
-        mSetLastrecipientRunnable = slrRunnable;
+        setLastRecipientRunnable = slrRunnable;
         Thread t = new Thread(slrRunnable);
         t.setDaemon(true);
         t.start();

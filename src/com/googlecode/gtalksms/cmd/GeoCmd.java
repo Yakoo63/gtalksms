@@ -33,7 +33,7 @@ public class GeoCmd extends CommandHandlerBase {
         }  
     }
 
-    /** Open geolocalization application */
+    /** Open geolocation application */
     private void geo(String text) {
         List<Address> addresses = geoDecode(text);
         if (addresses != null) {
@@ -51,8 +51,6 @@ public class GeoCmd extends CommandHandlerBase {
             }
         } else {
             send(R.string.chat_no_match_for, text);
-            // For emulation testing
-            // GeoManager.launchExternal("48.833199,2.362232");
         }
     }
     
@@ -102,6 +100,14 @@ public class GeoCmd extends CommandHandlerBase {
     @Override
     public void stop() {
         stopLocatingPhone();
+    }
+
+    @Override
+    protected void onCommandActivated() {
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
     }
 
     @Override

@@ -38,7 +38,12 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             Log.d("[PackageName]         " + event.getPackageName());
             Log.d("[Application]         " + appName);
             Log.d("[EventTime]           " + event.getEventTime());
-            
+
+            // Check for application black list
+            if (Arrays.asList(TextUtils.split(mSettingMgr.hiddenNotifications, "#sep#")).contains(appName)) {
+                return;
+            }
+
             String message = "";
             try {
                 // Dump the notification into a local view to parse it
@@ -64,7 +69,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                     }
                 }
             } catch (Exception e) {
-                Log.e("Failed to parse the notification.", e);
+                Log.e("Failed to parse the notification: " + e.getMessage());
             }
             
             if (message.equals("")) {
@@ -86,9 +91,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 }
             }
                 
-            // Ignore GTalkSMS notifications and send others
-            List<String> apps = Arrays.asList(TextUtils.split(mSettingMgr.hiddenNotifications, "#sep#"));
-            if (!ignore && !apps.contains(appName)) {
+            if (!ignore) {
                 Tools.send(msg, null, getBaseContext());
             }
             

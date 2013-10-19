@@ -24,20 +24,21 @@ import com.android.internal.telephony.ITelephony;
 
 public class CallCmd extends CommandHandlerBase {
     private static boolean sListenerActive = false;
-    private final PhoneManager _phoneMgr;
+    private PhoneManager mPhoneMgr = null;
     private PhoneCallListener mPhoneListener = null;
     private TelephonyManager mTelephonyMgr = null;
     private ContactsResolver mContactsResolver = null;
         
     public CallCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_CONTACTS, "Call", new Cmd("calls"), new Cmd("dial"), new Cmd("call"), new Cmd("ignore"), new Cmd("reject"));
-        _phoneMgr = new PhoneManager(sContext);
-        mTelephonyMgr = (TelephonyManager) mainService.getSystemService(Context.TELEPHONY_SERVICE);
-        mContactsResolver = ContactsResolver.getInstance(sContext);
     }
-    
-    public void activate() {
-        super.activate();
+
+    @Override
+    protected void onCommandActivated() {
+        mPhoneMgr = new PhoneManager(sContext);
+        mTelephonyMgr = (TelephonyManager) sMainService.getSystemService(Context.TELEPHONY_SERVICE);
+        mContactsResolver = ContactsResolver.getInstance(sContext);
+
         if (sSettingsMgr.notifyIncomingCalls && !sListenerActive) {
             if (mPhoneListener == null) {
                 mPhoneListener = new PhoneCallListener(sMainService);
@@ -46,10 +47,13 @@ public class CallCmd extends CommandHandlerBase {
             sListenerActive = true;
         }
     }
-    
+
     @Override
-    public void deactivate() {
-        super.deactivate();
+    protected void onCommandDeactivated() {
+        mPhoneMgr = null;
+        mTelephonyMgr = null;
+        mContactsResolver = null;
+
         if (mPhoneListener != null) {
             mTelephonyMgr.listen(mPhoneListener, 0);
             sListenerActive = false;
@@ -74,7 +78,7 @@ public class CallCmd extends CommandHandlerBase {
     /** reads last Call Logs from all contacts */
     private void readCallLogs(String args) {
 
-        ArrayList<Call> arrayList = _phoneMgr.getPhoneLogs();
+        ArrayList<Call> arrayList = mPhoneMgr.getPhoneLogs();
         XmppMsg all = new XmppMsg();
         int callLogsNumber = Tools.parseInt(args, 10);
         List<Call> callList = Tools.getLastElements(arrayList, callLogsNumber);
@@ -122,7 +126,7 @@ public class CallCmd extends CommandHandlerBase {
         }
 
         // check if the dial is successful
-        if (!_phoneMgr.Dial(number, makeTheCall)) {
+        if (!mPhoneMgr.Dial(number, makeTheCall)) {
             send(R.string.chat_error_dial);
         }
     }

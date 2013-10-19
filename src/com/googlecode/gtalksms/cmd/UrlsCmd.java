@@ -20,6 +20,14 @@ public class UrlsCmd extends CommandHandlerBase {
     }
 
     @Override
+    protected void onCommandActivated() {
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+    }
+
+    @Override
     protected void initializeSubCommands() {
         mCommandMap.get("http").setHelp(R.string.chat_help_urls, "#url#");   
     }

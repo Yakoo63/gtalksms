@@ -7,8 +7,8 @@ import java.io.InputStreamReader;
 import java.util.Date;
 
 import android.content.Context;
-import android.util.Log;
 
+import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.ShellCmd;
 import com.googlecode.gtalksms.tools.RootTools;
@@ -55,7 +55,7 @@ public class Shell {
                 sendMessage(mCurrentCommand + " killed.");
             }
             catch (Exception ex) {
-                Log.w(Tools.LOG_TAG, "Shell command error", ex);
+                Log.w("Shell command error", ex);
             }
             
             mThread = null;
@@ -155,5 +155,18 @@ public class Shell {
     
     private void sendMessage(String msg) {
         mCmdBase.send(mShellId, msg);
+    }
+
+    public void stop() {
+        try {
+            if (mThread != null && mThread.isAlive()) {
+                mShellThread.stop();
+                mThread.join(1000);
+            }
+            mThread = null;
+            mShellThread = null;
+        } catch (Exception e) {
+            Log.d("Error while stopping shell " + mShellId + ": " + e.getMessage());
+        }
     }
 }

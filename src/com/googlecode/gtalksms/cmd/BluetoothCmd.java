@@ -15,13 +15,14 @@ public class BluetoothCmd extends CommandHandlerBase {
     public BluetoothCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, "Bluetooth", new Cmd("bluetooth", "bt"));
     }
-    
-    public void activate() {
-        super.activate();
+
+    @Override
+    protected void onCommandActivated() {
         sBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
-    
-    public void deactivate() {
+
+    @Override
+    protected void onCommandDeactivated() {
         sBluetoothAdapter = null;
     }
 

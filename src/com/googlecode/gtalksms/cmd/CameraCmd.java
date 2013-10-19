@@ -19,7 +19,6 @@ import android.view.WindowManager;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
-import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.cmd.cameraCmd.EmailCallback;
 import com.googlecode.gtalksms.cmd.cameraCmd.VoidCallback;
 import com.googlecode.gtalksms.cmd.cameraCmd.XMPPTransferCallback;
@@ -31,60 +30,58 @@ public class CameraCmd extends CommandHandlerBase {
     private static final int XMPP_CALLBACK = 1;
     private static final int EMAIL_CALLBACK = 2;
 
-    private static AudioManager audioManager;
-    private static WindowManager windowManager;
-    private static Camera sCamera = null;
-    private static File repository;
-    private static String[] emailReceiving;
-    private static int streamVolume;
-    private static int cameraId = 0;
+    private AudioManager mAudioManager;
+    private WindowManager mWindowManager;
+    private Camera mCamera = null;
+    private File mRepository;
+    private String[] mEmailReceiving;
+    private int mStreamVolume;
+    private int mCameraId = 0;
     
     public CameraCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MEDIA, "Camera", new Cmd("camera", "photo"), new Cmd("flash", "light"));
-        File path;
-        
-        SettingsManager settings = SettingsManager.getSettingsManager(sContext);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {  // API Level >= 8 check
-            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        } else {
-            path = new File(Environment.getExternalStorageDirectory(), "DCIM");
-        }
-        emailReceiving = settings.getNotifiedAddresses().getAll();
-        try {
-            repository = new File(path, Tools.APP_NAME);
-            if(!repository.exists()) {
-                repository.mkdirs();
-            }
-        } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "Failed to create repository.", e);
-        }
-    }
-    
-    public void activate() {
-        super.activate();
-        windowManager = (WindowManager) sMainService.getSystemService(Context.WINDOW_SERVICE);
-        audioManager = (AudioManager) sMainService.getSystemService(Context.AUDIO_SERVICE);
     }
 
     @Override
-    public synchronized void deactivate() {
-        super.deactivate();
+    protected void onCommandActivated() {
+        mWindowManager = (WindowManager) sMainService.getSystemService(Context.WINDOW_SERVICE);
+        mAudioManager = (AudioManager) sMainService.getSystemService(Context.AUDIO_SERVICE);
+        mEmailReceiving = sSettingsMgr.getNotifiedAddresses().getAll();
+        try {
+            File path = Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO ?
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) :
+                    new File(Environment.getExternalStorageDirectory(), "DCIM");
+
+            mRepository = new File(path, Tools.APP_NAME);
+            if(!mRepository.exists()) {
+                mRepository.mkdirs();
+            }
+        } catch (Exception e) {
+            Log.e(Tools.LOG_TAG, "Failed to create mRepository.", e);
+        }
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
         releaseResources();
-        windowManager = null;
-        audioManager = null;
+
+        mWindowManager = null;
+        mAudioManager = null;
+        mEmailReceiving = null;
+        mRepository = null;
     }
     
     private void releaseResources() {
-        if (sCamera != null) {
+        if (mCamera != null) {
             try {
-                sCamera.stopPreview();
-                sCamera.setPreviewCallback(null);
-                sCamera.unlock();
-                sCamera.release();
+                mCamera.stopPreview();
+                mCamera.setPreviewCallback(null);
+                mCamera.unlock();
+                mCamera.release();
             } catch (Exception e) {
                 Log.e(Tools.LOG_TAG, "Failed to release Camera", e);
             }
-            sCamera = null;
+            mCamera = null;
         }
     }
 
@@ -118,9 +115,9 @@ public class CameraCmd extends CommandHandlerBase {
             if (id == null || id < 0 || id >= Camera.getNumberOfCameras()) {
                 listCameras();
             } else {
-                cameraId = id;
+                mCameraId = id;
                 CameraInfo info = new CameraInfo(); 
-                Camera.getCameraInfo(cameraId, info);
+                Camera.getCameraInfo(mCameraId, info);
                 
                 if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
                     send(R.string.chat_camera_back_activated);
@@ -158,8 +155,8 @@ public class CameraCmd extends CommandHandlerBase {
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     private int getCameraOrientation() {
         CameraInfo info = new CameraInfo();
-        Camera.getCameraInfo(cameraId, info);
-        int rotation = windowManager.getDefaultDisplay().getRotation();
+        Camera.getCameraInfo(mCameraId, info);
+        int rotation = mWindowManager.getDefaultDisplay().getRotation();
         int degrees = 0;
         switch (rotation) {
             case Surface.ROTATION_0: degrees = 0; break;
@@ -184,44 +181,44 @@ public class CameraCmd extends CommandHandlerBase {
         
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-                sCamera = Camera.open(cameraId);
-                sCamera.setDisplayOrientation(getCameraOrientation());
+                mCamera = Camera.open(mCameraId);
+                mCamera.setDisplayOrientation(getCameraOrientation());
             } else {
-                sCamera = Camera.open();
+                mCamera = Camera.open();
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                sCamera.setPreviewTexture(new SurfaceTexture(0));
+                mCamera.setPreviewTexture(new SurfaceTexture(0));
             } else {
-                sCamera.setPreviewDisplay(new SurfaceView(sContext).getHolder());
+                mCamera.setPreviewDisplay(new SurfaceView(sContext).getHolder());
             }
 
-            sCamera.startPreview();
+            mCamera.startPreview();
             
             switch (pCallbackMethod) {
                 case XMPP_CALLBACK:
-                    pictureCallback = new XMPPTransferCallback(repository, sContext, mAnswerTo);
+                    pictureCallback = new XMPPTransferCallback(mRepository, sContext, mAnswerTo);
                     break;
                 case EMAIL_CALLBACK:
-                    pictureCallback = new EmailCallback(repository, sContext, emailReceiving);
+                    pictureCallback = new EmailCallback(mRepository, sContext, mEmailReceiving);
                     break;
                 case VOID_CALLBACK:
                 default:
-                    pictureCallback = new VoidCallback(repository, sContext, mAnswerTo);
+                    pictureCallback = new VoidCallback(mRepository, sContext, mAnswerTo);
             }
             
-            streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM); 
-            audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, 0, 0); 
+            mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_SYSTEM);
+            mAudioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, 0, 0);
             
             Camera.ShutterCallback cb = new Camera.ShutterCallback() {
                 
                 @Override
                 public void onShutter() {
-                    audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, streamVolume, 0);
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, mStreamVolume, 0);
                 }
             };
             send("Taking picture");
-            sCamera.takePicture(cb, null, pictureCallback);
+            mCamera.takePicture(cb, null, pictureCallback);
         } catch (Exception e) {
             Log.w("Error taking picture", e);
             send(R.string.chat_camera_error_picture, e.getLocalizedMessage());
@@ -230,12 +227,12 @@ public class CameraCmd extends CommandHandlerBase {
     }
     
     void setLight(boolean turnOn) {
-        if (sCamera == null) {
-            sCamera = Camera.open();
+        if (mCamera == null) {
+            mCamera = Camera.open();
         }
-        Parameters params = sCamera.getParameters();
+        Parameters params = mCamera.getParameters();
         params.setFlashMode(turnOn ? Camera.Parameters.FLASH_MODE_TORCH : Camera.Parameters.FLASH_MODE_OFF);
-        sCamera.setParameters(params);
+        mCamera.setParameters(params);
         
         if (!turnOn) {
             releaseResources();

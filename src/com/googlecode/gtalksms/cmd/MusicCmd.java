@@ -17,7 +17,16 @@ public class MusicCmd extends CommandHandlerBase {
     
     public MusicCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MEDIA, "Music", new Cmd("music", "zic"), new Cmd("volume", "vol"));
+    }
+
+    @Override
+    protected void onCommandActivated() {
         audioManager = (AudioManager) sContext.getSystemService(Context.AUDIO_SERVICE);
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+        audioManager = null;
     }
 
     @Override

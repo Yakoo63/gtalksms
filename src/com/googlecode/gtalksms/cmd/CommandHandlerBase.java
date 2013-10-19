@@ -38,7 +38,7 @@ public abstract class CommandHandlerBase {
     
     private boolean mIsActivated;
     private final String mName;
-        
+
     CommandHandlerBase(MainService mainService, int cmdType, String name, Cmd... commands) {
         if (sMainService == null) {
             sMainService = mainService;
@@ -59,13 +59,17 @@ public abstract class CommandHandlerBase {
         
         mIsActivated = false;
     }
-    
+
+    protected abstract void onCommandActivated();
+    protected abstract void onCommandDeactivated();
+
+
     /**
-     * Setups the command to get working. Usually called when the user want's 
+     * Setups the command to get working. Usually called when the user wants
      * GTalkSMS to be active (meaning connected) and if the command is
      * activated
      */
-    void activate() {
+    public final void activate() {
         Map<String, CommandHandlerBase> activeCommands = MainService.getActiveCommands();
         Set<CommandHandlerBase> activeCommandSet = MainService.getActiveCommandSet(); 
         
@@ -79,14 +83,15 @@ public abstract class CommandHandlerBase {
         }
         activeCommandSet.add(this);
         mIsActivated = true;
+        onCommandActivated();
     }
-    
+
     /**
-     * Cleans up the structures holden by the CommandHanlderBase Class.
+     * Cleans up the structures holden by the CommandHandlerBase Class.
      * Common actions are: unregister broadcast receivers etc.
      * Usually issued on the stop of the MainService
      */
-    public void deactivate() {
+    public final void deactivate() {
         Map<String, CommandHandlerBase> activeCommands = MainService.getActiveCommands();
         Set<CommandHandlerBase> activeCommandSet = MainService.getActiveCommandSet(); 
         
@@ -100,8 +105,10 @@ public abstract class CommandHandlerBase {
         }
         activeCommandSet.remove(this);
         mIsActivated = false;
+
+        onCommandDeactivated();
     }
-    
+
     public boolean updateAndReturnStatus() {
         boolean atLeastOneCommandActive = false;
         for (Cmd c : mCommandMap.values()) {
@@ -240,7 +247,7 @@ public abstract class CommandHandlerBase {
     
     /**
      * Request a help String array from the command
-     * The String is formated with your internal BOLD/ITALIC/etc Tags
+     * The String is formatted with your internal BOLD/ITALIC/etc Tags
      * 
      * @return Help String array, null if there is no help available
      */

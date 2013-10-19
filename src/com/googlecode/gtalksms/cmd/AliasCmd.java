@@ -16,13 +16,23 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
  * 
  */
 public class AliasCmd extends CommandHandlerBase {
-    private final AliasHelper aliasHelper;
+    private AliasHelper mAliasHelper;
 
     public AliasCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_CONTACTS, "Alias", new Cmd("alias"));
-        this.aliasHelper = AliasHelper.getAliasHelper(sContext);
     }
 
+    @Override
+    protected void onCommandActivated() {
+        mAliasHelper = AliasHelper.getAliasHelper(sContext);
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+        mAliasHelper = null;
+    }
+
+    @Override
     protected void initializeSubCommands() {
         Cmd alias = mCommandMap.get("alias");
         alias.setHelp(R.string.chat_help_alias_general, null);
@@ -50,13 +60,13 @@ public class AliasCmd extends CommandHandlerBase {
         if (arg1.equals("") || arg2.equals("")) {
             send(R.string.chat_error_more_arguments, command);
         } else if (Phone.isCellPhoneNumber(arg2)) {
-                if (aliasHelper.addAliasByNumber(arg1, arg2)) {
+                if (mAliasHelper.addAliasByNumber(arg1, arg2)) {
                     send(R.string.chat_alias_add_by_number, arg1, arg2);
                 } else {
                     send(R.string.chat_alias_invalid_char);
                 }
             } else {
-                ArrayList<Phone> res = aliasHelper.addAliasByName(arg1, arg2);
+                ArrayList<Phone> res = mAliasHelper.addAliasByName(arg1, arg2);
                 if (res == null) {
                     send(R.string.chat_alias_invalid_char);
                 } else if (res.size() != 1) {
@@ -71,7 +81,7 @@ public class AliasCmd extends CommandHandlerBase {
     private void del(String command, String arg1) {
         if (arg1.equals("")) {
             send(R.string.chat_error_more_arguments, command);
-        } else if (aliasHelper.deleteAlias(arg1)) {
+        } else if (mAliasHelper.deleteAlias(arg1)) {
             send(R.string.chat_alias_del_suc, arg1);
         } else {
             send(R.string.chat_alias_del_fail, arg1);
@@ -82,7 +92,7 @@ public class AliasCmd extends CommandHandlerBase {
         if (arg1.equals("")) {
             send(R.string.chat_error_more_arguments, command);
         } else if (arg1.equals("all")) {
-            String[][] aliases = aliasHelper.getAllAliases();
+            String[][] aliases = mAliasHelper.getAllAliases();
             if (aliases == null) {
                 send(R.string.chat_alias_empty);
             } else {
@@ -99,7 +109,7 @@ public class AliasCmd extends CommandHandlerBase {
                 send(msg);
             }
         } else {
-            String[] res = aliasHelper.getAliasOrNull(arg1);
+            String[] res = mAliasHelper.getAliasOrNull(arg1);
             if (res == null) {
                 send(R.string.chat_alias_show_non_existent, arg1);
             } else if (res.length == 2) {

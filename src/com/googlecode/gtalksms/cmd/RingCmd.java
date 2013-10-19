@@ -20,19 +20,26 @@ public class RingCmd extends CommandHandlerBase {
     
     private static AudioManager sAudioManager;
     private MediaPlayer mMediaPlayer;
-    private final Vibrator mVibrator;
+    private Vibrator mVibrator;
     private boolean mCanRing;
    
     public RingCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MEDIA, "Ring", new Cmd("ring"), new Cmd("ringmode"));
-        sAudioManager = (AudioManager) mainService.getSystemService(Context.AUDIO_SERVICE);
-        mVibrator = (Vibrator) mainService.getSystemService(Context.VIBRATOR_SERVICE);
     }
+
     @Override
-    public void deactivate() {
-        super.deactivate();
+    protected void onCommandActivated() {
+        sAudioManager = (AudioManager) sMainService.getSystemService(Context.AUDIO_SERVICE);
+        mVibrator = (Vibrator) sMainService.getSystemService(Context.VIBRATOR_SERVICE);
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+        sAudioManager = null;
+        mVibrator = null;
         clearMediaPlayer();
     }
+
     @Override
     protected void execute(Command cmd) {
         if (isMatchingCmd(cmd, "ring")) {
@@ -147,7 +154,9 @@ public class RingCmd extends CommandHandlerBase {
         if (mMediaPlayer != null) {
             // stop will throw an IllegalStateEx when called but not initialized
             // we have the mCanRing bool to signal an successful initialization
-            if (mCanRing) mMediaPlayer.stop();
+            if (mCanRing) {
+                mMediaPlayer.stop();
+            }
             mMediaPlayer.release();
         }
         mMediaPlayer = null;

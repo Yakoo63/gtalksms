@@ -30,16 +30,12 @@ public class ContactCmd extends CommandHandlerBase {
             for (Contact contact : contacts) {
                 strContact.appendBoldLine(contact.name);
 
-                // strContact.append(Tools.LineSep + "Id : " + contact.id);
-                // strContact.append(Tools.LineSep + "Raw Ids : " + TextUtils.join(" ",
-                // contact.rawIds));
-
                 ArrayList<Phone> mobilePhones = ContactsManager.getPhones(sContext, contact.ids);
                 if (mobilePhones.size() > 0) {
                     strContact.appendItalicLine(getString(R.string.chat_phones));
                     for (Phone phone : mobilePhones) {
                         strContact.append(phone.getLabel() + " - " + phone.getCleanNumber());
-                        // append an asterix to mark the default number
+                        // append an astrix to mark the default number
                         if (phone.isDefaultNumber()) {
                             strContact.appendBold(" *");
                         }
@@ -67,6 +63,14 @@ public class ContactCmd extends CommandHandlerBase {
         } else {
             send(R.string.chat_no_match_for, searchedText);
         }
+    }
+
+    @Override
+    protected void onCommandActivated() {
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
     }
 
     @Override

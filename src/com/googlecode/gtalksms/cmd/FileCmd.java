@@ -20,30 +20,41 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 public class FileCmd extends CommandHandlerBase {
     private static final int MAX_CYCLES = 30;
     
-    private File landingDir;
-    private File sendDir;  // where the files come from if send:filename is given
-    private final KeyValueHelper keyValueHelper;
-    private final XmppFileManager mXmppFileManager;
-
-    private Exception ex;
+    private File mLandingDir;
+    private File mSendDir;  // where the files come from if send:filename is given
+    private KeyValueHelper mKeyValueHelper;
+    private XmppFileManager mXmppFileManager;
+    private Exception mLastException;
     
     public FileCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, "File", new Cmd("send"), new Cmd("ls"), new Cmd("rm"));
+    }
+
+    @Override
+    protected void onCommandActivated() {
         mXmppFileManager = XmppFileManager.getInstance(sContext);
         try {
-            landingDir = mXmppFileManager.getLandingDir();
+            mLandingDir = mXmppFileManager.getLandingDir();
         } catch (Exception e) {
-            ex = e;
+            mLastException = e;
         }
-        keyValueHelper = KeyValueHelper.getKeyValueHelper(sContext);
+        mKeyValueHelper = KeyValueHelper.getKeyValueHelper(sContext);
         restoreSendDir();
     }
-    
+
+    @Override
+    protected void onCommandDeactivated() {
+        mXmppFileManager = null;
+        mLandingDir = null;
+        mLastException = null;
+        mKeyValueHelper = null;
+    }
+
     @Override
     protected void execute(Command cmd) {
         if (isMatchingCmd(cmd, "send")) {
-            if (ex != null) {
-                throw new IllegalStateException(ex);
+            if (mLastException != null) {
+                throw new IllegalStateException(mLastException);
             }
             sendFile(cmd.getArg1());
         } else if (isMatchingCmd(cmd, "ls")) {
@@ -61,7 +72,7 @@ public class FileCmd extends CommandHandlerBase {
         if (args.startsWith("/")) {
             file = new File(args);
         } else {
-            file = new File(sendDir, args);
+            file = new File(mSendDir, args);
         }
         
         if (file.exists()) {
@@ -127,13 +138,13 @@ public class FileCmd extends CommandHandlerBase {
     
     private void ls(String args) {
         if (args.equals("")) {
-            setSendDir(landingDir);
-            listDir(landingDir);
+            setSendDir(mLandingDir);
+            listDir(mLandingDir);
         } else if (args.startsWith("/")) {
             File dir = new File(args);
             listDir(dir);
-        } else if (args.startsWith("./")) {  // emulate the current working directory with help of sendDir
-            File dir = new File(sendDir, args.substring(1));
+        } else if (args.startsWith("./")) {  // emulate the current working directory with help of mSendDir
+            File dir = new File(mSendDir, args.substring(1));
             listDir(dir);
         }
     }
@@ -142,8 +153,8 @@ public class FileCmd extends CommandHandlerBase {
         File f;
         if (args.startsWith("/")) {
             f = new File(args);
-        } else if (args.startsWith("./")) { // emulate the current working directory with help of sendDir
-            f = new File(sendDir, args.substring(1));
+        } else if (args.startsWith("./")) { // emulate the current working directory with help of mSendDir
+            f = new File(mSendDir, args.substring(1));
         } else {
             send("Wrong Syntax");
             return;
@@ -198,25 +209,21 @@ public class FileCmd extends CommandHandlerBase {
     }
     
     /**
-     * Sets the sendDir and saves it's value into the key-store database
+     * Sets the mSendDir and saves it's value into the key-store database
      * @param dir
      */
     private void setSendDir(File dir) {
-        sendDir = dir;
+        mSendDir = dir;
         String dirStr = dir.getAbsolutePath();
-        keyValueHelper.addKey(KeyValueHelper.KEY_SEND_DIR, dirStr);
+        mKeyValueHelper.addKey(KeyValueHelper.KEY_SEND_DIR, dirStr);
     }
     
     /**
-     * Restores the sendDir from the key-value database
+     * Restores the mSendDir from the key-value database
      */
     private void restoreSendDir() {
-        String dir = keyValueHelper.getValue(KeyValueHelper.KEY_SEND_DIR);
-        if (dir != null) {
-            sendDir = new File(dir);
-        } else {
-            sendDir = landingDir;
-        }
+        String dir = mKeyValueHelper.getValue(KeyValueHelper.KEY_SEND_DIR);
+        mSendDir = dir != null ? new File(dir) : mLandingDir;
     }
     
     private class DirFileFilter implements FileFilter {

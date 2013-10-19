@@ -38,19 +38,23 @@ public class SmsCmd extends CommandHandlerBase {
     private static BroadcastReceiver sDeliveredSmsReceiver = null;
     private static Integer sSmsID;
 
-    private final ContactsResolver mContactsResolver;
-    private final SmsManager mSmsManager;
-
     // synchronizedMap because the worker thread and the intent receivers work with this map
     private static Map<Integer, Sms> mSmsMap;
 
-    private final AliasHelper mAliasHelper;
-    private final KeyValueHelper mKeyValueHelper;
-    private final SMSHelper mSmsHelper;
+    private ContactsResolver mContactsResolver;
+    private SmsManager mSmsManager;
+
+    private AliasHelper mAliasHelper;
+    private KeyValueHelper mKeyValueHelper;
+    private SMSHelper mSmsHelper;
 
     public SmsCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MESSAGE, "SMS", new Cmd("sms", "s"), new Cmd("reply", "r"), 
                 new Cmd("findsms", "fs"), new Cmd("markasread", "mar"), new Cmd("chat", "c"), new Cmd("delsms"));
+    }
+
+    @Override
+    protected void onCommandActivated() {
         mSmsManager = new SmsManager(sSettingsMgr, sContext);
         mSmsHelper = SMSHelper.getSMSHelper(sContext);
         mAliasHelper = AliasHelper.getAliasHelper(sContext);
@@ -58,10 +62,7 @@ public class SmsCmd extends CommandHandlerBase {
         mContactsResolver = ContactsResolver.getInstance(sContext);
 
         restoreSmsInformation();
-    }
 
-    public void activate() {
-        super.activate();
         if (sSettingsMgr.notifySmsSent && !sSentIntentReceiverRegistered) {
             if (sSentSmsReceiver == null) {
                 sSentSmsReceiver = new SentIntentReceiver(sMainService, mSmsMap, mSmsHelper);
@@ -79,8 +80,13 @@ public class SmsCmd extends CommandHandlerBase {
     }
 
     @Override
-    public void deactivate() {
-        super.deactivate();
+    protected void onCommandDeactivated() {
+        mSmsManager = null;
+        mSmsHelper = null;
+        mAliasHelper = null;
+        mKeyValueHelper = null;
+        mContactsResolver = null;
+
         if (sSentSmsReceiver != null && sSentIntentReceiverRegistered) {
             sContext.unregisterReceiver(sSentSmsReceiver);
             sSentIntentReceiverRegistered = false;

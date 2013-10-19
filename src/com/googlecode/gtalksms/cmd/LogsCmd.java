@@ -70,6 +70,7 @@ public class LogsCmd extends CommandHandlerBase {
         super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Logs", new Cmd("logs", "log"));
     }
 
+    @Override
     protected void execute(Command cmd) {
         if (isMatchingCmd(cmd, "logs")) {
             if (mThread != null && mThread.isAlive()) {
@@ -91,6 +92,14 @@ public class LogsCmd extends CommandHandlerBase {
             mThread = new Thread(mLogsThread);
             mThread.start();
         }
+    }
+
+    @Override
+    protected void onCommandActivated() {
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
     }
     
     @Override

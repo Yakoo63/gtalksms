@@ -21,26 +21,23 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
     private boolean mTtsAvailable;
 
     public TextToSpeechCmd(MainService mainService) {
-        super(mainService, 
-                CommandHandlerBase.TYPE_MESSAGE, 
-                "TTS",
+        super(mainService, CommandHandlerBase.TYPE_MESSAGE, "TTS",
                 new Cmd("tts", "say"), 
                 new Cmd("tts-lang", "ttslang"), 
                 new Cmd("tts-lang-list", "ttslanglist"), 
                 new Cmd("tts-engine", "ttsengine"), 
                 new Cmd("tts-engine-list", "ttsenginelist"));
-        mLocale = Locale.getDefault();
     }
 
     @Override
-    public void activate() {
-        super.activate();
+    protected void onCommandActivated() {
+        mLocale = Locale.getDefault();
         mTts = new TextToSpeech(sContext, this);
     }
-    
+
     @Override
-    public void deactivate() {
-        super.deactivate();
+    protected void onCommandDeactivated() {
+        mLocale = null;
         if (mTts != null) {
             mTts.shutdown();
             mTts = null;

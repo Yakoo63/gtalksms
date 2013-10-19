@@ -27,13 +27,11 @@ public class VideoCmd extends CommandHandlerBase {
     }
 
     @Override
-    public void activate() {
-        super.activate();
+    protected void onCommandActivated() {
     }
 
     @Override
-    public synchronized void deactivate() {
-        super.deactivate();
+    protected void onCommandDeactivated() {
     }
 
     @Override

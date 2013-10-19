@@ -19,6 +19,14 @@ public class ExitCmd extends CommandHandlerBase {
     }
 
     @Override
+    protected void onCommandActivated() {
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+    }
+
+    @Override
     protected void initializeSubCommands() {
         mCommandMap.get("exit").setHelp(R.string.chat_help_stop, null);   
     }

@@ -16,6 +16,14 @@ public class NotificationsCmd extends CommandHandlerBase {
     }
 
     @Override
+    protected void onCommandActivated() {
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+    }
+
+    @Override
     protected void execute(Command cmd) {
         ArrayList<String> apps = new ArrayList<String>(Arrays.asList(TextUtils.split(sSettingsMgr.hiddenNotifications, "#sep#")));
         String arg1 = cmd.getArg1();

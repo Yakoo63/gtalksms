@@ -23,13 +23,11 @@ public class WifiCmd extends CommandHandlerBase {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, "WiFi", new Cmd("wifi", "wlan"));
     }
     
-    public void activate() {
-        super.activate();
+    protected void onCommandActivated() {
         sWifiManager = (WifiManager) sMainService.getSystemService(Context.WIFI_SERVICE);
     }
-    
-    public void deactivate() {
-        super.deactivate();
+
+    protected void onCommandDeactivated() {
         sWifiManager = null;
     }
 

@@ -218,6 +218,14 @@ public class HelpCmd extends CommandHandlerBase {
     }
 
     @Override
+    protected void onCommandActivated() {
+    }
+
+    @Override
+    protected void onCommandDeactivated() {
+    }
+
+    @Override
     protected void initializeSubCommands() {
     }
 }

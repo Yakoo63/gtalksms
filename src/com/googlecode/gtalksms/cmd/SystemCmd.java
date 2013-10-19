@@ -32,21 +32,21 @@ public class SystemCmd extends CommandHandlerBase {
     public SystemCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_INTERNAL, "System", new Cmd("sysinfo"), new Cmd("telinfo"));
     }
-    
-    public void activate() {
-        super.activate();
+
+    @Override
+    protected void onCommandActivated() {
         activityManager = (ActivityManager) sContext.getSystemService(Context.ACTIVITY_SERVICE);
         connectivityManager = (ConnectivityManager) sContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         telephonyManager = (TelephonyManager) sContext.getSystemService(Context.TELEPHONY_SERVICE);
         sNullIntentStartCounter = CrashedStartCounter.getInstance(sContext);
-
     }
-    
-    public void deactivate() {
-        super.deactivate();
+
+    @Override
+    protected void onCommandDeactivated() {
         activityManager = null;
         connectivityManager = null;
         telephonyManager = null;
+        sNullIntentStartCounter = null;
     }
 
     @Override
