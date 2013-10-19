@@ -86,6 +86,8 @@ public class XmppManager {
     // Indicates the current action associated to the status (connect, identify, wait X seconds,...)
     private String mStatusAction = "";
 
+    private long mLastPing = new Date().getTime();
+
     private final List<XmppConnectionChangeListener> mConnectionChangeListeners;
     private XMPPConnection mConnection = null;
 	private PacketListener mPacketListener = null;
@@ -351,6 +353,12 @@ public class XmppManager {
         }
     }
 
+    private void restartConnection() {
+        cleanupConnection();
+        mConnection = null;
+        start(XmppManager.CONNECTED);
+    }
+
     private void maybeStartReconnect() {
         cleanupConnection();
 
@@ -514,7 +522,6 @@ public class XmppManager {
                 }
             }
             maybeStartReconnect();
-            mConnection = null;
             return false;
         }          
         
@@ -532,16 +539,31 @@ public class XmppManager {
             // TODO remember that maybeStartReconnect is called from a
             // different thread (the PingTask) here, it may causes
             // synchronization problems
-            Log.d("PingManager reported failed ping, calling maybeStartReconnect()");
-            maybeStartReconnect();
+            long now = new Date().getTime();
+            if (now - mLastPing > mSettings.pingIntervalInSec * 500) {
+                Log.w("PingManager reported failed ping, calling maybeStartReconnect()");
+                restartConnection();
+                mLastPing = now;
+            } else {
+                Log.i("Ping failure reported too early. Skipping this occurrence.");
+            }
         }});
 
         try {
             XHTMLManager.setServiceEnabled(connection, false);
+        } catch (Exception e) {
+            Log.e("Failed to set ServiceEnabled flag for XHTMLManager", e);
+            // Managing an issue with ServiceDiscoveryManager
+            if (e.getMessage() == null) {
+                restartConnection();
+            }
+        }
+
+        try {
             updateAction("Login with " + mSettings.getLogin());
             connection.login(mSettings.getLogin(), mSettings.getPassword(), Tools.APP_NAME);
         } catch (Exception e) {
-            Log.e("xmpp login failed: " + e.getMessage());
+            Log.e("Xmpp login failed", e);
             // sadly, smack throws the same generic XMPPException for network
             // related messages (eg "no response from the server") as for
             // authoritative login errors (ie, bad password).  The only
@@ -676,8 +698,7 @@ public class XmppManager {
         // - we don't know the recipient
         // - we know that the recipient is able to read XHTML-IM
         // - we are disconnected and therefore send the message later
-        if ((to == null) || 
-                (mConnection != null && (XHTMLManager.isServiceEnabled(mConnection, to) || !mConnection.isConnected()))) {
+        if ((to == null) || (mConnection != null && (XHTMLManager.isServiceEnabled(mConnection, to) || !mConnection.isConnected()))) {
             String xhtmlBody = message.generateXHTMLText().toString();
             XHTMLManager.addBody(msg, xhtmlBody);
         }
