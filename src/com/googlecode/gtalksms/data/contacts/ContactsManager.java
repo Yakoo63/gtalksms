@@ -133,44 +133,45 @@ public class ContactsManager {
             searchedName = getContactName(ctx, searchedName);
         }
 
-        if (!searchedName.equals("")) {
-            ContentResolver resolver = ctx.getContentResolver();
+        ContentResolver resolver = ctx.getContentResolver();
 
-            Uri contactUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI, StringFmt.encodeSQL(searchedName));
-            Cursor c = resolver.query(contactUri, projection, null, null, sortOrder);
-            if (c != null) {
-                for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
-                    Long id = Tools.getLong(c, Contacts._ID);
-                    String contactName = Tools.getString(c, Contacts.DISPLAY_NAME);
-                    
-                    if (null == id || null == contactName || (isNameOnly && !contactName.toLowerCase().contains(searchedName.toLowerCase()))) {
-                        continue;
-                    }
+        Uri contactUri = searchedName.equals("") ?
+                Contacts.CONTENT_URI :
+                Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI, StringFmt.encodeSQL(searchedName));
+        Cursor c = resolver.query(contactUri, projection, null, null, sortOrder);
+        if (c != null) {
+            for (boolean hasData = c.moveToFirst() ; hasData ; hasData = c.moveToNext()) {
+                Long id = Tools.getLong(c, Contacts._ID);
+                String contactName = Tools.getString(c, Contacts.DISPLAY_NAME);
 
-                    Contact contact;
-                    if (contacts.containsKey(contactName)) {
-                        contact = contacts.get(contactName);
-                    } else {
-                        contact = new Contact();
-                        contact.name = contactName;
-                        
-                        res.add(contact);
-                        contacts.put(contact.name, contact);
-                    }
-                    
-                    contact.ids.add(id);
-                    Cursor c1 = resolver.query(RawContacts.CONTENT_URI, new String[]{RawContacts._ID},
-                            RawContacts.CONTACT_ID + "=?", new String[]{String.valueOf(id)}, null);
-                    if (c1 != null) {
-                        for (boolean hasData1 = c1.moveToFirst() ; hasData1 ; hasData1 = c1.moveToNext()) {
-                            contact.rawIds.add(Tools.getLong(c1, RawContacts._ID));
-                        }
-                        c1.close();
-                    }
+                if (null == id || null == contactName || (isNameOnly && !contactName.toLowerCase().contains(searchedName.toLowerCase()))) {
+                    continue;
                 }
-                c.close();
+
+                Contact contact;
+                if (contacts.containsKey(contactName)) {
+                    contact = contacts.get(contactName);
+                } else {
+                    contact = new Contact();
+                    contact.name = contactName;
+
+                    res.add(contact);
+                    contacts.put(contact.name, contact);
+                }
+
+                contact.ids.add(id);
+                Cursor c1 = resolver.query(RawContacts.CONTENT_URI, new String[]{RawContacts._ID},
+                        RawContacts.CONTACT_ID + "=?", new String[]{String.valueOf(id)}, null);
+                if (c1 != null) {
+                    for (boolean hasData1 = c1.moveToFirst() ; hasData1 ; hasData1 = c1.moveToNext()) {
+                        contact.rawIds.add(Tools.getLong(c1, RawContacts._ID));
+                    }
+                    c1.close();
+                }
             }
+            c.close();
         }
+
         Collections.sort(res);
         return res;
     }

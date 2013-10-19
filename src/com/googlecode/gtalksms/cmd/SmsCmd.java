@@ -92,53 +92,34 @@ public class SmsCmd extends CommandHandlerBase {
     }
 
     @Override
-    protected void execute(String command, String args) {
-        String contactInformation = null;
-        if (isMatchingCmd("sms", command)) {
-            int separatorPos = args.indexOf(":");
-            String message = null;
+    protected void execute(Command c) {
+        String arg1 = c.getArg1();
+        String arg2 = c.getArg2();
 
-            // There is more than 1 argument
-            if (-1 != separatorPos) {
-                contactInformation = args.substring(0, separatorPos);
-                message = args.substring(separatorPos + 1);
-            }
-
+        if (isMatchingCmd(c, "sms")) {
             // If there is a message, send it.
-            if (message != null && message.length() > 0) {
-                sendSMS(message, contactInformation);
-            } else if (args.length() > 0) {
-                if (args.equals("unread")) {
-                    readUnreadSMS();
-                } else {
-                    readSMS(args);
-                }
-                // Action when only "sms" is given
+            if (arg2.length() > 0) {
+                sendSMS(arg2, arg1);
+            } else if (c.getArg1().equals("unread")) {
+                readUnreadSMS();
+            } else if (arg1.length() > 0) {
+                readSMS(arg1);
             } else {
                 readLastSMS();
             }
-        } else if (isMatchingCmd("findsms", command)) {
-            int separatorPos = args.indexOf(":");
-            String message;
-            if (-1 != separatorPos) {
-                contactInformation = args.substring(0, separatorPos);
-                contactInformation = mAliasHelper.convertAliasToNumber(contactInformation);
-                message = args.substring(separatorPos + 1);
-                searchSMS(message, contactInformation);
-            } else if (args.length() > 0) {
-                searchSMS(args, null);
-            }
-        } else if (isMatchingCmd("markasread", command)) {
-            if (args.length() > 0) {
-                markSmsAsRead(args);
+        } else if (isMatchingCmd(c, "findsms")) {
+            searchSMS(arg2, mAliasHelper.convertAliasToNumber(arg1));
+        } else if (isMatchingCmd(c, "markasread")) {
+            if (arg1.length() > 0) {
+                markSmsAsRead(arg1);
             } else if (RecipientCmd.getLastRecipientNumber() == null) {
                 send(R.string.chat_error_no_recipient);
             } else {
                 markSmsAsReadByNumber(RecipientCmd.getLastRecipientNumber(), RecipientCmd.getLastRecipientName());
             }
-        } else if (command.equals("chat")) {
-            if (args.length() > 0) {
-                inviteRoom(args);
+        } else if (isMatchingCmd(c, "chat")) {
+            if (arg1.length() > 0) {
+                inviteRoom(arg1);
             } else if (RecipientCmd.getLastRecipientNumber() != null) {
                 try {
                     XmppMuc.getInstance(sContext).inviteRoom(RecipientCmd.getLastRecipientNumber(),
@@ -148,24 +129,18 @@ public class SmsCmd extends CommandHandlerBase {
                     send(R.string.chat_error, e.getLocalizedMessage());
                 }
             }
-        } else if (isMatchingCmd("delsms", command)) {
-            if (args.length() == 0) {
+        } else if (isMatchingCmd(c, "delsms")) {
+            if (arg1.length() == 0) {
                 send(R.string.chat_del_sms_syntax);
             } else {
-                int separatorPos = args.indexOf(":");
-                String subCommand = null;
                 String search = null;
-                if (-1 != separatorPos) {
-                    subCommand = args.substring(0, separatorPos);
-                    search = args.substring(separatorPos + 1);
-                    search = mAliasHelper.convertAliasToNumber(search);
-                } else if (args.length() > 0) {
-                    subCommand = args;
+                if (arg2.length() > 0) {
+                    search = mAliasHelper.convertAliasToNumber(arg2);
                 }
-                deleteSMS(subCommand, search);
+                deleteSMS(arg1, search);
             }
-        } else if (isMatchingCmd("reply", command)) {
-            if (args.length() == 0) {
+        } else if (isMatchingCmd(c, "reply")) {
+            if (arg1.length() == 0) {
                 executeNewCmd("recipient");
             } else if (RecipientCmd.getLastRecipientNumber() == null) {
                 send(R.string.chat_error_no_recipient);
@@ -173,7 +148,7 @@ public class SmsCmd extends CommandHandlerBase {
                 if (sSettingsMgr.markSmsReadOnReply) {
                     mSmsManager.markAsRead(RecipientCmd.getLastRecipientNumber());
                 }
-                sendSMS(args, RecipientCmd.getLastRecipientNumber());
+                sendSMS(arg1, RecipientCmd.getLastRecipientNumber());
             }
         }
     }
@@ -279,7 +254,7 @@ public class SmsCmd extends CommandHandlerBase {
         ArrayList<Contact> contacts;
 
         send(R.string.chat_sms_search_start);
-        contacts = ContactsManager.getMatchingContacts(sContext, contactName != null ? contactName : "*");
+        contacts = ContactsManager.getMatchingContacts(sContext, contactName);
 
         if (contacts.size() > 0) {
             send(R.string.chat_sms_search, message, contacts.size());
