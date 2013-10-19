@@ -8,9 +8,9 @@ public class ToastCmd extends CommandHandlerBase {
         super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Toast", new Cmd("toast"));
     }
 
-    protected void execute(String cmd, String args) {        
-        if (!args.equals("")) {
-            MainService.displayToast(args, null, false);
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "toast") && !cmd.getAllArguments().equals("")) {
+            MainService.displayToast(cmd.getAllArguments(), null, false);
         }
     }
     

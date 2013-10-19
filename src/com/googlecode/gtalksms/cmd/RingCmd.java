@@ -34,26 +34,27 @@ public class RingCmd extends CommandHandlerBase {
         clearMediaPlayer();
     }
     @Override
-    protected void execute(String cmd, String args) {
-        if (isMatchingCmd("ring", cmd)) {
-            if (args.equals("stop")) {
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "ring")) {
+            if (cmd.getArg1().equals("stop")) {
                 send(R.string.chat_stop_ringing);
                 stop();
-            } else if (ring(Tools.parseInt(args, 100))) {
+            } else if (ring(Tools.parseInt(cmd.getArg1(), 100))) {
                 send(R.string.chat_start_ringing);
             } else {
                 send(R.string.chat_error_ringing);
             }
-        } else if (isMatchingCmd("ringmode", cmd)) {
+        } else if (isMatchingCmd(cmd, "ringmode")) {
             int mode;
-            if (args.equals("vibrate")) {
+            String arg1 = cmd.getArg1();
+            if (arg1.equals("vibrate")) {
                 sAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-            } else if (args.equals("normal")) {
+            } else if (arg1.equals("normal")) {
                 sAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-            } else if (args.equals("silent")) {
+            } else if (arg1.equals("silent")) {
                 sAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-            } else if (!args.equals("")) {
-                send(R.string.chat_ringer_error_cmd, args);
+            } else if (!arg1.equals("")) {
+                send(R.string.chat_ringer_error_cmd, arg1);
                 return;
             }
             mode = sAudioManager.getRingerMode();

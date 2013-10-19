@@ -25,13 +25,15 @@ public class BluetoothCmd extends CommandHandlerBase {
         sBluetoothAdapter = null;
     }
 
-    protected void execute(String cmd, String args) {
-        if(args.equals("on")) {
-            enableAdapter();
-        } else if (args.equals("off")) {
-            disableAdapter();
-        } else {
-            showState();
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "bluetooth")) {
+            if(cmd.getArg1().equals("on")) {
+                enableAdapter();
+            } else if (cmd.getArg1().equals("off")) {
+                disableAdapter();
+            } else {
+                showState();
+            }
         }
     }
     

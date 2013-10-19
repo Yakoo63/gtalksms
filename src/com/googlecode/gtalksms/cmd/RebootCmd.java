@@ -27,17 +27,13 @@ public class RebootCmd extends CommandHandlerBase {
         mPowerManager = (PowerManager) sContext.getSystemService(Context.POWER_SERVICE);
     }
 
-    protected void execute(String cmd, String args) {
+    protected void execute(Command cmd) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.FROYO) {
             send("You need to run at last Froyo to issue the " + cmd + " command");
             return;
         }
         
-        if (args.equals("")) {
-            mPowerManager.reboot(null);
-        } else {
-            mPowerManager.reboot(args);
-        }
+        mPowerManager.reboot(cmd.getArg1().equals("") ? null : cmd.getArg1());
     }
     
     @Override

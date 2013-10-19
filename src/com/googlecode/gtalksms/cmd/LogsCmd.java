@@ -70,23 +70,24 @@ public class LogsCmd extends CommandHandlerBase {
         super(mainService, CommandHandlerBase.TYPE_INTERNAL, "Logs", new Cmd("logs", "log"));
     }
 
-    protected void execute(String cmd, String args) {
-        String[] argsArray = splitArgs(args);
-        if (isMatchingCmd("logs", cmd)) {
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "logs")) {
             if (mThread != null && mThread.isAlive()) {
                 mLogsThread.stop();
             }
-            if (argsArray.length == 0) {
-                mLogsThread = new LogsThread();
-            } else if (argsArray.length == 1) {
-                if (Tools.isInt(argsArray[0])) {
-                    mLogsThread = new LogsThread(Tools.parseInt(argsArray[0], 100));
+            String arg1 = cmd.getArg1();
+            String arg2 = cmd.getArg2();
+            if (!arg2.equals("")) {
+                mLogsThread = new LogsThread(arg1, Tools.parseInt(arg2, 100));
+            } else if (!arg1.equals("")) {
+                if (Tools.isInt(arg1)) {
+                    mLogsThread = new LogsThread(Tools.parseInt(arg1, 100));
                 } else {
-                    mLogsThread = new LogsThread(argsArray[0]);
+                    mLogsThread = new LogsThread(arg1);
                 }
-            } else if (argsArray.length == 2) {
-                mLogsThread = new LogsThread(argsArray[0], Tools.parseInt(argsArray[1], 100));
-            }
+            } else {
+                mLogsThread = new LogsThread();
+            } 
             mThread = new Thread(mLogsThread);
             mThread.start();
         }

@@ -23,11 +23,9 @@ public class RecipientCmd extends CommandHandlerBase {
         sRecipientCmd = this;
     }
 
-    protected void execute(String cmd, String args) {
-        if (isMatchingCmd("recipient", cmd)) {
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "recipient")) {
             displayLastRecipient(true);
-        } else {
-            send("Unkown argument \"" + args + "\" for command \"" + cmd + "\"");
         }
     }
     

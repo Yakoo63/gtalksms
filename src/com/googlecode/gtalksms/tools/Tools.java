@@ -144,16 +144,6 @@ public class Tools {
         return res;
     }
     
-    
-    public static Integer parseInt(String[] values, int index, Integer defaultValue) {
-        Integer res = defaultValue;
-        try { 
-            res = Integer.parseInt(values[index]); 
-        } catch(Exception e) {}
-        
-        return res;
-    }
-    
     public static Integer parseInt(String value, Integer defaultValue) {
         Integer res = defaultValue;
         try { 

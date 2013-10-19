@@ -190,11 +190,11 @@ public abstract class CommandHandlerBase {
         }
         
         return null;
-    } 
-    
-    boolean isMatchingCmd(String cmdName, String input) {
-        Cmd cmd = getCommand(input);        
-        return cmd != null && cmd.getName().equals(cmdName);
+    }
+
+    boolean isMatchingCmd(Command command, String ref) {
+        Cmd cmd = getCommand(command.getCommand());
+        return cmd != null && cmd.getName().equals(ref);
     }
     
     void executeNewCmd(String cmd) {
@@ -220,59 +220,18 @@ public abstract class CommandHandlerBase {
      * @param answerTo
      */
     public final void execute(String cmd, String args, String answerTo) {
-        /*
-         * This method should be depreciated, and currently contains an 
-         * experiment to isolate Xmpp From the commands altogether.
-         * As the XmppUserCommand class is verified to be good, the XmppUserCommand
-         * initialization should be moved out to the caller of this method.
-         */
-        execute(new XmppUserCommand(XmppManager.getInstance(sContext), cmd, args, answerTo));
+        this.mAnswerTo = answerTo;
+        execute(new Command(cmd, args, answerTo));
     }
-    
-    private static class XmppUserCommand extends Command {
-        private final XmppManager xmppManager;
-        public XmppUserCommand(XmppManager xmppManager, String cmd, String args, String replyTo) {
-            super(cmd + ":" + args, replyTo);
-            this.xmppManager = xmppManager;
-        }
 
-        @Override
-        public void respond(String message) {
-            xmppManager.send(new XmppMsg(message), getReplyTo());
-        }
-        
-        @SuppressWarnings("unused")
-        public void respond(XmppMsg msg) {
-            xmppManager.send(msg, getReplyTo());
-        }
-        
-    }
-    
-    void execute(Command userCommand) {
-        /*
-         * Default implementation is to fall back to old behavior with
-         * _answerTo variable and Xmpp awareness in sub classes.
-         * <p>
-         * Make abstract when execute(String, String) is gone, but for now default to it for
-         * backwards compatibility.
-         */
-        this.mAnswerTo = userCommand.getReplyTo();
-        execute(userCommand.getCommand(), userCommand.getAllArguments());
-    }
-    
     /**
      * Executes the given command
      * sends the results, if any, back to the given JID
-     * 
-     * @param cmd the base command
-     * @param args the arguments - substring after the first ":", if no other arguments where given this will be ""
-     * @deprecated Use {@link #execute(Command)} instead
+     *
+     * @param userCommand the base command
      */
-    @Deprecated
-    void execute(String cmd, String args) {
-        throw new RuntimeException("Must implement execute(UserCommand)");
-    }
-        
+    abstract void execute(Command userCommand);
+
     /**
      * Stop all ongoing actions caused by a command
      * gets called in mainService when "stop" command received

@@ -33,59 +33,55 @@ public class AliasCmd extends CommandHandlerBase {
     }
     
     @Override
-    protected void execute(String cmd, String args) {
-        if (args.equals("")) {
-            sendHelp();
+    protected void execute(Command cmd) {
+        String subCmd = cmd.getArg1();
+        if (subCmd.equals("add")) {
+            add(cmd.getArg1(), cmd.getArg2(), cmd.getArg3());
+        } else if (subCmd.equals("del")) {
+            del(cmd.getArg1(), cmd.getArg2());
+        } else if (subCmd.equals("show")) {
+            show(cmd.getArg1(), cmd.getArg2());
         } else {
-            String[] subCommand = splitArgs(args);
-            if (subCommand[0].equals("add")) {
-                add(subCommand);
-            } else if (subCommand[0].equals("del")) {
-                del(subCommand);
-            } else if (subCommand[0].equals("show")) {
-                show(subCommand);
-            } else {
-                sendHelp();
-            }
+            sendHelp();
         }
     }
     
-    private void add(String[] subCommand) {
-        if (subCommand.length < 3) {
-            send(R.string.chat_error_more_arguments, subCommand[0]);
-        } else if (Phone.isCellPhoneNumber(subCommand[2])) {
-                if (aliasHelper.addAliasByNumber(subCommand[1], subCommand[2])) {
-                    send(R.string.chat_alias_add_by_number, subCommand[1], subCommand[2]);
+    private void add(String command, String arg1, String arg2) {
+        if (arg1.equals("") || arg2.equals("")) {
+            send(R.string.chat_error_more_arguments, command);
+        } else if (Phone.isCellPhoneNumber(arg2)) {
+                if (aliasHelper.addAliasByNumber(arg1, arg2)) {
+                    send(R.string.chat_alias_add_by_number, arg1, arg2);
                 } else {
                     send(R.string.chat_alias_invalid_char);
                 }
             } else {
-                ArrayList<Phone> res = aliasHelper.addAliasByName(subCommand[1], subCommand[2]);
+                ArrayList<Phone> res = aliasHelper.addAliasByName(arg1, arg2);
                 if (res == null) {
                     send(R.string.chat_alias_invalid_char);
                 } else if (res.size() != 1) {
-                    send(R.string.chat_error_unkown_name);
+                    send(R.string.chat_error_unknown_name);
                 } else {
                     Phone p = res.get(0);
-                    send(R.string.chat_alias_add_by_name, subCommand[1], p.getContactName(), p.getNumber());
+                    send(R.string.chat_alias_add_by_name, arg1, p.getContactName(), p.getNumber());
                 }
             }
     }
     
-    private void del(String[] subCommand) {
-        if (subCommand.length < 2) {
-            send(R.string.chat_error_more_arguments, subCommand[0]);
-        } else if (aliasHelper.deleteAlias(subCommand[1])) {
-            send(R.string.chat_alias_del_suc, subCommand[1]);
+    private void del(String command, String arg1) {
+        if (arg1.equals("")) {
+            send(R.string.chat_error_more_arguments, command);
+        } else if (aliasHelper.deleteAlias(arg1)) {
+            send(R.string.chat_alias_del_suc, arg1);
         } else {
-            send(R.string.chat_alias_del_fail, subCommand[1]);
+            send(R.string.chat_alias_del_fail, arg1);
         }
     }
     
-    private void show(String[] subCommand) {
-        if (subCommand.length < 2) {
-            send(R.string.chat_error_more_arguments, subCommand[0]);
-        } else if (subCommand[1].equals("all")) {
+    private void show(String command, String arg1) {
+        if (arg1.equals("")) {
+            send(R.string.chat_error_more_arguments, command);
+        } else if (arg1.equals("all")) {
             String[][] aliases = aliasHelper.getAllAliases();
             if (aliases == null) {
                 send(R.string.chat_alias_empty);
@@ -103,9 +99,9 @@ public class AliasCmd extends CommandHandlerBase {
                 send(msg);
             }
         } else {
-            String[] res = aliasHelper.getAliasOrNull(subCommand[1]);
+            String[] res = aliasHelper.getAliasOrNull(arg1);
             if (res == null) {
-                send(R.string.chat_alias_show_non_existent, subCommand[1]);
+                send(R.string.chat_alias_show_non_existent, arg1);
             } else if (res.length == 2) {
                 send("\'" + res[0] + "\' -> " + res[1]);
             } else {

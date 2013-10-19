@@ -29,12 +29,12 @@ public class WifiCmd extends CommandHandlerBase {
     }
     
     public void deactivate() {
-        super.activate();
+        super.deactivate();
         sWifiManager = null;
     }
 
     protected void execute(Command cmd) {
-        String arg = cmd.get1();
+        String arg = cmd.getArg1();
         if (arg.equals("on")) {
             enableWifi();
         } else if (arg.equals("off")) {
@@ -44,9 +44,9 @@ public class WifiCmd extends CommandHandlerBase {
         } else if (arg.equals("list")) {
             listNetworks();
         } else if (arg.equals("enable")) {
-            enableNetwork(cmd.get2());
+            enableNetwork(cmd.getArg2());
         } else if (arg.equals("disable")) {
-            disableNetwork(cmd.get2());
+            disableNetwork(cmd.getArg2());
         } else {
             send("Unknown argument \"" + arg + "\" for command \"" + cmd + "\"");
         }

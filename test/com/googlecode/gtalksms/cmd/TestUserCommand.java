@@ -39,21 +39,21 @@ public class TestUserCommand extends AndroidTestCase {
     }
     
     public void testGet1() {
-        assertEquals("arg1", cmd("mycmd:arg1:arg2").get1());
-        assertEquals("arg1", cmd("mycmd : arg1 : arg2").get1());
-        assertEquals("arg1", cmd("mycmd:arg1:arg2").get1());
-        assertEquals("arg1", cmd("mycmd:arg1").get1());
-        assertEquals("", cmd("mycmd::arg2").get1());
-        assertEquals("", cmd("mycmd:").get1());
-        assertEquals("", cmd("mycmd").get1());
-        assertEquals("", cmd(":").get1());
-        assertEquals("", cmd("").get1());
+        assertEquals("arg1", cmd("mycmd:arg1:arg2").getArg1());
+        assertEquals("arg1", cmd("mycmd : arg1 : arg2").getArg1());
+        assertEquals("arg1", cmd("mycmd:arg1:arg2").getArg1());
+        assertEquals("arg1", cmd("mycmd:arg1").getArg1());
+        assertEquals("", cmd("mycmd::arg2").getArg1());
+        assertEquals("", cmd("mycmd:").getArg1());
+        assertEquals("", cmd("mycmd").getArg1());
+        assertEquals("", cmd(":").getArg1());
+        assertEquals("", cmd("").getArg1());
     }
     
     public void testGet2() {
-        assertEquals("arg2", cmd("mycmd:arg1:arg2").get2());
-        assertEquals("", cmd("mycmd:arg1:").get2());
-        assertEquals("", cmd("mycmd:arg1").get2());
+        assertEquals("arg2", cmd("mycmd:arg1:arg2").getArg2());
+        assertEquals("", cmd("mycmd:arg1:").getArg2());
+        assertEquals("", cmd("mycmd:arg1").getArg2());
     }
 
     private Command cmd(String cmd) {
@@ -63,11 +63,6 @@ public class TestUserCommand extends AndroidTestCase {
     static class NonReplyingUserCommand extends Command {
         public NonReplyingUserCommand(String originalCommand, String replyTo) {
             super(originalCommand, replyTo);
-        }
-
-        @Override
-        public void respond(String message) {
-            return;
         }
     }
 

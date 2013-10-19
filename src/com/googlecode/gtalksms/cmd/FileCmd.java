@@ -40,17 +40,16 @@ public class FileCmd extends CommandHandlerBase {
     }
     
     @Override
-    protected void execute(String cmd, String args) {
-        if ( ex != null) {
-            throw new IllegalStateException(ex);
-        }
-        
-        if (isMatchingCmd("send", cmd)) {
-            sendFile(args);
-        } else if (isMatchingCmd("ls", cmd)) {
-            ls(args);
-        } else if (isMatchingCmd("rm", cmd)) {
-            rm(args);
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "send")) {
+            if (ex != null) {
+                throw new IllegalStateException(ex);
+            }
+            sendFile(cmd.getArg1());
+        } else if (isMatchingCmd(cmd, "ls")) {
+            ls(cmd.getArg1());
+        } else if (isMatchingCmd(cmd, "rm")) {
+            rm(cmd.getArg1());
         }
     }
     
@@ -89,7 +88,7 @@ public class FileCmd extends CommandHandlerBase {
                 send(R.string.chat_file_transfer_started, mFile.getAbsolutePath(), transfer.getFileSize() / 1024);
                 
                 // We allow 30s before that status go to in progress
-               int currentCycle = 0;
+                int currentCycle = 0;
                 while (!transfer.isDone()) {
                     if (transfer.getStatus() == FileTransfer.Status.refused) {
                         send(R.string.chat_file_transfer_refused);
@@ -98,8 +97,7 @@ public class FileCmd extends CommandHandlerBase {
                         send(mXmppFileManager.returnAndLogError(transfer));
                         return;
                     } else if (transfer.getStatus() == FileTransfer.Status.negotiating_transfer) {
-                        // user has not accepted the transfer yet
-                        // reset the cycle count
+                        // user has not accepted the transfer yet reset the cycle count
                         currentCycle = 0; 
                     } else if (transfer.getStatus() != FileTransfer.Status.in_progress) {
                         // there is still not transfer going on

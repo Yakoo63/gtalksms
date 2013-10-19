@@ -38,8 +38,8 @@ public class VideoCmd extends CommandHandlerBase {
 
     @Override
     public void execute(Command c) {
-        String subCommand = c.get1();
-        if (isMatchingCmd("video", c.getCommand())) {
+        String subCommand = c.getArg1();
+        if (isMatchingCmd(c, "video")) {
             if (subCommand.equals("") || subCommand.equals("start")) {
                 Intent intent = new Intent(Video.VIDEO_START, null, sContext, Video.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK + Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -52,7 +52,7 @@ public class VideoCmd extends CommandHandlerBase {
                 } catch (Exception e) {
                 }
             } else if (subCommand.equals("params")) {
-                String param = c.get2();
+                String param = c.getArg2();
 
                 if (param.equals("")) {
                     XmppMsg msg = new XmppMsg();
@@ -64,7 +64,7 @@ public class VideoCmd extends CommandHandlerBase {
                     }
                     send(msg);
                 } else if (mParamList.contains(param)) {
-                    String value = c.get3();
+                    String value = c.getArg3();
 
                     if (!value.equals("")) {
                         Integer intValue = Tools.parseInt(value);

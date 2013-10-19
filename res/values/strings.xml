@@ -99,7 +99,7 @@
     <string name="chat_error_ringing">Unable to ring. Check if ringtone is not set to silent and accessible or that the alarm volume is set.</string>
     <string name="chat_error_root">Can\'t have root access!</string>
     <string name="chat_error_unknown_cmd">\'%s\': unknown command. Send \"?\" for help.</string>
-    <string name="chat_error_unkown_name">Contact name is not known or not distinct</string>
+    <string name="chat_error_unknown_name">Contact name is not known or not distinct</string>
     <string name="chat_file_error">File \'%1$s\' doesn\'t exist!</string>
     <string name="chat_file_sending">Sending you: %1$s to: %2$s</string>
     <string name="chat_file_transfer_dir">Directories within %1$s</string>

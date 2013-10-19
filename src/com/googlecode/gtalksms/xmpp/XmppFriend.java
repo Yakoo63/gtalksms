@@ -39,7 +39,7 @@ public class XmppFriend {
             return "Offline";
         default:
             Log.e("XMPP Friend state unknown: " + state);
-            return "unkown";
+            return "Unknown";
         }
     }
 }

@@ -13,7 +13,7 @@ public class ExitCmd extends CommandHandlerBase {
     }
 
     @Override
-    protected void execute(String cmd, String args) {
+    protected void execute(Command cmd) {
         MainService.sendToServiceHandler(new Intent(MainService.ACTION_DISCONNECT));
         sMainService.stopSelf();
     }

@@ -35,12 +35,9 @@ public class SystemCmd extends CommandHandlerBase {
     
     public void activate() {
         super.activate();
-        activityManager = (ActivityManager) sContext
-                .getSystemService(Context.ACTIVITY_SERVICE);
-        connectivityManager = (ConnectivityManager) sContext
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        telephonyManager = (TelephonyManager) sContext
-                .getSystemService(Context.TELEPHONY_SERVICE);
+        activityManager = (ActivityManager) sContext.getSystemService(Context.ACTIVITY_SERVICE);
+        connectivityManager = (ConnectivityManager) sContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        telephonyManager = (TelephonyManager) sContext.getSystemService(Context.TELEPHONY_SERVICE);
         sNullIntentStartCounter = CrashedStartCounter.getInstance(sContext);
 
     }
@@ -53,9 +50,9 @@ public class SystemCmd extends CommandHandlerBase {
     }
 
     @Override
-    protected void execute(String cmd, String args) {
+    protected void execute(Command cmd) {
         XmppMsg res = new XmppMsg(); 
-        if (isMatchingCmd("sysinfo", cmd)) {
+        if (isMatchingCmd(cmd, "sysinfo")) {
             ActivityManager.MemoryInfo memInfoSystem = new ActivityManager.MemoryInfo();
             activityManager.getMemoryInfo(memInfoSystem);
             MemoryInfo[] memInfoProc = activityManager.getProcessMemoryInfo(myPidArray);
@@ -80,7 +77,7 @@ public class SystemCmd extends CommandHandlerBase {
             appendBuildInfo(res);
             res.newLine();
             appendNullIntentStartCounter(res);
-        } else if (isMatchingCmd("telinfo", cmd)) {
+        } else if (isMatchingCmd(cmd, "telinfo")) {
             appendTelephonStatus(res);
         }
         send(res);
@@ -91,7 +88,7 @@ public class SystemCmd extends CommandHandlerBase {
     }
     
     private static String getMyImportance() {
-        String res = "unkown";
+        String res = "Unknown";
         RunningAppProcessInfo myInfo = null;
         List<RunningAppProcessInfo> apps = activityManager.getRunningAppProcesses();
         for (RunningAppProcessInfo info : apps) {

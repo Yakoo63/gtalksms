@@ -15,7 +15,7 @@ public class BatteryCmd extends CommandHandlerBase {
     private static final String PSRC_USB = "USB";
     private static final String PSRC_AC = "AC";
     private static final String PSRC_BATT = "Battery";
-    private static final String PSRC_UNKOWN = "Unknown";
+    private static final String PSRC_UNKNOWN = "Unknown";
     
     private static boolean sReceiverRegistered = false; 
     private static BroadcastReceiver sBatInfoReceiver = null;
@@ -55,7 +55,7 @@ public class BatteryCmd extends CommandHandlerBase {
                             pSourceStr = PSRC_USB;
                             break;
                         default:
-                            pSourceStr = PSRC_UNKOWN;
+                            pSourceStr = PSRC_UNKNOWN;
                             break;
                         }
                         // something has changed, update
@@ -139,9 +139,8 @@ public class BatteryCmd extends CommandHandlerBase {
         sendBatteryInfos(false);
     }
     
-    @Override
-    protected void execute(String cmd, String args) {
-        if (args.equals("silent")) {
+    protected void execute(Command cmd) {
+        if (cmd.getArg1().equals("silent")) {
             sendBatteryInfos(false);
         } else {
             sendBatteryInfos(true);

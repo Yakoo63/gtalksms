@@ -19,10 +19,9 @@ public class MmsCmd extends CommandHandlerBase {
     }
 
     @Override
-    protected void execute(String command, String args) {
-        if (isMatchingCmd("mms", command)) {
-            String[] arg = splitArgs(args);
-            sendMmsListOnXmpp(mMmsManager.getLastMmsDetails(Tools.parseInt(arg, 0, 10)), null, null);
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "mms")) {
+            sendMmsListOnXmpp(mMmsManager.getLastMmsDetails(Tools.parseInt(cmd.getArg1(), 10)), null, null);
         }
     }
 

@@ -31,6 +31,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
                 new Cmd("tts-engine-list", "ttsenginelist"));
         mLocale = Locale.getDefault();
     }
+
     @Override
     public void activate() {
         super.activate();
@@ -45,17 +46,18 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
             mTts = null;
         }
     }
-    protected void execute(String cmd, String args) {
-        Log.i("TTS: " + cmd + " (" + args + ")");
+
+    protected void execute(Command cmd) {
+        Log.i("TTS: " + cmd.getOriginalCommand());
         
-        if (isMatchingCmd("tts", cmd)) {
+        if (isMatchingCmd(cmd, "tts")) {
             if (mTtsAvailable) {
-                mTts.speak(args, TextToSpeech.QUEUE_ADD, null);
+                mTts.speak(cmd.getAllArguments(), TextToSpeech.QUEUE_ADD, null);
             } else {
                 send(getString(R.string.chat_tts_installation));
                 sContext.startActivity(new Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA));
             }
-        } else if (isMatchingCmd("tts-engine-list", cmd)) {
+        } else if (isMatchingCmd(cmd, "tts-engine-list")) {
             if (Build.VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
                 send(getString(R.string.android_version_incompatible, "ICE CREAM SANDWICH"));
             } else {
@@ -65,7 +67,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
                 }
                 send(sb.substring(0, Math.max(0,sb.length() - 1)));
             }
-        } else if (isMatchingCmd("tts-lang-list", cmd)) {
+        } else if (isMatchingCmd(cmd, "tts-lang-list")) {
             StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_languages));
             for (Locale locale : Locale.getAvailableLocales()) {
                 switch (mTts.isLanguageAvailable(locale)) {
@@ -84,20 +86,21 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
                 }
             }
             send(sb.substring(0, Math.max(0,sb.length() - 1)));
-        } else if (isMatchingCmd("tts-engine", cmd)) {
+        } else if (isMatchingCmd(cmd, "tts-engine")) {
             if (Build.VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
                 send(getString(R.string.android_version_incompatible, "ICE CREAM SANDWICH"));
             } else {
-                mTts = new TextToSpeech(sContext, this, args);
+                mTts = new TextToSpeech(sContext, this, cmd.getAllArguments());
                 send(getString(R.string.chat_tts_engine) + mTts.getDefaultEngine());
             }
-        } else if (isMatchingCmd("tts-lang", cmd)) {
-            String[] argList = splitArgs(args);
-            if (argList.length == 1) {
-                mLocale = new Locale(args);
+        } else if (isMatchingCmd(cmd, "tts-lang")) {
+            String arg1 = cmd.getArg1();
+            String arg2 = cmd.getArg2();
+            if (!arg1.equals("") && !arg2.equals("")) {
+                mLocale = new Locale(arg1, arg2);
                 mTts.setLanguage(mLocale);
-            } else if (argList.length == 2) {
-                mLocale = new Locale(argList[0], argList[1]);
+            } else if (!arg1.equals("")) {
+                mLocale = new Locale(arg1);
                 mTts.setLanguage(mLocale);
             } 
             send(getString(R.string.chat_tts_language) + mTts.getLanguage().getDisplayName());

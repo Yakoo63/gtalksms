@@ -18,7 +18,7 @@ public class SettingsCmd extends CommandHandlerBase {
     public void execute(Command c) {
         Map<String, ?> settings = sSettingsMgr.getAllSharedPreferences();
         ArrayList<String> protectedSettings = sSettingsMgr.getProtectedSettings();
-        String key = c.get1();
+        String key = c.getArg1();
         
         if(key.equals("")) {
             XmppMsg msg = new XmppMsg();
@@ -37,7 +37,7 @@ public class SettingsCmd extends CommandHandlerBase {
             send(msg);
         }
         else if(settings.containsKey(key)) {
-            String newVal = c.get2();
+            String newVal = c.getArg2();
             if(!"".equals(newVal)) {
                 if (!protectedSettings.contains(key)) {
                     Integer intValue = Tools.parseInt(newVal);

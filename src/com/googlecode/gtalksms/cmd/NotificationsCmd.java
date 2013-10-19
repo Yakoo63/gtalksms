@@ -16,39 +16,30 @@ public class NotificationsCmd extends CommandHandlerBase {
     }
 
     @Override
-    protected void execute(String cmd, String args) {
+    protected void execute(Command cmd) {
         ArrayList<String> apps = new ArrayList<String>(Arrays.asList(TextUtils.split(sSettingsMgr.hiddenNotifications, "#sep#")));
-        if (!args.equals("")) {
-            int separatorPos = args.indexOf(":");
+        String arg1 = cmd.getArg1();
+        String arg2 = cmd.getArg2();
 
-            // There is more than 1 argument
-            if (-1 != separatorPos) {
-                String subCmd = args.substring(0, separatorPos);
-                String app = args.substring(separatorPos + 1);
-            
-                if (subCmd.equals("hide")) {
-                    if (!apps.contains(app)) {
-                        apps.add(app);
-                        sSettingsMgr.saveSetting("hiddenNotifications", TextUtils.join("#sep#", apps));
-                    }
-                } else if (subCmd.equals("unhide") || subCmd.equals("show")) {
-                    if (apps.contains(app)) {
-                        apps.remove(app);
-                        sSettingsMgr.saveSetting("hiddenNotifications", TextUtils.join("#sep#", apps));
-                    }
-                } else if (subCmd.equals("ignoreDelay")) {
-                    Integer intValue = Tools.parseInt(app);
-                    if (intValue != null) {
-                        sSettingsMgr.saveSetting("notificationIgnoreDelay", intValue);
-                    }
-                    send("Ignoring duplicated notifications under " + sSettingsMgr.notificationIgnoreDelay + "ms");
-                    return;
-                }
-            } else if (args.equals("ignoreDelay")) {
-                send("Ignoring duplicated notifications under " + sSettingsMgr.notificationIgnoreDelay + "ms");
-                return;
+        if (arg1.equals("hide")) {
+            if (!apps.contains(arg2)) {
+                apps.add(arg2);
+                sSettingsMgr.saveSetting("hiddenNotifications", TextUtils.join("#sep#", apps));
             }
+        } else if (arg1.equals("unhide") || arg1.equals("show")) {
+            if (apps.contains(arg2)) {
+                apps.remove(arg2);
+                sSettingsMgr.saveSetting("hiddenNotifications", TextUtils.join("#sep#", apps));
+            }
+        } else if (arg1.equals("ignoreDelay")) {
+            Integer intValue = Tools.parseInt(arg2);
+            if (intValue != null) {
+                sSettingsMgr.saveSetting("notificationIgnoreDelay", intValue);
+            }
+            send("Ignoring duplicated notifications under " + sSettingsMgr.notificationIgnoreDelay + "ms");
+            return;
         }
+
         send("Black list: " + TextUtils.join(", ", apps));
     }
     

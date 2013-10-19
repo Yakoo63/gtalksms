@@ -25,7 +25,7 @@ import android.util.Log;
 import com.googlecode.gtalksms.SettingsManager;
 
 public class MyBackupAgent extends BackupAgent {
-    public static final int KEYTYPE_UNKOWN = 0;
+    public static final int KEYTYPE_UNKNOWN = 0;
     private static final int KEYTYPE_STRING = 1;
     private static final int KEYTYPE_INT = 2;
     private static final int KEYTYPE_BOOLEAN = 3;

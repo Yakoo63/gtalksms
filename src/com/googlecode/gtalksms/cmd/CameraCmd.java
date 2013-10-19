@@ -2,6 +2,7 @@ package com.googlecode.gtalksms.cmd;
 
 import java.io.File;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -64,6 +65,7 @@ public class CameraCmd extends CommandHandlerBase {
         windowManager = (WindowManager) sMainService.getSystemService(Context.WINDOW_SERVICE);
         audioManager = (AudioManager) sMainService.getSystemService(Context.AUDIO_SERVICE);
     }
+
     @Override
     public synchronized void deactivate() {
         super.deactivate();
@@ -85,28 +87,28 @@ public class CameraCmd extends CommandHandlerBase {
             sCamera = null;
         }
     }
+
     @Override
-    protected void execute(String cmd, String args) {
-        String[] splitedArgs = splitArgs(args);
-        if (isMatchingCmd("camera", cmd)) {
-            if (args.equals("") || splitedArgs[0].equals("")) {
+    protected void execute(Command cmd) {
+        String arg1 = cmd.getArg1();
+        if (isMatchingCmd(cmd, "camera")) {
+            if (arg1.equals("")) {
                 takePicture(VOID_CALLBACK);
-            } else if (splitedArgs[0].equals("email")) {
+            } else if (arg1.equals("email")) {
                 takePicture(EMAIL_CALLBACK);
-            } else if (splitedArgs[0].equals("xmpp")) {
+            } else if (arg1.equals("xmpp")) {
                 takePicture(XMPP_CALLBACK);
-            } else if (splitedArgs[0].equals("list")) {
+            } else if (arg1.equals("list")) {
                 listCameras();
-            } else if (splitedArgs[0].equals("set") && splitedArgs.length > 1) {
-                setCamera(splitedArgs[1]);
+            } else if (arg1.equals("set")) {
+                String arg2 = cmd.getArg2();
+                if (!arg2.equals("")){
+                    setCamera(arg2);
+                }
             }           
         } 
-        else if (isMatchingCmd("flash", cmd)) {
-            if (args.equals("") || splitedArgs[0].equals("on")) {
-                setLight(true);
-            } else {
-                setLight(false);
-            }
+        else if (isMatchingCmd(cmd, "flash")) {
+            setLight(arg1.equals("on"));
         }
     }
     
@@ -153,6 +155,7 @@ public class CameraCmd extends CommandHandlerBase {
         }
     }
     
+    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     private int getCameraOrientation() {
         CameraInfo info = new CameraInfo();
         Camera.getCameraInfo(cameraId, info);

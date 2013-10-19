@@ -57,16 +57,16 @@ public class CallCmd extends CommandHandlerBase {
     }
     
     @Override
-    protected void execute(String cmd, String args) {
-        if (isMatchingCmd("dial", cmd)) {
-            dial(args, false);
-        } else if (isMatchingCmd("call", cmd)) {
-            dial(args, true);
-        } else if (isMatchingCmd("calls", cmd)) {
-            readCallLogs(args);
-        } else if (isMatchingCmd("ignore", cmd)) {
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "dial")) {
+            dial(cmd.getArg1(), false);
+        } else if (isMatchingCmd(cmd, "call")) {
+            dial(cmd.getArg1(), true);
+        } else if (isMatchingCmd(cmd, "calls")) {
+            readCallLogs(cmd.getArg1());
+        } else if (isMatchingCmd(cmd, "ignore")) {
             ignoreIncomingCall();
-        } else if (isMatchingCmd("reject", cmd)) {
+        } else if (isMatchingCmd(cmd, "reject")) {
             rejectIncomingCall();
         }
     }

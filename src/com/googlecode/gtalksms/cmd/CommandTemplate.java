@@ -24,15 +24,14 @@ public class CommandTemplate extends CommandHandlerBase {
         super.deactivate();
     }
     
-    protected void execute(String cmd, String args) {
-        String[] sArgs = splitArgs(args);
-        if (cmd.equals("Your command")) {
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "cmd1")) {
             // do something useful
-            if (sArgs[0].equals("firstArgument")) {
+            if (cmd.getArg1().equals("firstArgument")) {
                 // do something useful
             }
         } else {
-            send("Unkown argument \"" + args + "\" for command \"" + cmd + "\"");
+            send("Unknown argument \"" + cmd.getAllArguments() + "\" for command \"" + cmd.getCommand() + "\"");
         }
     }
 

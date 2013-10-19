@@ -19,11 +19,11 @@ public class GeoCmd extends CommandHandlerBase {
     }
     
     @Override
-    protected void execute(String cmd, String args) {
-        if (isMatchingCmd("geo", cmd)) {
-            geo(args);
-        } else if (isMatchingCmd("where", cmd)) {
-            if (args.equals("stop")) {
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "geo")) {
+            geo(cmd.getAllArguments());
+        } else if (isMatchingCmd(cmd, "where")) {
+            if (cmd.getArg1().equals("stop")) {
                 send(R.string.chat_stop_locating);
                 stopLocatingPhone();    
             } else {
@@ -32,7 +32,7 @@ public class GeoCmd extends CommandHandlerBase {
             }
         }  
     }
-    
+
     /** Open geolocalization application */
     private void geo(String text) {
         List<Address> addresses = geoDecode(text);

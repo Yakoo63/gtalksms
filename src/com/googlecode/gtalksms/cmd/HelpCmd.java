@@ -152,10 +152,11 @@ public class HelpCmd extends CommandHandlerBase {
     }
 
     @Override
-    protected void execute(String cmd, String args) {
-        if (args.equals("all")) {
+    protected void execute(Command cmd) {
+        String subCmd = cmd.getArg1();
+        if (subCmd.equals("all")) {
             send(_msgAll);
-        } else if (args.equals("about")) {
+        } else if (subCmd.equals("about")) {
             send(_msgAbout);
             try {
                 send(getString(R.string.about_change_log) + "\n" + TextUtils.split(Web.DownloadFromUrl(Tools.CHANGELOG_URL), "\n\n")[0]);
@@ -163,34 +164,34 @@ public class HelpCmd extends CommandHandlerBase {
             } catch (Exception e) {
                 Log.w(Tools.LOG_TAG, "failed to access to remote files.");
             }
-        } else if (args.equals("changelog")) {
+        } else if (subCmd.equals("changelog")) {
             try {
                 send(getString(R.string.about_change_log) + "\n" + Web.DownloadFromUrl(Tools.CHANGELOG_URL));
             } catch (Exception e) {
                 Log.w(Tools.LOG_TAG, "failed to access to remote files.");
             }
-        } else if (commands.containsKey(args)) {
-        	ArrayList<String> helpLines = commands.get(args).help();
+        } else if (commands.containsKey(subCmd)) {
+        	ArrayList<String> helpLines = commands.get(subCmd).help();
             if (!helpLines.isEmpty()) {
                 XmppMsg helpMsg = new XmppMsg();
                 addLinesToMsg(helpMsg, helpLines);
                 send(helpMsg);
             }
-        } else if (args.equals("contacts")) {
+        } else if (subCmd.equals("contacts")) {
             send(_msgContact);
-        } else if (args.equals("message")) {
+        } else if (subCmd.equals("message")) {
             send(_msgMessage);
-        } else if (args.equals("geo")) {
+        } else if (subCmd.equals("geo")) {
             send(_msgGeo);
-        } else if (args.equals("system")) {
+        } else if (subCmd.equals("system")) {
             send(_msgSystem);
-        } else if (args.equals("media")) {
+        } else if (subCmd.equals("media")) {
             send(_msgMedia);
-        } else if (args.equals("text")) {
+        } else if (subCmd.equals("text")) {
             send(_msgCopy);
-        } else if (args.equals("internal")) {
+        } else if (subCmd.equals("internal")) {
             send(_msgInternal);
-        } else if (args.equals("cat") || args.equals("categories")) {
+        } else if (subCmd.equals("cat") || subCmd.equals("categories")) {
             send(_msgCategories);
         } else {
             send(_msg);

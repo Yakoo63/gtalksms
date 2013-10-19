@@ -99,7 +99,7 @@
     <string name="chat_error_ringing">Fehler bei Wiedergabe des Klingeltons - Klingelton lautlos/stumm, nicht verfügbar oder Lautstärke auf 0 gesetzt</string>
     <string name="chat_error_root">Fehler: Root nicht möglich!</string>
     <string name="chat_error_unknown_cmd">\'%s\': unbekannter Befehl. \&quot;?\&quot; für Hilfe.</string>
-    <string name="chat_error_unkown_name">Kontakt ist nicht bekannt oder eindeutig</string>    
+    <string name="chat_error_unknown_name">Kontakt ist nicht bekannt oder eindeutig</string>
     <string name="chat_file_error">Datei \'%1$s\' existiert nicht</string>
     <string name="chat_file_sending">Sennde: %1$s an: %2$s</string>
     <string name="chat_file_transfer_dir">Verzeichnisse unter %1$s</string>

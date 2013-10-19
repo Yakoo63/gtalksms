@@ -10,16 +10,16 @@ public class KeyboardCmd extends CommandHandlerBase {
     }
     
     @Override
-    protected void execute(String cmd, String args) {
+    protected void execute(Command cmd) {
         KeyboardInputMethod keyboard = sMainService.getKeyboard();
-        String msg = args.replace("\\n", "\n");
+        String msg = cmd.getAllArguments().replace("\\n", "\n");
         
         if (keyboard != null) {
-            if (isMatchingCmd("write", cmd)) {
+            if (isMatchingCmd(cmd, "write")) {
                 keyboard.setText(msg);
-            } else if (isMatchingCmd("wappend", cmd)) {
+            } else if (isMatchingCmd(cmd, "wappend")) {
                 keyboard.setText(keyboard.getText() + msg);
-            } else if (isMatchingCmd("wsend", cmd)) {
+            } else if (isMatchingCmd(cmd, "wsend")) {
                 if (msg.length() > 0) {
                     keyboard.setText(msg);
                 }

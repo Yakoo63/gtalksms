@@ -211,7 +211,7 @@ public class MainService extends Service {
                     sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
                     break;
                 default:
-                    throw new IllegalStateException("Unkown initialState while handling" + MainService.ACTION_TOGGLE);
+                    throw new IllegalStateException("Unknown initialState while handling" + MainService.ACTION_TOGGLE);
             }
         } else if (action.equals(ACTION_NETWORK_STATUS_CHANGED)) {
             boolean networkChanged = intent.getBooleanExtra("networkChanged", false);

@@ -17,13 +17,13 @@ public class ApplicationsCmd extends CommandHandlerBase {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, "Applications", new Cmd("applist", "apps"), new Cmd("appfind"), new Cmd("appstart", "start"));
     }
 
-    protected void execute(String cmd, String args) {
-        if (isMatchingCmd("applist", cmd)) {
-            appsList(args);
-        } else if (isMatchingCmd("appstart", cmd)) {
-            launchApp(args);
-        } else if (isMatchingCmd("appfind", cmd)) {
-            findApp(args);
+    protected void execute(Command cmd) {
+        if (isMatchingCmd(cmd, "applist")) {
+            appsList(cmd.getArg1());
+        } else if (isMatchingCmd(cmd, "appstart")) {
+            launchApp(cmd.getArg1());
+        } else if (isMatchingCmd(cmd, "appfind")) {
+            findApp(cmd.getArg1());
         }
     }
     

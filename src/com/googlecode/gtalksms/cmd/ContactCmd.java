@@ -16,8 +16,8 @@ public class ContactCmd extends CommandHandlerBase {
     }
    
     @Override
-    protected void execute(String cmd, String searchedText) {
-    
+    protected void execute(Command cmd) {
+        String searchedText = cmd.getAllArguments();
         ArrayList<Contact> contacts = ContactsManager.getMatchingContacts(sContext, searchedText);
 
         if (contacts.size() > 0) {

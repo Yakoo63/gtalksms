@@ -99,7 +99,7 @@
     <string name="chat_error_ringing">Impossible de faire sonner le téléphone, vérifier les paramètres.</string>
     <string name="chat_error_root">Impossible d\'avoir l\'accès super administrateur !</string>
     <string name="chat_error_unknown_cmd">\'%s\' : commande inconnue. Envoyer \"?\" afficher l\'aide.</string>
-    <string name="chat_error_unkown_name">Nom du contact inconnu</string>
+    <string name="chat_error_unknown_name">Nom du contact inconnu</string>
     <string name="chat_file_error">Le fichier \'%1$s\' n\'existe pas !</string>
     <string name="chat_file_sending">Envoi: %1$s A: %2$s</string>
     <string name="chat_file_transfer_dir">Répertoires %1$s</string>
