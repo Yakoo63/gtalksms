@@ -54,12 +54,12 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
             if (mTtsAvailable) {
                 mTts.speak(cmd.getAllArguments(), TextToSpeech.QUEUE_ADD, null);
             } else {
-                send(getString(R.string.chat_tts_installation));
+                send(R.string.chat_tts_installation);
                 sContext.startActivity(new Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA));
             }
         } else if (isMatchingCmd(cmd, "tts-engine-list")) {
             if (Build.VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
-                send(getString(R.string.android_version_incompatible, "ICE CREAM SANDWICH"));
+                send(R.string.android_version_incompatible, "ICE CREAM SANDWICH");
             } else {
                 StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_engines));
                 for (EngineInfo engine : mTts.getEngines()) {
@@ -88,7 +88,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
             send(sb.substring(0, Math.max(0,sb.length() - 1)));
         } else if (isMatchingCmd(cmd, "tts-engine")) {
             if (Build.VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
-                send(getString(R.string.android_version_incompatible, "ICE CREAM SANDWICH"));
+                send(R.string.android_version_incompatible, "ICE CREAM SANDWICH");
             } else {
                 mTts = new TextToSpeech(sContext, this, cmd.getAllArguments());
                 send(getString(R.string.chat_tts_engine) + mTts.getDefaultEngine());

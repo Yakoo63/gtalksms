@@ -31,9 +31,9 @@ public class ClipboardCmd extends CommandHandlerBase {
             String text = cmd.getAllArguments();
             if (text.length() > 0) {
                 mOldClipboardMgr.setText(text);
-                send(getString(R.string.chat_text_copied));
+                send(R.string.chat_text_copied);
             } else if (mOldClipboardMgr.getText().length() > 0) {
-                send(getString(R.string.chat_clipboard, mOldClipboardMgr.getText()));
+                send(R.string.chat_clipboard, mOldClipboardMgr.getText());
             }
         } catch (Exception ex) {
             Log.w(Tools.LOG_TAG, "Clipboard error", ex);

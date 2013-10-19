@@ -106,9 +106,9 @@ public class ApplicationsCmd extends CommandHandlerBase {
             if (name.toLowerCase().equals(packageInfo.loadLabel(pm).toString().toLowerCase())) {
                 try {
                     sContext.startActivity(pm.getLaunchIntentForPackage(packageInfo.packageName));
-                    send(getString(R.string.chat_apps_start, name));
+                    send(R.string.chat_apps_start, name);
                 } catch (Exception e) {
-                    send(getString(R.string.chat_apps_start_err, name));
+                    send(R.string.chat_apps_start_err, name);
                     send(e);
                 }
             }

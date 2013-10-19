@@ -80,7 +80,7 @@ public class VideoCmd extends CommandHandlerBase {
                     Map<String, ?> settings = sSettingsMgr.getAllSharedPreferences();
                     send(param + ":" + settings.get(param));
                 } else {
-                    send(sContext.getString(R.string.chat_video_settings_unknown, param));
+                    send(R.string.chat_video_settings_unknown, param);
                 }
             }
         }
