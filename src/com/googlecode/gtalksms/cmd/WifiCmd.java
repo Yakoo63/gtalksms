@@ -33,23 +33,22 @@ public class WifiCmd extends CommandHandlerBase {
         sWifiManager = null;
     }
 
-    protected void execute(String cmd, String args) {
-        String[] sArgs = splitArgs(args);
-        
-        if (sArgs[0].equals("on")) {
+    protected void execute(Command cmd) {
+        String arg = cmd.get1();
+        if (arg.equals("on")) {
             enableWifi();
-        } else if (sArgs[0].equals("off")) {
+        } else if (arg.equals("off")) {
             disableWifi();
-        } else if (sArgs[0].equals("state") || args.equals("")) {
+        } else if (arg.equals("state") || arg.equals("")) {
             sendStatus();
-        } else if (sArgs[0].equals("list")) {
+        } else if (arg.equals("list")) {
             listNetworks();
-        } else if (sArgs[0].equals("enable")) {
-            enableNetwork(sArgs);
-        } else if (sArgs[0].equals("disable")) {
-            disableNetwork(sArgs);
+        } else if (arg.equals("enable")) {
+            enableNetwork(cmd.get2());
+        } else if (arg.equals("disable")) {
+            disableNetwork(cmd.get2());
         } else {
-            send("Unkown argument \"" + args + "\" for command \"" + cmd + "\"");
+            send("Unknown argument \"" + arg + "\" for command \"" + cmd + "\"");
         }
     }
     private void listNetworks() {
@@ -73,7 +72,7 @@ public class WifiCmd extends CommandHandlerBase {
                 status = "Disabled";
                 break;
             default:
-                status = "Unkown";
+                status = "Unknown";
                 break;
             }
             msg.append(status);
@@ -82,50 +81,32 @@ public class WifiCmd extends CommandHandlerBase {
         send(msg);
     }
     
-    private void enableNetwork(String[] args) {
-        if (args.length == 2) {
-            int id = Integer.parseInt(args[1]);
-            if (sWifiManager.enableNetwork(id, false)) {
-                send("Successfully enabled network with ID " + id);
-            } else {
-                send("Could not enable network with ID" + id);
-            }
+    private void enableNetwork(String arg) {
+        int id = Integer.parseInt(arg);
+        if (sWifiManager.enableNetwork(id, false)) {
+            send("Successfully enabled network with ID " + id);
         } else {
-            send("Error enabling network");
+            send("Could not enable network with ID " + id);
         }
     }
     
-    private void disableNetwork(String[] args) {
-        if (args.length == 2) {
-            int id = Integer.parseInt(args[1]);
-            if (sWifiManager.disableNetwork(id)) {
-                send("Successfully disabled network with ID " + id);
-            } else {
-                send("Could not disable network with ID " + id);
-            }
+    private void disableNetwork(String arg) {
+        int id = Integer.parseInt(arg);
+        if (sWifiManager.disableNetwork(id)) {
+            send("Successfully disabled network with ID " + id);
         } else {
-            send("Error disabling network");
+            send("Could not disable network with ID " + id);
         }
     }
     
     private void enableWifi() {
         send("Enabling Wifi");
-        boolean ret = sWifiManager.setWifiEnabled(true);
-        if (ret) {
-            send("Enabled Wifi");
-        } else {
-            send("Could not enable Wifi");
-        }
+        send(sWifiManager.setWifiEnabled(true) ? "Wifi enabled" : "Could not enable Wifi");
     }
     
     private void disableWifi() {
         send("Disabling Wifi");
-        boolean ret = sWifiManager.setWifiEnabled(false);
-        if (ret) {
-            send("Disabled Wifi");
-        } else {
-            send("Could not disable Wifi");
-        }
+        send(sWifiManager.setWifiEnabled(false) ? "Wifi disabled" : "Could not disable Wifi");
     }
     
     void sendStatus() {
@@ -150,7 +131,7 @@ public class WifiCmd extends CommandHandlerBase {
             statusStr = "enabling";
             break;
         default:
-            statusStr = "unkown";
+            statusStr = "unknown";
             break;
         }        
         res.append("Wifi state is ");
@@ -213,7 +194,6 @@ public class WifiCmd extends CommandHandlerBase {
             res.appendLine(dhcpInfo.leaseDuration + "s");
             res.appendBold("DHCP Server IP: ");
             res.appendLine(Tools.ipIntToString(dhcpInfo.serverAddress));
-            
         }
         
         return res;        
