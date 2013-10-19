@@ -286,6 +286,7 @@
     <string name="chat_video_settings_unknown">Unknown parameter %1$s</string>
     <string name="chat_video_start">Starting recording video into %1$s</string>
     <string name="chat_video_stop">Video recording stopped</string>
+    <string name="chat_volume_level">Le volume pour la musique est à %1$s</string>
     <string name="chat_welcome">Welcome to GTalkSMS %s. Send \"?\" for getting help.</string>
     <string name="log_panel_acquiring">Acquiring log</string>
     <string name="log_panel_collect">This will collect the GTalkSMS log and create a message for you to send. You will be presented with an editable message - you should send the message to yourself, then attach it to a GTalkSMS issue describing your problem.</string>

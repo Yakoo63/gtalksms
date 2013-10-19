@@ -21,39 +21,41 @@ public class MusicCmd extends CommandHandlerBase {
     }
 
     @Override
-    protected void execute(String command, String args) {
-        if (isMatchingCmd("music", command)) {
-            if (args.toLowerCase().equals("next")) {
+    protected void execute(Command cmd) {
+        String arg = cmd.getArg1();
+        if (isMatchingCmd(cmd, "music")) {
+            if (arg.toLowerCase().equals("next")) {
                 sendKeyEvent(KeyEvent.KEYCODE_MEDIA_NEXT);
-            } else if (args.toLowerCase().equals("previous")) {
+            } else if (arg.toLowerCase().equals("previous")) {
                 sendKeyEvent(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
-            } else if (args.toLowerCase().equals("play")) {
+            } else if (arg.toLowerCase().equals("play")) {
                 sendKeyEvent(KeyEvent.KEYCODE_MEDIA_PLAY);
-            } else if (args.toLowerCase().equals("pause")) {
+            } else if (arg.toLowerCase().equals("pause")) {
                 sendKeyEvent(KeyEvent.KEYCODE_MEDIA_PAUSE);
-            } else if (args.toLowerCase().equals("stop")) {
+            } else if (arg.toLowerCase().equals("stop")) {
                 sendKeyEvent(KeyEvent.KEYCODE_MEDIA_STOP);
-            } else if (args.toLowerCase().equals("playpause")) {
+            } else if (arg.toLowerCase().equals("playpause")) {
                 sendKeyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
             }
         }
-        if (isMatchingCmd("music", command) || isMatchingCmd("volume", command)) {
-            if (args.toLowerCase().equals("up")) {
+        if (isMatchingCmd(cmd, "music") || isMatchingCmd(cmd, "volume")) {
+            if (arg.toLowerCase().equals("up")) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
-            } else if (args.toLowerCase().equals("down")) {
+            } else if (arg.toLowerCase().equals("down")) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0);
-            } else if (args.toLowerCase().equals("mute")) {
+            } else if (arg.toLowerCase().equals("mute")) {
                 audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-            } else if (args.toLowerCase().equals("unmute")) {
+            } else if (arg.toLowerCase().equals("unmute")) {
                 audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
             } else {
-                Integer value = Tools.parseInt(args);
+                Integer value = Tools.parseInt(arg);
                 if (value != null) {
                     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value, 0);
                 }
             }
+            send(R.string.chat_volume_level, audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         }
-    }  
+    }
 
     private void sendKeyEvent(int key) {
         Log.d(Tools.LOG_TAG, "Sending event key " + key);
