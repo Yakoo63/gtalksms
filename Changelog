@@ -6,6 +6,7 @@ upcoming
 * New setting to filter notified address resources
 * New setting to configure the ping interval
 * Adds more details during connection establishment
+* Re-adding ads in the free version
 
 4.4.1
 * Fixes connection issue introduced in 4.4 when having pending offline messages

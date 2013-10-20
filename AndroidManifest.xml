@@ -165,6 +165,8 @@
             android:value="AEdPqrEAAAAI8M6AdV8LJxkmMhej-2G7N_JLe-1BbFB-qOoM7Q" />
         
         <uses-library android:name="android.test.runner" />
+
+        <activity android:name="com.google.ads.AdActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
     </application>
     
     <!--

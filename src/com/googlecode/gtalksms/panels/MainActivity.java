@@ -19,6 +19,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -28,6 +29,9 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 import com.googlecode.gtalksms.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.MainService.LocalBinder;
@@ -94,6 +98,7 @@ public class MainActivity extends SherlockFragmentActivity {
     private MainService mMainService;
     private ActionBar mActionBar;
     private ViewPager mPager;
+    private AdView mAdView;
     private final ConnectionTabFragment mConnectionTabFragment = new ConnectionTabFragment();
     private final BuddiesTabFragment mBuddiesTabFragment = new BuddiesTabFragment();
     private final CommandsTabFragment mCommandsTabFragment = new CommandsTabFragment();
@@ -175,6 +180,12 @@ public class MainActivity extends SherlockFragmentActivity {
                     Tools.openLink(MainActivity.this, "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted");
                 }
             });
+
+            // Create the adView
+            mAdView = new AdView(this, AdSize.BANNER, "ca-app-pub-1255069456864059/8040023329");
+            LinearLayout  layout = (LinearLayout) findViewById(R.id.StatusBar);
+            layout.addView(mAdView, 0);
+            mAdView.loadAd(new AdRequest());
         }
         
         mFragments.add(mConnectionTabFragment);
@@ -192,6 +203,17 @@ public class MainActivity extends SherlockFragmentActivity {
                 mActionBar.getTabAt(index).select();
             }
         }); 
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mAdView != null) {
+            mAdView.removeAllViews();
+            mAdView.destroy();
+            mAdView = null;
+        }
+
+        super.onDestroy();
     }
 
     @Override
@@ -268,14 +290,14 @@ public class MainActivity extends SherlockFragmentActivity {
         
         boolean b1 = removeTab(getString(R.string.panel_buddies));
         boolean b2 = removeTab(getString(R.string.panel_commands));
-        boolean b3 = removeTab(getString(R.string.panel_connectionstatus)); // TODO to resource
+        boolean b3 = removeTab(getString(R.string.panel_connection_status)); // TODO to resource
         
         if (status == XmppManager.CONNECTED) {
             mCommandsTabFragment.updateCommands();
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_buddies)).setTabListener(new TabListener(mPager, 2)));
             mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_commands)).setTabListener(new TabListener(mPager, 3)));
             if (mSettingsManager.debugLog) {
-                mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_connectionstatus)).setTabListener(new TabListener(mPager, 4)));
+                mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_connection_status)).setTabListener(new TabListener(mPager, 4)));
             }
         } else if (b1 || b2 || b3) {
             mActionBar.setSelectedNavigationItem(0);
