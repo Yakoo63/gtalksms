@@ -363,10 +363,14 @@ public class XmppManager {
         cleanupConnection();
 
         // a simple linear back off strategy with 5 min max
-        int timeout = mCurrentRetryCount < 20 ? 5000 * mCurrentRetryCount : 1000 * 60 * 5;
+        // + 100ms to avoid post delayed issue ??
+        int timeout = mCurrentRetryCount < 20 ? 5000 * mCurrentRetryCount + 100 : 1000 * 60 * 5;
         updateStatus(WAITING_TO_CONNECT, "Attempt #" + mCurrentRetryCount + " in " + timeout / 1000 + "s");
         Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + mCurrentRetryCount);
-        mReconnectHandler.postDelayed(mReconnectRunnable, timeout);
+        if (!mReconnectHandler.postDelayed(mReconnectRunnable, timeout)) {
+            Log.w("maybeStartReconnect fails to post delayed job, reconnecting now.");
+            Tools.startSvcIntent(mContext, MainService.ACTION_CONNECT);
+        }
         mCurrentRetryCount++;
     }
     
