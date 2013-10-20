@@ -1,6 +1,7 @@
 upcoming
+* New activate/deactivate command to manage enabled commands
 * New video command
-* Enhance camera management
+* Enhances camera management
 * New ASmack library
 * New setting to filter notified address resources
 * New setting to configure the ping interval

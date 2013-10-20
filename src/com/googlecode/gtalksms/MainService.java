@@ -34,6 +34,7 @@ import com.googlecode.gtalksms.cmd.CallCmd;
 import com.googlecode.gtalksms.cmd.CameraCmd;
 import com.googlecode.gtalksms.cmd.ClipboardCmd;
 import com.googlecode.gtalksms.cmd.Cmd;
+import com.googlecode.gtalksms.cmd.CommandActivationCmd;
 import com.googlecode.gtalksms.cmd.CommandHandlerBase;
 import com.googlecode.gtalksms.cmd.ContactCmd;
 import com.googlecode.gtalksms.cmd.ExitCmd;
@@ -728,7 +729,7 @@ public class MainService extends Service {
     }
 
     /**
-     * Creates the instances from the CommandHanlderBase classes
+     * Creates the instances from the CommandHandlerBase classes
      */
     private void setupCommands() {
         
@@ -762,7 +763,8 @@ public class MainService extends Service {
                 RecipientCmd.class,
                 // used for debugging
                 SystemCmd.class,
-                // help command needs to be registered as last
+                // help & command activation commands need to be registered as last
+                CommandActivationCmd.class,
                 HelpCmd.class,
             };
         
