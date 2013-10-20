@@ -17,6 +17,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
@@ -163,7 +164,7 @@ public class Tools {
     }
     
     public static boolean isDonateAppInstalled(Context context) {
-        return 0 == context.getPackageManager().checkSignatures( context.getPackageName(), "com.googlecode.gtalksmsdonate");
+        return context.getPackageManager().checkSignatures(context.getPackageName(), "com.googlecode.gtalksmsdonate") == PackageManager.SIGNATURE_MATCH;
     }
     
     public static boolean copyFile(File from, File to) {
