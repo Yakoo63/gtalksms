@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms"
 
-    android:versionName="4.4.2 ß3"
-    android:versionCode="69">
+    android:versionName="4.4.2"
+    android:versionCode="70">
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="18"/>
     
