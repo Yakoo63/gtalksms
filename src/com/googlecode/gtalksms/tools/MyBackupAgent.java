@@ -35,7 +35,8 @@ public class MyBackupAgent extends BackupAgent {
     @Override
     public void onBackup(ParcelFileDescriptor oldState, BackupDataOutput data, ParcelFileDescriptor newState) throws IOException {
         Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() begin");
-        //settingsManager = SettingsManager.getSettingsManager(this);
+        settingsManager = SettingsManager.getSettingsManager(this);
+
         String sharedPrefsPath = Tools.getSharedPrefDir(this) + "/" + Tools.APP_NAME + ".xml";
         File mDataFile = new File(sharedPrefsPath);
         DataInputStream in = null;
@@ -67,12 +68,14 @@ public class MyBackupAgent extends BackupAgent {
         long modified = mDataFile.lastModified();
         out.writeLong(modified);
         out.close();
+        Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() end");
     }
 
     @Override
     public void onRestore(BackupDataInput data, int appVersionCode, ParcelFileDescriptor newState) throws IOException {        
-        settingsManager = SettingsManager.getSettingsManager(this);
         Log.i(Tools.LOG_TAG, "MyBackupAgent onRestore() - starting to restore saved preferences");
+        settingsManager = SettingsManager.getSettingsManager(this);
+
         Class<?> cls;
         try {
             cls = Class.forName("com.googlecode.gtalksms.SettingsManager");
@@ -125,6 +128,7 @@ public class MyBackupAgent extends BackupAgent {
             }
         }
         prefEditor.commit();
+        Log.i(Tools.LOG_TAG, "MyBackupAgent onRestore() - end");
     }
     
     private void writeData(BackupDataOutput data) {
@@ -138,7 +142,7 @@ public class MyBackupAgent extends BackupAgent {
         Set<String> keys;
         Iterator<String> i;
         
-        //first Strings without the password
+        // First Strings without the password
         Map<String, Object> stringMap = convertToMap(getAllTypeFields(cls, String.class));
         stringMap.remove("password");
         keys = stringMap.keySet();
@@ -162,7 +166,7 @@ public class MyBackupAgent extends BackupAgent {
                 data.writeEntityData(buffer, len);
             } catch (IOException e) { /* Ignore */ }
         }
-        //then int
+        // Then int
         Map<String, Object> intMap = convertToMap(getAllTypeFields(cls, int.class));
         keys = intMap.keySet();
         i = keys.iterator();
@@ -180,7 +184,7 @@ public class MyBackupAgent extends BackupAgent {
             } catch (IOException e) { /* Ignore */ }
         }
         
-        //then boolean
+        // Then boolean
         Map<String, Object> booleanMap = convertToMap(getAllTypeFields(cls, boolean.class));
         keys = booleanMap.keySet();
         i = keys.iterator();
