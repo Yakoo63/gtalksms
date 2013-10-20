@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms"
 
-    android:versionName="4.4.2 ß2"
+    android:versionName="4.4.2 ß3"
     android:versionCode="69">
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="18"/>
@@ -163,17 +163,7 @@
         <meta-data 
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAI8M6AdV8LJxkmMhej-2G7N_JLe-1BbFB-qOoM7Q" />
-        
-        <uses-library android:name="android.test.runner" />
 
         <activity android:name="com.google.ads.AdActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
     </application>
-    
-    <!--
-    This declares that this app uses the instrumentation test runner targeting
-    the package of com.example.android.apis.  To run the tests use the command:
-    "adb shell am instrument -w com.example.android.apis.tests/android.test.InstrumentationTestRunner"
-    -->
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:label="Tests GTalkSMS" android:targetPackage="com.googlecode.gtalksms"/>
 </manifest>
