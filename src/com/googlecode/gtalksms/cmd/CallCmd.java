@@ -50,14 +50,14 @@ public class CallCmd extends CommandHandlerBase {
 
     @Override
     protected void onCommandDeactivated() {
-        mPhoneMgr = null;
-        mTelephonyMgr = null;
-        mContactsResolver = null;
-
-        if (mPhoneListener != null) {
+        if (mPhoneListener != null && mTelephonyMgr != null) {
             mTelephonyMgr.listen(mPhoneListener, 0);
             sListenerActive = false;
         }
+
+        mPhoneMgr = null;
+        mTelephonyMgr = null;
+        mContactsResolver = null;
     }
     
     @Override

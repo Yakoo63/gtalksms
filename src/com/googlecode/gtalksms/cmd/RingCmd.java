@@ -35,9 +35,9 @@ public class RingCmd extends CommandHandlerBase {
 
     @Override
     protected void onCommandDeactivated() {
+        stop();
         sAudioManager = null;
         mVibrator = null;
-        clearMediaPlayer();
     }
 
     @Override
@@ -164,8 +164,10 @@ public class RingCmd extends CommandHandlerBase {
     
     @Override
     public void stop() {
-        clearMediaPlayer();        
-        mVibrator.cancel();
+        clearMediaPlayer();
+        if (mVibrator != null) {
+            mVibrator.cancel();
+        }
         sMainService.hideRingingNotification();
     }
 
