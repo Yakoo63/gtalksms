@@ -1,4 +1,7 @@
 upcoming
+* New ASmack library
+
+4.4.2
 * New activate/deactivate command to manage enabled commands
 * New video command
 * Enhances camera management
@@ -7,6 +10,7 @@ upcoming
 * New setting to configure the ping interval
 * Adds more details during connection establishment
 * Re-adding ads in the free version
+* Fix several disconnection issues
 
 4.4.1
 * Fixes connection issue introduced in 4.4 when having pending offline messages
