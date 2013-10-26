@@ -371,7 +371,7 @@ public class SettingsManager {
         useGoogleMapUrl = getBoolean("useGoogleMapUrl", true);
         useOpenStreetMapUrl = getBoolean("useOpenStreetMapUrl", false);
         
-        showStatusIcon = getBoolean("showStatusIcon", false);
+        showStatusIcon = getBoolean("showStatusIcon", true);
         
         notifyApplicationConnection = getBoolean("notifyApplicationConnection", false);
         notifyBattery = getBoolean("notifyBattery", false);
