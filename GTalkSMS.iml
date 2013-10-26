@@ -18,8 +18,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="library" />
-    <orderEntry type="library" name="asmack-android-8-0.8.5" level="project" />
     <orderEntry type="library" name="GoogleAdMobAdsSdk-6.4.1" level="project" />
+    <orderEntry type="library" name="asmack-android-8-0.8.6beta" level="project" />
   </component>
 </module>
 
