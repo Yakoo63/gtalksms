@@ -29,6 +29,7 @@ import org.jivesoftware.smackx.MultipleRecipientManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.packet.DiscoverInfo;
 import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 
@@ -114,7 +115,11 @@ public class XmppManager {
     private final SettingsManager mSettings;
     private final Context mContext;
     final SmackAndroid mSmackAndroid;
-    
+
+    static {
+        ServiceDiscoveryManager.setDefaultIdentity(new DiscoverInfo.Identity("client", Tools.APP_NAME, "bot"));
+    }
+
     /**
      * Constructor for an XmppManager instance, connection is optional. It 
      * servers only a purpose when creating the instance with an already
@@ -151,12 +156,10 @@ public class XmppManager {
         XmppLocalS5BProxyManager.getInstance(context).registerListener(this);
         sReusedConnectionCount = 0;
         sNewConnectionCount = 0;
-        ServiceDiscoveryManager.setIdentityName(Tools.APP_NAME);
-        ServiceDiscoveryManager.setIdentityType("bot"); // http://xmpp.org/registrar/disco-categories.html
         XmppEntityCapsCache.enableEntityCapsCache(context);
-        
+
         // Smack Settings
-        SmackConfiguration.setPacketReplyTimeout(1000 * 40);      // 40 sec
+        SmackConfiguration.setPacketReplyTimeout(1000 * 20);      // 20 sec
         SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         SmackConfiguration.setLocalSocks5ProxyPort(-7777);        // negative number means try next port if already in use
         SmackConfiguration.setAutoEnableEntityCaps(true);

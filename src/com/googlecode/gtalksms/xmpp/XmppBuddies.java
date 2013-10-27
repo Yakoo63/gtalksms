@@ -246,7 +246,7 @@ public class XmppBuddies implements RosterListener {
     public void entriesUpdated(Collection<String> addresses) {
     }
 
-    // carefull, this method does also get called by the SmackListener Thread
+    // careful, this method does also get called by the SmackListener Thread
     @Override    
     public void presenceChanged(Presence presence) {
         String bareUserId = StringUtils.parseBareAddress(presence.getFrom());
