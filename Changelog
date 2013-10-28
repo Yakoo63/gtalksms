@@ -1,5 +1,7 @@
 upcoming
 * New ASmack library
+* New subcommand to filter notification by content
+* Fix several Force Close
 
 4.4.2
 * New activate/deactivate command to manage enabled commands
