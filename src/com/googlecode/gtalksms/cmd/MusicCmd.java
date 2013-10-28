@@ -56,13 +56,13 @@ public class MusicCmd extends CommandHandlerBase {
                 audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
             } else if (arg.toLowerCase().equals("unmute")) {
                 audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-            } else {
+            } else if (isMatchingCmd(cmd, "volume")) {
                 Integer value = Tools.parseInt(arg);
                 if (value != null) {
                     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value, 0);
                 }
+                send(R.string.chat_volume_level, audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
             }
-            send(R.string.chat_volume_level, audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         }
     }
 
