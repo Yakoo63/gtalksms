@@ -207,8 +207,7 @@ public class SettingsManager {
     private SettingsManager(Context context) {
         mContext = context;
         mSharedPreferences = mContext.getSharedPreferences(Tools.APP_NAME, 0);
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
-        
+
         mProtectedSettings.add("serverHost");
         mProtectedSettings.add("serverPort");
         mProtectedSettings.add("notifiedAddress");
@@ -226,6 +225,9 @@ public class SettingsManager {
         } catch (Exception e) {
             Log.e(Tools.LOG_TAG, "Failed to load settings", e);
         }
+
+        // Registering the listener after the first import
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
     }
     
     public static SettingsManager getSettingsManager(Context context) {
@@ -233,10 +235,6 @@ public class SettingsManager {
             sSettingsManager = new SettingsManager(context);           
         } 
         return sSettingsManager;        
-    }
-    
-    public void Destroy() {
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
     }
     
     public ArrayList<String> getProtectedSettings() {
@@ -342,6 +340,7 @@ public class SettingsManager {
     
     /** imports the preferences */
     private void importPreferences() {
+
         serverHost = getString("serverHost", "");
         serverPort = getInt("serverPort", 0);
         pingIntervalInSec = getInt("pingIntervalInSec", 600);
