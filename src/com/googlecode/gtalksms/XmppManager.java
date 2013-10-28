@@ -768,7 +768,6 @@ public class XmppManager {
         } else {
             boolean result = mClientOfflineMessages.addOfflineMessage(msg);
             Log.d("Adding message: \"" + message.toShortString() + "\" to offline queue, because we are not connected. Status=" + statusString());
-            xmppRequestStateChange(getConnectionStatus());
             return result;
         }
     }
