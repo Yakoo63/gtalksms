@@ -109,9 +109,14 @@ public class SettingsManager {
     public boolean formatResponses;
     public boolean showStatusIcon;
     public boolean displayContactNumber;
-    public String hiddenNotifications;
     public int notificationIgnoreDelay;
-    
+
+    private ArrayStringSetting _notifHiddenApps = new ArrayStringSetting("hiddenNotifications", "#sep#", this);
+    public ArrayStringSetting getNotifHiddenApps() { return _notifHiddenApps; }
+
+    private ArrayStringSetting _notifHiddenMsg = new ArrayStringSetting("hiddenMsgNotifications", "#sep#", this);
+    public ArrayStringSetting getNotifHiddenMsgs() { return _notifHiddenMsg; }
+
     // geo location
     public boolean useGoogleMapUrl;
     public boolean useOpenStreetMapUrl;
@@ -345,8 +350,8 @@ public class SettingsManager {
         serverPort = getInt("serverPort", 0);
         pingIntervalInSec = getInt("pingIntervalInSec", 600);
 
-        _blockedResourcePrefixes.set(getString("xmppBlockedResourcePrefixes", "android|MessagingA"));
-        _notifiedAddresses.set(getString("notifiedAddress", ""));
+        _blockedResourcePrefixes.set(getString(_blockedResourcePrefixes.getKey(), "android|MessagingA"));
+        _notifiedAddresses.set(getString(_notifiedAddresses.getKey(), ""));
         _login = getString("login", "");
 
         manuallySpecifyServerSettings = getBoolean("manuallySpecifyServerSettings", false);
@@ -433,7 +438,8 @@ public class SettingsManager {
         publicIntentToken = getString("publicIntentToken", "secret");
         
         // Manage notifications
-        hiddenNotifications = getString("hiddenNotifications", "GTalkSMS");
+        _notifHiddenApps.set(getString(_notifHiddenApps.getKey(), "GTalkSMS"));
+        _notifHiddenMsg.set(getString(_notifHiddenMsg.getKey(), ""));
         notificationIgnoreDelay = getInt("notificationIgnoreDelay", 1000);
 
         // Manage camera settings

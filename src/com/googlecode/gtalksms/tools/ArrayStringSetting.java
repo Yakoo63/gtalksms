@@ -35,6 +35,10 @@ public class ArrayStringSetting {
         return _string;
     }
 
+    public String getKey() {
+        return _key;
+    }
+
     public void set(String value) {
         _string = _settingsManager.saveSetting(_key, value);
         update();

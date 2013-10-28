@@ -39,8 +39,9 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             Log.d("[Application]         " + appName);
             Log.d("[EventTime]           " + event.getEventTime());
 
-            // Check for application black list
-            if (Arrays.asList(TextUtils.split(mSettingMgr.hiddenNotifications, "#sep#")).contains(appName)) {
+            // Check for blacklisted application
+            if (mSettingMgr.getNotifHiddenApps().contains(appName)) {
+                Log.d("Application blacklisted");
                 return;
             }
 
@@ -75,7 +76,15 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             if (message.equals("")) {
                 message = getEventText(event.getText());
             }
-            
+
+            // Check for blacklisted message
+            for (String str: mSettingMgr.getNotifHiddenMsgs().getAll()) {
+                if (message.contains(str)) {
+                    Log.d("Message (" + message + ") blacklisted with " + str);
+                    return;
+                }
+            }
+
             // Format the result
             XmppMsg msg = new XmppMsg();
             msg.append("New notification from  ");

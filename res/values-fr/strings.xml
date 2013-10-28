@@ -175,7 +175,9 @@
     <string name="chat_help_music_previous">Joue la piste précédente.</string>
     <string name="chat_help_notif_general">Gère la liste noire et les paramètres pour recevoir toutes les notifications du téléphone. Pour utiliser cette fonctionnalité, il faut activer le service \"GTalkSMS Accessibility Service\" dans les préférences d\'Android.</string>
     <string name="chat_help_notif_hide">Ajoute une application à la liste noire. Toutes les notifications des applications présentes dans cette liste seront ignorées.</string>
-    <string name="chat_help_notif_unhide">Supprime une application de la liste noire. Toutes les notifications des applications présentes dans cette liste seront ignorées.</string>
+    <string name="chat_help_notif_hide_msg">Ajoute un message à la liste noire. Toutes les notifications contenant le texte présent dans cette liste seront ignorées.</string>
+    <string name="chat_help_notif_unhide">Supprime une application de la liste noire.</string>
+    <string name="chat_help_notif_unhide_msg">Supprime un message de la liste noire.</string>
     <string name="chat_help_notif_ignore_delay">Définit le delai minimum en ms entre 2 notifications identiques.</string>
     <string name="chat_help_recipient">Affiche le dernier destinataire.</string>
     <string name="chat_help_reject">Rejète l\'appel entrant.</string>

@@ -174,8 +174,10 @@
     <string name="chat_help_music_next">plays the next song.</string>
     <string name="chat_help_music_previous">plays the previous song.</string>
     <string name="chat_help_notif_general">manages the Notification black list and settings. To use this feature you need to activate the GTalkSMS Accessibility Service in the Android settings.</string>
-    <string name="chat_help_notif_hide">adds an application to the black list. All black listed application notifications will be ignored.</string>
-    <string name="chat_help_notif_unhide">removes an application from the black list. All black listed application notifications will be ignored.</string>
+    <string name="chat_help_notif_hide">adds an application to the blacklist. All blacklisted application notifications will be ignored.</string>
+    <string name="chat_help_notif_hide_msg">adds a message to the blacklist. All notifications that contains a blacklisted message will be ignored.</string>
+    <string name="chat_help_notif_unhide">removes an application from the blacklist.</string>
+    <string name="chat_help_notif_unhide_msg">removes a message from the blacklist.</string>
     <string name="chat_help_notif_ignore_delay">sets the delay to ignore duplicated notifications in ms.</string>
     <string name="chat_help_recipient">displays the last recipient.</string>
     <string name="chat_help_reject">reject the incoming phone call</string>
