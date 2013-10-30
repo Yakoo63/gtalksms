@@ -716,9 +716,9 @@ public class XmppManager {
         if (isConnected()) {
             // Message has no destination information send to all known resources 
             if (muc == null && to == null) {
+                List<String> toList = new LinkedList<String>();
                 for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
                     Iterator<Presence> presences = mConnection.getRoster().getPresences(notifiedAddress);
-                    List<String> toList = new LinkedList<String>();
                     while (presences.hasNext()) {
                         Presence p = presences.next();
                         String toPresence = p.getFrom();
@@ -744,12 +744,12 @@ public class XmppManager {
                             Log.d("Message not sent to " + toPresence + " because resource is empty");
                         }
                     }
-                    if (toList.size() > 0) {
-                        try {
-                            MultipleRecipientManager.send(mConnection, msg, toList, null, null);
-                        } catch (Exception e) {
-                            return false;
-                        }
+                }
+                if (toList.size() > 0) {
+                    try {
+                        MultipleRecipientManager.send(mConnection, msg, toList, null, null);
+                    } catch (Exception e) {
+                        return false;
                     }
                 }
             // Message has a known destination information
