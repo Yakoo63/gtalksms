@@ -2,6 +2,8 @@ upcoming
 * New ASmack library
 * New subcommand to filter notification by content
 * Fix several Force Close
+* German translation removed (not up to date)
+* Fix regression on sms when the message contains a :
 
 4.4.2
 * New activate/deactivate command to manage enabled commands
