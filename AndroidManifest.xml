@@ -4,7 +4,7 @@
     package="com.googlecode.gtalksms"
 
     android:versionName="4.4.3"
-    android:versionCode="71">
+    android:versionCode="72">
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="18"/>
     
