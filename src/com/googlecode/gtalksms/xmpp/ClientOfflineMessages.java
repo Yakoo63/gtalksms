@@ -54,7 +54,7 @@ public class ClientOfflineMessages {
     }
     
     private static void sendOfflineMessages() {
-        List<ClientOfflineMessagesDateFile> files = getDatefiles();
+        List<ClientOfflineMessagesDateFile> files = getDateFiles();
         for (ClientOfflineMessagesDateFile f : files) {
             try {
                 Message msg = f.getMessage();
@@ -86,7 +86,7 @@ public class ClientOfflineMessages {
     }
     
     private static void cleanUp() {
-        List<ClientOfflineMessagesDateFile> datefiles = getDatefiles();
+        List<ClientOfflineMessagesDateFile> datefiles = getDateFiles();
         
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -7);
@@ -95,15 +95,15 @@ public class ClientOfflineMessages {
         DateFile.deleteDatefilesOlderThan(datefiles, date);
     }
     
-    private static List<ClientOfflineMessagesDateFile> getDatefiles() {
+    private static List<ClientOfflineMessagesDateFile> getDateFiles() {
         File[] files = sDirFile.listFiles();
-        List<ClientOfflineMessagesDateFile> datefiles = new ArrayList<ClientOfflineMessagesDateFile>();
+        List<ClientOfflineMessagesDateFile> dateFiles = new ArrayList<ClientOfflineMessagesDateFile>();
         for (File f : files) {
             try {
                 ClientOfflineMessagesDateFile df = ClientOfflineMessagesDateFile.reconstruct(f);
-                datefiles.add(df);
+                dateFiles.add(df);
             } catch (NumberFormatException e) {} 
         }
-        return datefiles;
+        return dateFiles;
     }
 }
