@@ -39,9 +39,6 @@ public class SettingsManager {
     public static final int XMPPSecurityRequired = 2;
     public static final int XMPPSecurityOptional = 3;
     
-    public static final String FRAMEBUFFER_ARGB_8888 = "ARGB_8888";
-    public static final String FRAMEBUFFER_RGB_565 = "RGB_565";
-    
     // XMPP connection
     public String serverHost;
     public String serviceName;
