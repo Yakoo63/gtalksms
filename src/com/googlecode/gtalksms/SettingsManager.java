@@ -350,7 +350,7 @@ public class SettingsManager {
         serverPort = getInt("serverPort", 0);
         pingIntervalInSec = getInt("pingIntervalInSec", 600);
 
-        _blockedResourcePrefixes.set(getString(_blockedResourcePrefixes.getKey(), "android|MessagingA"));
+        _blockedResourcePrefixes.set(getString(_blockedResourcePrefixes.getKey(), "android\nMessagingA"));
         _notifiedAddresses.set(getString(_notifiedAddresses.getKey(), ""));
         _login = getString("login", "");
 
