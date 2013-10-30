@@ -62,7 +62,7 @@ public class VideoCmd extends CommandHandlerBase {
                     }
                     send(msg);
                 } else if (mParamList.contains(param)) {
-                    String value = c.getArg3();
+                    String value = c.getAllArg(3);
 
                     if (!value.equals("")) {
                         Integer intValue = Tools.parseInt(value);

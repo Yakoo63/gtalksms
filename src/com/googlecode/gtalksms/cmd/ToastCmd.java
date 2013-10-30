@@ -18,8 +18,9 @@ public class ToastCmd extends CommandHandlerBase {
 
     @Override
     protected void execute(Command cmd) {
-        if (isMatchingCmd(cmd, "toast") && !cmd.getAllArguments().equals("")) {
-            MainService.displayToast(cmd.getAllArguments(), null, false);
+        String args = cmd.getAllArg1();
+        if (isMatchingCmd(cmd, "toast") && !args.equals("")) {
+            MainService.displayToast(args, null, false);
         }
     }
     

@@ -20,11 +20,11 @@ public class ApplicationsCmd extends CommandHandlerBase {
     @Override
     protected void execute(Command cmd) {
         if (isMatchingCmd(cmd, "applist")) {
-            appsList(cmd.getArg1());
+            appsList(cmd.getAllArg1());
         } else if (isMatchingCmd(cmd, "appstart")) {
-            launchApp(cmd.getArg1());
+            launchApp(cmd.getAllArg1());
         } else if (isMatchingCmd(cmd, "appfind")) {
-            findApp(cmd.getArg1());
+            findApp(cmd.getAllArg1());
         }
     }
 

@@ -42,9 +42,9 @@ public class WifiCmd extends CommandHandlerBase {
         } else if (arg.equals("list")) {
             listNetworks();
         } else if (arg.equals("enable")) {
-            enableNetwork(cmd.getArg2());
+            enableNetwork(cmd.getAllArg2());
         } else if (arg.equals("disable")) {
-            disableNetwork(cmd.getArg2());
+            disableNetwork(cmd.getAllArg2());
         } else {
             send("Unknown argument \"" + arg + "\" for command \"" + cmd + "\"");
         }

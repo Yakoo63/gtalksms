@@ -77,14 +77,14 @@ public class LogsCmd extends CommandHandlerBase {
                 mLogsThread.stop();
             }
             String arg1 = cmd.getArg1();
-            String arg2 = cmd.getArg2();
+            String arg2 = cmd.getAllArg2();
             if (!arg2.equals("")) {
                 mLogsThread = new LogsThread(arg1, Tools.parseInt(arg2, 100));
             } else if (!arg1.equals("")) {
                 if (Tools.isInt(arg1)) {
                     mLogsThread = new LogsThread(Tools.parseInt(arg1, 100));
                 } else {
-                    mLogsThread = new LogsThread(arg1);
+                    mLogsThread = new LogsThread(cmd.getAllArg1());
                 }
             } else {
                 mLogsThread = new LogsThread();

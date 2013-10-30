@@ -29,7 +29,7 @@ public class ShellCmd extends CommandHandlerBase {
         
         if (cmd.getCommand().equals("cmd")) {
             try {
-                mShells.get(Tools.parseInt(cmd.getReplyTo(), 0)).executeCommand(cmd.getAllArguments());
+                mShells.get(Tools.parseInt(cmd.getReplyTo(), 0)).executeCommand(cmd.getAllArg1());
             } catch (Exception e) {
                 send(R.string.chat_shell_error_access, cmd.getReplyTo(), e.getLocalizedMessage());     
             }

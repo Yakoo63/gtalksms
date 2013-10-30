@@ -56,11 +56,11 @@ public class FileCmd extends CommandHandlerBase {
             if (mLastException != null) {
                 throw new IllegalStateException(mLastException);
             }
-            sendFile(cmd.getArg1());
+            sendFile(cmd.getAllArg1());
         } else if (isMatchingCmd(cmd, "ls")) {
-            ls(cmd.getArg1());
+            ls(cmd.getAllArg1());
         } else if (isMatchingCmd(cmd, "rm")) {
-            rm(cmd.getArg1());
+            rm(cmd.getAllArg1());
         }
     }
     

@@ -49,7 +49,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
         
         if (isMatchingCmd(cmd, "tts")) {
             if (mTtsAvailable) {
-                mTts.speak(cmd.getAllArguments(), TextToSpeech.QUEUE_ADD, null);
+                mTts.speak(cmd.getAllArg1(), TextToSpeech.QUEUE_ADD, null);
             } else {
                 send(R.string.chat_tts_installation);
                 sContext.startActivity(new Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA));
@@ -87,7 +87,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
             if (Build.VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
                 send(R.string.android_version_incompatible, "ICE CREAM SANDWICH");
             } else {
-                mTts = new TextToSpeech(sContext, this, cmd.getAllArguments());
+                mTts = new TextToSpeech(sContext, this, cmd.getAllArg1());
                 send(getString(R.string.chat_tts_engine) + mTts.getDefaultEngine());
             }
         } else if (isMatchingCmd(cmd, "tts-lang")) {

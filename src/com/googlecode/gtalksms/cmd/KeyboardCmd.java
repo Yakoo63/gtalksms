@@ -12,7 +12,7 @@ public class KeyboardCmd extends CommandHandlerBase {
     @Override
     protected void execute(Command cmd) {
         KeyboardInputMethod keyboard = sMainService.getKeyboard();
-        String msg = cmd.getAllArguments().replace("\\n", "\n");
+        String msg = cmd.getAllArg1().replace("\\n", "\n");
         
         if (keyboard != null) {
             if (isMatchingCmd(cmd, "write")) {

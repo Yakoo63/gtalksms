@@ -100,7 +100,7 @@ public class SmsCmd extends CommandHandlerBase {
     @Override
     protected void execute(Command c) {
         String arg1 = c.getArg1();
-        String arg2 = c.getArg2();
+        String arg2 = c.getAllArg2();
 
         if (isMatchingCmd(c, "sms")) {
             // If there is a message, send it.
@@ -146,6 +146,7 @@ public class SmsCmd extends CommandHandlerBase {
                 deleteSMS(arg1, search);
             }
         } else if (isMatchingCmd(c, "reply")) {
+            arg1 = c.getAllArg1();
             if (arg1.length() == 0) {
                 executeNewCmd("recipient");
             } else if (RecipientCmd.getLastRecipientNumber() == null) {

@@ -32,8 +32,8 @@ public class RebootCmd extends CommandHandlerBase {
             send("You need to run at last Froyo to issue the " + cmd + " command");
             return;
         }
-        
-        mPowerManager.reboot(cmd.getArg1().equals("") ? null : cmd.getArg1());
+        String args = cmd.getAllArg1();
+        mPowerManager.reboot(args.equals("") ? null : args);
     }
 
     @Override

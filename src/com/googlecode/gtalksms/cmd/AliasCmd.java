@@ -46,7 +46,7 @@ public class AliasCmd extends CommandHandlerBase {
     protected void execute(Command cmd) {
         String subCmd = cmd.getArg1();
         if (subCmd.equals("add")) {
-            add(cmd.getArg1(), cmd.getArg2(), cmd.getArg3());
+            add(cmd.getArg1(), cmd.getArg2(), cmd.getAllArg(3));
         } else if (subCmd.equals("del")) {
             del(cmd.getArg1(), cmd.getArg2());
         } else if (subCmd.equals("show")) {

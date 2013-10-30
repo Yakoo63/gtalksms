@@ -27,7 +27,7 @@ public class CommandTemplate extends CommandHandlerBase {
                 // do something useful
             }
         } else {
-            send("Unknown argument \"" + cmd.getAllArguments() + "\" for command \"" + cmd.getCommand() + "\"");
+            send("Unknown argument \"" + cmd.getAllArg1() + "\" for command \"" + cmd.getCommand() + "\"");
         }
     }
 

@@ -21,7 +21,7 @@ public class GeoCmd extends CommandHandlerBase {
     @Override
     protected void execute(Command cmd) {
         if (isMatchingCmd(cmd, "geo")) {
-            geo(cmd.getAllArguments());
+            geo(cmd.getAllArg1());
         } else if (isMatchingCmd(cmd, "where")) {
             if (cmd.getArg1().equals("stop")) {
                 send(R.string.chat_stop_locating);

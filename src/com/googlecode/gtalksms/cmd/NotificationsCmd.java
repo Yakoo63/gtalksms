@@ -30,7 +30,7 @@ public class NotificationsCmd extends CommandHandlerBase {
         ArrayStringSetting hiddenMsgs = sSettingsMgr.getNotifHiddenMsgs();
         String arg1 = cmd.getArg1();
         String arg2 = cmd.getArg2();
-        String arg3 = cmd.getArg3();
+        String arg3 = cmd.getAllArg(3);
 
         if (arg1.equals("hide")) {
             if (arg2.equals("app")) {

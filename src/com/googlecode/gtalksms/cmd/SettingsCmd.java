@@ -45,7 +45,7 @@ public class SettingsCmd extends CommandHandlerBase {
             send(msg);
         }
         else if(settings.containsKey(key)) {
-            String newVal = c.getArg2();
+            String newVal = c.getAllArg2();
             if(!"".equals(newVal)) {
                 if (!protectedSettings.contains(key)) {
                     Integer intValue = Tools.parseInt(newVal);

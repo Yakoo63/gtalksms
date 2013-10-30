@@ -35,7 +35,7 @@ public class ClipboardCmd extends CommandHandlerBase {
     @Override
     public void execute(Command cmd) {
         try {
-            String text = cmd.getAllArguments();
+            String text = cmd.getAllArg1();
             if (text.length() > 0) {
                 mOldClipboardMgr.setText(text);
                 send(R.string.chat_text_copied);
