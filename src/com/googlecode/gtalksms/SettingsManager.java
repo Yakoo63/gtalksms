@@ -343,8 +343,8 @@ public class SettingsManager {
     /** imports the preferences */
     private void importPreferences() {
 
-        serverHost = getString("serverHost", "");
-        serverPort = getInt("serverPort", 0);
+        serverHost = getString("serverHost", "talk.google.com");
+        serverPort = getInt("serverPort", 5222);
         pingIntervalInSec = getInt("pingIntervalInSec", 600);
 
         _blockedResourcePrefixes.set(getString(_blockedResourcePrefixes.getKey(), "android\nMessagingA"));
@@ -353,7 +353,7 @@ public class SettingsManager {
 
         manuallySpecifyServerSettings = getBoolean("manuallySpecifyServerSettings", false);
         if (manuallySpecifyServerSettings) {
-            serviceName = getString("serviceName", "");
+            serviceName = getString("serviceName", "gmail.com");
         } else {
             serviceName = StringUtils.parseServer(_login);
         }
@@ -397,7 +397,7 @@ public class SettingsManager {
             locale = new Locale(localeStr);
         }
         
-        roomPassword = getString("roomPassword", "gtalksms");
+        roomPassword = getString("roomPassword", "GTalkSMS");
         forceMucServer = getBoolean("forceMucServer", false);
         mucServer = getString("mucServer", "conference.jabber.org");
         String notificationIncomingSmsType = getString("notificationIncomingSmsType", "same");
