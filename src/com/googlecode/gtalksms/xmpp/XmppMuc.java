@@ -114,7 +114,7 @@ public class XmppMuc {
     }
     
     /**
-     * Writes a formated message to a room and creates the room if necessary,
+     * Writes a formatted message to a room and creates the room if necessary,
      * followed by an invite to the default notification address 
      * to join the room
      * 

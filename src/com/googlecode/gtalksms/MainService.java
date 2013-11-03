@@ -167,8 +167,9 @@ public class MainService extends Service {
      */
     void onHandleIntent(final Intent intent, int id) {
         // ensure XMPP manager is setup (but not yet connected)
-        if (sXmppMgr == null)
+        if (sXmppMgr == null) {
             setupXmppManagerAndCommands();
+        }
 
         // Set Disconnected state by force to manage pending tasks
         // This is not actively used any more
@@ -282,7 +283,7 @@ public class MainService extends Service {
             if (sSettingsMgr.notifySmsInChatRooms || roomExists) {
                 try {
                     XmppMuc.getInstance(this).writeRoom(number, name, message, XmppMuc.MODE_SMS);
-                } catch (XMPPException e) {
+                } catch (Exception e) {
                     // room creation and/or writing failed - notify about this error
                     // and send the message to the notification address
                     XmppMsg msg = new XmppMsg();
