@@ -3,6 +3,7 @@
     <string-array name="list_locale_entries">
         <item>Langue par défaut</item>
         <item>Français</item>
+        <item>Allemand</item>
         <item>Anglais</item>
     </string-array>
     <string-array name="list_smsNotificationType_entries">

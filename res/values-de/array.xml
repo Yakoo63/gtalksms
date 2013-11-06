@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="list_locale_entries">
+        <item>Systemstandard</item>
+        <item>Französisch</item>
+        <item>Deutsch</item>
+        <item>Englisch</item>
+    </string-array>
+    <string-array name="list_smsNotificationType_entries">
+        <item>Keine Benachrichtigung</item>
+        <item>In getrennten Dialogen (Groupchat/MUC)</item>
+        <item>In einem Dialog (GTalkSMS Presence)</item>
+        <item>Beides</item>
+    </string-array>
+    <string-array name="list_xmppConnectionSecurity_entries">
+        <item>Deaktiviert</item>
+        <item>Notwendig</item>
+        <item>Optional</item>
+    </string-array> 
+</resources>
