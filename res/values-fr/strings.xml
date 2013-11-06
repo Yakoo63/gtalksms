@@ -264,9 +264,9 @@
     <string name="chat_sms_null_pdu_to">Erreur PDU. SMS \"%1$s\" pour %2$s non envoyé.</string>
     <string name="chat_sms_radio_off">Radio éteinte</string>
     <string name="chat_sms_radio_off_to">SMS \"%1$s\" pour %2$s non envoyé car la radio est éteinte.</string> 
-    <string name="chat_sms_search">Recherche \"%1$s\" pour %2$d contacts...</string>
+    <string name="chat_sms_search">Recherche \"%1$s\" pour %2$d contacts…</string>
     <string name="chat_sms_search_results">%d SMS trouvé(s).</string>
-    <string name="chat_sms_search_start">Recherche en cours...</string>
+    <string name="chat_sms_search_start">Recherche en cours…</string>
     <string name="chat_sms_sent">SMS envoyé</string>
     <string name="chat_sms_sent_to">SMS \"%1$s\" envoyé à %2$s</string>
     <string name="chat_specify_details">Spécifier plus de détails :</string>

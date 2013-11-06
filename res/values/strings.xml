@@ -40,7 +40,7 @@
     <string name="about_donors">Donors</string>
     <string name="about_help">\n\nIf you can\'t find yours answers on the website, don\'t hesitate to ask for help at:\n</string>
     <string name="about_panel">About GTalkSMS</string>
-    <string name="about_rate_help">\nPlease rate the applicaton on Google Market:\n\</string>
+    <string name="about_rate_help">\nPlease rate the application on Google Market:\n\</string>
     <string name="about_rate">\tGTalkSMS on Google Market\n</string>
     <string name="about_rate_donate">\tGTalkSMS Donate on Google Market\n</string>
     <string name="about_website">Website</string>
@@ -141,7 +141,7 @@
     <string name="chat_help_camera_set">set the default camera to take photo.</string>
     <string name="chat_help_camera_xmpp">take a photo, store it and send it through xmpp connection.</string>
     <string name="chat_help_cmd">execute shell instruction with root access if possible.</string>
-    <string name="chat_help_contact">display informations of a searched contact.</string>
+    <string name="chat_help_contact">display information of a searched contact.</string>
     <string name="chat_help_copy">copy text to clipboard or sent phone clipboard if text is empty.</string>
     <string name="chat_help_del_sms">Delete SMS without confirmation!</string>    
     <string name="chat_help_del_sms_all">Delete all SMS without confirmation!</string>    
@@ -188,7 +188,7 @@
     <string name="chat_help_ringmode_silent">Set ringer mode to silent.</string>
     <string name="chat_help_ringmode_vibrate">Set ringer mode to vibrate.</string>
     <string name="chat_help_rm">Deletes the specified file.</string>
-    <string name="chat_help_send">Sends the specified file through XMPP. Use an absolut path, otherwise the last listed directory will be prefixed</string>
+    <string name="chat_help_send">Sends the specified file through XMPP. Use an absolute path, otherwise the last listed directory will be prefixed</string>
     <string name="chat_help_shell">Opens a new chat as a shell.</string>
     <string name="chat_help_sms_chat">Creates a new Chat with the contact and invites you to that chat. Leave contact empty to use last contact</string>
     <string name="chat_help_sms_reply">Sends a SMS to your last recipient with content message.</string>

@@ -266,7 +266,7 @@
     <string name="chat_sms_radio_off_to">Telefon deaktiviert (ERROR_RADIO_OFF). SMS \"%1$s\" an %2$s</string>   
     <string name="chat_sms_search">Suche nach \"%1$s\" in den SMS Nachrichten von %2$d Kontakten.</string>
     <string name="chat_sms_search_results">Insgesammt %d SMS gefunden.</string>
-    <string name="chat_sms_search_start">Suchen...</string>
+    <string name="chat_sms_search_start">Suchen…</string>
     <string name="chat_sms_sent">SMS gesendet</string>
     <string name="chat_sms_sent_to">SMS \"%1$s\" wurde an %2$s gesendet</string>
     <string name="chat_specify_details">Bitte genauere Kontaktinformationen angeben:</string>
