@@ -467,34 +467,34 @@ public class SmsCmd extends CommandHandlerBase {
             mSmsManager.markAsRead(phoneNumber);
         }
 
-        ArrayList<PendingIntent> SentPenIntents = null;
-        ArrayList<PendingIntent> DelPenIntents = null;
+        ArrayList<PendingIntent> sentPendingIntents = new ArrayList<PendingIntent>();
+        ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
         android.telephony.SmsManager smsManager = android.telephony.SmsManager.getDefault();
         ArrayList<String> messages = smsManager.divideMessage(message);
 
         if (sSettingsMgr.notifySmsSentDelivered) {
-            String shortendMessage = Tools.shortenMessage(message);
+            String shortenedMessage = Tools.shortenMessage(message);
             Integer smsID = getSmsID();
-            Sms s = new Sms(phoneNumber, toName, shortendMessage, messages.size(), mAnswerTo, smsID);
+            Sms s = new Sms(phoneNumber, toName, shortenedMessage, messages.size(), mAnswerTo, smsID);
             mSmsMap.put(smsID, s);
             mSmsHelper.addSMS(s);
             if (sSettingsMgr.notifySmsSent) {
                 Log.i("SmsCmd sendSMSByPhoneNumber() - creating SentPendingIntents");
-                SentPenIntents = createSPendingIntents(messages.size(), smsID);
+                sentPendingIntents = createSPendingIntents(messages.size(), smsID);
             }
             if (sSettingsMgr.notifySmsDelivered) {
                 Log.i("SmsCmd sendSMSByPhoneNumber() - creating DeliveredPendingIntents");
-                DelPenIntents = createDPendingIntents(messages.size(), smsID);
+                deliveredPendingIntents = createDPendingIntents(messages.size(), smsID);
             }
         }
 
-        smsManager.sendMultipartTextMessage(phoneNumber, null, messages, SentPenIntents, DelPenIntents);
+        smsManager.sendMultipartTextMessage(phoneNumber, null, messages, sentPendingIntents, deliveredPendingIntents);
         RecipientCmd.setLastRecipient(phoneNumber);
         mSmsManager.addSmsToSentBox(message, phoneNumber);
     }
 
     private ArrayList<PendingIntent> createSPendingIntents(int size, int smsID) {
-        ArrayList<PendingIntent> SentPenIntents = new ArrayList<PendingIntent>();
+        ArrayList<PendingIntent> pendingIntents = new ArrayList<PendingIntent>();
         int startSIntentNumber = getSIntentStart(size);
         for (int i = 0; i < size; i++) {
             int p = startSIntentNumber++;
@@ -502,13 +502,13 @@ public class SmsCmd extends CommandHandlerBase {
             sentIntent.putExtra("partNum", i);
             sentIntent.putExtra("smsID", smsID);
             PendingIntent sentPenIntent = PendingIntent.getBroadcast(sContext, p, sentIntent, PendingIntent.FLAG_ONE_SHOT);
-            SentPenIntents.add(sentPenIntent);
+            pendingIntents.add(sentPenIntent);
         }
-        return SentPenIntents;
+        return pendingIntents;
     }
 
     private ArrayList<PendingIntent> createDPendingIntents(int size, int smsID) {
-        ArrayList<PendingIntent> DelPenIntents = new ArrayList<PendingIntent>();
+        ArrayList<PendingIntent> pendingIntents = new ArrayList<PendingIntent>();
         int startDIntentNumber = getDIntentStart(size);
         for (int i = 0; i < size; i++) {
             int p = startDIntentNumber++;
@@ -516,9 +516,9 @@ public class SmsCmd extends CommandHandlerBase {
             deliveredIntent.putExtra("partNum", i);
             deliveredIntent.putExtra("smsID", smsID);
             PendingIntent deliveredPenIntent = PendingIntent.getBroadcast(sContext, p, deliveredIntent, PendingIntent.FLAG_ONE_SHOT);
-            DelPenIntents.add(deliveredPenIntent);
+            pendingIntents.add(deliveredPenIntent);
         }
-        return DelPenIntents;
+        return pendingIntents;
     }
 
     /**
