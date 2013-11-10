@@ -102,23 +102,23 @@ public class MusicCmd extends CommandHandlerBase {
     @Override
     protected void initializeSubCommands() {
         Cmd music = mCommandMap.get("music");
-        music.setHelp(R.string.chat_help_music_general, null);
-        music.AddSubCmd("play", R.string.chat_help_music_play, null);
-        music.AddSubCmd("pause", R.string.chat_help_music_pause, null);
-        music.AddSubCmd("playpause", R.string.chat_help_music_playpause, null);
-        music.AddSubCmd("stop", R.string.chat_help_music_stop, null);
-        music.AddSubCmd("next", R.string.chat_help_music_next, null);
-        music.AddSubCmd("previous", R.string.chat_help_music_previous, null);
-        music.AddSubCmd("up", R.string.chat_help_volume_up, null);
-        music.AddSubCmd("down", R.string.chat_help_volume_down, null);
-        music.AddSubCmd("mute", R.string.chat_help_volume_mute, null);
-        music.AddSubCmd("unmute", R.string.chat_help_volume_unmute, null);
+        music.setHelp(R.string.chat_help_music_general);
+        music.AddSubCmd("play", R.string.chat_help_music_play);
+        music.AddSubCmd("pause", R.string.chat_help_music_pause);
+        music.AddSubCmd("playpause", R.string.chat_help_music_playpause);
+        music.AddSubCmd("stop", R.string.chat_help_music_stop);
+        music.AddSubCmd("next", R.string.chat_help_music_next);
+        music.AddSubCmd("previous", R.string.chat_help_music_previous);
+        music.AddSubCmd("up", R.string.chat_help_volume_up);
+        music.AddSubCmd("down", R.string.chat_help_volume_down);
+        music.AddSubCmd("mute", R.string.chat_help_volume_mute);
+        music.AddSubCmd("unmute", R.string.chat_help_volume_unmute);
 
         Cmd volume = mCommandMap.get("volume");
         volume.setHelp(R.string.chat_help_volume_general, "#volumeLevel#");
-        volume.AddSubCmd("up", R.string.chat_help_volume_up, null);
-        volume.AddSubCmd("down", R.string.chat_help_volume_down, null);
-        volume.AddSubCmd("mute", R.string.chat_help_volume_mute, null);
-        volume.AddSubCmd("unmute", R.string.chat_help_volume_unmute, null);
+        volume.AddSubCmd("up", R.string.chat_help_volume_up);
+        volume.AddSubCmd("down", R.string.chat_help_volume_down);
+        volume.AddSubCmd("mute", R.string.chat_help_volume_mute);
+        volume.AddSubCmd("unmute", R.string.chat_help_volume_unmute);
     }
 }
