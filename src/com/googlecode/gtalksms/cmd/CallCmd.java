@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
@@ -25,18 +26,20 @@ import com.android.internal.telephony.ITelephony;
 public class CallCmd extends CommandHandlerBase {
     private static boolean sListenerActive = false;
     private PhoneManager mPhoneMgr = null;
+    private AudioManager mAudioMgr = null;
     private PhoneCallListener mPhoneListener = null;
     private TelephonyManager mTelephonyMgr = null;
     private ContactsResolver mContactsResolver = null;
         
     public CallCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_CONTACTS, "Call", new Cmd("calls"), new Cmd("dial"), new Cmd("call"), new Cmd("ignore"), new Cmd("reject"));
+        super(mainService, CommandHandlerBase.TYPE_CONTACTS, "Phone", new Cmd("phone", "p"));
     }
 
     @Override
     protected void onCommandActivated() {
         mPhoneMgr = new PhoneManager(sContext);
         mTelephonyMgr = (TelephonyManager) sMainService.getSystemService(Context.TELEPHONY_SERVICE);
+        mAudioMgr = (AudioManager) sMainService.getSystemService(Context.AUDIO_SERVICE);
         mContactsResolver = ContactsResolver.getInstance(sContext);
 
         if (sSettingsMgr.notifyIncomingCalls && !sListenerActive) {
@@ -54,7 +57,7 @@ public class CallCmd extends CommandHandlerBase {
             mTelephonyMgr.listen(mPhoneListener, 0);
             sListenerActive = false;
         }
-
+        mAudioMgr = null;
         mPhoneMgr = null;
         mTelephonyMgr = null;
         mContactsResolver = null;
@@ -62,15 +65,22 @@ public class CallCmd extends CommandHandlerBase {
     
     @Override
     protected void execute(Command cmd) {
-        if (isMatchingCmd(cmd, "dial")) {
-            dial(cmd.getArg1(), false);
-        } else if (isMatchingCmd(cmd, "call")) {
-            dial(cmd.getArg1(), true);
-        } else if (isMatchingCmd(cmd, "calls")) {
-            readCallLogs(cmd.getArg1());
-        } else if (isMatchingCmd(cmd, "ignore")) {
+        String subCmd = cmd.getArg1();
+        if (subCmd.equals("speaker")) {
+            setSpeaker(cmd.getArg2());
+        } else if (subCmd.equals("dial")) {
+            dial(cmd.getArg2(), false, false);
+        } else if (subCmd.equals("call")) {
+            dial(cmd.getArg2(), true, false);
+        } else if (subCmd.equals("callspeaker")) {
+            dial(cmd.getArg2(), true, true);
+        } else if (subCmd.equals("hangout")) {
+            hangUp();
+        } else if (subCmd.equals("calls")) {
+            readCallLogs(cmd.getArg2());
+        } else if (subCmd.equals("ignore")) {
             ignoreIncomingCall();
-        } else if (isMatchingCmd(cmd, "reject")) {
+        } else if (subCmd.equals("reject")) {
             rejectIncomingCall();
         }
     }
@@ -96,12 +106,12 @@ public class CallCmd extends CommandHandlerBase {
     }
     
     /** dial the specified contact */
-    private void dial(String contactInformation, boolean makeTheCall) {
+    private void dial(String contactInformation, boolean makeTheCall, boolean usePhoneSpeaker) {
         if (contactInformation.equals("")) {
             String lastRecipient = RecipientCmd.getLastRecipientNumber();
             String lastRecipientName = RecipientCmd.getLastRecipientName();
             if (lastRecipient != null) {
-                doDial(lastRecipientName, lastRecipient, makeTheCall);
+                doDial(lastRecipientName, lastRecipient, makeTheCall, usePhoneSpeaker);
             } else {
                 // TODO l18n
                 send("error: last recipient not set");
@@ -111,24 +121,47 @@ public class CallCmd extends CommandHandlerBase {
             if (resolvedContact == null) {
                 send(R.string.chat_no_match_for, contactInformation);
             } else if (resolvedContact.isDistinct()) {
-                doDial(resolvedContact.getName(), resolvedContact.getNumber(), makeTheCall);
+                doDial(resolvedContact.getName(), resolvedContact.getNumber(), makeTheCall, usePhoneSpeaker);
             } else if (!resolvedContact.isDistinct()) {
                 askForMoreDetails(resolvedContact.getCandidates());
             }
         }
     }
 
-    private void doDial(String name, String number, boolean makeTheCall) {
+    private void setSpeaker(String arg) {
+        if (arg.equals("on")) {
+            mAudioMgr.setSpeakerphoneOn(true);
+        } else if (arg.equals("off")) {
+            mAudioMgr.setSpeakerphoneOn(false);
+        } else {
+            send("Speaker state is " + (mAudioMgr.isSpeakerphoneOn() ? "on" : "off"));
+        }
+    }
+
+    private void doDial(String name, String number, boolean makeTheCall, boolean usePhoneSpeaker) {
         if (number != null) {
             send(R.string.chat_dial, name + " (" + number + ")");
         } else {
             send(R.string.chat_dial, name);
         }
 
+        if (usePhoneSpeaker) {
+            mPhoneListener.enableSpeakerOnTheNextCall();
+        }
+
         // check if the dial is successful
         if (!mPhoneMgr.Dial(number, makeTheCall)) {
             send(R.string.chat_error_dial);
         }
+    }
+
+    /**
+     * Ends the current call and send a notification.
+     * Doesn't throw if there is no pending call
+     */
+    private void hangUp() {
+        send("Hanging up");
+        getTelephonyService().endCall();
     }
 
     /**
@@ -170,10 +203,16 @@ public class CallCmd extends CommandHandlerBase {
 
     @Override
     protected void initializeSubCommands() {
-        mCommandMap.get("calls").setHelp(R.string.chat_help_calls, "#count#");
-        mCommandMap.get("dial").setHelp(R.string.chat_help_dial, "#contact#");
-        mCommandMap.get("call").setHelp(R.string.chat_help_call, "#contact#");
-        mCommandMap.get("reject").setHelp(R.string.chat_help_reject, null);
-        mCommandMap.get("ignore").setHelp(R.string.chat_help_ignore, null);
+        Cmd cmd = mCommandMap.get("phone");
+        cmd.setHelp(R.string.chat_help_phone, null);
+        cmd.AddSubCmd("calls", R.string.chat_help_phone_calls, "#count#");
+        cmd.AddSubCmd("call", R.string.chat_help_phone_call, "#contact#");
+        cmd.AddSubCmd("callspeaker", R.string.chat_help_phone_callspeaker, "#contact#");
+        cmd.AddSubCmd("dial", R.string.chat_help_phone_dial, "#contact#");
+        cmd.AddSubCmd("hangup", R.string.chat_help_phone_hangup);
+        cmd.AddSubCmd("ignore", R.string.chat_help_phone_ignore);
+        cmd.AddSubCmd("reject", R.string.chat_help_phone_reject);
+        cmd.AddSubCmd("speaker", R.string.chat_help_phone_speaker);
+        cmd.AddSubCmd("speaker", R.string.chat_help_phone_speaker_set, "[on|off]");
     }
 }

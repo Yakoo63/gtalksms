@@ -871,7 +871,7 @@ public class MainService extends Service {
         cleanupCommands();
     }
 
-    static Looper getServiceLooper() {
+    public static Looper getServiceLooper() {
         return sServiceLooper;
     }
 

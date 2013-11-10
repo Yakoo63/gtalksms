@@ -1,5 +1,8 @@
 package com.googlecode.gtalksms.receivers;
 
+import android.content.Context;
+import android.media.AudioManager;
+import android.os.Handler;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -15,15 +18,46 @@ public class PhoneCallListener extends PhoneStateListener {
         super();
         this.svc = svc;
         settingsMgr = SettingsManager.getSettingsManager(svc);
+        mAudioMgr = (AudioManager) svc.getSystemService(Context.AUDIO_SERVICE);
+        mReconnectHandler = new Handler(svc.getServiceLooper());
     }
 
     private final MainService svc;
     private final SettingsManager settingsMgr;
-    
+    private final AudioManager mAudioMgr;
+    private final Handler mReconnectHandler;
+
+    private boolean mIsSpeakerOn;
+    private boolean mIsModifiedSettings = false;
+    private boolean mEnableSpeakerOnTheNextCall = false;
+
     // Android seems to send the intent not only once per call
     // but every 10 seconds for ongoing ringing
     // we prevent multiple "is calling" notifications with this boolean
     private static boolean manageIncoming = true;
+
+    /**
+     * Enable the phone speaker on the next out/ingoing call
+     */
+    public void enableSpeakerOnTheNextCall() {
+        mEnableSpeakerOnTheNextCall = true;
+    }
+
+    /**
+     * Runnable to backup the speaker state and enabled it after
+     */
+    private final Runnable mReconnectRunnable = new Runnable() {
+        public void run() {
+            if (mAudioMgr != null) {
+                if (!mIsModifiedSettings) {
+                    mIsSpeakerOn = mAudioMgr.isSpeakerphoneOn();
+                    mIsModifiedSettings = true;
+                }
+
+                mAudioMgr.setSpeakerphoneOn(true);
+            }
+        }
+    };
 
     /**
      * incomingNumber is null when the caller ID is hidden
@@ -32,12 +66,29 @@ public class PhoneCallListener extends PhoneStateListener {
      * @param incomingNumber
      */
     public void onCallStateChanged(int state, String incomingNumber) {
+        Log.d(Tools.LOG_TAG, "onCallStateChanged, state=" + state);
         if (MainService.IsRunning) {
             switch (state) {
             case TelephonyManager.CALL_STATE_IDLE:
                 manageIncoming = true;
+                mReconnectHandler.removeCallbacks(mReconnectRunnable);
+
+                if (mIsModifiedSettings) {
+                    mAudioMgr.setSpeakerphoneOn(mIsSpeakerOn);
+                    mIsModifiedSettings = false;
+                }
+
                 break;
             case TelephonyManager.CALL_STATE_OFFHOOK:
+                // One shot to avoid enabling the speaker on every phone calls
+                if (mEnableSpeakerOnTheNextCall) {
+                    mEnableSpeakerOnTheNextCall = false;
+
+                    // Adding a 1s delay before turning on the speaker due to the Android implementation
+                    // The speaker is automatically disabled on outgoing call right after this event
+                    Log.d(Tools.LOG_TAG, "Setting speaker on in 1s, state=" + state);
+                    mReconnectHandler.postDelayed(mReconnectRunnable, 1000);
+                }
                 manageIncoming = true;
                 break;
             case TelephonyManager.CALL_STATE_RINGING:

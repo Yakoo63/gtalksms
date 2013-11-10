@@ -133,8 +133,6 @@
     <string name="chat_help_bt_off">Deaktiviert Bluetooth.</string>
     <string name="chat_help_bt_on">Aktiviert Bluetooth.</string>
     <string name="chat_help_bt_state">Zeigt den aktuellen Bluetooth Status an.</string>
-    <string name="chat_help_call">Ruft den Kontakt an.</string>
-    <string name="chat_help_calls">Zeigt die Anrufeliste an. Optional kann die Anzal der Einträge angegeben werden</string>
     <string name="chat_help_camera">Macht ein Foto und speichert es.</string>
     <string name="chat_help_camera_email">Macht ein Foto und sendet es per E-Mail.</string>
     <string name="chat_help_camera_list">Listet alle Kameras des Smartphones auf.</string>
@@ -151,7 +149,6 @@
     <string name="chat_help_del_sms_last_in">Löscht letzten [number] empfangen SMS. Ohne Angabe einer Wertes wird nur die letzte gelöscht.</string>    
     <string name="chat_help_del_sms_last_out">Löscht letzten [number] gesendeten SMS. Ohne Angabe einer Wertes wird nur die letzte gelöscht.</string>
     <string name="chat_help_del_sms_sent">Lösche alle gesendeten SMS Nachrichten ohne Nachfrage!</string>
-    <string name="chat_help_dial">Ruft den angegebenen Kontakt an.</string>
     <string name="chat_help_find_sms">Suche nach SMS Nachrichten von bestimmten Kontakt.</string>
     <string name="chat_help_find_sms_all">Suche nach SMS Nachrichten.</string>
     <string name="chat_help_flash_off">Deaktiviert das Blitzlicht/Lampe</string>
@@ -162,7 +159,6 @@
     <string name="chat_help_help_about">zeigt Informationen über die Anwendung.</string>
     <string name="chat_help_help_changelog">zeigt die letzten Änderungen an.</string>
     <string name="chat_help_help_categories">zeigt einzelnen Befehlskategorien an.</string>
-    <string name="chat_help_ignore">Ignoriert den eingehenden Anruf.</string>
     <string name="chat_help_ls">Zeigt den Inhalt des Verzeichnisses an.</string>
     <string name="chat_help_mark_as_read">markiert SMS des angegebenen oder des letzten Kontaktes als gelesen.</string>
     <string name="chat_help_mms_general">zeigt die zuletzt empfangene MMS.</string>
@@ -179,8 +175,17 @@
     <string name="chat_help_notif_unhide">Entfernt eine Anwendung von der Blacklist.</string>
     <string name="chat_help_notif_unhide_msg">Entfernt eine Nachricht von der Blacklist.</string>
     <string name="chat_help_notif_ignore_delay">setzt die Pause (in Millisekunden) zum Ignorieren doppelter Benachrichtigungen.</string>
+    <string name="chat_help_phone">**manages your outgoing and ingoing phone calls</string>
+    <string name="chat_help_phone_call">Ruft den Kontakt an.</string>
+    <string name="chat_help_phone_calls">Zeigt die Anrufeliste an. Optional kann die Anzal der Einträge angegeben werden</string>
+    <string name="chat_help_phone_callspeaker">**calls the specified contact with the phone speaker on.</string>
+    <string name="chat_help_phone_dial">Ruft den angegebenen Kontakt an.</string>
+    <string name="chat_help_phone_hangup">**hangs up the current phone call.</string>
+    <string name="chat_help_phone_ignore">Ignoriert den eingehenden Anruf.</string>
+    <string name="chat_help_phone_reject">Weist den eingehenden Anruf ab.</string>
+    <string name="chat_help_phone_speaker">**displays the current state of the phone speaker.</string>
+    <string name="chat_help_phone_speaker_set">**sets the phone speaker to on/off.</string>
     <string name="chat_help_recipient">Zeigt den letzten Empfänger an.</string>
-    <string name="chat_help_reject">Weist den eingehenden Anruf ab.</string>
     <string name="chat_help_ring">Lässt das Telefon klingeln bis stop gesendet wird.</string>
     <string name="chat_help_ring_stop">Beendent das Klingeln.</string>
     <string name="chat_help_ringmode">Wobei mode={normal,silent,vibrate} - Setz den Klingelmodus entsprechend. Ohne Argument wird der aktuelle Modus angezeigt.</string>

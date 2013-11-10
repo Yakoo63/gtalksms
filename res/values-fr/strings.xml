@@ -133,8 +133,6 @@
     <string name="chat_help_bt_off">Désactive le composant bluetooth.</string>
     <string name="chat_help_bt_on">Active le composant bluetooth.</string>
     <string name="chat_help_bt_state">Donne l\'état du composant bluetooth.</string>
-    <string name="chat_help_call">Appelle le numéro du contact spécifié.</string>
-    <string name="chat_help_calls">Affiche l\'historique d\'appels.</string>
     <string name="chat_help_camera">Prend une photo et l\'enregistre dans le répertoire des photos.</string>
     <string name="chat_help_camera_email">Prend une photo, l\'enregistre et l\'envoie par email.</string>
     <string name="chat_help_camera_list">Liste l\'ensemble des appareils photo du téléphone.</string>
@@ -150,8 +148,7 @@
     <string name="chat_help_del_sms_last">Supprime les [n] derniers SMS, 1 par défaut.</string>    
     <string name="chat_help_del_sms_last_in">Supprime les [n] derniers SMS entrants, 1 par défaut.</string>    
     <string name="chat_help_del_sms_last_out">Supprime les [n] derniers SMS sortants, 1 par défaut.</string>    
-    <string name="chat_help_del_sms_sent">Supprime tous les SMS envoyés sans confirmation !</string>    
-    <string name="chat_help_dial">Compose le numéro du contact spécifié.</string>
+    <string name="chat_help_del_sms_sent">Supprime tous les SMS envoyés sans confirmation !</string>
     <string name="chat_help_find_sms">Effectue une recherche dans les SMS des contacts spécifiés.</string>
     <string name="chat_help_find_sms_all">Effectue une recherche dans tous les SMS.</string>
     <string name="chat_help_flash_off">Eteint le flash.</string>
@@ -162,7 +159,6 @@
     <string name="chat_help_help_about">Affiche des informations sur l\'application.</string>
     <string name="chat_help_help_changelog">Affiche l\'historique des changements.</string>
     <string name="chat_help_help_categories">Affiche les catégories d\'aide.</string>
-    <string name="chat_help_ignore">Ignore l\'appel entrant.</string>
     <string name="chat_help_ls">Affiche les fichiers et les sous-répertoires du dossier passé en paramètre.</string>
     <string name="chat_help_mark_as_read">Marque comme lu les SMS du dernier destinataire ou du contact spécifié.</string>
     <string name="chat_help_mms_general">Affiche les derniers MMS reçus.</string>
@@ -179,8 +175,17 @@
     <string name="chat_help_notif_unhide">Supprime une application de la liste noire.</string>
     <string name="chat_help_notif_unhide_msg">Supprime un message de la liste noire.</string>
     <string name="chat_help_notif_ignore_delay">Définit le delai minimum en ms entre 2 notifications identiques.</string>
+    <string name="chat_help_phone">Appelle le numéro du contact spécifié.</string>
+    <string name="chat_help_phone_call">Appelle le numéro du contact spécifié.</string>
+    <string name="chat_help_phone_calls">Affiche l\'historique d\'appels.</string>
+    <string name="chat_help_phone_callspeaker">Appelle le numéro du contact spécifié en activant le haut-parleur.</string>
+    <string name="chat_help_phone_dial">Compose le numéro du contact spécifié.</string>
+    <string name="chat_help_phone_hangup">Raccroche le téléphone.</string>
+    <string name="chat_help_phone_ignore">Ignore l\'appel entrant.</string>
+    <string name="chat_help_phone_reject">Rejète l\'appel entrant.</string>
+    <string name="chat_help_phone_speaker">Affiche l\'état du haut-parleur.</string>
+    <string name="chat_help_phone_speaker_set">Active ou désactive le haut-parleur.</string>
     <string name="chat_help_recipient">Affiche le dernier destinataire.</string>
-    <string name="chat_help_reject">Rejète l\'appel entrant.</string>
     <string name="chat_help_ring">Fait sonner le téléphone jusqu\'à l\'envoie de la commande stop. Volume entre 0 et 100, 0 pour faire vibrer le téléphone. Sans paramètre pour utiliser le volume courant.</string>
     <string name="chat_help_ring_stop">Arrête la sonnerie du téléphone.</string>
     <string name="chat_help_ringmode">Affiche le type de sonnerie acutel du téléphone.</string>    

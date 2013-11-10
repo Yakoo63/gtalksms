@@ -133,8 +133,6 @@
     <string name="chat_help_bt_off">turn off the bluetooth adapter.</string>
     <string name="chat_help_bt_on">turn on the bluetooth adapter.</string>
     <string name="chat_help_bt_state">give the current state of the bluetooth adapter.</string>
-    <string name="chat_help_call">call the specified contact.</string>
-    <string name="chat_help_calls">display call log. The number argument is optional</string>
     <string name="chat_help_camera">take a photo and store it in the picture directory.</string>
     <string name="chat_help_camera_email">take a photo, store it and send it by email.</string>
     <string name="chat_help_camera_list">list all camera.</string>
@@ -150,8 +148,7 @@
     <string name="chat_help_del_sms_last">Delete last [number] SMS, 1 by default.</string>    
     <string name="chat_help_del_sms_last_in">Delete last [number] received SMS, 1 by default.</string>    
     <string name="chat_help_del_sms_last_out">Delete last [number] sent SMS, 1 by default.</string>    
-    <string name="chat_help_del_sms_sent">Delete all sent SMS without confirmation!</string>    
-    <string name="chat_help_dial">dial the specified contact.</string>
+    <string name="chat_help_del_sms_sent">Delete all sent SMS without confirmation!</string>
     <string name="chat_help_find_sms">search specific message in all SMS from searched contacts.</string>
     <string name="chat_help_find_sms_all">search specific message in all SMS.</string>
     <string name="chat_help_flash_off">turn flashlight off.</string>
@@ -162,7 +159,6 @@
     <string name="chat_help_help_about">displays information about the application.</string>
     <string name="chat_help_help_changelog">displays the change logs.</string>
     <string name="chat_help_help_categories">shows the help categories.</string>
-    <string name="chat_help_ignore">ignore the incoming phone call</string>
     <string name="chat_help_ls">Displays the list of files and folders in the specified folder.</string>
     <string name="chat_help_mark_as_read">marks SMS as read for last recipient or given contact.</string>
     <string name="chat_help_mms_general">displays the last received MMS.</string>
@@ -179,8 +175,17 @@
     <string name="chat_help_notif_unhide">removes an application from the blacklist.</string>
     <string name="chat_help_notif_unhide_msg">removes a message from the blacklist.</string>
     <string name="chat_help_notif_ignore_delay">sets the delay to ignore duplicated notifications in ms.</string>
+    <string name="chat_help_phone">manages your outgoing and ingoing phone calls.</string>
+    <string name="chat_help_phone_call">calls the specified contact.</string>
+    <string name="chat_help_phone_callspeaker">calls the specified contact with the phone speaker on.</string>
+    <string name="chat_help_phone_calls">displays call log. The number argument is optional.</string>
+    <string name="chat_help_phone_dial">dials the specified contact.</string>
+    <string name="chat_help_phone_hangup">hangs up the current phone call.</string>
+    <string name="chat_help_phone_ignore">ignores the incoming phone call.</string>
+    <string name="chat_help_phone_reject">rejects the incoming phone call.</string>
+    <string name="chat_help_phone_speaker">displays the current state of the phone speaker.</string>
+    <string name="chat_help_phone_speaker_set">sets the phone speaker to on/off.</string>
     <string name="chat_help_recipient">displays the last recipient.</string>
-    <string name="chat_help_reject">reject the incoming phone call</string>
     <string name="chat_help_ring">Rings the phone until you send stop. Volume between 0 and 100, 0 to vibrate. Empty to current volume.</string>
     <string name="chat_help_ring_stop">Stops the phone ring.</string>
     <string name="chat_help_ringmode">Shows the actual ringer mode.</string>

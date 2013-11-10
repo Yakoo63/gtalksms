@@ -76,7 +76,11 @@ public class Cmd {
     public void setActive(boolean val) {
         PreferenceManager.getDefaultSharedPreferences(sContext).edit().putBoolean("cmd_" + mName, val).commit();
     }
-    
+
+    public void AddSubCmd(String name, int resHelp) {
+        mSubCmds.add(new SubCmd(name, this, resHelp, null, new String[]{}));
+    }
+
     public void AddSubCmd(String name, int resHelp, String args, Object... alias) {
         mSubCmds.add(new SubCmd(name, this, resHelp, args, alias));
     }
