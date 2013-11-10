@@ -1,3 +1,7 @@
+upcoming
+* Fix long SMS issue when Sent Notification is disabled
+* New ASmack version
+
 4.4.3
 * New ASmack library
 * New subcommand to filter notification by content
