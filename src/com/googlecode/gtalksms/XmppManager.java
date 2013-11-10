@@ -3,8 +3,6 @@ package com.googlecode.gtalksms;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.jivesoftware.smack.AndroidConnectionConfiguration;
@@ -20,12 +18,9 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
 import org.jivesoftware.smack.parsing.UnparsablePacket;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.MultipleRecipientManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -48,6 +43,7 @@ import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppLocalS5BProxyManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 import com.googlecode.gtalksms.xmpp.XmppMuc;
+import com.googlecode.gtalksms.xmpp.XmppMultipleRecipientManager;
 import com.googlecode.gtalksms.xmpp.XmppOfflineMessages;
 import com.googlecode.gtalksms.xmpp.XmppPresenceStatus;
 import com.googlecode.gtalksms.xmpp.XmppSocketFactory;
@@ -157,6 +153,7 @@ public class XmppManager {
         sReusedConnectionCount = 0;
         sNewConnectionCount = 0;
         XmppEntityCapsCache.enableEntityCapsCache(context);
+        XmppMultipleRecipientManager.setSettingsManager(mSettings);
 
         // Smack Settings
         SmackConfiguration.setPacketReplyTimeout(1000 * 20);      // 20 sec
@@ -714,44 +711,10 @@ public class XmppManager {
         msg.setType(muc == null ? Message.Type.chat : Message.Type.groupchat);
 
         if (isConnected()) {
-            // Message has no destination information send to all known resources 
+            // Message has no destination information send to all known resources
             if (muc == null && to == null) {
-                List<String> toList = new LinkedList<String>();
-                for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
-                    Iterator<Presence> presences = mConnection.getRoster().getPresences(notifiedAddress);
-                    while (presences.hasNext()) {
-                        Presence p = presences.next();
-                        String toPresence = p.getFrom();
-                        String toResource = StringUtils.parseResource(toPresence);
-                        // Don't send messages to GTalk Android devices
-                        // It would be nice if there was a better way to detect 
-                        // an Android gTalk XMPP client, but currently there is none
-                        if (toResource != null && !toResource.equals("")) {
-                            boolean found = false;
-                            for (String blockedResourcePrefix: mSettings.getBlockedResourcePrefixes().getAll()) {
-                                if (toResource.startsWith(blockedResourcePrefix)) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (!found) {
-                                Log.d("Sending message to " + toPresence);
-                                toList.add(toPresence);
-                            } else {
-                                Log.d("Message not sent to " + toPresence + " because resource is blacklisted");
-                            }
-                        } else {
-                            Log.d("Message not sent to " + toPresence + " because resource is empty");
-                        }
-                    }
-                }
-                if (toList.size() > 0) {
-                    try {
-                        MultipleRecipientManager.send(mConnection, msg, toList, null, null);
-                    } catch (Exception e) {
-                        return false;
-                    }
-                }
+               return XmppMultipleRecipientManager.send(mConnection, msg);
+
             // Message has a known destination information
             // And we have set the to-address before
             } else if (muc == null) {
