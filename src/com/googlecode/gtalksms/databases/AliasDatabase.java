@@ -65,41 +65,50 @@ class AliasDatabase extends Database {
     public static boolean containsAlias(String aliasName) {
         
         Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "number" }, "aliasName='" + aliasName + "'", null, null , null, null);
-        boolean ret = c.getCount() == 1;
-        c.close();
+        boolean ret = false;
+        if (c != null) {
+            ret = c.getCount() == 1;
+            c.close();
+        }
         return ret;
     }
     
     public static String[][] getFullDatabase() {
+        String[][] res = null;
+
         Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "aliasName", "number", "contactName" }, null, null, null , null, null);
-        int rowCount = c.getCount();
-        c.moveToFirst();
-        String[][] res = new String[rowCount][3];
-        for (int i = 0; i < rowCount; i++) {
-            res[i][0] = c.getString(0);  // aliasName field
-            res[i][1] = c.getString(1);  // number field           
-            res[i][2] = c.getString(2);   // contactName field - may be null
-            c.moveToNext();
+        if (c != null) {
+            int rowCount = c.getCount();
+            c.moveToFirst();
+            res = new String[rowCount][3];
+            for (int i = 0; i < rowCount; i++) {
+                res[i][0] = c.getString(0);  // aliasName field
+                res[i][1] = c.getString(1);  // number field
+                res[i][2] = c.getString(2);   // contactName field - may be null
+                c.moveToNext();
+            }
+            c.close();
         }
-        c.close();
         return res;
     }
     
     public static String[] getAlias(String aliasName) {
-        String[] res;
+        String[] res = null;
         Cursor c = databaseRO.query(DatabaseOpenHelper.ALIAS_TABLE_NAME, new String[] { "aliasName", "number", "contactName" }, "aliasName='" + aliasName + "'", null, null , null, null);
-        c.moveToFirst();
-        if(c.getString(2) == null) {
-            res = new String[2];
-            res[0] = c.getString(0);
-            res[1] = c.getString(1);
-        } else {
-            res = new String[3];
-            res[0] = c.getString(0);
-            res[1] = c.getString(1);
-            res[2] = c.getString(2);
+        if (c != null) {
+            c.moveToFirst();
+            if(c.getString(2) == null) {
+                res = new String[2];
+                res[0] = c.getString(0);
+                res[1] = c.getString(1);
+            } else {
+                res = new String[3];
+                res[0] = c.getString(0);
+                res[1] = c.getString(1);
+                res[2] = c.getString(2);
+            }
+            c.close();
         }
-        c.close();
         return res;       
     }
     
@@ -107,8 +116,9 @@ class AliasDatabase extends Database {
         ContentValues values = new ContentValues();
         values.put("aliasName", aliasName);
         values.put("number", number);
-        if (contactName != null) 
+        if (contactName != null) {
             values.put("contactName", contactName);
+        }
         return values;
     }
 }

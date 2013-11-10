@@ -37,8 +37,7 @@ public class PhoneManager {
 
         ContentResolver resolver = _context.getContentResolver();
         
-        String[] projection = new String[] { CallLog.Calls.NUMBER, CallLog.Calls.TYPE, 
-                CallLog.Calls.DURATION, CallLog.Calls.DATE};
+        String[] projection = new String[] { CallLog.Calls.NUMBER, CallLog.Calls.TYPE, CallLog.Calls.DURATION, CallLog.Calls.DATE};
         String sortOrder = CallLog.Calls.DATE + " ASC";
 
         Cursor c = resolver.query(CallLog.Calls.CONTENT_URI, projection, null, null, sortOrder);

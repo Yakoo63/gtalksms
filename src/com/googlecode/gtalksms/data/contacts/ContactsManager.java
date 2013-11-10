@@ -37,8 +37,10 @@ public class ContactsManager {
             Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
             Cursor c = resolver.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
 
-            if (c != null && c.moveToFirst()) {
-                res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
+                }
                 c.close();
             }
         } catch (Exception ex) {
@@ -61,10 +63,12 @@ public class ContactsManager {
                 Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
                 Cursor c = resolver.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
     
-                if (c != null && c.moveToFirst()) {
-                    res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);      
-                    if (SettingsManager.getSettingsManager(ctx).displayContactNumber) {
-                    	res += " " + Phone.cleanPhoneNumber(phoneNumber);
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        res = Tools.getString(c, CommonDataKinds.Phone.DISPLAY_NAME);
+                        if (SettingsManager.getSettingsManager(ctx).displayContactNumber) {
+                            res += " " + Phone.cleanPhoneNumber(phoneNumber);
+                        }
                     }
                     c.close();
                 }
@@ -92,8 +96,10 @@ public class ContactsManager {
                 new String[]{String.valueOf(rawId)}, null);
         
         long id = -1;
-        if (c != null && c.moveToFirst()) {
-            id = Tools.getLong(c, RawContacts.CONTACT_ID);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                id = Tools.getLong(c, RawContacts.CONTACT_ID);
+            }
             c.close();
         }
         
@@ -102,8 +108,10 @@ public class ContactsManager {
                 RawContacts._ID + "=?",
                 new String[]{String.valueOf(id)}, null);
         
-        if (c != null && c.moveToFirst()) {
-            res = Tools.getString(c, Contacts.DISPLAY_NAME);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                res = Tools.getString(c, Contacts.DISPLAY_NAME);
+            }
             c.close();
         }
         
@@ -188,29 +196,30 @@ public class ContactsManager {
         
             Cursor c = ctx.getContentResolver().query(ContactsContract.Data.CONTENT_URI, 
                         null, where, whereParams, null); 
-            
-            while(c.moveToNext()) {
-                int type = Tools.getLong(c, ContactsContract.CommonDataKinds.StructuredPostal.TYPE).intValue();
-                String label = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.LABEL);
+            if (c != null) {
+                while(c.moveToNext()) {
+                    int type = Tools.getLong(c, ContactsContract.CommonDataKinds.StructuredPostal.TYPE).intValue();
+                    String label = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.LABEL);
 
-//                String poBox        = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.POBOX);
-//                String street       = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.STREET);
-//                String city         = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.CITY);
-//                String state        = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.REGION);
-//                String postalCode   = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE);
-//                String country      = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY);
+    //                String poBox        = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.POBOX);
+    //                String street       = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.STREET);
+    //                String city         = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.CITY);
+    //                String state        = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.REGION);
+    //                String postalCode   = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE);
+    //                String country      = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY);
 
-                if (type != 0 && (label == null || label.compareTo("") != 0)) {
-                    label = ContactsContract.CommonDataKinds.StructuredPostal.getTypeLabel(ctx.getResources(), type, "").toString();
+                    if (type != 0 && (label == null || label.compareTo("") != 0)) {
+                        label = ContactsContract.CommonDataKinds.StructuredPostal.getTypeLabel(ctx.getResources(), type, "").toString();
+                    }
+
+                    ContactAddress a = new ContactAddress();
+                    a.address = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.DATA);
+                    a.label = label;
+                    res.add(a);
                 }
-                
-                ContactAddress a = new ContactAddress();
-                a.address = Tools.getString(c, ContactsContract.CommonDataKinds.StructuredPostal.DATA);
-                a.label = label;
-                res.add(a);
-            } 
-            c.close();
-        }
+                c.close();
+            }
+         }
         
         return res;
     }
@@ -229,21 +238,22 @@ public class ContactsManager {
         if (ids.size() > 0) {
             String where =  ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " IN (" + TextUtils.join(", ", ids) + ")";
             Cursor c = ctx.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, where, null, null); 
-            while(c.moveToNext()) {
+            if (c != null) {
+                while(c.moveToNext()) {
+                    String label = Tools.getString(c, ContactsContract.CommonDataKinds.Email.LABEL);
+                    int type = Tools.getLong(c, ContactsContract.CommonDataKinds.Email.TYPE).intValue();
 
-                String label = Tools.getString(c, ContactsContract.CommonDataKinds.Email.LABEL);
-                int type = Tools.getLong(c, ContactsContract.CommonDataKinds.Email.TYPE).intValue();
+                    if (type != 0 && (label == null || label.compareTo("") != 0)) {
+                        label = ContactsContract.CommonDataKinds.Email.getTypeLabel(ctx.getResources(), type, "").toString();
+                    }
 
-                if (type != 0 && (label == null || label.compareTo("") != 0)) {
-                    label = ContactsContract.CommonDataKinds.Email.getTypeLabel(ctx.getResources(), type, "").toString();
+                    ContactAddress a = new ContactAddress();
+                    a.address = Tools.getString(c, ContactsContract.CommonDataKinds.Email.DATA);
+                    a.label = label;
+                    res.add(a);
                 }
-
-                ContactAddress a = new ContactAddress();
-                a.address = Tools.getString(c, ContactsContract.CommonDataKinds.Email.DATA);
-                a.label = label;
-                res.add(a);
+                c.close();
             }
-            c.close();
         }
         return res;
     }
@@ -262,26 +272,27 @@ public class ContactsManager {
         if (ids.size() > 0) {
             String where =  ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " IN (" + TextUtils.join(", ", ids) + ")";
             Cursor c = ctx.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, where, null, null);
-            
-            while (c.moveToNext()) {
-                String number = Tools.getString(c, CommonDataKinds.Phone.NUMBER);
-                String label = Tools.getString(c, CommonDataKinds.Phone.LABEL);
-                int type = Tools.getLong(c, CommonDataKinds.Phone.TYPE).intValue();
-                int super_primary = Tools.getInt(c, ContactsContract.Data.IS_SUPER_PRIMARY);
-    
-                if (label == null || label.compareTo("") != 0) {
-                    label = ContactsContract.CommonDataKinds.Phone.getTypeLabel(ctx.getResources(), type, "").toString();
+            if (c != null) {
+                while (c.moveToNext()) {
+                    String number = Tools.getString(c, CommonDataKinds.Phone.NUMBER);
+                    String label = Tools.getString(c, CommonDataKinds.Phone.LABEL);
+                    int type = Tools.getLong(c, CommonDataKinds.Phone.TYPE).intValue();
+                    int super_primary = Tools.getInt(c, ContactsContract.Data.IS_SUPER_PRIMARY);
+
+                    if (label == null || label.compareTo("") != 0) {
+                        label = ContactsContract.CommonDataKinds.Phone.getTypeLabel(ctx.getResources(), type, "").toString();
+                    }
+
+                    Phone phone = new Phone(number, label, type, super_primary);
+
+                    if (phones.add(phone.getCleanNumber())) {
+                        res.add(phone);
+                    } else if (SettingsManager.getSettingsManager(ctx).debugLog) {
+                        Log.i(Tools.LOG_TAG, "getPhones(ids) Duplicated phone number: " + number);
+                    }
                 }
-    
-                Phone phone = new Phone(number, label, type, super_primary);
-    
-                if (phones.add(phone.getCleanNumber())) {
-                    res.add(phone);
-                } else if (SettingsManager.getSettingsManager(ctx).debugLog) {
-                    Log.i(Tools.LOG_TAG, "getPhones(ids) Duplicated phone number: " + number);
-                }
+                c.close();
             }
-            c.close();
         }
              
         return res;
