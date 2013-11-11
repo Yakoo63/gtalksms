@@ -18,15 +18,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 
 public class ConnectionStatusTabFragment extends SherlockFragment {
 
     private Button mSendPingButton;
+    private Button mRefreshMemoryUsageButton;
     private ImageView mPingStatus;
     private TextView mPingTime;
+    private TextView mMemoryUsage;
     private TextView mPingDate;
     
     private volatile MainService mMainService;
@@ -50,11 +52,20 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
         View view = inflater.inflate(R.layout.tab_connection_status, container, false);
 
         mSendPingButton = (Button) view.findViewById(R.id.sendPing);
+        mRefreshMemoryUsageButton = (Button) view.findViewById(R.id.refreshMemoryUsage);
         mPingStatus = (ImageView) view.findViewById(R.id.pingState);
         mPingTime = (TextView) view.findViewById(R.id.pingTime);
         mPingDate = (TextView) view.findViewById(R.id.pingDate);
+        mMemoryUsage = (TextView) view.findViewById(R.id.memoryUsage);
         
         mPingStatus.setImageResource(R.drawable.icon_red);
+
+        mRefreshMemoryUsageButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                Log.d("Send ping button pressed");
+                mMemoryUsage.setText(Runtime.getRuntime().totalMemory() / 1024 / 1024 + " MB");
+            }
+        });
 
         mSendPingButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -62,20 +73,20 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
                 if (mPingMyServerAsyncTask != null) {
                     AsyncTask.Status status = mPingMyServerAsyncTask.getStatus();
                     switch (status) {
-                    case PENDING:
-                    case RUNNING:
-                        mPingMyServerAsyncTask.cancel(true);
-                    default:
-                        break;
+                        case PENDING:
+                        case RUNNING:
+                            mPingMyServerAsyncTask.cancel(true);
+                        default:
+                            break;
                     }
                 }
-                
+
                 PingManager pingManager = maybeGetPingManager();
                 if (pingManager == null) {
                     Log.d("pingManager was null when send ping button was pressed");
                     return;
                 }
-                
+
                 mPingStatus.setImageResource(R.drawable.icon_orange);
                 mPingMyServerAsyncTask = new PingMyServerAsyncTask();
                 mPingMyServerAsyncTask.execute(pingManager);
