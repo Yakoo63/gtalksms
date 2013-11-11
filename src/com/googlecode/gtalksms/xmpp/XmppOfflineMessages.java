@@ -10,7 +10,7 @@ import org.jivesoftware.smackx.OfflineMessageManager;
 
 import android.content.Context;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppOfflineMessages {

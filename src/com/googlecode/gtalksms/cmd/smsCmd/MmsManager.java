@@ -14,7 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;

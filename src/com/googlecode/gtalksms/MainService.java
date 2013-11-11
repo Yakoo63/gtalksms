@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ping.PingManager;
 
 import android.app.NotificationManager;
@@ -65,6 +64,7 @@ import com.googlecode.gtalksms.receivers.PublicIntentReceiver;
 import com.googlecode.gtalksms.receivers.StorageLowReceiver;
 import com.googlecode.gtalksms.tools.CrashedStartCounter;
 import com.googlecode.gtalksms.tools.DisplayToast;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppMsg;

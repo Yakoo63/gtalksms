@@ -7,7 +7,7 @@ import org.jivesoftware.smackx.XHTMLText;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppMsg implements Parcelable {

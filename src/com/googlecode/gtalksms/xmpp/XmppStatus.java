@@ -2,7 +2,7 @@ package com.googlecode.gtalksms.xmpp;
 
 import java.io.File;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
 

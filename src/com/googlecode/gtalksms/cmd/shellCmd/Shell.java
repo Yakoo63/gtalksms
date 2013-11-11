@@ -8,7 +8,7 @@ import java.util.Date;
 
 import android.content.Context;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.ShellCmd;
 import com.googlecode.gtalksms.tools.RootTools;

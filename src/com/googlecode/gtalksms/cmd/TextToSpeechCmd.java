@@ -9,7 +9,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.EngineInfo;
 import android.speech.tts.TextToSpeech.OnInitListener;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 

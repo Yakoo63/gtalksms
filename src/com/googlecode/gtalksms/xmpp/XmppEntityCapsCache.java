@@ -10,7 +10,7 @@ import org.jivesoftware.smackx.entitycaps.cache.SimpleDirectoryPersistentCache;
 
 import android.content.Context;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 
 public class XmppEntityCapsCache {
     private static final String CACHE_DIR = "EntityCapsCacheBase32";

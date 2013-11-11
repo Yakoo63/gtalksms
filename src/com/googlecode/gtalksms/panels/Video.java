@@ -17,7 +17,7 @@ import android.os.Environment;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;

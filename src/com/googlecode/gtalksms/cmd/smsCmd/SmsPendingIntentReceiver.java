@@ -2,7 +2,7 @@ package com.googlecode.gtalksms.cmd.smsCmd;
 
 import java.util.Map;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.databases.SMSHelper;

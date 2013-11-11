@@ -1,6 +1,6 @@
 package com.googlecode.gtalksms.xmpp;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 
 public class XmppFriend {
     

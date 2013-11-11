@@ -32,7 +32,7 @@ import com.actionbarsherlock.view.Window;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.MainService.LocalBinder;
 import com.googlecode.gtalksms.R;

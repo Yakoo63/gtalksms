@@ -14,8 +14,6 @@ import org.apache.http.util.ByteArrayBuffer;
 
 import android.content.Context;
 
-import com.googlecode.gtalksms.Log;
-
 public class Web {
     public static String DownloadFromUrl(String urlStr) {
         try {

@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;

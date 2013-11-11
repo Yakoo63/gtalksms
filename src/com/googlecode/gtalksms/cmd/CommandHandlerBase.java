@@ -4,17 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
-import com.googlecode.gtalksms.XmppManager;
 import com.googlecode.gtalksms.cmd.Cmd.SubCmd;
 import com.googlecode.gtalksms.data.contacts.ResolvedContact;
 import com.googlecode.gtalksms.xmpp.XmppMsg;

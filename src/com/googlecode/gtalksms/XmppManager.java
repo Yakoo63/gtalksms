@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;

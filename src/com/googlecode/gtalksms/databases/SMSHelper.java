@@ -1,6 +1,6 @@
 package com.googlecode.gtalksms.databases;
 
-import com.googlecode.gtalksms.Log;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.cmd.smsCmd.Sms;
 
 import android.content.ContentValues;
