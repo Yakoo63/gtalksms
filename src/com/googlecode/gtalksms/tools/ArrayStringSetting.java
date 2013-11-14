@@ -40,7 +40,9 @@ public class ArrayStringSetting {
     }
 
     public void set(String value) {
-        _string = _settingsManager.saveSetting(_key, value);
+        if (_string == null || !_string.equals(value)) {
+            _string = _settingsManager.saveSetting(_key, value);
+        }
         update();
     }
 
