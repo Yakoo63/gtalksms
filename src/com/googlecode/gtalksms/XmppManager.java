@@ -39,6 +39,7 @@ import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;
 import com.googlecode.gtalksms.xmpp.XmppBuddies;
 import com.googlecode.gtalksms.xmpp.XmppConnectionChangeListener;
+import com.googlecode.gtalksms.xmpp.XmppDeliveryReceipts;
 import com.googlecode.gtalksms.xmpp.XmppEntityCapsCache;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppLocalS5BProxyManager;
@@ -97,7 +98,8 @@ public class XmppManager {
     private final ClientOfflineMessages mClientOfflineMessages;
     private final XmppStatus mXmppStatus;
     private final XmppPresenceStatus mXmppPresenceStatus;
-        
+    private final XmppDeliveryReceipts mXmppDeliveryReceipts;
+
     // Our current retry attempt, plus a runnable and handler to implement retry
     private int mCurrentRetryCount = 0;
     private final Runnable mReconnectRunnable = new Runnable() {
@@ -139,6 +141,7 @@ public class XmppManager {
         mSettings = SettingsManager.getSettingsManager(context);
         Log.initialize(mSettings);
         mContext = context;
+        mXmppDeliveryReceipts = XmppDeliveryReceipts.getInstance();
         mXmppBuddies = XmppBuddies.getInstance(context);
         mXmppFileMgr = XmppFileManager.getInstance(context);
         mXmppMuc = XmppMuc.getInstance(context);
@@ -150,6 +153,7 @@ public class XmppManager {
         mXmppMuc.registerListener(this);
         mClientOfflineMessages.registerListener(this);
         mXmppPresenceStatus.registerListener(this);
+        mXmppDeliveryReceipts.registerListener(this);
         XmppLocalS5BProxyManager.getInstance(context).registerListener(this);
         sReusedConnectionCount = 0;
         sNewConnectionCount = 0;
