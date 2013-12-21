@@ -1,8 +1,5 @@
 package com.googlecode.gtalksms;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,38 +22,10 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 
-import com.googlecode.gtalksms.cmd.AliasCmd;
-import com.googlecode.gtalksms.cmd.ApplicationsCmd;
-import com.googlecode.gtalksms.cmd.BatteryCmd;
-import com.googlecode.gtalksms.cmd.BluetoothCmd;
-import com.googlecode.gtalksms.cmd.CallCmd;
-import com.googlecode.gtalksms.cmd.CameraCmd;
-import com.googlecode.gtalksms.cmd.ClipboardCmd;
 import com.googlecode.gtalksms.cmd.Cmd;
-import com.googlecode.gtalksms.cmd.CommandActivationCmd;
 import com.googlecode.gtalksms.cmd.CommandHandlerBase;
-import com.googlecode.gtalksms.cmd.ContactCmd;
-import com.googlecode.gtalksms.cmd.ExitCmd;
-import com.googlecode.gtalksms.cmd.FileCmd;
-import com.googlecode.gtalksms.cmd.GeoCmd;
-import com.googlecode.gtalksms.cmd.HelpCmd;
-import com.googlecode.gtalksms.cmd.KeyboardCmd;
-import com.googlecode.gtalksms.cmd.LogsCmd;
-import com.googlecode.gtalksms.cmd.MmsCmd;
-import com.googlecode.gtalksms.cmd.MusicCmd;
-import com.googlecode.gtalksms.cmd.NotificationsCmd;
-import com.googlecode.gtalksms.cmd.RebootCmd;
 import com.googlecode.gtalksms.cmd.RecipientCmd;
-import com.googlecode.gtalksms.cmd.RingCmd;
-import com.googlecode.gtalksms.cmd.SettingsCmd;
-import com.googlecode.gtalksms.cmd.ShellCmd;
-import com.googlecode.gtalksms.cmd.SmsCmd;
-import com.googlecode.gtalksms.cmd.SystemCmd;
-import com.googlecode.gtalksms.cmd.TextToSpeechCmd;
-import com.googlecode.gtalksms.cmd.ToastCmd;
-import com.googlecode.gtalksms.cmd.UrlsCmd;
-import com.googlecode.gtalksms.cmd.VideoCmd;
-import com.googlecode.gtalksms.cmd.WifiCmd;
+
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.panels.MainActivity;
 import com.googlecode.gtalksms.receivers.NetworkConnectivityReceiver;
@@ -72,6 +41,8 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 import com.googlecode.gtalksms.xmpp.XmppStatus;
 
 public class MainService extends Service {
+    private static MainService sIntance = null;
+
     private final static int NOTIFICATION_CONNECTION = 1;
     private final static int NOTIFICATION_STOP_RINGING = 2;
     
@@ -120,13 +91,11 @@ public class MainService extends Service {
     private static PendingIntent sPendingIntentLaunchApplication = null;
     private static PendingIntent sPendingIntentStopRinging = null;
 
-    private static final Set<CommandHandlerBase> sAvailableCommandSet = new HashSet<CommandHandlerBase>();
-    private static final Map<String, CommandHandlerBase> sActiveCommands = Collections.synchronizedMap(new HashMap<String, CommandHandlerBase>());
-    private static final Set<CommandHandlerBase> sActiveCommandSet = Collections.synchronizedSet(new HashSet<CommandHandlerBase>());
-
     // This is the object that receives interactions from clients. See
     // RemoteService for a more complete example.
     private final IBinder mBinder = new LocalBinder();
+
+    private CommandManager mCommandManager;
 
     private long mHandlerThreadId;
 
@@ -250,7 +219,7 @@ public class MainService extends Service {
             }
             sXmppMgr.send(xmppMsg, intent.getStringExtra("to"));
         } else if (action.equals(ACTION_XMPP_MESSAGE_RECEIVED)) {
-            maybeAquireWakelock();
+            maybeAcquireWakeLock();
             String message = intent.getStringExtra("message");
             if (message != null) {
                 handleCommandFromXMPP(message, intent.getStringExtra("from"));
@@ -340,15 +309,24 @@ public class MainService extends Service {
     }
     
     public static Set<CommandHandlerBase> getAvailableCommandSet() {
-        return sAvailableCommandSet; 
+        if (sIntance != null && sIntance.mCommandManager != null) {
+            return sIntance.mCommandManager.getAvailableCommandSet();
+        }
+        return null;
     }
 
     public static Map<String, CommandHandlerBase> getActiveCommands() {
-        return sActiveCommands;
+        if (sIntance != null && sIntance.mCommandManager != null) {
+            return sIntance.mCommandManager.getActiveCommands();
+        }
+        return null;
     }
 
     public static Set<CommandHandlerBase> getActiveCommandSet() {
-        return sActiveCommandSet;
+        if (sIntance != null && sIntance.mCommandManager != null) {
+            return sIntance.mCommandManager.getActiveCommandSet();
+        }
+        return null;
     }
 
     public boolean getTLSStatus() {
@@ -389,6 +367,7 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        sIntance = this;
 
         NetworkConnectivityReceiver.setLastActiveNetworkName(this);
         
@@ -418,6 +397,7 @@ public class MainService extends Service {
 
         sPendingIntentLaunchApplication = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
         sNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        mCommandManager = new CommandManager();
         
         Log.i("onCreate(): service thread created - IsRunning is set to true");
         IsRunning = true;
@@ -485,14 +465,19 @@ public class MainService extends Service {
             sXmppMgr.mSmackAndroid.onDestroy();
             sXmppMgr = null;
         }
-        teardownListenersForConnection();
+        tearDownListenersForConnection();
+
         // All data must be cleaned, because onDestroy can be call without releasing the current object
         // It's due to BIND_AUTO_CREATE used for Service Binder
         // http://developer.android.com/reference/android/content/Context.html#stopService(android.content.Intent)
-        sActiveCommands.clear();
-        sActiveCommandSet.clear();
+        if (mCommandManager != null) {
+            mCommandManager.stopCommands();
+            mCommandManager.cleanupCommands();
+            mCommandManager = null;
+        }
         
         sServiceLooper.quit();
+        sIntance = null;
 
         super.onDestroy();
         Log.i("MainService onDestroy(): service destroyed");
@@ -580,18 +565,18 @@ public class MainService extends Service {
         intentFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
         registerReceiver(sStorageLowReceiver, intentFilter);
 
-        setupCommands();
+        mCommandManager.setupCommands(this);
         sXmppMgr = XmppManager.getInstance(this);
     }
 
     private void executeCommand(String cmd, String args, String answerTo) {
         assert (cmd != null);
         cmd = cmd.toLowerCase();
-        
-        if (sActiveCommands.containsKey(cmd)) {
+
+        CommandHandlerBase exec = mCommandManager.getActiveCommand(cmd);
+        if (exec != null) {
             Log.d("MainService executing command: \"" + cmd + ":" + Tools.shortenMessage(args) + "\"");
             try {
-                CommandHandlerBase exec = sActiveCommands.get(cmd);
                 Cmd execCmd = exec.getCommand(cmd);
                 if (execCmd != null && execCmd.isActive()) {
                     exec.execute(cmd, args == null ? "" : args, answerTo);
@@ -616,7 +601,7 @@ public class MainService extends Service {
             }
         } else if (cmd.equals("stop")) {
             send(getString(R.string.chat_stop_actions), answerTo);
-            stopCommands();
+            mCommandManager.stopCommands();
         } else {
             send(getString(R.string.chat_error_unknown_cmd, cmd), answerTo);
         }
@@ -729,102 +714,6 @@ public class MainService extends Service {
         executeCommand(command, args, from);
     }
 
-    /**
-     * Creates the instances from the CommandHandlerBase classes
-     */
-    private void setupCommands() {
-        
-        Class<?>[] cmds = new Class[] {
-                VideoCmd.class,
-                NotificationsCmd.class,
-                ApplicationsCmd.class,
-                LogsCmd.class,
-                TextToSpeechCmd.class,
-                ToastCmd.class,
-                ClipboardCmd.class,
-                CameraCmd.class,
-                KeyboardCmd.class,
-                BatteryCmd.class,
-                GeoCmd.class,
-                CallCmd.class,
-                ContactCmd.class,
-                ShellCmd.class,
-                UrlsCmd.class,
-                RingCmd.class,
-                FileCmd.class,
-                MusicCmd.class,
-                MmsCmd.class,
-                SmsCmd.class,
-                ExitCmd.class,
-                AliasCmd.class,
-                SettingsCmd.class,
-                BluetoothCmd.class,
-                WifiCmd.class,
-                RebootCmd.class,
-                RecipientCmd.class,
-                // used for debugging
-                SystemCmd.class,
-                // help & command activation commands need to be registered as last
-                CommandActivationCmd.class,
-                HelpCmd.class,
-            };
-        
-        for (Class<?> c : cmds) {
-            try {
-                registerCommand((CommandHandlerBase) c.getConstructor(MainService.class).newInstance(this));
-            } catch (Exception e) {
-                // Should not happen.
-                Log.e("Failed to register command " + c.getName(), e);
-            }
-        }
-    }
-
-    /**
-     * Calls cleanUp() for every registered command
-     */
-    private static void cleanupCommands() {
-        // Make a copy of the activeCommandSet as deactivate() may remove a command from sActiveCommandSet
-        Set<CommandHandlerBase> currentActiveCommandSet = new HashSet<CommandHandlerBase>(sActiveCommandSet);
-        for (CommandHandlerBase cmd : currentActiveCommandSet) {
-            try {
-                cmd.deactivate();
-            } catch (Exception e) {
-                Log.e("Failed to cleanup command", e);
-            }
-        }
-    }
-
-    /**
-     * used to stop ongoing actions, like gps updates, ringing, ...
-     */
-    private static void stopCommands() {
-        for (CommandHandlerBase c : sAvailableCommandSet) {
-            c.stop();
-        }
-    }
-    
-    public static void updateCommandState() {
-        for (CommandHandlerBase c : sAvailableCommandSet) {
-            c.updateAndReturnStatus();
-        }
-    }
-
-    private static void registerCommand(CommandHandlerBase cmd) {
-        sAvailableCommandSet.add(cmd);
-        
-        if (cmd.updateAndReturnStatus()) {
-            for (Cmd c : cmd.getCommands()) {
-                sActiveCommands.put(c.getName().toLowerCase(), cmd);
-                if (c.getAlias() != null) {
-                    for (String a : c.getAlias()) {
-                        sActiveCommands.put(a.toLowerCase(), cmd);
-                    }
-                }
-            }
-            sActiveCommandSet.add(cmd);
-        }
-    }
-
     private int updateListenersToCurrentState(int currentState) {
         boolean wantListeners;
         switch (currentState) {
@@ -846,29 +735,33 @@ public class MainService extends Service {
             setupListenersForConnection();
             sListenersActive = true;
         } else if (!wantListeners) {
-            teardownListenersForConnection();
+            tearDownListenersForConnection();
             sListenersActive = false;
         }
 
         return currentState;
     }
 
-    /**
-     * registers the commands, executing their constructor
-     * 
-     */
-    private void setupListenersForConnection() {
-        Log.i("setupListenersForConnection()");
-        for (CommandHandlerBase c : sAvailableCommandSet) {
-            c.updateAndReturnStatus();
+    public static void updateCommandState() {
+        if (sIntance != null && sIntance.mCommandManager != null) {
+            sIntance.mCommandManager.updateCommandState();
         }
     }
 
-    private void teardownListenersForConnection() {
-        Log.i("teardownListenersForConnection()");
+    /**
+     * registers the commands, executing their constructor
+     *
+     */
+    private void setupListenersForConnection() {
+        Log.i("setupListenersForConnection()");
+        mCommandManager.updateAndReturnStatus();
+    }
+
+    private void tearDownListenersForConnection() {
+        Log.i("tearDownListenersForConnection()");
         stopForeground(true);
-        stopCommands();
-        cleanupCommands();
+        mCommandManager.stopCommands();
+        mCommandManager.cleanupCommands();
     }
 
     public static Looper getServiceLooper() {
@@ -896,7 +789,7 @@ public class MainService extends Service {
         return sendToServiceHandler(0, intent);
     }
 
-    public static void maybeAquireWakelock() {
+    public static void maybeAcquireWakeLock() {
         if (!sWl.isHeld()) {
             sWl.acquire();
         }
