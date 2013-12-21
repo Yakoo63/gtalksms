@@ -219,9 +219,12 @@ public class SettingsManager {
         mProtectedSettings.add("password");
         mProtectedSettings.add("xmppSecurityMode");
         mProtectedSettings.add("useCompression");
-        
+
+        mHiddenSettings.add("login");
         mHiddenSettings.add("password");
-        
+        mHiddenSettings.add("notifiedAddress");
+        mHiddenSettings.add("roomPassword");
+
         try {
             importPreferences();
         } catch (Exception e) {

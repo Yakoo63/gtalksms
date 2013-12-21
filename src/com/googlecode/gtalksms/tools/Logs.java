@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -147,8 +148,10 @@ public class Logs {
         res.append(Tools.APP_NAME + " Preferences").append(LINE_SEPARATOR);
         SettingsManager settings = SettingsManager.getSettingsManager(ctx);
         Map<String, ?> allSharedPrefs = settings.getAllSharedPreferences();
-        for (Map.Entry<String, ?> pairs : allSharedPrefs.entrySet()) {
-            res.append(pairs.getKey()).append(": ").append(pairs.getValue().toString()).append(LINE_SEPARATOR);
+        ArrayList<String> keys = new ArrayList<String>(allSharedPrefs.keySet());
+        Collections.sort(keys);
+        for(String k : keys) {
+            res.append(k).append(": ").append(allSharedPrefs.get(k).toString()).append(LINE_SEPARATOR);
         }
         return res.toString();
     }
