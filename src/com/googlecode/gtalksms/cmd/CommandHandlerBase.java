@@ -273,17 +273,6 @@ public abstract class CommandHandlerBase {
     }
     
     /**
-     * Useful Method to split the arguments into an String Array
-     * The Arguments are split by ":"
-     * 
-     * @param args
-     * @return args split in an array or an array only containing the empty string
-     */
-    String[] splitArgs(String args) {
-        return args == null ? new String[] { "" } : TextUtils.split(args, ":");
-    }
-    
-    /**
      * Returns a nice formatted String of the Commands this class handles
      * 
      * @return
@@ -324,7 +313,7 @@ public abstract class CommandHandlerBase {
     /**
      * This method presents the user with possible candidates, when the user
      * given contact information is not distinct enough, so that there are
-     * more possible contacts that match these informations.
+     * more possible contacts that match these information.
      * This is a quite common task, so it has its own method.
      * 
      * @param candidates
