@@ -1,4 +1,4 @@
-upcoming
+4.4.4
 * Fix long SMS issue when Sent Notification is disabled
 * Manage Hangout account differently to avoid multiple notifications
 * Phone command refactoring with new hangup command to stop the current phone call, and new speaker command to manage the phone speaker
