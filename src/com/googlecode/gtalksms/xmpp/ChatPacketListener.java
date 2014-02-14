@@ -26,7 +26,7 @@ public class ChatPacketListener implements PacketListener {
 
 		if (mSettings.cameFromNotifiedAddress(from) && message.getBody() != null) {
 			Log.d("XMPP packet received - sending Intent: " + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
-			// Aquire a WakeLock just before we are about to send the intent
+			// Acquire a WakeLock just before we are about to send the intent
 			MainService.maybeAcquireWakeLock();
 			Tools.startSvcXMPPMsg(mCtx, message.getBody(), from);
 		} else if (mSettings.debugLog) {
