@@ -23,6 +23,7 @@ import org.jivesoftware.smackx.muc.Occupant;
 import org.jivesoftware.smackx.muc.RoomInfo;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.R;
@@ -60,7 +61,7 @@ public class XmppMuc {
         mMucHelper = MUCHelper.getMUCHelper(context);
         mDiscussionHistory = new DiscussionHistory();
         // this should disable history replay on MUC rooms
-        mDiscussionHistory.setMaxChars(0);        
+        mDiscussionHistory.setMaxChars(0);
     }
     
     public void registerListener(XmppManager xmppMgr) {
@@ -231,7 +232,9 @@ public class XmppMuc {
         } while (mRoomNumbers.contains(randomInt));
 
         String normalizedName = name.replaceAll(" ", "_").replaceAll("[\\W]|�", "");
-        normalizedName = Normalizer.normalize(normalizedName, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            normalizedName = Normalizer.normalize(normalizedName, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        }
         String cleanLogin = mSettings.getLogin().replaceAll("@", "_");
         String roomUID = normalizedName + "_" + ROOM_START_TAG + randomInt + "_" + cleanLogin;
 
@@ -277,7 +280,11 @@ public class XmppMuc {
 
             try {
                 List<String> owners = new ArrayList<String>();
-                owners.add(mSettings.getLogin());
+                if (mConnection.getUser() != null) {
+                    owners.add(mConnection.getUser());
+                } else {
+                    owners.add(mSettings.getLogin());
+                }
                 Collections.addAll(owners, mSettings.getNotifiedAddresses().getAll());
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
             } catch (Exception ex) {
