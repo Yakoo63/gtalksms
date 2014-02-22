@@ -25,15 +25,28 @@ import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class LocationService extends Service {
 
-    private SettingsManager _settingsManager = null;
-    private LocationManager _locationManager = null;
-    private LocationListener _locationListener = null;
     private Location _currentBestLocation = null;
-    private String answerTo;
+    private String _answerTo;
 
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     public static final String STOP_SERVICE = "com.googlecode.gtalksms.LOCATION_STOP_SERVICE";
     public static final String START_SERVICE = "com.googlecode.gtalksms.LOCATION_START_SERVICE";
+
+    private SettingsManager _settingsManager = null;
+    private LocationManager _locationManager = null;
+
+    private LocationListener _locationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            if (isBetterLocation(location, _currentBestLocation)) {
+                _currentBestLocation = location;
+                sendLocationUpdate(_currentBestLocation);
+            }
+        }
+        public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
+        public void onProviderDisabled(String arg0) {}
+        public void onProviderEnabled(String arg0) {}
+    };
+
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -42,7 +55,6 @@ public class LocationService extends Service {
 
     @Override
     public void onCreate() {
-        _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         _settingsManager = SettingsManager.getSettingsManager(this);
     }
 
@@ -76,7 +88,7 @@ public class LocationService extends Service {
             Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
             m.setAccessible(true);
             m.invoke(_locationManager);
-        // use the secuirty hole from http://code.google.com/p/android/issues/detail?id=7890
+        // use the security hole from http://code.google.com/p/android/issues/detail?id=7890
         } else {
             // the GPS is not in the requested state
             if (!allowedLocationProviders.contains("gps") == newGPSStatus) {                
@@ -94,6 +106,10 @@ public class LocationService extends Service {
      * @param location the location to send.
      */
     void sendLocationUpdate(Location location) {
+        if (location == null) {
+            return;
+        }
+
         XmppMsg msg = new XmppMsg();
         if (_settingsManager.useGoogleMapUrl) {
             msg.appendLine("http://maps.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude());
@@ -111,6 +127,7 @@ public class LocationService extends Service {
     @SuppressWarnings("deprecation")
     public void onStart(final Intent intent, int startId) {
         super.onStart(intent, startId);
+
         if (_settingsManager.debugLog) {
             if (intent != null) {
                 Log.i(Tools.LOG_TAG, "LocationService onStart with intent action=" + intent.getAction());
@@ -119,14 +136,17 @@ public class LocationService extends Service {
             }
         }
 
-        if (intent != null) {
-            if (intent.getAction().equals(STOP_SERVICE)) {
-                destroy();
-                stopSelf();
-                return;
-            }
+        // Cleanup previous instance
+        destroy();
+        if (intent != null && intent.getAction().equals(STOP_SERVICE)) {
+            stopSelf();
+            return;
+        }
 
-            answerTo = intent.getStringExtra("to");
+        // Initializing the new instance
+        _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (intent != null) {
+            _answerTo = intent.getStringExtra("to");
         }
         
         // try to enable the GPS
@@ -137,36 +157,19 @@ public class LocationService extends Service {
                 send("Could not enable GPS: " + e);
             }
         }
-        
-        _locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                if (isBetterLocation(location, _currentBestLocation)) {
-                    _currentBestLocation = location;
-                    sendLocationUpdate(_currentBestLocation);
-                }
-            }
-            public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-            public void onProviderDisabled(String arg0) {}
-            public void onProviderEnabled(String arg0) {}
-        };
 
         // We query every available location providers
         _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, _locationListener);
         _locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, _locationListener);
 
         Location location = _locationManager.getLastKnownLocation("gps");
-        if (location == null)
-        {
+        if (location == null) {
             location = _locationManager.getLastKnownLocation("network");
-            if (location != null) {
-                if (isBetterLocation(location, _currentBestLocation)) {
-                    _currentBestLocation = location;
-                    //TODO localization
-                    send("Last known location");  
-                    sendLocationUpdate(_currentBestLocation);
-                }
+            if (location != null && isBetterLocation(location, _currentBestLocation)) {
+                _currentBestLocation = location;
             }
         }
+        sendLocationUpdate(_currentBestLocation);
     }
 
     public void onDestroy() {
@@ -174,19 +177,18 @@ public class LocationService extends Service {
     }
 
     private void destroy() {
-        if (_locationManager != null && _locationListener != null) {
+        if (_locationManager != null) {
             _locationManager.removeUpdates(_locationListener);
             _locationManager = null;
-            _locationListener = null;
         }
     }
     
     private void send(String message) {
-        Tools.send(message, answerTo, this);
+        Tools.send(message, _answerTo, this);
     }
     
     private void send(XmppMsg msg) {
-        Tools.send(msg, answerTo, this);
+        Tools.send(msg, _answerTo, this);
     }
 
     /** 
