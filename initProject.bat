@@ -1,15 +1,16 @@
 @echo off
-set FDIR=files
-set ABSDIR=external-libs\ActionBarSherlock\library
+set ABSDIR=external-libs\ActionBarSherlock\actionbarsherlock
 
 if not exist %ABSDIR% (
-    git submodule update --init --recursive || pause & exit 1
+	mkdir .git\modules\external-libs
+	mkdir external-libs
+	rem git submodule update --init --recursive
+	echo Initializing Module
+	git submodule add -f git://github.com/JakeWharton/ActionBarSherlock.git external-libs\ActionBarSherlock
+	echo Copy Android Studio configuration
+	cp actionbarsherlock.iml %ABSDIR%
 ) else (
     echo Project already initialized
 )
-
-copy local.properties %ABSDIR%\
-copy %FDIR%/abs-build.xml %ABSDIR%\build.xml
-copy %FDIR%/abs-dot-project %ABSDIR%\.project
 
 pause

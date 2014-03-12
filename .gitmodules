@@ -1,3 +1,0 @@
-[submodule "external-libs/ActionBarSherlock"]
-	path = external-libs/ActionBarSherlock
-	url = git://github.com/JakeWharton/ActionBarSherlock.git

@@ -1,3 +1,8 @@
+4.4.5
+* Fix MUC creation with OpenFire
+* Fix "where" command infinite notifications
+* Remove MUC password from the lo
+
 4.4.4
 * Fix long SMS issue when Sent Notification is disabled
 * Manage Hangout account differently to avoid multiple notifications

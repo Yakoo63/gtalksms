@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms"
 
-    android:versionName="4.4.4"
-    android:versionCode="76">
+    android:versionName="4.4.5"
+    android:versionCode="77">
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="18"/>
     
@@ -50,7 +50,7 @@
         android:allowBackup="true">
 
         <activity 
-            android:name="com.googlecode.gtalksms.panels.MainActivity"
+            android:name=".panels.MainActivity"
             android:theme="@style/Theme.Sherlock"
             android:windowSoftInputMode="adjustPan"
             android:configChanges="orientation|screenSize"
@@ -61,17 +61,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.googlecode.gtalksms.panels.GeoPopup"
+        <activity android:name=".panels.GeoPopup"
                   android:label="@string/app_name">
         </activity>
-        <activity android:name="com.googlecode.gtalksms.panels.Preferences"
+        <activity android:name=".panels.Preferences"
                   android:label="@string/preference_panel">
         </activity>
-        <activity android:name="com.googlecode.gtalksms.panels.LogCollector"/>
-        <activity android:name="com.googlecode.gtalksms.panels.Video"
+        <activity android:name=".panels.LogCollector"/>
+        <activity android:name=".panels.Video"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
         </activity>
-        <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService" android:exported="false">
+        <service android:enabled="true" android:name=".MainService" android:exported="false">
             <intent-filter>
                 <action android:name="com.googlecode.gtalksms.action.CONNECT" />
                 <action android:name="com.googlecode.gtalksms.action.DISCONNECT" />
@@ -81,14 +81,14 @@
                 <action android:name="com.googlecode.gtalksms.action.COMMAND" />
             </intent-filter>
         </service>
-        <receiver android:name="com.googlecode.gtalksms.receivers.PublicIntentReceiver">
+        <receiver android:name=".receivers.PublicIntentReceiver">
             <intent-filter>
                 <action android:name="com.googlecode.gtalksms.action.CONNECT" />
                 <action android:name="com.googlecode.gtalksms.action.DISCONNECT" />
                 <action android:name="com.googlecode.gtalksms.action.TOGGLE" />
             </intent-filter>    
         </receiver>
-        <receiver android:name="com.googlecode.gtalksms.WidgetProvider" >
+        <receiver android:name=".widgets.WidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.googlecode.gtalksms.action.XMPP.CONNECTION_CHANGED"/>
@@ -97,32 +97,32 @@
             <meta-data android:name="android.appwidget.provider"
                        android:resource="@xml/appwidget_info" />
         </receiver>
-        <service android:enabled="true" android:name="com.googlecode.gtalksms.LocationService" android:exported="false" />
-        <receiver android:name="com.googlecode.gtalksms.receivers.BootReceiver">
+        <service android:enabled="true" android:name=".services.LocationService" android:exported="false" />
+        <receiver android:name=".receivers.BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.googlecode.gtalksms.receivers.PowerReceiver">
+        <receiver android:name=".receivers.PowerReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.googlecode.gtalksms.receivers.SmsReceiver">
+        <receiver android:name=".receivers.SmsReceiver">
             <intent-filter>
                 <!-- Receiver priority is set to SYSTEM_HIGH + 10 -->
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" android:priority="1010" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.googlecode.gtalksms.receivers.MmsReceiver">
+        <receiver android:name=".receivers.MmsReceiver">
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_RECEIVED" android:priority="1010" />
                 <data android:mimeType="application/vnd.wap.mms-message" />
             </intent-filter>
         </receiver>
-        <activity android:name="com.googlecode.gtalksms.receivers.UrlActivity" android:label="@string/app_name">
+        <activity android:name=".receivers.UrlActivity" android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -131,19 +131,19 @@
                 <data android:scheme="https"/> 
             </intent-filter>
         </activity>
-        <activity android:name="com.googlecode.gtalksms.receivers.SendIntentActivity" android:label="@string/app_name">
+        <activity android:name=".receivers.SendIntentActivity" android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
-        <receiver android:name="com.googlecode.gtalksms.receivers.NetworkConnectivityReceiver" android:enabled="true">
+        <receiver android:name=".receivers.NetworkConnectivityReceiver" android:enabled="true">
              <intent-filter>
                  <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
              </intent-filter>
         </receiver>
-        <service android:name="com.googlecode.gtalksms.KeyboardInputMethod"
+        <service android:name=".services.KeyboardInputMethodService"
             android:label="@string/keyboard_name"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
@@ -151,7 +151,7 @@
             </intent-filter>
             <meta-data android:name="android.view.im" android:resource="@xml/method" />
         </service>
-        <service android:name="com.googlecode.gtalksms.AccessibilityService"
+        <service android:name=".services.AccessibilityService"
             android:label="@string/accessibility_service_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>

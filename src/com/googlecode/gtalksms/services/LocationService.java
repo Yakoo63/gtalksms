@@ -1,4 +1,4 @@
-package com.googlecode.gtalksms;
+package com.googlecode.gtalksms.services;
 
 /*
  * Source code of this class originally written by Kevin AN <anyupu@gmail.com>
@@ -18,8 +18,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.util.Log;
 
+import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
@@ -128,12 +130,10 @@ public class LocationService extends Service {
     public void onStart(final Intent intent, int startId) {
         super.onStart(intent, startId);
 
-        if (_settingsManager.debugLog) {
-            if (intent != null) {
-                Log.i(Tools.LOG_TAG, "LocationService onStart with intent action=" + intent.getAction());
-            } else {
-                Log.i(Tools.LOG_TAG, "Location Service onStart with null intent");
-            }
+        if (intent != null) {
+            Log.i("LocationService onStart with intent action=" + intent.getAction());
+        } else {
+            Log.i("Location Service onStart with null intent");
         }
 
         // Cleanup previous instance
