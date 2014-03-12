@@ -31,6 +31,7 @@ import com.googlecode.gtalksms.panels.MainActivity;
 import com.googlecode.gtalksms.receivers.NetworkConnectivityReceiver;
 import com.googlecode.gtalksms.receivers.PublicIntentReceiver;
 import com.googlecode.gtalksms.receivers.StorageLowReceiver;
+import com.googlecode.gtalksms.services.KeyboardInputMethodService;
 import com.googlecode.gtalksms.tools.CrashedStartCounter;
 import com.googlecode.gtalksms.tools.DisplayToast;
 import com.googlecode.gtalksms.tools.Log;
@@ -85,7 +86,7 @@ public class MainService extends Service {
     private static XmppManager sXmppMgr;
     private static BroadcastReceiver sXmppConChangedReceiver;
     private static BroadcastReceiver sStorageLowReceiver;
-    private static KeyboardInputMethod sKeyboardInputMethod;
+    private static KeyboardInputMethodService sKeyboardInputMethodService;
     private static PowerManager sPm;
     private static PowerManager.WakeLock sWl;
     private static PendingIntent sPendingIntentLaunchApplication = null;
@@ -117,34 +118,52 @@ public class MainService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
-            onHandleIntent((Intent) msg.obj, msg.arg1);
+            // ensure XMPP manager is setup (but not yet connected)
+            if (sXmppMgr == null) {
+                setupXmppManagerAndCommands();
+            }
+
+            Intent intent = (Intent)msg.obj;
+            String action = intent.getAction();
+            int id = msg.arg1;
+
+            if (action.equals(ACTION_CONNECT)
+                    || action.equals(ACTION_DISCONNECT)
+                    || action.equals(ACTION_TOGGLE)
+                    || action.equals(ACTION_NETWORK_STATUS_CHANGED)) {
+                onHandleIntentTransportConnection(intent);
+            } else if (!action.equals(ACTION_XMPP_CONNECTION_CHANGED)){
+                onHandleIntentMessage(intent);
+            }
+
+            // stop the service if we are disconnected (but stopping the service
+            // doesn't mean the process is terminated - onStart can still happen.)
+            if (getConnectionStatus() == XmppManager.DISCONNECTED) {
+                if (stopSelfResult(id)) {
+                    Log.i("service is stopping because we are disconnected and no pending intents exist");
+                } else {
+                    Log.i("we are disconnected, but more pending intents to be delivered - service will not stop");
+                }
+            }
         }
     }
 
-    // TODO move the following method into the subclass above ?
-    /**
-     * The IntentService(-like) implementation manages taking the intents passed
-     * to startService and delivering them to this function which runs in its
-     * own thread (so can block Pretty-much everything using the _xmppMgr is
-     * here...
-     * 
-     * ACTION_XMPP_CONNECTION_CHANGED is handled implicitly, by every call of
-     * this method.
-     * 
-     * @param intent
-     * @param id
-     */
-    void onHandleIntent(final Intent intent, int id) {
-        // ensure XMPP manager is setup (but not yet connected)
-        if (sXmppMgr == null) {
-            setupXmppManagerAndCommands();
-        }
+    static Thread sThread = null;
+    static boolean sIsConnecting = false;
+    static boolean sIsDisconnecting = false;
+    void connectTransport() {
+        sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+    }
 
+    void disconnectTransport() {
+        sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+    }
+
+    void onHandleIntentTransportConnection(final Intent intent) {
         // Set Disconnected state by force to manage pending tasks
         // This is not actively used any more
         if (intent.getBooleanExtra("force", false) && intent.getBooleanExtra("disconnect", false)) {
-            // request to disconnect.
-            sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+            disconnectTransport();
         }
 
         if (Thread.currentThread().getId() != mHandlerThreadId) {
@@ -159,26 +178,23 @@ public class MainService extends Service {
         // of the connection status
         if (action.equals(ACTION_CONNECT)) {
             if (intent.getBooleanExtra("disconnect", false)) {
-                // Request to disconnect. We will stop the service if
-                // we are in "DISCONNECTED" state at the end of the method
-                sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+                disconnectTransport();
             } else {
-                // A simple 'connect' request.
-                sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+                connectTransport();
             }
         } else if (action.equals(ACTION_DISCONNECT)) {
-            sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+            disconnectTransport();
         } else if (action.equals(ACTION_TOGGLE)) {
             switch (initialState) {
                 case XmppManager.CONNECTED:
                 case XmppManager.CONNECTING:
                 case XmppManager.WAITING_TO_CONNECT:
                 case XmppManager.WAITING_FOR_NETWORK:
-                    sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
+                    disconnectTransport();
                     break;
                 case XmppManager.DISCONNECTED:
                 case XmppManager.DISCONNECTING:
-                    sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+                    connectTransport();
                     break;
                 default:
                     throw new IllegalStateException("Unknown initialState while handling" + MainService.ACTION_TOGGLE);
@@ -199,19 +215,27 @@ public class MainService extends Service {
             } else if (connected && (initialState == XmppManager.WAITING_TO_CONNECT || initialState == XmppManager.WAITING_FOR_NETWORK)) {
                 sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
             } else if (networkChanged && initialState == XmppManager.CONNECTED) {
-                // The network has changed (WiFi <-> GSM switch) and we are connected
-                // reconnect now
-                sXmppMgr.xmppRequestStateChange(XmppManager.DISCONNECTED);
-                sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
+                // The network has changed (WiFi <-> GSM switch) and we are connected, reconnect now
+                disconnectTransport();
+                connectTransport();
             }
+        } else {
+            Log.w("Unexpected intent: " + action);
         }
 
         // Now that the connection state may has changed either because of a
         // Intent Action or because of connection changes that happened "externally"
         // (eg, due to a connection error, or running out of retries, or a retry
         // handler actually succeeding etc.) we may need to update the listener
+        // TODO issue with asynch connection
         updateListenersToCurrentState(getConnectionStatus());
-        
+    }
+
+    void onHandleIntentMessage(final Intent intent) {
+        String action = intent.getAction();
+        int initialState = getConnectionStatus();
+        Log.i("handling action '" + action + "' while in state " + XmppManager.statusAsString(initialState));
+
         if (action.equals(ACTION_SEND)) {
             XmppMsg xmppMsg = intent.getParcelableExtra("xmppMsg");
             if (xmppMsg == null) {
@@ -247,7 +271,7 @@ public class MainService extends Service {
                 RecipientCmd.setLastRecipient(number);
             }
             // Forward the incoming SMS message to an MUC
-            // either because the user want's all notifications in MUCs or
+            // either because the user wants all notifications in MUCs or
             // because there is already an MUC for the senders number
             if (sSettingsMgr.notifySmsInChatRooms || roomExists) {
                 try {
@@ -279,25 +303,10 @@ public class MainService extends Service {
             } else {
                 Log.w("Intent " + MainService.ACTION_COMMAND + " without extra cmd");
             }
-        // ACTION_XMPP_CONNECTION_CHANGED is handled implicitly by every call
-        } else if (!action.equals(ACTION_XMPP_CONNECTION_CHANGED)
-                && !action.equals(ACTION_CONNECT)
-                && !action.equals(ACTION_DISCONNECT)
-                && !action.equals(ACTION_TOGGLE)
-                && !action.equals(ACTION_NETWORK_STATUS_CHANGED)) {
+        } else {
             Log.w("Unexpected intent: " + action);
         }
         Log.i("handled action '" + action + "' - state now: " + sXmppMgr.statusString());
-
-        // stop the service if we are disconnected (but stopping the service
-        // doesn't mean the process is terminated - onStart can still happen.)
-        if (getConnectionStatus() == XmppManager.DISCONNECTED) {
-            if (stopSelfResult(id)) {
-                Log.i("service is stopping because we are disconnected and no pending intents exist");
-            } else {
-                Log.i("we are disconnected, but more pending intents to be delivered - service will not stop");
-            }
-        }
     }
 
     public int getConnectionStatus() {
@@ -465,7 +474,6 @@ public class MainService extends Service {
             sXmppMgr.mSmackAndroid.onDestroy();
             sXmppMgr = null;
         }
-        tearDownListenersForConnection();
 
         // All data must be cleaned, because onDestroy can be call without releasing the current object
         // It's due to BIND_AUTO_CREATE used for Service Binder
@@ -512,12 +520,12 @@ public class MainService extends Service {
         }
     }
 
-    public void setKeyboard(KeyboardInputMethod keyboard) {
-        sKeyboardInputMethod = keyboard;
+    public void setKeyboard(KeyboardInputMethodService keyboard) {
+        sKeyboardInputMethodService = keyboard;
     }
 
-    public KeyboardInputMethod getKeyboard() {
-        return sKeyboardInputMethod;
+    public KeyboardInputMethodService getKeyboard() {
+        return sKeyboardInputMethodService;
     }
 
     /**
@@ -732,10 +740,13 @@ public class MainService extends Service {
         }
 
         if (wantListeners && !sListenersActive) {
-            setupListenersForConnection();
+            Log.i("setupListenersForConnection()");
+            mCommandManager.updateAndReturnStatus();
             sListenersActive = true;
         } else if (!wantListeners) {
-            tearDownListenersForConnection();
+            Log.i("tearDownListenersForConnection()");
+            mCommandManager.stopCommands();
+            mCommandManager.cleanupCommands();
             sListenersActive = false;
         }
 
@@ -746,22 +757,6 @@ public class MainService extends Service {
         if (sIntance != null && sIntance.mCommandManager != null) {
             sIntance.mCommandManager.updateCommandState();
         }
-    }
-
-    /**
-     * registers the commands, executing their constructor
-     *
-     */
-    private void setupListenersForConnection() {
-        Log.i("setupListenersForConnection()");
-        mCommandManager.updateAndReturnStatus();
-    }
-
-    private void tearDownListenersForConnection() {
-        Log.i("tearDownListenersForConnection()");
-        stopForeground(true);
-        mCommandManager.stopCommands();
-        mCommandManager.cleanupCommands();
     }
 
     public static Looper getServiceLooper() {

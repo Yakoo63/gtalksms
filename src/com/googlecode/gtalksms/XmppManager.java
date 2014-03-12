@@ -23,8 +23,8 @@ import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
 import org.jivesoftware.smack.parsing.UnparsablePacket;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.XHTMLManager;
-import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.packet.DiscoverInfo;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 
@@ -55,10 +55,6 @@ public class XmppManager {
 
     private static final boolean DEBUG = false;
 
-    // my first measuring showed that the disconnect in fact does not hang
-    // but takes sometimes a lot of time
-    // disconnectED xmpp connection. Took: 1048.576 s
-    private static final int DISCON_TIMEOUT = 1000 * 10; // 10s
     // The timeout for XMPP connections that get created with
     // DNS SRV information
     private static final int DNSSRV_TIMEOUT = 1000 * 30; // 30s
@@ -119,16 +115,7 @@ public class XmppManager {
         ServiceDiscoveryManager.setDefaultIdentity(new DiscoverInfo.Identity("client", Tools.APP_NAME, "bot"));
     }
 
-    /**
-     * Constructor for an XmppManager instance, connection is optional. It 
-     * servers only a purpose when creating the instance with an already
-     * connected connection, e.g. when registering new accounts with an server
-     * and using this connection.
-     * 
-     * @param context - required
-     * @param connection - optional
-     */
-    private XmppManager(Context context, XMPPConnection connection) {
+    private XmppManager(Context context) {
         if (DEBUG) {
             Connection.DEBUG_ENABLED = true;
         }
@@ -180,7 +167,7 @@ public class XmppManager {
 		mPacketListener = new ChatPacketListener(mContext);
 
         // connection can be null, it is created on demand
-        mConnection = connection;
+        mConnection = null;
     }
     
     /**
@@ -192,7 +179,7 @@ public class XmppManager {
      */
     public static XmppManager getInstance(Context ctx) {
         if (sXmppManager == null) {
-            sXmppManager = new XmppManager(ctx, null);            
+            sXmppManager = new XmppManager(ctx);
         }
         return sXmppManager;
     }
@@ -248,24 +235,9 @@ public class XmppManager {
                 mConnection.removeConnectionListener(mConnectionListener);
             }
             if (mConnection.isConnected()) {
-                // Try to disconnect
-                Thread t = new Thread(new Runnable() {
-                    public void run() {
-                        try {
-                            mConnection.disconnect();
-                        } catch (Exception e) {}
-                    }
-                }, "xmpp-disconnector");
-                // we don't want this thread to hold up process shutdown so mark as daemon.
-                t.setDaemon(true);
-                t.start();
-
-                try {
-                    t.join(DISCON_TIMEOUT);
-                } catch (InterruptedException e) {
-                    mConnection = null;
-                    mPingManager = null;
-                }
+                mConnection.disconnect();
+                mConnection = null;
+                mPingManager = null;
             }
         }
         mConnectionListener = null;
@@ -373,7 +345,10 @@ public class XmppManager {
         updateStatus(WAITING_TO_CONNECT, "Attempt #" + mCurrentRetryCount + " in " + timeout / 1000 + "s");
         Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + mCurrentRetryCount);
         if (!mReconnectHandler.postDelayed(mReconnectRunnable, timeout)) {
-            Log.w("maybeStartReconnect fails to post delayed job, reconnecting now.");
+            Log.w("maybeStartReconnect fails to post delayed job, reconnecting in 5s.");
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {}
             Tools.startSvcIntent(mContext, MainService.ACTION_CONNECT);
         }
         mCurrentRetryCount++;
@@ -473,13 +448,14 @@ public class XmppManager {
         mConnection.addConnectionListener(mConnectionListener);
 
         try {
-            informListeners(mConnection);
-
             PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
             mConnection.addPacketListener(mPacketListener, filter);
 
             // It is important that we query the server for offline messages BEFORE we send the first presence stanza
 			XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.getNotifiedAddresses().getAll(), mContext);
+
+            informListeners(mConnection);
+
         } catch (Exception e) {
             // see issue 126 for an example where this happens because
             // the connection drops while we are in initConnection()
@@ -591,8 +567,7 @@ public class XmppManager {
     }    
     
     /**
-     * Parses the current preferences and returns an new unconnected
-     * XMPPConnection 
+     * Parses the current preferences and returns an new unconnected XMPPConnection
      * @return
      * @throws XMPPException 
      */
