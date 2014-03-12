@@ -5,4 +5,4 @@ local.properties
 out/
 .idea/workspace.xml
 .idea/dictionaries
-external-libs/
+external-libs/ActionBarSherlock
