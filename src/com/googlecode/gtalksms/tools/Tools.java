@@ -235,15 +235,15 @@ public class Tools {
     }
     
     public static String shortenMessage(String message) {
-        String shortendMessage;
+        String shortenedMessage;
         if (message == null) {
-            shortendMessage = "";
+            shortenedMessage = "";
         } else if (message.length() < shortenTo) {
-            shortendMessage = message.replace("\n", " ");
+            shortenedMessage = message.replace("\n", " ");
         } else {
-            shortendMessage = message.substring(0, shortenTo).replace("\n", " ") + "...";
+            shortenedMessage = message.substring(0, shortenTo).replace("\n", " ") + "...";
         }
-        return shortendMessage;
+        return shortenedMessage;
     }    
     
     /**

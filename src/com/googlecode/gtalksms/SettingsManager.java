@@ -13,10 +13,10 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Build;
 import android.provider.Settings;
-import android.util.Log;
 import android.media.CamcorderProfile;
 
 import com.googlecode.gtalksms.tools.ArrayStringSetting;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 /**
  * 
@@ -180,13 +180,11 @@ public class SettingsManager {
     private final OnSharedPreferenceChangeListener mSharedPreferenceChangeListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (debugLog) {
-                Log.i(Tools.LOG_TAG, "Preferences updated: key=" + key);
-            }
+            Log.i("Preferences updated: key=" + key);
             try {
                 importPreferences();
             } catch (Exception e) {
-                Log.e(Tools.LOG_TAG, "Failed to load settings", e);
+                Log.e("Failed to load settings", e);
             }
             OnPreferencesUpdated(key);
         }
@@ -228,7 +226,7 @@ public class SettingsManager {
         try {
             importPreferences();
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "Failed to load settings", e);
+            Log.e("Failed to load settings", e);
         }
 
         // Registering the listener after the first import
@@ -302,7 +300,7 @@ public class SettingsManager {
             try {
                 listener.OnSettingChanged(connectionSettingsObsolete);
             } catch (Exception e) {
-                Log.e(Tools.LOG_TAG, "Failed to notified listener.", e);
+                Log.e("Failed to notified listener.", e);
             }
         }
     }
@@ -313,7 +311,7 @@ public class SettingsManager {
                 return mSharedPreferences.getString(key, defaultValue);
             }
         } catch (ClassCastException  e) {
-            Log.e(Tools.LOG_TAG, "Failed to retrieve setting " + key, e);
+            Log.e("Failed to retrieve setting " + key, e);
         }
         saveSetting(key, defaultValue);
         return defaultValue;
@@ -325,7 +323,7 @@ public class SettingsManager {
                 return mSharedPreferences.getInt(key, defaultValue);
             }
         } catch (ClassCastException  e) {
-            Log.e(Tools.LOG_TAG, "Failed to retrieve setting " + key, e);
+            Log.e("Failed to retrieve setting " + key, e);
         }
         saveSetting(key, defaultValue);
         return defaultValue;
@@ -337,7 +335,7 @@ public class SettingsManager {
                 return mSharedPreferences.getBoolean(key, defaultValue);
             }
         } catch (ClassCastException  e) {
-            Log.e(Tools.LOG_TAG, "Failed to retrieve setting " + key, e);
+            Log.e("Failed to retrieve setting " + key, e);
         }
         saveSetting(key, defaultValue);
         return defaultValue;

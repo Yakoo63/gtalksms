@@ -281,7 +281,7 @@ public class XmppBuddies implements RosterListener {
             // thus avoiding an extra data packet
             for (String notifiedAddress : sSettings.getNotifiedAddresses().getAll()) {
                 Presence presence = sRoster.getPresence(notifiedAddress);
-                if( presence.isAvailable()) {
+                if (presence.isAvailable()) {
                     return true;
                 }
             }

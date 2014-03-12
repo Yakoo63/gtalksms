@@ -3,7 +3,6 @@ package com.googlecode.gtalksms.tools;
 import android.content.Context;
 import android.preference.EditTextPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 
 /** Used to put an integer in the preferences string (e.g. for server port)*/
 
@@ -31,7 +30,7 @@ public class EditIntegerPreference extends EditTextPreference {
         try {
             getSharedPreferences().edit().putInt(getKey(), Integer.parseInt(text)).commit();
         } catch (Exception ex) {
-            Log.w(Tools.LOG_TAG, "Error while updating EditIntegerPreference: text=" + text, ex);
+            Log.w("Error while updating EditIntegerPreference: text=" + text, ex);
         }
     }
     

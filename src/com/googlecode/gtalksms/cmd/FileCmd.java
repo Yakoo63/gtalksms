@@ -8,11 +8,10 @@ import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 
-import android.util.Log;
-
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.databases.KeyValueHelper;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFileManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
@@ -122,7 +121,7 @@ public class FileCmd extends CommandHandlerBase {
                     Thread.sleep(1000);
                 }
             } catch (Exception ex) {
-                Log.e(Tools.LOG_TAG, "Cannot send the file because an error occured during the process.", ex);
+                Log.e("Cannot send the file because an error occurred during the process.", ex);
                 send(R.string.chat_file_transfer_error, ex.getMessage());
             }
         }

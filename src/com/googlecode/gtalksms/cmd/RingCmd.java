@@ -8,10 +8,10 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
-import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 
@@ -133,7 +133,7 @@ public class RingCmd extends CommandHandlerBase {
             mMediaPlayer.setDataSource(sContext, alert);
         } catch (IOException ioe) {
             try {
-                Log.w(Tools.LOG_TAG, "Could not set choosen ringtone, falling back to system default ringtone");
+                Log.w("Could not set chosen ringtone, falling back to system default ringtone");
                 mMediaPlayer.setDataSource(sContext, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)); //the emulator wont find the default ringtone as he has none
             } catch (Exception e) {
                 mCanRing = false;

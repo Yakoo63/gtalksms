@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.util.Log;
 
 import com.googlecode.gtalksms.SettingsManager;
 
@@ -74,7 +73,7 @@ public class Logs {
             }
         }
         catch (Exception e){
-            Log.e(Tools.LOG_TAG, "CollectLogTask.doInBackground failed", e);
+            Log.e("CollectLogTask.doInBackground failed", e);
         }
         if (mIncludeContext) {
             log.insert(0, LINE_SEPARATOR);
@@ -129,16 +128,16 @@ public class Logs {
             Matcher m = p.matcher(procVersionStr);
 
             if (!m.matches()) {
-                Log.e(Tools.LOG_TAG, "Regex did not match on /proc/version: " + procVersionStr);
+                Log.e("Regex did not match on /proc/version: " + procVersionStr);
             } else if (m.groupCount() < 4) {
-                Log.e(Tools.LOG_TAG, "Regex match on /proc/version only returned " + m.groupCount() + " groups");
+                Log.e("Regex match on /proc/version only returned " + m.groupCount() + " groups");
             } else {
                 return (new StringBuilder(m.group(1)).append("\n").append(
                         m.group(2)).append(" ").append(m.group(3)).append("\n")
                         .append(m.group(4))).toString();
             }
         } catch (IOException e) {  
-            Log.e(Tools.LOG_TAG, "IO Exception when getting kernel version for Device Info screen", e);
+            Log.e("IO Exception when getting kernel version for Device Info screen", e);
         }
         return "--";
     }

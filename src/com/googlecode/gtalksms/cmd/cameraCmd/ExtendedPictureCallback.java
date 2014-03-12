@@ -6,8 +6,8 @@ import java.util.GregorianCalendar;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
-import android.util.Log;
 
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 abstract class ExtendedPictureCallback implements PictureCallback {
@@ -29,7 +29,7 @@ abstract class ExtendedPictureCallback implements PictureCallback {
         if (Tools.writeFile(data, filename)) {
             onPictureSaved(filename);
         } else {
-            Log.e(Tools.LOG_TAG, "Error writing file");
+            Log.e("Error writing file");
         }
         camera.stopPreview();
         camera.setPreviewCallback(null);

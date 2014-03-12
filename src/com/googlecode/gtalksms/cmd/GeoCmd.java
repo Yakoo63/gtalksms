@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 
-import com.googlecode.gtalksms.LocationService;
+import com.googlecode.gtalksms.services.LocationService;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.panels.GeoPopup;

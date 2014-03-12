@@ -7,7 +7,6 @@ abstract class Database {
     static SQLiteDatabase database;
     static SQLiteDatabase databaseRO;
 
-    
     Database(Context ctx) {
         if (database == null) {
             DatabaseOpenHelper helper = new DatabaseOpenHelper(ctx);
@@ -15,16 +14,4 @@ abstract class Database {
             databaseRO = helper.getReadableDatabase();
         }
     }
-    
-    
-    /*  We don't need these getters atm
-     public SQLiteDatabase getDatabase() {
-         return database;
-     }
-     
-     public SQLiteDatabase getReadOnlyDatabase() {
-         return databaseRO;
-     }
-     */
-    
 }

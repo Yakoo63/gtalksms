@@ -31,20 +31,20 @@ public class SentIntentReceiver extends SmsPendingIntentReceiver {
         }
 
         if (res == Activity.RESULT_OK && sentIntComplete) {
-            send(context.getString(R.string.chat_sms_sent_to, s.getShortendMessage(), smsSendTo));
+            send(context.getString(R.string.chat_sms_sent_to, s.getShortenedMessage(), smsSendTo));
         } else if (s.getResSentIntent() == -1) {
             switch (res) {
             case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                send(context.getString(R.string.chat_sms_failure_to, s.getShortendMessage(), smsSendTo));
+                send(context.getString(R.string.chat_sms_failure_to, s.getShortenedMessage(), smsSendTo));
                 break;
             case SmsManager.RESULT_ERROR_NO_SERVICE:
-                send(context.getString(R.string.chat_sms_no_service_to, s.getShortendMessage(), smsSendTo));
+                send(context.getString(R.string.chat_sms_no_service_to, s.getShortenedMessage(), smsSendTo));
                 break;
             case SmsManager.RESULT_ERROR_NULL_PDU:
-                send(context.getString(R.string.chat_sms_null_pdu_to, s.getShortendMessage(), smsSendTo));
+                send(context.getString(R.string.chat_sms_null_pdu_to, s.getShortenedMessage(), smsSendTo));
                 break;
             case SmsManager.RESULT_ERROR_RADIO_OFF:
-                send(context.getString(R.string.chat_sms_radio_off_to, s.getShortendMessage(), smsSendTo));
+                send(context.getString(R.string.chat_sms_radio_off_to, s.getShortenedMessage(), smsSendTo));
                 break;
             }
             s.setResSentIntent(res);

@@ -5,12 +5,12 @@ import android.media.AudioManager;
 import android.os.Handler;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class PhoneCallListener extends PhoneStateListener {
@@ -66,7 +66,7 @@ public class PhoneCallListener extends PhoneStateListener {
      * @param incomingNumber
      */
     public void onCallStateChanged(int state, String incomingNumber) {
-        Log.d(Tools.LOG_TAG, "onCallStateChanged, state=" + state);
+        Log.d("onCallStateChanged, state=" + state);
         if (MainService.IsRunning) {
             switch (state) {
             case TelephonyManager.CALL_STATE_IDLE:
@@ -86,16 +86,14 @@ public class PhoneCallListener extends PhoneStateListener {
 
                     // Adding a 1s delay before turning on the speaker due to the Android implementation
                     // The speaker is automatically disabled on outgoing call right after this event
-                    Log.d(Tools.LOG_TAG, "Setting speaker on in 1s, state=" + state);
+                    Log.d("Setting speaker on in 1s, state=" + state);
                     mReconnectHandler.postDelayed(mReconnectRunnable, 1000);
                 }
                 manageIncoming = true;
                 break;
             case TelephonyManager.CALL_STATE_RINGING:
-                if (settingsMgr.debugLog) {
-                	Log.d(Tools.LOG_TAG, "PhoneCallListener Call State Ringing with incomingNumber=" + incomingNumber + " manageIncoming=" + manageIncoming);
-                }
-                
+                Log.d("PhoneCallListener Call State Ringing with incomingNumber=" + incomingNumber + " manageIncoming=" + manageIncoming);
+
                 if (manageIncoming) {
                     manageIncoming = false;
                     String contact = ContactsManager.getContactName(svc, incomingNumber);

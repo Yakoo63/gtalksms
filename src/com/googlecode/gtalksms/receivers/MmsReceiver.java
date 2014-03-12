@@ -6,11 +6,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.cmd.smsCmd.Mms;
 import com.googlecode.gtalksms.cmd.smsCmd.MmsManager;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 
@@ -18,7 +18,7 @@ public class MmsReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(Tools.LOG_TAG, "New MMS");
+        Log.d("New MMS");
         
         try {
             Bundle bundle = intent.getExtras();
@@ -27,7 +27,7 @@ public class MmsReceiver extends BroadcastReceiver {
                 if (dataBytes != null) {
                     MmsManager mmsManager = new MmsManager(context);
                     String buffer = new String(bundle.getByteArray("data"));
-                    Log.d(Tools.LOG_TAG, "MMS data = " + buffer);
+                    Log.d("MMS data = " + buffer);
                     
                     // Ensure that the MMS is managed by the stock application
                     for (int i = 0; i < 10; ++i) {
@@ -42,10 +42,10 @@ public class MmsReceiver extends BroadcastReceiver {
                             // Check if the retrieved MMS is the good one
                             if (mms != null && mms.getId() != null && buffer.contains(mms.getId())) {
                                 String msg = mms.getSubject() + "\n" + mms.getMessage();
-                                Intent svcintent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg, null);
-                                svcintent.putExtra("sender", mms.getSenderNumber());
-                                Log.i(Tools.LOG_TAG, "MmsReceiver: Issuing service intent for incoming MMS. sender=" + mms.getSenderNumber() + " message=" + Tools.shortenMessage(msg));
-                                context.startService(svcintent);
+                                Intent svcIntent = Tools.newSvcIntent(context, MainService.ACTION_SMS_RECEIVED, msg, null);
+                                svcIntent.putExtra("sender", mms.getSenderNumber());
+                                Log.i("MmsReceiver: Issuing service intent for incoming MMS. sender=" + mms.getSenderNumber() + " message=" + Tools.shortenMessage(msg));
+                                context.startService(svcIntent);
                                 return;
                             }
                         }
@@ -53,7 +53,7 @@ public class MmsReceiver extends BroadcastReceiver {
                 }
             }
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "MMS data Exception caught: " + e.getMessage(), e);
+            Log.e("MMS data Exception caught: " + e.getMessage(), e);
         }
     }
 }

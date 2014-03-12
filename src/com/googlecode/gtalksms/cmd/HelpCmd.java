@@ -6,10 +6,9 @@ import java.util.Map;
 import java.util.Set;
 
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.tools.Web;
@@ -117,7 +116,7 @@ public class HelpCmd extends CommandHandlerBase {
                     internalHelp.addAll(helpLines);
                     break;
                 default:
-                    Log.w(Tools.LOG_TAG, "help command unknown command type");
+                    Log.w("help command unknown command type");
             }
         }
 
@@ -162,13 +161,13 @@ public class HelpCmd extends CommandHandlerBase {
                 send(getString(R.string.about_change_log) + "\n" + TextUtils.split(Web.DownloadFromUrl(Tools.CHANGELOG_URL), "\n\n")[0]);
                 send(getString(R.string.about_authors) + "\n" + TextUtils.split(Web.DownloadFromUrl(Tools.AUTHORS_URL), "\n\n")[0]);
             } catch (Exception e) {
-                Log.w(Tools.LOG_TAG, "failed to access to remote files.");
+                Log.w("failed to access to remote files.");
             }
         } else if (subCmd.equals("changelog")) {
             try {
                 send(getString(R.string.about_change_log) + "\n" + Web.DownloadFromUrl(Tools.CHANGELOG_URL));
             } catch (Exception e) {
-                Log.w(Tools.LOG_TAG, "failed to access to remote files.");
+                Log.w("failed to access to remote files.");
             }
         } else if (commands.containsKey(subCmd)) {
         	ArrayList<String> helpLines = commands.get(subCmd).help();

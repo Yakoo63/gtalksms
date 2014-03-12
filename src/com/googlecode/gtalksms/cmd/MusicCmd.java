@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.KeyEvent;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class MusicCmd extends CommandHandlerBase {
@@ -67,7 +67,7 @@ public class MusicCmd extends CommandHandlerBase {
     }
 
     private void sendKeyEvent(int key) {
-        Log.d(Tools.LOG_TAG, "Sending event key " + key);
+        Log.d("Sending event key " + key);
         handleMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, key));
         handleMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, key));
     }
@@ -88,7 +88,7 @@ public class MusicCmd extends CommandHandlerBase {
                     .invoke(audioService, keyEvent);
             hasDispatchSucceeded = true;
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "Error sending event key " + e.getMessage(), e);
+            Log.e("Error sending event key " + e.getMessage(), e);
         }
         
         // If dispatchMediaKeyEvent failed then try using broadcast

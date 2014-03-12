@@ -9,7 +9,6 @@ import java.util.concurrent.Semaphore;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Logs;
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -60,7 +60,7 @@ class LogTabFragment extends SherlockFragment {
         mButtonClear.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mTextView.setText("");
-                Log.i(Tools.LOG_TAG, "Logs cleared");
+                Log.i("Logs cleared");
             }
         });
         

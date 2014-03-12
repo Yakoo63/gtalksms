@@ -20,7 +20,6 @@ import android.app.backup.BackupDataInput;
 import android.app.backup.BackupDataOutput;
 import android.content.SharedPreferences;
 import android.os.ParcelFileDescriptor;
-import android.util.Log;
 
 import com.googlecode.gtalksms.SettingsManager;
 
@@ -34,7 +33,7 @@ public class MyBackupAgent extends BackupAgent {
     
     @Override
     public void onBackup(ParcelFileDescriptor oldState, BackupDataOutput data, ParcelFileDescriptor newState) throws IOException {
-        Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() begin");
+        Log.i("Starting backup");
         settingsManager = SettingsManager.getSettingsManager(this);
 
         String sharedPrefsPath = Tools.getSharedPrefDir(this) + "/" + Tools.APP_NAME + ".xml";
@@ -53,6 +52,7 @@ public class MyBackupAgent extends BackupAgent {
         } catch (IOException e) {
             // Unable to read state file... be safe and do a backup
         } catch (Exception e) {
+            Log.w("Backup error", e);
         } finally {
             if (in != null) {
                 in.close();
@@ -63,17 +63,17 @@ public class MyBackupAgent extends BackupAgent {
         writeData(data);
         
         //step 3
-        FileOutputStream outstream = new FileOutputStream(newState.getFileDescriptor());
-        DataOutputStream out = new DataOutputStream(outstream);
+        FileOutputStream outputStream = new FileOutputStream(newState.getFileDescriptor());
+        DataOutputStream out = new DataOutputStream(outputStream);
         long modified = mDataFile.lastModified();
         out.writeLong(modified);
         out.close();
-        Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() end");
+        Log.i("Backup ended");
     }
 
     @Override
     public void onRestore(BackupDataInput data, int appVersionCode, ParcelFileDescriptor newState) throws IOException {        
-        Log.i(Tools.LOG_TAG, "MyBackupAgent onRestore() - starting to restore saved preferences");
+        Log.i("Starting to restore saved preferences");
         settingsManager = SettingsManager.getSettingsManager(this);
 
         Class<?> cls;
@@ -93,13 +93,13 @@ public class MyBackupAgent extends BackupAgent {
         while (data.readNextHeader()) {
             String key = data.getKey();
             int dataSize = data.getDataSize();
-            int keytype;
+            int keyType;
             if (stringKeys.contains(key)) {
-                keytype = MyBackupAgent.KEYTYPE_STRING;
+                keyType = MyBackupAgent.KEYTYPE_STRING;
             } else if (intKeys.contains(key)) {
-                keytype = MyBackupAgent.KEYTYPE_INT;
+                keyType = MyBackupAgent.KEYTYPE_INT;
             } else if (booleanKeys.contains(key)) {
-                keytype = MyBackupAgent.KEYTYPE_BOOLEAN;
+                keyType = MyBackupAgent.KEYTYPE_BOOLEAN;
             } else {
                 // unknown or unsupported key
                 data.skipEntityData();
@@ -110,7 +110,7 @@ public class MyBackupAgent extends BackupAgent {
                 data.readEntityData(dataBuf, 0, dataSize);
                 ByteArrayInputStream baStream = new ByteArrayInputStream(dataBuf);
                 DataInputStream in = new DataInputStream(baStream);
-                switch (keytype) {
+                switch (keyType) {
                 case MyBackupAgent.KEYTYPE_STRING:
                     prefEditor.putString(key, in.readUTF());
                     break;
@@ -128,11 +128,11 @@ public class MyBackupAgent extends BackupAgent {
             }
         }
         prefEditor.commit();
-        Log.i(Tools.LOG_TAG, "MyBackupAgent onRestore() - end");
+        Log.i("Settings restored");
     }
     
     private void writeData(BackupDataOutput data) {
-        Log.i(Tools.LOG_TAG, "MyBackupAgent onBackup() new data found - starting backup");
+        Log.i("New data found - starting backup");
         Class<?> cls;
         try {
             cls = Class.forName("com.googlecode.gtalksms.SettingsManager");

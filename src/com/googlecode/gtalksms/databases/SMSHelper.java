@@ -36,8 +36,8 @@ public class SMSHelper {
         values.put("smsID", smsID);
         values.put("phoneNumber", sms.getNumber());
         values.put("name", sms.getTo().replace('\'', '\"'));
-        values.put("shortendMessage", sms.getShortendMessage().replace('\'', '\"'));
-        values.put("answerTo", sms.getAnswerTo());
+        values.put("shortenedMessage", sms.getShortenedMessage().replace('\'', '\"'));
+        values.put("answerTo", sms.getAnswerTo() == null ? "unknown" : sms.getAnswerTo());
         values.put("dIntents", sms.getDelIntents());
         values.put("sIntents", sms.getSentIntents());
         values.put("numParts", sms.getNumParts());

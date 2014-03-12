@@ -6,6 +6,7 @@ import org.jivesoftware.smack.packet.Presence;
 import android.content.Context;
 
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppPresenceStatus {
@@ -80,6 +81,7 @@ public class XmppPresenceStatus {
             presence.setStatus(composePresenceStatus());
             presence.setPriority(24);
             mConnection.sendPacket(presence);
+            Log.i("Sending presence status: " + presence);
             return true;
         } else {
             return false;

@@ -1,8 +1,7 @@
 package com.googlecode.gtalksms.cmd;
 
-import android.util.Log;
-
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Logs;
 import com.googlecode.gtalksms.tools.Tools;
 
@@ -54,7 +53,7 @@ public class LogsCmd extends CommandHandlerBase {
                 }
             } catch (Exception e) {
                 send(e.getMessage());
-                Log.w(Tools.LOG_TAG, "Failed to send logs", e);
+                Log.w("Failed to send logs", e);
             }
             
             mLogsThread = null;

@@ -12,7 +12,6 @@ import android.hardware.Camera.PictureCallback;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Environment;
-import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.WindowManager;
@@ -22,6 +21,7 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.cmd.cameraCmd.EmailCallback;
 import com.googlecode.gtalksms.cmd.cameraCmd.VoidCallback;
 import com.googlecode.gtalksms.cmd.cameraCmd.XMPPTransferCallback;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class CameraCmd extends CommandHandlerBase {
@@ -57,7 +57,7 @@ public class CameraCmd extends CommandHandlerBase {
                 mRepository.mkdirs();
             }
         } catch (Exception e) {
-            Log.e(Tools.LOG_TAG, "Failed to create mRepository.", e);
+            Log.e("Failed to create mRepository.", e);
         }
     }
 
@@ -79,7 +79,7 @@ public class CameraCmd extends CommandHandlerBase {
                 mCamera.unlock();
                 mCamera.release();
             } catch (Exception e) {
-                Log.e(Tools.LOG_TAG, "Failed to release Camera", e);
+                Log.e("Failed to release Camera", e);
             }
             mCamera = null;
         }
@@ -126,7 +126,7 @@ public class CameraCmd extends CommandHandlerBase {
                 }    
             }                
         } else {
-            Log.w(Tools.LOG_TAG, "Android version doesn't allow setCamera command.");
+            Log.w("Android version doesn't allow setCamera command.");
             send(R.string.chat_camera_error_version);
         }
     }
@@ -147,7 +147,7 @@ public class CameraCmd extends CommandHandlerBase {
             }
             send(res.toString());
         } else {
-            Log.w(Tools.LOG_TAG, "Android version doesn't allow listCamera command.");
+            Log.w("Android version doesn't allow listCamera command.");
             send(R.string.chat_camera_error_version);
         }
     }
@@ -230,10 +230,11 @@ public class CameraCmd extends CommandHandlerBase {
         if (mCamera == null) {
             mCamera = Camera.open();
         }
+
         Parameters params = mCamera.getParameters();
         params.setFlashMode(turnOn ? Camera.Parameters.FLASH_MODE_TORCH : Camera.Parameters.FLASH_MODE_OFF);
         mCamera.setParameters(params);
-        
+
         if (!turnOn) {
             releaseResources();
         }

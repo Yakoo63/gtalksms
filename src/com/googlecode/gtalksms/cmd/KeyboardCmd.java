@@ -1,6 +1,6 @@
 package com.googlecode.gtalksms.cmd;
 
-import com.googlecode.gtalksms.KeyboardInputMethod;
+import com.googlecode.gtalksms.services.KeyboardInputMethodService;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 
@@ -11,7 +11,7 @@ public class KeyboardCmd extends CommandHandlerBase {
     
     @Override
     protected void execute(Command cmd) {
-        KeyboardInputMethod keyboard = sMainService.getKeyboard();
+        KeyboardInputMethodService keyboard = sMainService.getKeyboard();
         String msg = cmd.getAllArg1().replace("\\n", "\n");
         
         if (keyboard != null) {

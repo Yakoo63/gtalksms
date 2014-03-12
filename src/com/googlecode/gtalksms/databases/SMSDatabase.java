@@ -44,7 +44,7 @@ class SMSDatabase extends Database {
     
     public static Sms[] getFullDatabase() {
         Cursor c = databaseRO.query(DatabaseOpenHelper.SMS_TABLE_NAME, 
-                new String[] { "smsID", "phoneNumber", "name", "shortendMessage", "answerTo",
+                new String[] { "smsID", "phoneNumber", "name", "shortenedMessage", "answerTo",
                     "dIntents", "sIntents", "numParts", "resSIntent", "resDIntent", "date"}, null, null, null , null, null);
         int rowCount = c.getCount();
         c.moveToFirst();

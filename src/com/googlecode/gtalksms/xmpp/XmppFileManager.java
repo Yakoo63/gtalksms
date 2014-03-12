@@ -14,12 +14,12 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.XmppManager;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class XmppFileManager implements FileTransferListener {
@@ -149,7 +149,7 @@ public class XmppFileManager implements FileTransferListener {
                 send(returnAndLogError(transfer));
             }
         } catch (Exception ex) {
-            Log.e(Tools.LOG_TAG, "Cannot send the file because an error occured during the process.", ex);
+            Log.e("Cannot send the file because an error occurred during the process.", ex);
             send(R.string.chat_file_transfer_error, ex.getMessage());
         }
     }
@@ -159,15 +159,15 @@ public class XmppFileManager implements FileTransferListener {
         message.appendBoldLine(mCtx.getString(R.string.chat_file_transfer_error_msg));
         if (transfer.getError() != null) {
             message.appendLine(transfer.getError().getMessage());
-            Log.w(Tools.LOG_TAG, transfer.getError().getMessage());
+            Log.w(transfer.getError().getMessage());
         }
         if (transfer.getException() != null) {
             message.appendLine(transfer.getException().getMessage());
-            Log.w(Tools.LOG_TAG, transfer.getException().getMessage(), transfer.getException());
+            Log.w(transfer.getException().getMessage(), transfer.getException());
         }
         if (transfer.getStatus() == Status.negotiating_stream) {
             message.appendLine(mCtx.getString(R.string.chat_file_transfer_error_stream));
-            Log.w(Tools.LOG_TAG, "Negotiating stream failed");
+            Log.w("Negotiating stream failed");
         }
         return message;
     }

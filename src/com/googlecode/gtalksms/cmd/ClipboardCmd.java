@@ -2,10 +2,10 @@ package com.googlecode.gtalksms.cmd;
 
 import android.app.Service;
 import android.text.ClipboardManager;
-import android.util.Log;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
 
 
@@ -43,7 +43,7 @@ public class ClipboardCmd extends CommandHandlerBase {
                 send(R.string.chat_clipboard, mOldClipboardMgr.getText());
             }
         } catch (Exception ex) {
-            Log.w(Tools.LOG_TAG, "Clipboard error", ex);
+            Log.w("Clipboard error", ex);
             send(R.string.chat_error_clipboard);
         }
     }

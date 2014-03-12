@@ -7,7 +7,6 @@ import java.util.Set;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
 
 import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.MainService;
@@ -60,7 +59,21 @@ public abstract class CommandHandlerBase {
 
     protected abstract void onCommandActivated();
     protected abstract void onCommandDeactivated();
+    protected abstract void initializeSubCommands();
 
+    /**
+     * Executes the given command
+     * sends the results, if any, back to the given JID
+     *
+     * @param userCommand the base command
+     */
+    abstract void execute(Command userCommand);
+
+    /**
+     * Stop all ongoing actions caused by a command
+     * gets called in mainService when "stop" command received
+     */
+    public void stop() {}
 
     /**
      * Setups the command to get working. Usually called when the user wants
@@ -230,20 +243,6 @@ public abstract class CommandHandlerBase {
     }
 
     /**
-     * Executes the given command
-     * sends the results, if any, back to the given JID
-     *
-     * @param userCommand the base command
-     */
-    abstract void execute(Command userCommand);
-
-    /**
-     * Stop all ongoing actions caused by a command
-     * gets called in mainService when "stop" command received
-     */
-    public void stop() {}
-    
-    /**
      * Request a help String array from the command
      * The String is formatted with your internal BOLD/ITALIC/etc Tags
      * 
@@ -265,9 +264,7 @@ public abstract class CommandHandlerBase {
         
         return res;            
     }
-    
-    protected abstract void initializeSubCommands();
-    
+
     String makeBold(String msg) {
         return XmppMsg.makeBold(msg);
     }

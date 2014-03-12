@@ -30,10 +30,10 @@ public class DeliveredIntentReceiver extends SmsPendingIntentReceiver {
         }
 
         if (res == Activity.RESULT_OK && delIntComplete) {
-            send(context.getString(R.string.chat_sms_delivered_to, s.getShortendMessage(), smsSendTo));
+            send(context.getString(R.string.chat_sms_delivered_to, s.getShortenedMessage(), smsSendTo));
         } else if (s.getResSentIntent() == -1) {
             if(res == Activity.RESULT_CANCELED) {
-                send(context.getString(R.string.chat_sms_not_delivered_to, s.getShortendMessage(), smsSendTo));
+                send(context.getString(R.string.chat_sms_not_delivered_to, s.getShortenedMessage(), smsSendTo));
             }
             s.setResSentIntent(res);
         }

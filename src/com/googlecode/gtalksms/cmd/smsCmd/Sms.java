@@ -11,7 +11,7 @@ import java.util.Date;
  */
 public class Sms implements Comparable<Sms> {
     private String message;          
-    private String shortendMessage;
+    private String shortenedMessage;
     private String number;
     private String sender;
     private String to;
@@ -43,11 +43,11 @@ public class Sms implements Comparable<Sms> {
      * 
      * @param phoneNumber
      * @param toName
-     * @param shortendMessage
+     * @param shortenedMessage
      * @param numParts
      * @param answerTo - which jid should be informed about the status (sent/delivered) of the sms
      */
-    public Sms(String phoneNumber, String toName, String shortendMessage, int numParts, String answerTo, Integer id) {
+    public Sms(String phoneNumber, String toName, String shortenedMessage, int numParts, String answerTo, Integer id) {
         this.id = id;
         this.setResSentIntent(-1);
         this.setResDelIntent(-1);
@@ -56,16 +56,16 @@ public class Sms implements Comparable<Sms> {
         this.delIntents = new boolean[numParts];
         this.setNumber(phoneNumber);
         this.setTo(toName);
-        this.setShortendMessage(shortendMessage);
+        this.setShortenedMessage(shortenedMessage);
         this.setAnswerTo(answerTo);
         this.date = new Date();
     }
     
-    public Sms(int smsID, String phoneNumber, String name, String shortendMessage, String answerTo, String dIntents, String sIntents, int resSIntent, int resDIntent, long date) {
+    public Sms(int smsID, String phoneNumber, String name, String shortenedMessage, String answerTo, String dIntents, String sIntents, int resSIntent, int resDIntent, long date) {
         this.id = smsID;
         this.number = phoneNumber;
         this.to = name;
-        this.shortendMessage = shortendMessage;
+        this.shortenedMessage = shortenedMessage;
         this.answerTo = answerTo;
         this.delIntents = toBoolArray(dIntents);
         this.sentIntents = toBoolArray(sIntents);
@@ -118,12 +118,12 @@ public class Sms implements Comparable<Sms> {
         return message;
     }
 
-    void setShortendMessage(String shortendMessage) {
-        this.shortendMessage = shortendMessage;
+    void setShortenedMessage(String shortenedMessage) {
+        this.shortenedMessage = shortenedMessage;
     }
 
-    public String getShortendMessage() {
-        return shortendMessage;
+    public String getShortenedMessage() {
+        return shortenedMessage;
     }
 
     void setNumber(String number) {

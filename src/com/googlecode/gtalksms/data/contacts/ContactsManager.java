@@ -15,15 +15,13 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.PhoneLookup;
 import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.phone.Phone;
+import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
-
-
 
 public class ContactsManager {
     // constants used by getMatchingContacts(Context, String)
@@ -73,7 +71,7 @@ public class ContactsManager {
                     c.close();
                 }
             } catch (Exception ex) {
-              Log.e(Tools.LOG_TAG, "getContactName error: Phone number = " + phoneNumber, ex);  
+              Log.e("getContactName error: Phone number = " + phoneNumber, ex);
               res = ctx.getString(R.string.chat_call_hidden);
             }
         } else {
@@ -287,8 +285,8 @@ public class ContactsManager {
 
                     if (phones.add(phone.getCleanNumber())) {
                         res.add(phone);
-                    } else if (SettingsManager.getSettingsManager(ctx).debugLog) {
-                        Log.i(Tools.LOG_TAG, "getPhones(ids) Duplicated phone number: " + number);
+                    } else {
+                        Log.i("getPhones(ids) Duplicated phone number: " + number);
                     }
                 }
                 c.close();
@@ -324,8 +322,8 @@ public class ContactsManager {
                         phone.setContactName(contact.name);
                         if (resPhones.add(phone.getCleanNumber())) {
                             res.add(phone);
-                        } else if (SettingsManager.getSettingsManager(ctx).debugLog) {
-                            Log.i(Tools.LOG_TAG, "getPhones(searchedText): Duplicated phone number: " + phone.getContactName() + " " + phone.getCleanNumber());
+                        } else {
+                            Log.i("getPhones(searchedText): Duplicated phone number: " + phone.getContactName() + " " + phone.getCleanNumber());
                         }
                     }
                 }

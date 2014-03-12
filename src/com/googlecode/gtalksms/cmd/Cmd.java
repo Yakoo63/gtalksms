@@ -78,7 +78,7 @@ public class Cmd {
     }
 
     public void AddSubCmd(String name, int resHelp) {
-        mSubCmds.add(new SubCmd(name, this, resHelp, null, new String[]{}));
+        mSubCmds.add(new SubCmd(name, this, resHelp, null, new Object[]{}));
     }
 
     public void AddSubCmd(String name, int resHelp, String args, Object... alias) {
@@ -87,10 +87,6 @@ public class Cmd {
     
     public static void setContext(Context c) {
         sContext = c;
-    }
-    
-    protected static String makeBold(String msg) {
-        return XmppMsg.makeBold(msg);
     }
     
     private static String getString(int id, Object... args) {

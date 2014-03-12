@@ -29,7 +29,7 @@ public class ChatPacketListener implements PacketListener {
 			// Acquire a WakeLock just before we are about to send the intent
 			MainService.maybeAcquireWakeLock();
 			Tools.startSvcXMPPMsg(mCtx, message.getBody(), from);
-		} else if (mSettings.debugLog) {
+		} else {
 			if (!mSettings.cameFromNotifiedAddress(from)) {
 				Log.i("XMPP packet received - but from address \"" + from.toLowerCase()
 	                + "\" does not match notification address \""
