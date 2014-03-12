@@ -20,27 +20,31 @@ public class XmppOfflineMessages {
 		Log.i("Begin retrieval of offline messages from server");
 		OfflineMessageManager offlineMessageManager = new OfflineMessageManager(connection);
 
-		if (!offlineMessageManager.supportsFlexibleRetrieval())
-			return;
+		if (!offlineMessageManager.supportsFlexibleRetrieval()) {
+            Log.d("Offline messages not supported");
+            return;
+        }
 
-		Iterator<Message> i = offlineMessageManager.getMessages();
-
-		if (!i.hasNext()) {
+		if (offlineMessageManager.getMessageCount() == 0) {
 			Log.d("No offline messages found on server");
-		}
-		while (i.hasNext()) {
-			Message msg = i.next();
-			String fullJid = msg.getFrom();
-			String bareJid = StringUtils.parseBareAddress(fullJid);
-			String messageBody = msg.getBody();
-			Log.d("Retrieved offline message from " + fullJid + " with content: " + messageBody.substring(0, 40));
-			for (String notifiedAddress : notifiedAddresses) {
-				if (bareJid.equals(notifiedAddress) && (messageBody != null)) {
-					Tools.startSvcXMPPMsg(ctx, messageBody, fullJid);
-				}
-			}
-		}
-		offlineMessageManager.deleteMessages();
+		} else {
+            Iterator<Message> i = offlineMessageManager.getMessages();
+            while (i.hasNext()) {
+                Message msg = i.next();
+                String fullJid = msg.getFrom();
+                String bareJid = StringUtils.parseBareAddress(fullJid);
+                String messageBody = msg.getBody();
+                if (messageBody != null) {
+                    Log.d("Retrieved offline message from " + fullJid + " with content: " + messageBody.substring(0, Math.min(40, messageBody.length())));
+                    for (String notifiedAddress : notifiedAddresses) {
+                        if (bareJid.equals(notifiedAddress)) {
+                            Tools.startSvcXMPPMsg(ctx, messageBody, fullJid);
+                        }
+                    }
+                }
+            }
+            offlineMessageManager.deleteMessages();
+        }
 		Log.i("End of retrieval of offline messages from server");
 	}
 }

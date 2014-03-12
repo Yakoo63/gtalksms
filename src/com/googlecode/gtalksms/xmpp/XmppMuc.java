@@ -38,7 +38,7 @@ public class XmppMuc {
     public static final int MODE_SMS = 1;
     public static final int MODE_SHELL = 2;
 
-    private static final String ROOM_START_TAG = Tools.APP_NAME + "_";
+    private static final String ROOM_START_TAG = Tools.APP_NAME + "_#";
     private static final int ROOM_START_TAG_LENGTH = ROOM_START_TAG.length();
     private static final int JOIN_TIMEOUT = 5000;
     private static final long REJOIN_ROOMS_SLEEP = 1000;
@@ -188,19 +188,18 @@ public class XmppMuc {
     }    
     
     /**
-     * Returns the MultiUserChat given in roomname, 
+     * Returns the MultiUserChat given in room name,
      * which is a full JID (e.g. room@conference.jabber.com),
      * if the room is in your internal data structure.
      * Otherwise null will be returned
-     * 
-     * 
-     * @param roomname - the full roomname as JID
+     *
+     * @param roomName - the full room name as JID
      * @return the room or null
      */
-    public MultiUserChat getRoomViaRoomName(String roomname) {
+    public MultiUserChat getRoomViaRoomName(String roomName) {
         Collection<MultiUserChat> mucSet = mRooms.values();
         for(MultiUserChat muc : mucSet) {
-            if(muc.getRoom().equals(roomname)) {
+            if(muc.getRoom().equals(roomName)) {
                 return muc;
             }
         }
@@ -392,12 +391,12 @@ public class XmppMuc {
      * @param affCol
      * @return
      */
-    private boolean affilateCheck(Collection<Affiliate> affCol) {
-        Set<String> jids = new HashSet<String>();
+    private boolean affiliateCheck(Collection<Affiliate> affCol) {
+        Set<String> ids = new HashSet<String>();
         for (Affiliate a : affCol) {
-            jids.add(a.getJid());
+            ids.add(a.getJid());
         }
-        return jids.contains(mSettings.getLogin());        
+        return ids.contains(mSettings.getLogin());
     }
     /**
      * Extracts the room random integer from the room JID
@@ -406,13 +405,13 @@ public class XmppMuc {
      * @return
      */
     private Integer getRoomInt(String room) {
-        int intBegin = room.indexOf(ROOM_START_TAG) + ROOM_START_TAG_LENGTH;
+        int intBegin = room.toLowerCase().indexOf(ROOM_START_TAG.toLowerCase()) + ROOM_START_TAG_LENGTH;
         int intEnd = room.indexOf("_", intBegin);
         return Integer.valueOf(room.substring(intBegin, intEnd));        
     }
         
     /**
-     * creates a formated string from number and contact
+     * creates a formatted string from number and contact
      * 
      * @param number
      * @param contact
@@ -464,9 +463,8 @@ public class XmppMuc {
                             // check here if we are still owner of these room, in case somebody has taken over ownership
                             // sadly getOwners() throws sometimes a 403 on my openfire server
                             try {
-                                if (!affilateCheck(muc.getOwners())) {
-                                    if (mSettings.debugLog)
-                                        Log.i("rejoinRooms: leaving " + muc.getRoom() + " because affilateCheck failed");
+                                if (!affiliateCheck(muc.getOwners())) {
+                                    Log.i("rejoinRooms: leaving " + muc.getRoom() + " because affiliateCheck failed");
                                     leaveRoom(muc);
                                     continue;
                                 }
@@ -477,9 +475,8 @@ public class XmppMuc {
                             } catch (XMPPException e) {
                                 Log.d("rejoinRooms: Exception, falling back", e);
                                 if (!(info.isMembersOnly() || info.isPasswordProtected())) {
-                                    if (mSettings.debugLog)
-                                        Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of membersOnly="
-                                                + info.isMembersOnly() + " passwordProtected=" + info.isPasswordProtected());
+                                    Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of membersOnly="
+                                        + info.isMembersOnly() + " passwordProtected=" + info.isPasswordProtected());
                                     leaveRoom(muc);
                                     continue;
                                 }
@@ -487,15 +484,13 @@ public class XmppMuc {
                         }
                         // looks like there is no one in the room
                         if (info.getOccupantsCount() > 0) {
-                            if (mSettings.debugLog)
-                                Log.i("rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
+                            Log.i("rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
                             leaveRoom(muc);
                             continue;
                         }
                     } catch (XMPPException e) {
-                        if (mSettings.debugLog) {
-                            Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
-                        }
+                        Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
+
                         // TODO decide in which cases it would be the best to remove the room from the DB, because of a persistent error
                         // and in which cases the error will not be permanent
                         if (mConnection.isAuthenticated()) {
