@@ -19,6 +19,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -29,9 +30,6 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
 import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.MainService.LocalBinder;
@@ -46,6 +44,8 @@ import com.googlecode.gtalksms.panels.tabs.HelpTabFragment;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFriend;
+
+import com.google.android.gms.ads.*;
 
 public class MainActivity extends SherlockFragmentActivity {
     
@@ -79,6 +79,10 @@ public class MainActivity extends SherlockFragmentActivity {
         @Override
         public int getCount() {
             return mActionBar.getTabCount();
+        }
+
+        public void update() {
+            notifyDataSetChanged();
         }
 
         @Override
@@ -182,10 +186,12 @@ public class MainActivity extends SherlockFragmentActivity {
             });
 
             // Create the adView
-            mAdView = new AdView(this, AdSize.BANNER, "ca-app-pub-1255069456864059/8040023329");
+            mAdView = new AdView(this);
+            mAdView.setAdUnitId("ca-app-pub-1255069456864059/8040023329");
+            mAdView.setAdSize(AdSize.BANNER);
             LinearLayout  layout = (LinearLayout) findViewById(R.id.StatusBar);
             layout.addView(mAdView, 0);
-            mAdView.loadAd(new AdRequest());
+            mAdView.loadAd(new AdRequest.Builder().build());
         }
         
         mFragments.add(mConnectionTabFragment);
@@ -193,9 +199,9 @@ public class MainActivity extends SherlockFragmentActivity {
         mFragments.add(mBuddiesTabFragment);
         mFragments.add(mCommandsTabFragment);
         mFragments.add(mConnectionStatusTabFragment);
-        
+
         mPager.setAdapter(new TabAdapter(getSupportFragmentManager(), mActionBar, mFragments));
-       
+
         mPager.setOnPageChangeListener(new OnPageChangeListener() {
             public void onPageScrollStateChanged(int arg0) {}
             public void onPageScrolled(int arg0, float arg1, int arg2) {}
@@ -212,8 +218,23 @@ public class MainActivity extends SherlockFragmentActivity {
             mAdView.destroy();
             mAdView = null;
         }
-
         super.onDestroy();
+    }
+
+    @Override
+    public void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
     }
 
     @Override
@@ -291,20 +312,25 @@ public class MainActivity extends SherlockFragmentActivity {
         boolean b1 = removeTab(getString(R.string.panel_buddies));
         boolean b2 = removeTab(getString(R.string.panel_commands));
         boolean b3 = removeTab(getString(R.string.panel_connection_status)); // TODO to resource
-        
+
         if (status == XmppManager.CONNECTED) {
             mCommandsTabFragment.updateCommands();
-            mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_buddies)).setTabListener(new TabListener(mPager, 2)));
-            mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_commands)).setTabListener(new TabListener(mPager, 3)));
+            addTab(getString(R.string.panel_buddies), 2);
+            addTab(getString(R.string.panel_commands), 3);
             if (mSettingsManager.debugLog) {
-                mActionBar.addTab(mActionBar.newTab().setText(getString(R.string.panel_connection_status)).setTabListener(new TabListener(mPager, 4)));
+                addTab(getString(R.string.panel_connection_status), 4);
             }
         } else if (b1 || b2 || b3) {
             mActionBar.setSelectedNavigationItem(0);
             mPager.setCurrentItem(0);
         }
     }
-    
+
+    private void addTab(String name, int index) {
+        mActionBar.addTab(mActionBar.newTab().setText(name).setTabListener(new TabListener(mPager, index)));
+        mPager.getAdapter().notifyDataSetChanged();
+    }
+
     private boolean removeTab(String name) {
         boolean result = false;
         for (int i = 0 ; i < mActionBar.getTabCount() ; ++i) {
@@ -314,6 +340,7 @@ public class MainActivity extends SherlockFragmentActivity {
                 }
                 
                 mActionBar.removeTabAt(i);
+                mPager.getAdapter().notifyDataSetChanged();
                 i--;
             }
         }
