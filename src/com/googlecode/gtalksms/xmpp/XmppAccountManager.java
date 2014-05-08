@@ -1,19 +1,19 @@
 package com.googlecode.gtalksms.xmpp;
 
 import org.jivesoftware.smack.AccountManager;
-import org.jivesoftware.smack.AndroidConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.StringUtils;
 
 import android.content.SharedPreferences.Editor;
 
 import com.googlecode.gtalksms.SettingsManager;
 
+
 class XmppAccountManager {
-    // some servers need the username to be a full JID
-    // define them here (currently only Google services)
+    // some servers need the username to be a full JID define them here (currently only Google services)
     private static final String[] USERNAME_IS_FULL_JID = new String[] {"gmail.com", "googlemail.com"};                                
     
     /**
@@ -27,20 +27,20 @@ class XmppAccountManager {
      * @return
      * @throws XMPPException
      */
-    public static XMPPConnection tryToCreateAccount(String username, String host, String password) throws XMPPException {
+    public static XMPPConnection tryToCreateAccount(String username, String host, String password) throws Exception {
         username = needsDomainPart(username, host);
-        
+
         // TODO throws NetworkOnMainThreadException on Honycomb or higher
         // Fix it!
-        ConnectionConfiguration conf = new AndroidConnectionConfiguration(host);
-        XMPPConnection connection = new XMPPConnection(conf);
+        ConnectionConfiguration conf = new ConnectionConfiguration(host);
+        XMPPConnection connection = new XMPPTCPConnection(conf);
         connection.connect();
-        AccountManager accManager = new AccountManager(connection);
+
+        AccountManager accManager = AccountManager.getInstance(connection);
         if(!accManager.supportsAccountCreation()) {
-            throw new XMPPException("Server does not support account creation");
+            throw new Exception("Server does not support account creation");
         }
         accManager.createAccount(username, password);
-
         return connection;
     }
     
@@ -104,19 +104,16 @@ class XmppAccountManager {
      * @return
      * @throws XMPPException 
      */
-    public static XMPPConnection makeConnectionAndSavePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) throws XMPPException {
+    public static XMPPConnection makeConnectionAndSavePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) throws Exception {
         String domain = StringUtils.parseServer(jid);
-        
+
         // TODO throws NetworkOnMainThreadException on Honeycomb or higher
         // Fix it!
-        ConnectionConfiguration config = new AndroidConnectionConfiguration(domain);
-        XMPPConnection con = new XMPPConnection(config);
+        XMPPConnection con = new XMPPTCPConnection(new ConnectionConfiguration(domain));
         con.connect();
         con.login(jid, password);
-        // looks like we have successfully established a connection
-        // save the settings
+        // looks like we have successfully established a connection save the settings
         savePreferences(jid, password, notifiedAddress, settings);
         return con;
     }
-    
 }
