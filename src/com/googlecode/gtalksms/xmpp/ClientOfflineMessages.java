@@ -66,8 +66,8 @@ public class ClientOfflineMessages {
                 }
             } catch (FileNotFoundException e) {                
             } catch (IOException e) {
-            } catch (XMPPException e) {
-                // dont delete the file here
+            } catch (Exception e) {
+                // don't delete the file here
                 continue;
             }
             f.delete();

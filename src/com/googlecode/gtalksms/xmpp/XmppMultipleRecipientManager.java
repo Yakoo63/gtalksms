@@ -3,13 +3,12 @@ package com.googlecode.gtalksms.xmpp;
 import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.SettingsManager;
 
-import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.MultipleRecipientManager;
+import org.jivesoftware.smackx.address.MultipleRecipientManager;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class XmppMultipleRecipientManager {
      * @param msg Message
      * @return True if succeeded, false otherwise
      */
-    public static boolean send(Connection connection, Message msg) {
+    public static boolean send(XMPPConnection connection, Message msg) {
 
         List<String> toList = getAllowedNotifiedAddresses(connection);
         toList = filterHangoutAddresses(toList);
@@ -55,14 +54,13 @@ public class XmppMultipleRecipientManager {
      * @param connection Used to retrieved connected resources
      * @return the list of allowed resources
      */
-    private static List<String> getAllowedNotifiedAddresses(Connection connection) {
+    private static List<String> getAllowedNotifiedAddresses(XMPPConnection connection) {
         List<String> toList = new LinkedList<String>();
 
         // Removing blacklisted resources for notified addresses
         for (String notifiedAddress : sSettingsManager.getNotifiedAddresses().getAll()) {
-            Iterator<Presence> presences = connection.getRoster().getPresences(notifiedAddress);
-            while (presences.hasNext()) {
-                Presence p = presences.next();
+            List<Presence> presences = connection.getRoster().getPresences(notifiedAddress);
+            for (Presence p : presences) {
                 String toPresence = p.getFrom();
                 String toResource = StringUtils.parseResource(toPresence);
                 // Don't send messages to GTalk Android devices

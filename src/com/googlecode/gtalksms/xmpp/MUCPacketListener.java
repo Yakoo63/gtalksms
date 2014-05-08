@@ -7,8 +7,8 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smackx.delay.packet.DelayInformation;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.packet.DelayInformation;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +29,7 @@ class MUCPacketListener implements PacketListener {
     
     /**
      * Creates a new MUCPacketListener
-     * The MUC can either be use for a SMS chat/converstation or for a shell session
+     * The MUC can either be use for a SMS chat/conversation or for a shell session
      * 
      * @param number
      * @param muc

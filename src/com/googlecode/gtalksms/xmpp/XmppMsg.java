@@ -2,13 +2,14 @@ package com.googlecode.gtalksms.xmpp;
 
 import java.util.ArrayList;
 
-import org.jivesoftware.smackx.XHTMLText;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Tools;
+
+import org.jivesoftware.smackx.xhtmlim.XHTMLText;
 
 public class XmppMsg implements Parcelable {
     private final static String BOLD_BEGIN = "##BOLD_BEGIN##";

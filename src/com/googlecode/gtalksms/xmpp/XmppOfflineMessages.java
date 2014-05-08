@@ -1,12 +1,13 @@
 package com.googlecode.gtalksms.xmpp;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.OfflineMessageManager;
+import org.jivesoftware.smackx.offline.OfflineMessageManager;
 
 import android.content.Context;
 
@@ -16,7 +17,7 @@ import com.googlecode.gtalksms.tools.Tools;
 public class XmppOfflineMessages {
 
 	public static void handleOfflineMessages(XMPPConnection connection, String[] notifiedAddresses, Context ctx)
-	        throws XMPPException {
+	        throws Exception {
 		Log.i("Begin retrieval of offline messages from server");
 		OfflineMessageManager offlineMessageManager = new OfflineMessageManager(connection);
 
@@ -28,9 +29,8 @@ public class XmppOfflineMessages {
 		if (offlineMessageManager.getMessageCount() == 0) {
 			Log.d("No offline messages found on server");
 		} else {
-            Iterator<Message> i = offlineMessageManager.getMessages();
-            while (i.hasNext()) {
-                Message msg = i.next();
+            List<Message> msgs = offlineMessageManager.getMessages();
+            for (Message msg : msgs) {
                 String fullJid = msg.getFrom();
                 String bareJid = StringUtils.parseBareAddress(fullJid);
                 String messageBody = msg.getBody();

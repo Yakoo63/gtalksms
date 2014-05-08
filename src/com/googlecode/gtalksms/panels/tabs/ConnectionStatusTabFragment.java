@@ -3,6 +3,7 @@ package com.googlecode.gtalksms.panels.tabs;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smackx.ping.PingManager;
 
 import android.os.AsyncTask;
@@ -119,12 +120,10 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
             return;
         }
         
-        long lastPing = pingManager.getLastSuccessfulPing();
+        long lastPing = pingManager.getLastReceivedPong();
         Date date = new Date(lastPing);
-        String timeStr = SimpleDateFormat.getTimeInstance().format(date);
-        String dateStr = SimpleDateFormat.getDateInstance().format(date);
-        mPingTime.setText(timeStr);
-        mPingDate.setText(dateStr);
+        mPingTime.setText(SimpleDateFormat.getTimeInstance().format(date));
+        mPingDate.setText(SimpleDateFormat.getDateInstance().format(date));
     }
     
     private class PingMyServerAsyncTask extends AsyncTask<PingManager, Void, Boolean> {
@@ -137,7 +136,12 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
             
             PingManager pingManager = params[0];
             Log.d("Issuing pingMyServer in PingMyServerAsyncTask");
-            Boolean res = pingManager.pingMyServer();
+            Boolean res = null;
+            try {
+                res = pingManager.pingMyServer();
+            } catch (SmackException.NotConnectedException e) {
+                res = false;
+            }
             Log.d("Ping result was " + res);
             
             return res;
@@ -145,11 +149,7 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
         
         protected void onPostExecute(Boolean res) {
             Message msg = mPingStatusHandler.obtainMessage();
-            if (res) {
-                msg.arg1 = 1;
-            } else {
-                msg.arg1 = 0;
-            }
+            msg.arg1 = res ? 1 : 0;
             mPingStatusHandler.sendMessage(msg);
         }
     }

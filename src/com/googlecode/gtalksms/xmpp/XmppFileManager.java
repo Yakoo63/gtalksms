@@ -81,31 +81,32 @@ public class XmppFileManager implements FileTransferListener {
     @Override
     public void fileTransferRequest(FileTransferRequest request) {
         File saveTo;
-        mAnswerTo = request.getRequestor();  // set answerTo for replies and send()        
-        if (!mSettings.cameFromNotifiedAddress(mAnswerTo)) { 
-            send(R.string.chat_file_transfer_file_rejected, mAnswerTo);
-            request.reject();
-            return;                
-        } else if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            send(R.string.chat_file_transfer_file_not_mount);
-            request.reject();
-            return;
-        } else if (!mLandingDir.isDirectory()) {
-            send(R.string.chat_file_transfer_not_dir, mLandingDir.getAbsolutePath());
-            request.reject();
-            return;
-        }
-        
-        saveTo = new File(mLandingDir, request.getFileName());
-        if (saveTo.exists()) {
-            send(R.string.chat_file_transfer_file_already_exists, saveTo.getAbsolutePath());
-            request.reject();
-            return;
-        }
-        
-        IncomingFileTransfer transfer = request.accept();
-        send(R.string.chat_file_transfer_file, saveTo.getName(), request.getFileSize() / 1024 + " KiB");
         try {
+            mAnswerTo = request.getRequestor();  // set answerTo for replies and send()
+            if (!mSettings.cameFromNotifiedAddress(mAnswerTo)) {
+                send(R.string.chat_file_transfer_file_rejected, mAnswerTo);
+                request.reject();
+                return;
+            } else if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                send(R.string.chat_file_transfer_file_not_mount);
+                request.reject();
+                return;
+            } else if (!mLandingDir.isDirectory()) {
+                send(R.string.chat_file_transfer_not_dir, mLandingDir.getAbsolutePath());
+                request.reject();
+                return;
+            }
+
+            saveTo = new File(mLandingDir, request.getFileName());
+            if (saveTo.exists()) {
+                send(R.string.chat_file_transfer_file_already_exists, saveTo.getAbsolutePath());
+                request.reject();
+                return;
+            }
+
+            IncomingFileTransfer transfer = request.accept();
+            send(R.string.chat_file_transfer_file, saveTo.getName(), request.getFileSize() / 1024 + " KiB");
+
             transfer.recieveFile(saveTo);
             send(R.string.chat_file_transfer_file, saveTo.getName(), transfer.getStatus());
             double percents;

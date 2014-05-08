@@ -41,7 +41,7 @@ public class ShellCmd extends CommandHandlerBase {
                 XmppMuc.getInstance(sContext).inviteRoom(sIndex.toString(), sRoomName, XmppMuc.MODE_SHELL);
                 mShells.add(new Shell(sIndex, this, sContext));
                 
-            } catch (XMPPException e) {
+            } catch (Exception e) {
                 send(R.string.chat_shell_error_instance, e.getLocalizedMessage());
             }
         }
@@ -57,7 +57,7 @@ public class ShellCmd extends CommandHandlerBase {
         } else {
             try {
                 XmppMuc.getInstance(sContext).writeRoom(id.toString(), sRoomName, msg, XmppMuc.MODE_SHELL);
-            } catch (XMPPException e) {
+            } catch (Exception e) {
                 // room creation and/or writing failed - 
                 // notify about this error
                 // and send the message to the notification address

@@ -6,21 +6,22 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smackx.Form;
-import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.Occupant;
 import org.jivesoftware.smackx.muc.RoomInfo;
+import org.jivesoftware.smackx.xdata.Form;
+import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
 import android.content.Context;
 import android.os.Build;
@@ -81,10 +82,9 @@ public class XmppMuc {
                 try {
                     Collection<String> mucComponents = MultiUserChat.getServiceNames(connection);
                     if (mucComponents.size() > 0) {
-                        Iterator<String> i = mucComponents.iterator();
-                        mMucServer = i.next();
+                        mMucServer = mucComponents.iterator().next();
                     }
-                } catch (XMPPException e) {
+                } catch (Exception e) {
                     // This is not fatal, just log a warning
                     Log.i("Could not discover local MUC component: " + e.getMessage());            
                 }
@@ -110,7 +110,7 @@ public class XmppMuc {
      * @param message
      * @throws XMPPException
      */
-    public void writeRoom(String number, String contact, String message, int mode) throws XMPPException {
+    public void writeRoom(String number, String contact, String message, int mode) throws Exception {
         writeRoom(number, contact, new XmppMsg(message), mode);
     }
     
@@ -124,7 +124,7 @@ public class XmppMuc {
      * @param message
      * @throws XMPPException
      */
-    public void writeRoom(String number, String contact, XmppMsg message, int mode) throws XMPPException {
+    public void writeRoom(String number, String contact, XmppMsg message, int mode) throws Exception {
         MultiUserChat muc;
         muc = inviteRoom(number, contact, mode);
         if (muc != null) {
@@ -150,7 +150,7 @@ public class XmppMuc {
      * @return true if successful, otherwise false
      * @throws XMPPException 
      */
-    public MultiUserChat inviteRoom(String number, String contact, int mode) throws XMPPException {
+    public MultiUserChat inviteRoom(String number, String contact, int mode) throws Exception {
         MultiUserChat muc;
         if (!mRooms.containsKey(number)) {
             muc = createRoom(number, contact, mode);
@@ -215,7 +215,7 @@ public class XmppMuc {
      * @return
      * @throws XMPPException 
      */
-    private MultiUserChat createRoom(String number, String name, int mode) throws XMPPException {
+    private MultiUserChat createRoom(String number, String name, int mode) throws Exception {
         String room = getRoomString(number, name);
         MultiUserChat multiUserChat;
         boolean passwordMode = false;
@@ -260,14 +260,14 @@ public class XmppMuc {
             multiUserChat = new MultiUserChat(mConnection, roomJID);
         } catch (Exception e) {  
             Log.e("MUC creation failed: ", e);
-            throw new XMPPException("MUC creation failed for " + roomJID + ": " + e.getLocalizedMessage(), e);
+            throw new Exception("MUC creation failed for " + roomJID + ": " + e.getLocalizedMessage(), e);
         }
 
         try {
             multiUserChat.create(name);
         } catch (Exception e) {  
             Log.e("MUC creation failed: ", e);
-            throw new XMPPException("MUC creation failed for " + name + ": " + e.getLocalizedMessage(), e);
+            throw new Exception("MUC creation failed for " + name + ": " + e.getLocalizedMessage(), e);
         }
 
         try {
@@ -299,7 +299,7 @@ public class XmppMuc {
                     // If a server doesn't provide even password protected MUC, the setAnswer
                     // call will result in an IllegalArgumentException, which we wrap into an XMPPException
                     // See also Issue 247 http://code.google.com/p/gtalksms/issues/detail?id=247
-                    throw new XMPPException(iae);
+                    throw new Exception(iae);
                 }
                 passwordMode = true;
             }
@@ -337,7 +337,7 @@ public class XmppMuc {
      * 
      * @param muc
      */
-    private void leaveRoom(MultiUserChat muc) {
+    private void leaveRoom(MultiUserChat muc) throws SmackException.NotConnectedException {
         mMucHelper.deleteMUC(muc.getRoom());
         if (muc.isJoined())
             muc.leave();
@@ -379,7 +379,7 @@ public class XmppMuc {
         RoomInfo info;
         try {
             info = MultiUserChat.getRoomInfo(mConnection, room);
-        } catch (XMPPException e) {
+        } catch (Exception e) {
             return null;
         }
         return info;
@@ -488,13 +488,17 @@ public class XmppMuc {
                             leaveRoom(muc);
                             continue;
                         }
-                    } catch (XMPPException e) {
+                    } catch (Exception e) {
                         Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
 
                         // TODO decide in which cases it would be the best to remove the room from the DB, because of a persistent error
                         // and in which cases the error will not be permanent
                         if (mConnection.isAuthenticated()) {
-                            leaveRoom(muc);
+                            try {
+                                leaveRoom(muc);
+                            } catch (SmackException.NotConnectedException e1) {
+                                Log.i("rejoinRooms: error when leaving " + muc.getRoom() + " because of Exception", e);
+                            }
                             continue;
                         } else {
                             break;

@@ -130,7 +130,7 @@ public class SmsCmd extends CommandHandlerBase {
                 try {
                     XmppMuc.getInstance(sContext).inviteRoom(RecipientCmd.getLastRecipientNumber(),
                             RecipientCmd.getLastRecipientName(), XmppMuc.MODE_SMS);
-                } catch (XMPPException e) {
+                } catch (Exception e) {
                     // Creation of chat with last recipient failed
                     send(R.string.chat_error, e.getLocalizedMessage());
                 }
@@ -242,7 +242,7 @@ public class SmsCmd extends CommandHandlerBase {
         } else if (res.isDistinct()) {
             try {
                 XmppMuc.getInstance(sContext).inviteRoom(res.getNumber(), res.getName(), XmppMuc.MODE_SMS);
-            } catch (XMPPException e) {
+            } catch (Exception e) {
                 send(R.string.chat_error, e.getLocalizedMessage());
             }
         } else if (!res.isDistinct()) {

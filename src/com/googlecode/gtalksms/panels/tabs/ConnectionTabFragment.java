@@ -71,8 +71,8 @@ public class ConnectionTabFragment extends SherlockFragment {
         mSettingsMgr.addSettingChangeListener(mSettingListerner);
         mSettingListerner.OnSettingChanged(false);
 
-        if (mSwitchConnection.isChecked()) {
-             Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
+        if (mSettingsMgr.getConnectOnMainScreenStartup()) {
+            Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
         }
         
         mSwitchConnection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

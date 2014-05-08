@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
@@ -70,7 +71,7 @@ public class XmppBuddies implements RosterListener {
                 try {
                     sRoster.createEntry(userID, StringUtils.parseBareAddress(userID), null);
                     retrieveFriendList();
-                } catch (XMPPException e) {
+                } catch (Exception e) {
                     System.err.println("Error in adding friend " + e.getMessage());
                 }
             } else {
@@ -102,7 +103,7 @@ public class XmppBuddies implements RosterListener {
                 try {
                     roster.removeEntry(roster.getEntry(userID));
                     return true;
-                } catch (XMPPException e) {
+                } catch (Exception e) {
                     System.err.println("Error in removing friend " + e.getMessage());
                 }
             }
@@ -115,7 +116,11 @@ public class XmppBuddies implements RosterListener {
             Roster roster = sConnection.getRoster();
             if (roster.contains(userID)) {
                 RosterEntry entry  = roster.getEntry(userID);
-                entry.setName(name);
+                try {
+                    entry.setName(name);
+                } catch (SmackException.NotConnectedException e) {
+                    return false;
+                }
                 return true;
             }
         }
@@ -320,6 +325,10 @@ public class XmppBuddies implements RosterListener {
     
     private static void sendPresenceTo(String to, Presence presence, XMPPConnection connection) {
         presence.setTo(to);
-        connection.sendPacket(presence); 
+        try {
+            connection.sendPacket(presence);
+        } catch (SmackException.NotConnectedException e) {
+            Log.e("Failed to send presence.", e);
+        }
     }
 }

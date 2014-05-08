@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.xmpp;
 
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 
@@ -80,7 +81,11 @@ public class XmppPresenceStatus {
             Presence presence = new Presence(Presence.Type.available);
             presence.setStatus(composePresenceStatus());
             presence.setPriority(24);
-            mConnection.sendPacket(presence);
+            try {
+                mConnection.sendPacket(presence);
+            } catch (SmackException.NotConnectedException e) {
+                return false;
+            }
             Log.i("Sending presence status: " + presence);
             return true;
         } else {

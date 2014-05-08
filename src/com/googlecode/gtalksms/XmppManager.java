@@ -1,36 +1,36 @@
 package com.googlecode.gtalksms;
 
-import java.io.File;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.jivesoftware.smack.AndroidConnectionConfiguration;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.SmackAndroid;
 import org.jivesoftware.smack.SmackConfiguration;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
 import org.jivesoftware.smack.parsing.UnparsablePacket;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
-import org.jivesoftware.smackx.XHTMLManager;
-import org.jivesoftware.smackx.packet.DiscoverInfo;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.disco.packet.DiscoverInfo;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
+import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 
 import com.googlecode.gtalksms.tools.Log;
@@ -51,14 +51,12 @@ import com.googlecode.gtalksms.xmpp.XmppPresenceStatus;
 import com.googlecode.gtalksms.xmpp.XmppSocketFactory;
 import com.googlecode.gtalksms.xmpp.XmppStatus;
 
+import javax.net.ssl.SSLContext;
+
+import de.duenndns.ssl.MemorizingTrustManager;
+
 public class XmppManager {
 
-    private static final boolean DEBUG = false;
-
-    // The timeout for XMPP connections that get created with
-    // DNS SRV information
-    private static final int DNSSRV_TIMEOUT = 1000 * 30; // 30s
-    
     public static final int DISCONNECTED = 1;
     // A "transient" state - will only be CONNECTING *during* a call to start()
     public static final int CONNECTING = 2;
@@ -74,6 +72,7 @@ public class XmppManager {
     private static XmppManager sXmppManager = null;
     private static int sReusedConnectionCount = 0;
     private static int sNewConnectionCount = 0;
+    private static ConnectionConfiguration sConnectionConfiguration = null;
 
     // Indicates the current state of the service (disconnected/connecting/connected)
     private int mStatus = DISCONNECTED;
@@ -105,7 +104,7 @@ public class XmppManager {
         }
     };
 
-    private final Handler mReconnectHandler;
+    private Handler mReconnectHandler;
 
     private final SettingsManager mSettings;
     private final Context mContext;
@@ -116,12 +115,8 @@ public class XmppManager {
     }
 
     private XmppManager(Context context) {
-        if (DEBUG) {
-            Connection.DEBUG_ENABLED = true;
-        }
-        
         mSmackAndroid = SmackAndroid.init(context);
-        
+
         mReconnectHandler = new Handler(MainService.getServiceLooper());
         
         mConnectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
@@ -148,12 +143,7 @@ public class XmppManager {
         XmppMultipleRecipientManager.setSettingsManager(mSettings);
 
         // Smack Settings
-        SmackConfiguration.setPacketReplyTimeout(1000 * 20);      // 20 sec
-        SmackConfiguration.setLocalSocks5ProxyEnabled(true);
-        SmackConfiguration.setLocalSocks5ProxyPort(-7777);        // negative number means try next port if already in use
-        SmackConfiguration.setAutoEnableEntityCaps(true);
-
-        SmackConfiguration.setDefaultPingInterval(mSettings.pingIntervalInSec);
+        SmackConfiguration.setDefaultPacketReplyTimeout(20 * 1000);
         SmackConfiguration.setDefaultParsingExceptionCallback(new ParsingExceptionCallback() {
             @Override
             public void handleUnparsablePacket(UnparsablePacket stanzaData) throws Exception {
@@ -171,7 +161,7 @@ public class XmppManager {
     }
     
     /**
-     * This getter creates the XmppManager and inits the XmppManager
+     * This getter creates the XmppManager and init the XmppManager
      * with a new connection with the current preferences.
      * 
      * @param ctx
@@ -235,7 +225,10 @@ public class XmppManager {
                 mConnection.removeConnectionListener(mConnectionListener);
             }
             if (mConnection.isConnected()) {
-                mConnection.disconnect();
+                try {
+                    mConnection.disconnect();
+                } catch (SmackException.NotConnectedException e) {
+                }
                 mConnection = null;
                 mPingManager = null;
             }
@@ -293,7 +286,7 @@ public class XmppManager {
         intent.putExtra("new_state", newState);
         intent.putExtra("current_action", currentAction);
         if (newState == CONNECTED && sXmppManager != null && sXmppManager.mConnection != null) {
-            intent.putExtra("TLS", sXmppManager.mConnection.isUsingTLS());
+            intent.putExtra("TLS", sXmppManager.mConnection.isSecureConnection());
             intent.putExtra("Compression", sXmppManager.mConnection.isUsingCompression());
         }
         ctx.sendBroadcast(intent);
@@ -307,9 +300,7 @@ public class XmppManager {
      */
     private void updateStatus(int status, String action) {
         if (status != mStatus) {
-            // ensure _status is set before broadcast, just in-case
-            // a receiver happens to wind up querying the state on
-            // delivery.
+            // ensure _status is set before broadcast, just in-case a receiver happens to wind up querying the state on delivery.
             int old = mStatus;
             mStatus = status;
             mXmppStatus.setState(status);
@@ -321,9 +312,7 @@ public class XmppManager {
 
     private void updateAction(String action) {
         if (action != mStatusAction) {
-            // ensure action is set before broadcast, just in-case
-            // a receiver happens to wind up querying the state on
-            // delivery.
+            // ensure action is set before broadcast, just in-case a receiver happens to wind up querying the state on delivery.
             mStatusAction = action;
             Log.i("broadcasting new action " + action + "for status " + statusAsString(mStatus) + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
             broadcastStatus(mContext, mStatus, mStatus, action);
@@ -340,10 +329,11 @@ public class XmppManager {
         cleanupConnection();
 
         // a simple linear back off strategy with 5 min max
-        // + 100ms to avoid post delayed issue ??
+        // + 100ms to avoid post delayed issue
         int timeout = mCurrentRetryCount < 20 ? 5000 * mCurrentRetryCount + 100 : 1000 * 60 * 5;
         updateStatus(WAITING_TO_CONNECT, "Attempt #" + mCurrentRetryCount + " in " + timeout / 1000 + "s");
         Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + mCurrentRetryCount);
+        mReconnectHandler = new Handler(MainService.getServiceLooper());
         if (!mReconnectHandler.postDelayed(mReconnectRunnable, timeout)) {
             Log.w("maybeStartReconnect fails to post delayed job, reconnecting in 5s.");
             try {
@@ -374,12 +364,8 @@ public class XmppManager {
         // everything is ready for a connection attempt
         updateStatus(CONNECTING, "");
 
-        // create a new connection if the connection is obsolete or if the
-        // old connection is still active
-        if (SettingsManager.connectionSettingsObsolete 
-                || mConnection == null 
-                || mConnection.isConnected() ) {
-            
+        // create a new connection if the connection is obsolete or if the old connection is still active
+        if (SettingsManager.connectionSettingsObsolete || mConnection == null || mConnection.isConnected() ) {
             try {
                 connection = createNewConnection(mSettings);
             } catch (Exception e) {
@@ -413,9 +399,18 @@ public class XmppManager {
         updateAction("Configuring listeners and retrieving offline messages");
         mConnectionListener = new ConnectionListener() {
             @Override
+            public void connected(XMPPConnection connection) {
+                Log.i("ConnectionListener: connected() called");
+            }
+
+            @Override
+            public void authenticated(XMPPConnection connection) {
+                Log.i("ConnectionListener: authenticated() called");
+            }
+
+            @Override
             public void connectionClosed() {
-                // connection was closed by the foreign host
-                // or we have closed the connection
+                // connection was closed by the foreign host or we have closed the connection
                 Log.i("ConnectionListener: connectionClosed() called - connection was shutdown by foreign host or by us");
                 xmppRequestStateChange(getConnectionStatus());
             }
@@ -425,8 +420,7 @@ public class XmppManager {
                 // this happens mainly because of on IOException
                 // eg. connection timeouts because of lost connectivity
                 Log.d("xmpp disconnected due to error: ", e);
-                // We update the state to disconnected (mainly to cleanup listeners etc)
-                // then schedule an automatic reconnect.
+                // We update the state to disconnected (mainly to cleanup listeners etc) then schedule an automatic reconnect.
                 maybeStartReconnect();
             }
 
@@ -457,8 +451,7 @@ public class XmppManager {
             informListeners(mConnection);
 
         } catch (Exception e) {
-            // see issue 126 for an example where this happens because
-            // the connection drops while we are in initConnection()
+            // see issue 126 for an example where this happens because the connection drops while we are in initConnection()
             Log.e("xmppMgr exception caught", e);
             maybeStartReconnect();
             return;
@@ -466,9 +459,9 @@ public class XmppManager {
 
         Log.i("connection established with parameters: con=" + mConnection.isConnected() + 
                 " auth=" + mConnection.isAuthenticated() + 
-                " enc=" + mConnection.isUsingTLS() + 
+                " enc=" + mConnection.isSecureConnection() +
                 " comp=" + mConnection.isUsingCompression());
-        
+
         // Send welcome message
         if (mSettings.notifyApplicationConnection) {
             Tools.send((mContext.getString(R.string.chat_welcome, Tools.getVersionName(mContext))), null, mContext);
@@ -494,17 +487,12 @@ public class XmppManager {
      */
     private boolean connectAndAuth(XMPPConnection connection) {
         try {
-            updateAction("Connecting to " + mSettings.serverHost + ":" + mSettings.serverPort);
+            updateAction("Connecting to " + sConnectionConfiguration.getServiceName());
             connection.connect();
         } catch (Exception e) {
             Log.w("XMPP connection failed", e);
             if (e instanceof XMPPException) {
-                XMPPException xmppEx = (XMPPException) e;
-                StreamError error = xmppEx.getStreamError();
-                // Make sure the error is not null
-                if (error != null) {
-                    Log.w("XMPP connection failed because of stream error: " + error.toString());
-                }
+                Log.w("XMPP connection failed because of stream error: " + e.getMessage());
             }
             maybeStartReconnect();
             return false;
@@ -521,9 +509,7 @@ public class XmppManager {
             
             @Override
             public void pingFailed() {
-            // TODO remember that maybeStartReconnect is called from a
-            // different thread (the PingTask) here, it may causes
-            // synchronization problems
+            // TODO remember that maybeStartReconnect is called from a different thread (the PingTask) here, it may causes synchronization problems
             long now = new Date().getTime();
             if (now - mLastPing > mSettings.pingIntervalInSec * 500) {
                 Log.w("PingManager reported failed ping, calling maybeStartReconnect()");
@@ -541,6 +527,7 @@ public class XmppManager {
             // Managing an issue with ServiceDiscoveryManager
             if (e.getMessage() == null) {
                 restartConnection();
+                return false;
             }
         }
 
@@ -554,7 +541,7 @@ public class XmppManager {
             // authoritative login errors (ie, bad password).  The only
             // differentiator is the message itself which starts with this
             // hard-coded string.
-            if (e.getMessage() == null || !e.getMessage().contains("SASL authentication")) {
+            if (e.getMessage() == null || !e.getMessage().contains("SASLError using PLAIN: not-authorized")) {
                 // doesn't look like a bad username/password, so retry
                 maybeStartReconnect();
             } else {
@@ -571,36 +558,30 @@ public class XmppManager {
      * @return
      * @throws XMPPException 
      */
-    private static XMPPConnection createNewConnection(SettingsManager settings) throws XMPPException {
+    private XMPPConnection createNewConnection(SettingsManager settings) throws XMPPException {
         ConnectionConfiguration conf;
         
         if (settings.manuallySpecifyServerSettings) {
             // trim the serverHost here because of Issue 122
             conf = new ConnectionConfiguration(settings.serverHost.trim(), settings.serverPort, settings.serviceName);
         } else {
-            // DNS SRV lookup, yeah! :)
-            // Note: The Emulator will throw here an BadAddressFamily Exception
-            // but on a real device it just works fine
+            // Note: The Emulator will throw here an BadAddressFamily Exception but on a real device it just works fine
             // see: http://stackoverflow.com/questions/2879455/android-2-2-and-bad-address-family-on-socket-connect
             // and http://code.google.com/p/android/issues/detail?id=9431            
-            conf = new AndroidConnectionConfiguration(settings.serviceName, DNSSRV_TIMEOUT);
+            conf = new ConnectionConfiguration(settings.serviceName);
         }
-        
+        sConnectionConfiguration = conf;
         conf.setSocketFactory(new XmppSocketFactory());
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            conf.setTruststoreType("AndroidCAStore");
-            conf.setTruststorePassword(null);
-            conf.setTruststorePath(null);
-        } else {
-            conf.setTruststoreType("BKS");
-            String path = System.getProperty("javax.net.ssl.trustStore");
-            if (path == null) {
-                path = System.getProperty("java.home") + File.separator + "etc"
-                    + File.separator + "security" + File.separator
-                    + "cacerts.bks";
-            }
-            conf.setTruststorePath(path);
+        conf.setLegacySessionDisabled(false);
+
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, MemorizingTrustManager.getInstanceList(mContext), new SecureRandom());
+            conf.setCustomSSLContext(sc);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        } catch (KeyManagementException e) {
+            throw new IllegalStateException(e);
         }
 
         switch (settings.xmppSecurityModeInt) {
@@ -623,9 +604,9 @@ public class XmppManager {
         // disable the built-in ReconnectionManager since we handle this
         conf.setReconnectionAllowed(false);
         conf.setSendPresence(false);
-        // conf.setDebuggerEnabled(true);
-        
-        return new XMPPConnection(conf);
+        conf.setDebuggerEnabled(settings.debugLog);
+
+        return new XMPPTCPConnection(conf);
     }
 
     /** returns the current connection state */
@@ -639,7 +620,7 @@ public class XmppManager {
     }
     
     public boolean getTLSStatus() {
-        return mConnection != null && mConnection.isUsingTLS();
+        return mConnection != null && mConnection.isSecureConnection();
     }
     
     public boolean getCompressionStatus() {
@@ -682,9 +663,13 @@ public class XmppManager {
         // - we don't know the recipient
         // - we know that the recipient is able to read XHTML-IM
         // - we are disconnected and therefore send the message later
-        if ((to == null) || (mConnection != null && (XHTMLManager.isServiceEnabled(mConnection, to) || !mConnection.isConnected()))) {
-            String xhtmlBody = message.generateXHTMLText().toString();
-            XHTMLManager.addBody(msg, xhtmlBody);
+        try {
+            if ((to == null) || (mConnection != null && (XHTMLManager.isServiceEnabled(mConnection, to) || !mConnection.isConnected()))) {
+                String xhtmlBody = message.generateXHTMLText().toString();
+                XHTMLManager.addBody(msg, xhtmlBody);
+            }
+        } catch (Exception e) {
+            Log.d("XHTMLManager error. Ex:" + e.getMessage());
         }
 
         // determine the type of the message, groupchat or chat
@@ -698,12 +683,18 @@ public class XmppManager {
             // Message has a known destination information
             // And we have set the to-address before
             } else if (muc == null) {
-                mConnection.sendPacket(msg);
+                try {
+                    mConnection.sendPacket(msg);
+                } catch (SmackException.NotConnectedException e) {
+                    Log.e("Send message error. Ex:" + e.getMessage());
+                    return false;
+                }
             // Message is for a known MUC
             } else {
                 try {
                     muc.sendMessage(msg);
                 } catch (Exception e) {
+                    Log.e("Send message MUC error. Ex:" + e.getMessage());
                     return false;
                 }
             }

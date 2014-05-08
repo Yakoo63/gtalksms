@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.jivesoftware.smack.util.Base32Encoder;
-import org.jivesoftware.smackx.entitycaps.EntityCapsManager;
-import org.jivesoftware.smackx.entitycaps.cache.EntityCapsPersistentCache;
-import org.jivesoftware.smackx.entitycaps.cache.SimpleDirectoryPersistentCache;
+import org.jivesoftware.smackx.caps.EntityCapsManager;
+import org.jivesoftware.smackx.caps.cache.EntityCapsPersistentCache;
+import org.jivesoftware.smackx.caps.cache.SimpleDirectoryPersistentCache;
 
 import android.content.Context;
 
