@@ -1,8 +1,11 @@
+build/
 bin/
 gen/
 local.properties
 /Releases
 out/
+.gradle/
 .idea/workspace.xml
 .idea/dictionaries
-external-libs/ActionBarSherlock
+external-libs/ActionBarSherlock/
+external-libs/MemorizingTrustManager/

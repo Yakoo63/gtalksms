@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GTalkSMS.iml" filepath="$PROJECT_DIR$/GTalkSMS.iml" />
-      <module fileurl="file://$PROJECT_DIR$/external-libs/ActionBarSherlock/actionbarsherlock/actionbarsherlock.iml" filepath="$PROJECT_DIR$/external-libs/ActionBarSherlock/actionbarsherlock/actionbarsherlock.iml" />
     </modules>
   </component>
 </project>

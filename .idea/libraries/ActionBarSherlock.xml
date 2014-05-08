@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ActionBarSherlock">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/build/exploded-aar/GTalkSMS/external-libs/ActionBarSherlock/unspecified/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
