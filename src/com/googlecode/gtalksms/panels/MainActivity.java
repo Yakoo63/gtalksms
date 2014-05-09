@@ -308,10 +308,6 @@ public class MainActivity extends SherlockFragmentActivity {
             default:
                 throw new IllegalStateException();
         }
-        
-        boolean b1 = removeTab(getString(R.string.panel_buddies));
-        boolean b2 = removeTab(getString(R.string.panel_commands));
-        boolean b3 = removeTab(getString(R.string.panel_connection_status)); // TODO to resource
 
         if (status == XmppManager.CONNECTED) {
             mCommandsTabFragment.updateCommands();
@@ -320,30 +316,40 @@ public class MainActivity extends SherlockFragmentActivity {
             if (mSettingsManager.debugLog) {
                 addTab(getString(R.string.panel_connection_status), 4);
             }
-        } else if (b1 || b2 || b3) {
-            mActionBar.setSelectedNavigationItem(0);
-            mPager.setCurrentItem(0);
+        } else {
+            if (isTabExists(getString(R.string.panel_buddies))) {
+                mActionBar.setSelectedNavigationItem(0);
+                mPager.setCurrentItem(0);
+            }
+            removeTab(getString(R.string.panel_buddies));
+            removeTab(getString(R.string.panel_commands));
+            removeTab(getString(R.string.panel_connection_status));
         }
     }
 
     private void addTab(String name, int index) {
-        mActionBar.addTab(mActionBar.newTab().setText(name).setTabListener(new TabListener(mPager, index)));
-        mPager.getAdapter().notifyDataSetChanged();
+        if (!isTabExists(name)) {
+            mActionBar.addTab(mActionBar.newTab().setText(name).setTabListener(new TabListener(mPager, index)));
+            mPager.getAdapter().notifyDataSetChanged();
+        }
     }
 
-    private boolean removeTab(String name) {
-        boolean result = false;
+    private boolean isTabExists(String name) {
         for (int i = 0 ; i < mActionBar.getTabCount() ; ++i) {
             if (mActionBar.getTabAt(i).getText().equals(name)) {
-                if (mActionBar.getSelectedNavigationIndex() == i) {
-                    result = true;
-                }
-                
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void removeTab(String name) {
+        for (int i = 0 ; i < mActionBar.getTabCount() ; ++i) {
+            if (mActionBar.getTabAt(i).getText().equals(name)) {
                 mActionBar.removeTabAt(i);
                 mPager.getAdapter().notifyDataSetChanged();
                 i--;
             }
         }
-        return result;
     }
 }
