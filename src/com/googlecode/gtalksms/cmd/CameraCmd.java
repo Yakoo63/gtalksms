@@ -105,7 +105,11 @@ public class CameraCmd extends CommandHandlerBase {
             }           
         } 
         else if (isMatchingCmd(cmd, "flash")) {
-            setLight(arg1.equals("on"));
+            if (!arg1.equals("")) {
+                setLight(arg1.equals("on"));
+            } else {
+                send(R.string.chat_camera_flash_mode, getLightMode());
+            }
         }
     }
     
@@ -225,8 +229,8 @@ public class CameraCmd extends CommandHandlerBase {
             releaseResources();
         }
     }
-    
-    void setLight(boolean turnOn) {
+
+    private void setLight(boolean turnOn) {
         if (mCamera == null) {
             mCamera = Camera.open();
         }
@@ -239,6 +243,16 @@ public class CameraCmd extends CommandHandlerBase {
             releaseResources();
         }
     }
+
+
+    private String getLightMode() {
+        if (mCamera == null) {
+            mCamera = Camera.open();
+        }
+
+        Parameters params = mCamera.getParameters();
+        return params.getFlashMode();
+    }
        
     @Override
     protected void initializeSubCommands() {
@@ -249,7 +263,7 @@ public class CameraCmd extends CommandHandlerBase {
         cam.AddSubCmd("list", R.string.chat_help_camera_list, null);
         cam.AddSubCmd("set", R.string.chat_help_camera_set, "#number#");
         Cmd flash = mCommandMap.get("flash");
-        flash.setHelp(R.string.chat_help_flash_on, null);
+        flash.setHelp(R.string.chat_help_flash_state, null);
         flash.AddSubCmd("on", R.string.chat_help_flash_on, null);
         flash.AddSubCmd("off", R.string.chat_help_flash_off, null);
     }

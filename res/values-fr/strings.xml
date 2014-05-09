@@ -79,6 +79,7 @@
     <string name="chat_camera_back_activated">Caméra arrière activée</string>
     <string name="chat_camera_error_picture">Erreur lors de la récupération de l\'image: %1$s</string>
     <string name="chat_camera_error_version">La version Android de ce téléphone ne permet pas d\exécuter cette commande.</string>
+    <string name="chat_camera_flash_mode">Le mode flash de la caméra est sur %1$s</string>
     <string name="chat_camera_front"> - Caméra frontale</string>
     <string name="chat_camera_front_activated">Caméra frontale activée</string>
     <string name="chat_choose_activity">GTalkSMS : choisir l\'application</string>
@@ -153,6 +154,7 @@
     <string name="chat_help_find_sms_all">Effectue une recherche dans tous les SMS.</string>
     <string name="chat_help_flash_off">Eteint le flash.</string>
     <string name="chat_help_flash_on">Allume le flash.</string>
+    <string name="chat_help_flash_state">Etat du flash (on/off).</string>
     <string name="chat_help_geo">Ouvri Google Map, Google Navigation ou Google Street View pour l\'adresse spécifiée.</string>
     <string name="chat_help_help">Affiche cette aide.</string>
     <string name="chat_help_help_all">Affiche toute l\'aide.</string>
