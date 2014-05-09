@@ -4,8 +4,10 @@ GTalkSMS is an android application which allows you to
  - control your phone
  - send and receive sms
  - do various other things 
- via an gtalk/XMPP connection
+ via an GTalk/XMPP connection
  
- It is release under the LGPG (lgpl-3.0.txt) and depends on 2 other libraries:
- - asmack https://github.com/flowdalic/asmack for android XMPP functionality (Apache License - Version 2.0)
- - jzlib http://www.jcraft.com/jzlib/ for the XMPP compression feature (BSD-style License)
+It is release under the GNU GPL v3 and depends on other libraries:
+ - aSmack                   https://github.com/flowdalic/asmack
+ - ActionBar Sherlock       http://actionbarsherlock.com/
+ - DNS Java                 http://www.dnsjava.org/
+ - MemorizingTrustManager   https://github.com/ge0rg/MemorizingTrustManager/
