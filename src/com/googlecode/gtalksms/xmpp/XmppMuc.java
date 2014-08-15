@@ -264,7 +264,7 @@ public class XmppMuc {
         }
 
         try {
-            multiUserChat.create(name);
+            multiUserChat.createOrJoin(name);
         } catch (Exception e) {  
             Log.e("MUC creation failed: ", e);
             throw new Exception("MUC creation failed for " + name + ": " + e.getLocalizedMessage(), e);
