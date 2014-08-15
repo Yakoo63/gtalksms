@@ -94,7 +94,7 @@
     <orderEntry type="library" exported="" name="dnsjava-2.1.6" level="project" />
     <orderEntry type="library" exported="" name="asmack-android-8-4.0.2" level="project" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-4.3.23" level="project" />
+    <orderEntry type="library" exported="" name="play-services-5.2.08" level="project" />
     <orderEntry type="library" exported="" name="MemorizingTrustManager" level="project" />
     <orderEntry type="library" exported="" name="ActionBarSherlock" level="project" />
   </component>
