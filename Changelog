@@ -2,6 +2,8 @@
 * Fix MUC creation with OpenFire
 * Fix "where" command infinite notifications
 * Remove MUC password from the logs
+* New ASmack version
+* Fix vulnerability
 
 4.4.4
 * Fix long SMS issue when Sent Notification is disabled
