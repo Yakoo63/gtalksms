@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.http.conn.ssl.StrictHostnameVerifier;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
@@ -150,6 +151,8 @@ public class XmppManager {
                 Log.e("Handling unparsable Packet. Reconnecting", stanzaData.getParsingException());
             }
         });
+
+        SmackConfiguration.setDefaultHostnameVerifier(new StrictHostnameVerifier());
 
 		// Roster settings
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
