@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="icons_prefix">
+    <string-array name="icons_prefix" translatable="false">
         <item>status_green_</item>
         <item>status_orange_</item>
         <item>status_red_</item>
     </string-array>
-    <string-array name="list_bat_notif_interval">
+    <string-array name="list_bat_notif_interval" translatable="false">
         <item>1</item>
         <item>5</item>
         <item>10</item>
@@ -17,7 +17,7 @@
         <item>German</item>
         <item>English</item>
     </string-array>
-    <string-array name="list_locale_entryValues">
+    <string-array name="list_locale_entryValues" translatable="false">
         <item>default</item>
         <item>fr</item>
         <item>de</item>
@@ -29,7 +29,7 @@
         <item>In main GTalkSMS thread</item>
         <item>Both</item>
     </string-array>
-    <string-array name="list_smsNotificationType_entryValues">
+    <string-array name="list_smsNotificationType_entryValues" translatable="false">
         <item>no</item>
         <item>separate</item>
         <item>same</item>
@@ -40,12 +40,12 @@
         <item>Required</item>
         <item>Optional</item>
     </string-array>
-    <string-array name="list_xmppConnectionSecurity_entryValues">
+    <string-array name="list_xmppConnectionSecurity_entryValues" translatable="false">
        <item>dis</item>
        <item>req</item>
        <item>opt</item>
     </string-array>
-    <string-array name="predefined_xmpp_servers">
+    <string-array name="predefined_xmpp_servers" translatable="false">
         <item>jabber.ccc.de</item>
         <item>draugr.de</item>
     </string-array>

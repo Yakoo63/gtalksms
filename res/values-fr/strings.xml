@@ -195,9 +195,6 @@
     <string name="chat_help_ringmode_silent">Met la sonnerie du téléphone en mode silence.</string>
     <string name="chat_help_ringmode_vibrate">Met la sonnerie du téléphone en mode vibreur.</string>
     <string name="chat_help_rm">Supprime le fichier spécifié.</string>
-    <string name="chat_help_sc">Réalise une capture d\'écran et l\'enregistre dans le répertoire des photos.</string>
-    <string name="chat_help_sc_email">Réalise une capture d\'écran, l\'enregistre et l\'envoie par email.</string>
-    <string name="chat_help_sc_xmpp">Réalise une capture d\'écran, l\'enregistre et l\'envoie via la connexion XMPP.</string>
     <string name="chat_help_send">Envoie un fichier en utilisant la connexion XMPP.</string>
     <string name="chat_help_shell">Ouvre une nouvelle fenêtre de chat en tant que shell.</string>
     <string name="chat_help_sms_chat">Crée un nouveau salon de discussion. Le dernier contact sera utilisé si rien n\'est passé en paramètre.</string>

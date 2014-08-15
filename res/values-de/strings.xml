@@ -195,9 +195,6 @@
     <string name="chat_help_ringmode_silent">Anrufsignalisierung lautlos.</string>
     <string name="chat_help_ringmode_vibrate">Anrufsignalisierung vibrieren.</string>
     <string name="chat_help_rm">Löscht die Datei.</string>
-    <string name="chat_help_sc">Erstellt einen Screenshot und speichert ihn.</string>
-    <string name="chat_help_sc_email">Erstellt einen Screenshot und sendet ihn per E-Mail</string>
-    <string name="chat_help_sc_xmpp">Erstellt einen SCreenshot und sendet ihn per XMPP.</string>
     <string name="chat_help_send">Sendet die Datei via XMPP. Entweder einen absoluten Pfad zur Datei angeben, anonsten wird das letzte aufgelistete Verzeichnis vorangestellt.</string>
     <string name="chat_help_shell">Öffnet einen neuen MUC Chat mit einer Shell Session</string>
     <string name="chat_help_sms_chat">eröffnet neuen Chat mit dem Kontatk und schick eine entsprechende Einladung.</string>

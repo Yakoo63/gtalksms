@@ -21,9 +21,8 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.tools.Logs;
-import com.googlecode.gtalksms.tools.Tools;
 
-class LogTabFragment extends SherlockFragment {
+public class LogTabFragment extends SherlockFragment {
 
     private final static String LINE_SEPARATOR = System.getProperty("line.separator");
     private Button mButtonStartStop;
