@@ -282,7 +282,7 @@ public class SmsCmd extends CommandHandlerBase {
     }
 
     /**
-     * Appends an SMS to an XmppMsg with formating does not send the XmppMsg!
+     * Appends an SMS to an XmppMsg with formatting does not send the XmppMsg!
      * 
      * @param msg
      * @param sms
