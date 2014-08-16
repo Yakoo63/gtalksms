@@ -54,7 +54,7 @@ public class CallCmd extends CommandHandlerBase {
     @Override
     protected void onCommandDeactivated() {
         if (mPhoneListener != null && mTelephonyMgr != null) {
-            mTelephonyMgr.listen(mPhoneListener, 0);
+            mTelephonyMgr.listen(mPhoneListener, PhoneStateListener.LISTEN_NONE);
             sListenerActive = false;
         }
         mAudioMgr = null;
