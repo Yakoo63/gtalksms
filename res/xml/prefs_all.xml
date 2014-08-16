@@ -46,7 +46,7 @@
             <CheckBoxPreference android:key="debugLog" android:title="@string/pref_app_enable_debug" android:summary="@string/pref_app_enable_debug_help" android:defaultValue="false" />
             <ListPreference android:key="locale" android:title="@string/pref_app_locale" android:summary="@string/pref_app_locale_help" android:entryValues="@array/list_locale_entryValues" android:entries="@array/list_locale_entries" android:defaultValue="default" />
             <CheckBoxPreference android:defaultValue="true" android:key="formatResponses" android:title="@string/pref_app_format_responses" android:summary="@string/pref_app_format_responses_help" />
-            <CheckBoxPreference android:defaultValue="false" android:key="displayContactNumber" android:title="@string/pref_app_display_contact_number" android:summary="@string/pref_app_display_contact_number_help" />
+            <CheckBoxPreference android:defaultValue="true" android:key="displayContactNumber" android:title="@string/pref_app_display_contact_number" android:summary="@string/pref_app_display_contact_number_help" />
             <CheckBoxPreference android:key="markSmsReadOnReply" android:title="@string/pref_app_mark_read_on_send" android:summary="@string/pref_app_mark_read_on_send_help" android:defaultValue="false" />
             <CheckBoxPreference android:key="smsReplySeparate" android:title="@string/pref_notif_sms_separate" android:summary="@string/pref_notif_sms_separate_help" android:defaultValue="false" />
             <CheckBoxPreference android:key="connectOnMainscreenShow" android:title="@string/pref_app_connect_mainscreen" android:summary="@string/pref_app_connect_mainscreen_help" android:defaultValue="false" />

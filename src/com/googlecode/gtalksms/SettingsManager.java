@@ -387,8 +387,8 @@ public class SettingsManager {
         markSmsReadOnReply = getBoolean("markSmsReadOnReply", false);
         smsNumber = getInt("smsNumber", 5);
         formatResponses = getBoolean("formatResponses", false);
-        displayContactNumber = getBoolean("displayContactNumber", false);
-        notifyIncomingCalls = getBoolean("notifyIncomingCalls", false);
+        displayContactNumber = getBoolean("displayContactNumber", true);
+        notifyIncomingCalls = getBoolean("notifyIncomingCalls", true);
         displayIconIndex = getString("displayIconIndex", "0");
         
         String localeStr = getString("locale", "default");
