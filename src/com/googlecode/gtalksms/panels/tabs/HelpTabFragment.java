@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.panels.tabs;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -82,9 +83,13 @@ public class HelpTabFragment extends SherlockFragment {
         mTextViewConsole.append(getString(R.string.about_donate_string));
         mTextViewConsole.append(StringFmt.Url(getString(R.string.about_donate_paypal), "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"));
         mTextViewConsole.append(StringFmt.Url(getString(R.string.about_donate_market), "market://details?id=com.googlecode.gtalksmsdonate"));
-        
-        mTextViewConsole.append(appendURL(Tools.DONORS_URL));
-        
+
+        try {
+            mTextViewConsole.append(new String(appendURL(Tools.DONORS_URL).getBytes("ISO-8859-1"), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            mTextViewConsole.append(appendURL(Tools.DONORS_URL));
+        }
+
         mTextViewConsole.append(StringFmt.Fmt("\n" + getString(R.string.about_change_log) + "\n", 0xFFFF0000, 1.5, Typeface.BOLD));
         mTextViewConsole.append(appendURL(Tools.CHANGELOG_URL));
         
