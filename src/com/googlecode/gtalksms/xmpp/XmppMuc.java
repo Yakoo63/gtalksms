@@ -153,11 +153,13 @@ public class XmppMuc {
     public MultiUserChat inviteRoom(String number, String contact, int mode) throws Exception {
         MultiUserChat muc;
         if (!mRooms.containsKey(number)) {
+            Log.i("No existing chat room with " + contact + ". Creating a new one...");
             muc = createRoom(number, contact, mode);
             mRooms.put(number, muc);
 
         } else {
             muc = mRooms.get(number);
+            Log.i("Opening existing room for " + contact);
             if (muc != null) {
                 Collection<Occupant> occupants = muc.getParticipants();
                 for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
@@ -169,6 +171,7 @@ public class XmppMuc {
                         }
                     }
                     if (!found) {
+                        Log.i("Inviting notified address in the room for " + contact);
                         muc.invite(notifiedAddress, "SMS conversation with " + contact);
                     }
                 }
@@ -216,9 +219,7 @@ public class XmppMuc {
      * @throws XMPPException 
      */
     private MultiUserChat createRoom(String number, String name, int mode) throws Exception {
-        String room = getRoomString(number, name);
         MultiUserChat multiUserChat;
-        boolean passwordMode = false;
         Integer randomInt;
  
         // With "@conference.jabber.org" messages are sent several times...
@@ -240,12 +241,12 @@ public class XmppMuc {
         switch (mode) {
             case MODE_SMS:
                 roomJID = roomUID + "_SMS_" + "@" + getMUCServer();
-                subjectInviteStr =  mCtx.getString(R.string.xmpp_muc_sms) + getRoomString(number, name);
+                subjectInviteStr =  mCtx.getString(R.string.xmpp_muc_sms) + name;
                 break;
 
             case MODE_SHELL:
                 roomJID = roomUID + "_Shell_" + "@" + getMUCServer();
-                subjectInviteStr =  mCtx.getString(R.string.xmpp_muc_shell) + getRoomString(number, name);
+                subjectInviteStr =  mCtx.getString(R.string.xmpp_muc_shell) + name + " (" + number + ")";
                 break;
 
             default:
@@ -271,11 +272,15 @@ public class XmppMuc {
         }
 
         try {
-            // Since this is a private room, make the room not public and set
-            // user as owner of the room.
+            // Since this is a private room, make the room not public and set user as owner of the room.
             Form submitForm = multiUserChat.getConfigurationForm().createAnswerForm();
             submitForm.setAnswer("muc#roomconfig_publicroom", false);
-            submitForm.setAnswer("muc#roomconfig_roomname", room);
+            submitForm.setAnswer("muc#roomconfig_roomname", name);
+            try {
+                submitForm.setAnswer("muc#roomconfig_roomdesc", name);
+            } catch (Exception ex) {
+                Log.w("Unable to configure room description to " + name, ex);
+            }
 
             try {
                 List<String> owners = new ArrayList<String>();
@@ -286,6 +291,7 @@ public class XmppMuc {
                 }
                 Collections.addAll(owners, mSettings.getNotifiedAddresses().getAll());
                 submitForm.setAnswer("muc#roomconfig_roomowners", owners);
+                submitForm.setAnswer("muc#roomconfig_membersonly", true);
             } catch (Exception ex) {
                 // Password protected MUC fallback code begins here
                 Log.w("Unable to configure room owners on Server " + getMUCServer() + ". Falling back to room passwords", ex);
@@ -299,15 +305,11 @@ public class XmppMuc {
                     // If a server doesn't provide even password protected MUC, the setAnswer
                     // call will result in an IllegalArgumentException, which we wrap into an XMPPException
                     // See also Issue 247 http://code.google.com/p/gtalksms/issues/detail?id=247
-                    throw new Exception(iae);
+                    throw iae;
                 }
-                passwordMode = true;
             }
 
-            if (!passwordMode) {
-                submitForm.setAnswer("muc#roomconfig_membersonly", true);
-            }
-
+            Log.d(submitForm.getDataFormToSend().toXML().toString());
             multiUserChat.sendConfigurationForm(submitForm);
             multiUserChat.changeSubject(subjectInviteStr);
         } catch (XMPPException e1) {
@@ -320,6 +322,7 @@ public class XmppMuc {
         for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
             multiUserChat.invite(notifiedAddress, subjectInviteStr);
         }
+
         registerRoom(multiUserChat, number, name, randomInt, mode);
         return multiUserChat;
     }
@@ -339,8 +342,9 @@ public class XmppMuc {
      */
     private void leaveRoom(MultiUserChat muc) throws SmackException.NotConnectedException {
         mMucHelper.deleteMUC(muc.getRoom());
-        if (muc.isJoined())
+        if (muc.isJoined()) {
             muc.leave();
+        }
 
         // Remove the room if mRooms contains it
         if (mRooms.size() > 0) {
@@ -409,18 +413,7 @@ public class XmppMuc {
         int intEnd = room.indexOf("_", intBegin);
         return Integer.valueOf(room.substring(intBegin, intEnd));        
     }
-        
-    /**
-     * creates a formatted string from number and contact
-     * 
-     * @param number
-     * @param contact
-     * @return
-     */
-    private static String getRoomString(String number, String contact) {
-        return contact + " (" + number + ")";
-    }
-    
+
     private void send(String msg) {
         Tools.send(msg, null, mCtx);
     }
@@ -483,7 +476,7 @@ public class XmppMuc {
                             }
                         }
                         // looks like there is no one in the room
-                        if (info.getOccupantsCount() > 0) {
+                        if (info.getOccupantsCount() == 0) {
                             Log.i("rejoinRooms: leaving " + muc.getRoom() + " because there is no one there");
                             leaveRoom(muc);
                             continue;

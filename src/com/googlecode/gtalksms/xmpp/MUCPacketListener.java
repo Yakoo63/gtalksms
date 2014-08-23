@@ -64,20 +64,15 @@ class MUCPacketListener implements PacketListener {
         if (from.equals(mRoomName)) {
             Intent intent = new Intent(MainService.ACTION_SEND);
             intent.putExtra("message", mName + ": " + message.getBody());
-            // fromMuc sounds right at first, but it servers no purpose here atm            
+            // fromMuc sounds right at first, but it serves no purpose here atm
             // intent.putExtra("fromMuc", true);
             MainService.sendToServiceHandler(intent);
         } else if (mMode == XmppMuc.MODE_SMS) {
             if (!fromBareResource.equals(mName)) {
                 if (message.getBody() != null) {
                     DelayInformation inf = (DelayInformation) message.getExtension("x", "jabber:x:delay");
-                    Date sentDate;
-                    if (inf != null) {
-                        sentDate = inf.getStamp();
-                    } else {
-                        sentDate = new Date();
-                    }
-    
+                    Date sentDate = inf != null ? inf.getStamp(): new Date();
+
                     if (sentDate.compareTo(mLastDate) > 0) {
                         Intent intent = new Intent(MainService.ACTION_COMMAND);
                         intent.setClass(mCtx, MainService.class);
