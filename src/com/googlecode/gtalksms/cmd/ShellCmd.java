@@ -1,8 +1,6 @@
 package com.googlecode.gtalksms.cmd;
 
-import java.util.ArrayList;
-
-import org.jivesoftware.smack.XMPPException;
+import java.util.HashMap;
 
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
@@ -14,11 +12,10 @@ import com.googlecode.gtalksms.xmpp.XmppMuc;
 
 public class ShellCmd extends CommandHandlerBase {
     
-    private final ArrayList<Shell> mShells = new ArrayList<Shell>();
+    private final HashMap<Integer, Shell> mShells = new HashMap<Integer, Shell>();
     private static final String sRoomName = "Shell";
     XmppFont _font = new XmppFont("consolas", "red");
-    private Integer sIndex = 0;
-    
+
     public ShellCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_SYSTEM, "Shell", new Cmd("cmd"), new Cmd("shell"));
     }
@@ -26,20 +23,24 @@ public class ShellCmd extends CommandHandlerBase {
     
     @Override
     public void execute(Command cmd) {
-        
+        Integer shellId;
         if (cmd.getCommand().equals("cmd")) {
+            // Try to parse the roomId, if error we'll not use chat rooms
+            shellId = Tools.parseInt(cmd.getReplyTo(), 0);
             try {
-                mShells.get(Tools.parseInt(cmd.getReplyTo(), 0)).executeCommand(cmd.getAllArg1());
+                if (!mShells.containsKey(shellId)) {
+                    mShells.put(shellId, new Shell(shellId, this, sContext));
+                }
+                mShells.get(shellId).executeCommand(cmd.getAllArg1());
             } catch (Exception e) {
-                send(R.string.chat_shell_error_access, cmd.getReplyTo(), e.getLocalizedMessage());     
+                send(R.string.chat_shell_error_access, shellId, e.getLocalizedMessage());
             }
         } else if (cmd.getCommand().equals("shell")) {
-            
-            // TODO see how to re-use shells 
+            // Try to parse the roomId, if error we'll use the Shell 1
+            shellId = Tools.parseInt(cmd.getArg1(), 1);
             try {
-                ++sIndex;
-                XmppMuc.getInstance(sContext).inviteRoom(sIndex.toString(), sRoomName, XmppMuc.MODE_SHELL);
-                mShells.add(new Shell(sIndex, this, sContext));
+                XmppMuc.getInstance(sContext).inviteRoom(shellId.toString(), sRoomName, XmppMuc.MODE_SHELL);
+                mShells.put(shellId, new Shell(shellId, this, sContext));
                 
             } catch (Exception e) {
                 send(R.string.chat_shell_error_instance, e.getLocalizedMessage());
@@ -65,19 +66,20 @@ public class ShellCmd extends CommandHandlerBase {
                 msgError.appendLine(getString(R.string.chat_shell_error_muc_write, e.getLocalizedMessage()));
                 msgError.appendBold(sRoomName + " " + id);
                 msgError.append(msg);
-                send(msgError);
+                send(msgError, null);
             }
         }
     }
 
     @Override
     protected void onCommandActivated() {
-        mShells.add(new Shell(0, this, sContext));
+        // Create the default shell for the cmd command
+        mShells.put(0, new Shell(0, this, sContext));
     }
 
     @Override
     protected void onCommandDeactivated() {
-        for (Shell s : mShells){
+        for (Shell s : mShells.values()){
             s.stop();
         }
         mShells.clear();
@@ -86,6 +88,6 @@ public class ShellCmd extends CommandHandlerBase {
     @Override
     protected void initializeSubCommands() {
         mCommandMap.get("cmd").setHelp(R.string.chat_help_cmd, "#command#");   
-        mCommandMap.get("shell").setHelp(R.string.chat_help_shell, null);   
+        mCommandMap.get("shell").setHelp(R.string.chat_help_shell, "#ShellId#");
     }
 }

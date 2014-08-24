@@ -196,7 +196,7 @@
     <string name="chat_help_ringmode_vibrate">Met la sonnerie du téléphone en mode vibreur.</string>
     <string name="chat_help_rm">Supprime le fichier spécifié.</string>
     <string name="chat_help_send">Envoie un fichier en utilisant la connexion XMPP.</string>
-    <string name="chat_help_shell">Ouvre une nouvelle fenêtre de chat en tant que shell.</string>
+    <string name="chat_help_shell">Ouvre une nouvelle fenêtre de chat en tant que shell. Ceci n\'est pas un vrai shell. Chaque commande est indépendante et ne tient pas compte du contexte (return code, cd...). Pour chainer les commandes il faut les écrire sur une ligne avec des \'|\'.</string>
     <string name="chat_help_sms_chat">Crée un nouveau salon de discussion. Le dernier contact sera utilisé si rien n\'est passé en paramètre.</string>
     <string name="chat_help_sms_reply">Envoye un SMS au dernier destinataire entrant ou sortant.</string>
     <string name="chat_help_sms_send">Envoye un SMS au contact/numéro spécifié.</string>

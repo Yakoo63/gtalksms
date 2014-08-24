@@ -29,11 +29,11 @@ public class MUCHelper {
         return mucHelper;
     }
     
-    public boolean addMUC(String muc, String number) {
+    public boolean addMUC(String muc, String number, int type) {
         if (muc.contains("'") || number.contains("'"))
             return false;
         
-        addOrUpdate(muc, number);
+        addOrUpdate(muc, number, type);
         return true;
     }
     
@@ -69,16 +69,17 @@ public class MUCHelper {
 
     public String[][] getAllMUC() {
         String[][] res = MUCDatabase.getFullDatabase();
-        if (res.length == 0)
+        if (res.length == 0) {
             res = null;
+        }
         return res;
     }
 
-    private void addOrUpdate(String muc, String number) {
+    private void addOrUpdate(String muc, String number, int type) {
         if (MUCDatabase.containsMUC(muc)) {
-            MUCDatabase.updateMUC(muc, number);
+            MUCDatabase.updateMUC(muc, number, type);
         } else {
-            MUCDatabase.addMUC(muc, number);
+            MUCDatabase.addMUC(muc, number, type);
         }
     }
 }

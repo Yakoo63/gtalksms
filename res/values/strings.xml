@@ -196,7 +196,7 @@
     <string name="chat_help_ringmode_vibrate">Set ringer mode to vibrate.</string>
     <string name="chat_help_rm">Deletes the specified file.</string>
     <string name="chat_help_send">Sends the specified file through XMPP. Use an absolute path, otherwise the last listed directory will be prefixed</string>
-    <string name="chat_help_shell">Opens a new chat as a shell.</string>
+    <string name="chat_help_shell">Opens a new chat as a shell. This is not a real shell: there is no context between command (ex: return value, cd...). To link commands, write them on a single line using \'|\'.</string>
     <string name="chat_help_sms_chat">Creates a new Chat with the contact and invites you to that chat. Leave contact empty to use last contact</string>
     <string name="chat_help_sms_reply">Sends a SMS to your last recipient with content message.</string>
     <string name="chat_help_sms_send">Sends a SMS to number with content message.</string>

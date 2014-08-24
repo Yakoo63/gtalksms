@@ -162,6 +162,13 @@ public class XmppMuc {
             Log.i("Opening existing room for " + contact);
             if (muc != null) {
                 Collection<Occupant> occupants = muc.getParticipants();
+
+                // Logging participants
+                for (Occupant occupant : occupants) {
+                    Log.d(occupant.getJid() + " already in the room");
+                }
+
+                // Invite notified addresses if needed
                 for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
                     boolean found = false;
                     for (Occupant occupant : occupants) {
@@ -171,7 +178,7 @@ public class XmppMuc {
                         }
                     }
                     if (!found) {
-                        Log.i("Inviting notified address in the room for " + contact);
+                        Log.d("Inviting notified address '" + notifiedAddress + "' in the room for " + contact);
                         muc.invite(notifiedAddress, "SMS conversation with " + contact);
                     }
                 }
@@ -245,8 +252,9 @@ public class XmppMuc {
                 break;
 
             case MODE_SHELL:
-                roomJID = roomUID + "_Shell_" + "@" + getMUCServer();
-                subjectInviteStr =  mCtx.getString(R.string.xmpp_muc_shell) + name + " (" + number + ")";
+                roomJID = roomUID + "_Shell_" + number + "@" + getMUCServer();
+                subjectInviteStr =  mCtx.getString(R.string.xmpp_muc_shell) + name + " " + number;
+                name = "Shell " + number;
                 break;
 
             default:
@@ -355,13 +363,10 @@ public class XmppMuc {
         }
     }
 
-    private void registerRoom(MultiUserChat muc, String number, String name) {
+    private void registerRoom(MultiUserChat muc, String number, String name, int mode) {
         String roomJID = muc.getRoom();
         Integer randomInt = getRoomInt(roomJID);
-        // TODO This contains not so safe, if we have a user that has 
-        // the string "_SMS_" in his name. A cleaner way would be to 
-        // extend the MUC DB with this information.
-        registerRoom(muc, number, name, randomInt, roomJID.toUpperCase().contains("_SMS_") ? MODE_SMS : MODE_SHELL);
+        registerRoom(muc, number, name, randomInt, mode);
     }
     
     private void registerRoom(MultiUserChat muc, String number, String name, Integer randomInt, int mode) {
@@ -369,7 +374,7 @@ public class XmppMuc {
         muc.addMessageListener(chatListener);
         mRoomNumbers.add(randomInt);
         mRooms.put(number, muc);
-        mMucHelper.addMUC(muc.getRoom(), number);
+        mMucHelper.addMUC(muc.getRoom(), number, mode);
     }
     
     /**
@@ -427,20 +432,25 @@ public class XmppMuc {
         
         private void rejoinRooms() {
             String[][] mucDB = mMucHelper.getAllMUC();
-            if (mucDB == null)
+            if (mucDB == null)  {
                 return;
+            }
 
             for (String[] aMucDB : mucDB) {
-                if (!mConnection.isAuthenticated())
+                if (!mConnection.isAuthenticated()) {
                     return;
+                }
+
+                Log.i("Trying to reconnect to the room with parameters: Muc=" + aMucDB[0] + ", Number=" + aMucDB[1] + ", Mode=" + aMucDB[2]);
 
                 RoomInfo info = getRoomInfo(aMucDB[0]);
-                // if info is not null, the room exists on the server
-                // so lets check if we can reuse it
+                // if info is not null, the room exists on the server, so lets check if we can reuse it
                 if (info != null) {
                     MultiUserChat muc = new MultiUserChat(mConnection, aMucDB[0]);
-                    String name = ContactsManager.getContactName(mCtx,
-                            aMucDB[1]);
+                    int mode = Integer.parseInt(aMucDB[2]);
+                    // Hardcoded room name for shell
+                    String name = mode == MODE_SMS ? ContactsManager.getContactName(mCtx, aMucDB[1]) : "Shell " + aMucDB[1];
+
                     try {
                         if (info.isPasswordProtected()) {
                             muc.join(name, mSettings.roomPassword, mDiscussionHistory, JOIN_TIMEOUT);
@@ -498,8 +508,13 @@ public class XmppMuc {
                         }
                     }
 
+                    Log.i("Connected to the room '" + aMucDB[0]);
+
                     // MUC has passed all tests and is fully usable
-                    registerRoom(muc, aMucDB[1], name);
+                    registerRoom(muc, aMucDB[1], name, mode);
+                } else {
+                    Log.i("The room '" + aMucDB[0] + "'is no more available");
+                    mMucHelper.deleteMUC(aMucDB[0]);
                 }
             }
         }

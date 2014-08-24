@@ -66,7 +66,7 @@ public class Shell {
         /**
          * Reads the given InputStream and sends a XmppMsg every 5000 chars
          * or every 10 seconds, whatever comes first.
-         * If we happen to encouter an InputStream that never stops, like from
+         * If we happen to encounter an InputStream that never stops, like from
          * "tail -f" or "logcat" without the "-d" option, the method will never 
          * return. See executeCommand on how we handle this.
          * 
