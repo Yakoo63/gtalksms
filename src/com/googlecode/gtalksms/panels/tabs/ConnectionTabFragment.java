@@ -31,6 +31,7 @@ public class ConnectionTabFragment extends SherlockFragment {
     private String mCurrentAction = MainService.ACTION_CONNECT;
     private int mCurrentStatus = XmppManager.DISCONNECTED;
     private String mCurrentStatusAction = "";
+    private boolean isInitialized = false;
 
     @Override
     public void onResume() {
@@ -50,6 +51,10 @@ public class ConnectionTabFragment extends SherlockFragment {
 
     public void onDestroyView() {
         mSettingsMgr.delSettingChangeListener(mSettingListerner);
+
+        if (isInitialized) {
+            saveConnectionSettings();
+        }
 
         super.onDestroyView();
     }
@@ -71,32 +76,41 @@ public class ConnectionTabFragment extends SherlockFragment {
         mSettingsMgr.addSettingChangeListener(mSettingListerner);
         mSettingListerner.OnSettingChanged(false);
 
-        if (mSettingsMgr.getConnectOnMainScreenStartup()) {
+        if (mSettingsMgr.getConnectOnMainScreenStartup() && !mSettingsMgr.getLogin().equals("")) {
             Tools.startSvcIntent(getActivity().getBaseContext(), MainService.ACTION_CONNECT);
         }
         
         mSwitchConnection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSettingsMgr.setConnectOnMainScreenStartup(mSwitchConnection.isChecked());
+                saveConnectionSettings();
             }
         });
         
         mStartStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mSettingsMgr.delSettingChangeListener(mSettingListerner);
+                saveConnectionSettings();
 
-                mSettingsMgr.setLogin(mEditTextLogin.getText().toString());
-                mSettingsMgr.getNotifiedAddresses().set(mEditNotificationAddress.getText().toString());
-                mSettingsMgr.setPassword(mEditTextPassword.getText().toString());
-                
                 if (!mSettingsMgr.getLogin().equals("")) {
                     Tools.startSvcIntent(getActivity().getBaseContext(), mCurrentAction);
                 }
 
-                mSettingsMgr.addSettingChangeListener(mSettingListerner);
             }
         });
+
+        isInitialized = true;
+
         return view;
+    }
+
+    private void saveConnectionSettings() {
+        mSettingsMgr.delSettingChangeListener(mSettingListerner);
+
+        mSettingsMgr.setConnectOnMainScreenStartup(mSwitchConnection.isChecked());
+        mSettingsMgr.setLogin(mEditTextLogin.getText().toString());
+        mSettingsMgr.getNotifiedAddresses().set(mEditNotificationAddress.getText().toString());
+        mSettingsMgr.setPassword(mEditTextPassword.getText().toString());
+
+        mSettingsMgr.addSettingChangeListener(mSettingListerner);
     }
     
     public void updateStatus(int status, String action) {
