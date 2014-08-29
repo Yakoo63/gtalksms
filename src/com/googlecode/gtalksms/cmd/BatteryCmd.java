@@ -74,7 +74,10 @@ public class BatteryCmd extends CommandHandlerBase {
         sXmppPresenceStatus = null;
         sLastKnownPowerSource = null;
         if (sReceiverRegistered) {
-            sContext.unregisterReceiver(mBatInfoReceiver);
+            try {
+                sContext.unregisterReceiver(mBatInfoReceiver);
+            } catch (Exception e) {
+            }
             sReceiverRegistered = false;
         }
     }

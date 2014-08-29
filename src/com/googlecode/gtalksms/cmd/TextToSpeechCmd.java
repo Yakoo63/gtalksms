@@ -32,24 +32,30 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
     @Override
     protected void onCommandActivated() {
         mLocale = Locale.getDefault();
-        mTts = new TextToSpeech(sContext, this);
     }
 
     @Override
     protected void onCommandDeactivated() {
         mLocale = null;
         if (mTts != null) {
-            mTts.shutdown();
+            try {
+                mTts.shutdown();
+            } catch (Exception e) {
+                // Don't care
+            }
+
             mTts = null;
         }
     }
+
+    private TextToSpeech getTts() { return mTts == null ? mTts = new TextToSpeech(sContext, this) : mTts; }
 
     protected void execute(Command cmd) {
         Log.i("TTS: " + cmd.getOriginalCommand());
         
         if (isMatchingCmd(cmd, "tts")) {
             if (mTtsAvailable) {
-                mTts.speak(cmd.getAllArg1(), TextToSpeech.QUEUE_ADD, null);
+                getTts().speak(cmd.getAllArg1(), TextToSpeech.QUEUE_ADD, null);
             } else {
                 send(R.string.chat_tts_installation);
                 sContext.startActivity(new Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA));
@@ -59,7 +65,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
                 send(R.string.android_version_incompatible, "ICE CREAM SANDWICH");
             } else {
                 StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_engines));
-                for (EngineInfo engine : mTts.getEngines()) {
+                for (EngineInfo engine : getTts().getEngines()) {
                     sb.append(engine.label).append(" - ").append(engine.name).append("\n");
                 }
                 send(sb.substring(0, Math.max(0,sb.length() - 1)));
@@ -67,7 +73,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
         } else if (isMatchingCmd(cmd, "tts-lang-list")) {
             StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_languages));
             for (Locale locale : Locale.getAvailableLocales()) {
-                switch (mTts.isLanguageAvailable(locale)) {
+                switch (getTts().isLanguageAvailable(locale)) {
                     case TextToSpeech.LANG_AVAILABLE:
                         sb.append(locale.getDisplayLanguage());
                         if (locale.getDisplayCountry() != null && locale.getDisplayCountry().length() > 0)  {
@@ -88,19 +94,19 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
                 send(R.string.android_version_incompatible, "ICE CREAM SANDWICH");
             } else {
                 mTts = new TextToSpeech(sContext, this, cmd.getAllArg1());
-                send(getString(R.string.chat_tts_engine) + mTts.getDefaultEngine());
+                send(getString(R.string.chat_tts_engine) + getTts().getDefaultEngine());
             }
         } else if (isMatchingCmd(cmd, "tts-lang")) {
             String arg1 = cmd.getArg1();
             String arg2 = cmd.getArg2();
             if (!arg1.equals("") && !arg2.equals("")) {
                 mLocale = new Locale(arg1, arg2);
-                mTts.setLanguage(mLocale);
+                getTts().setLanguage(mLocale);
             } else if (!arg1.equals("")) {
                 mLocale = new Locale(arg1);
-                mTts.setLanguage(mLocale);
+                getTts().setLanguage(mLocale);
             } 
-            send(getString(R.string.chat_tts_language) + mTts.getLanguage().getDisplayName());
+            send(getString(R.string.chat_tts_language) + getTts().getLanguage().getDisplayName());
         }
     }
     
@@ -115,9 +121,9 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
 
     @Override
     public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS && mTts != null) {
+        if (status == TextToSpeech.SUCCESS && getTts() != null) {
             Log.i("TTS initialized!");
-            mTts.setLanguage(mLocale);
+            getTts().setLanguage(mLocale);
             mTtsAvailable = true;
         } else {
             Log.e("Can't initialise TTS!");
