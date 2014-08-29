@@ -254,8 +254,7 @@ public class MainActivity extends SherlockFragmentActivity {
         IntentFilter intentFilter = new IntentFilter(MainService.ACTION_XMPP_PRESENCE_CHANGED);
         intentFilter.addAction(MainService.ACTION_XMPP_CONNECTION_CHANGED);
         registerReceiver(mXmppreceiver, intentFilter);
-        Intent intent = new Intent(MainService.ACTION_CONNECT);
-        bindService(intent, mMainServiceConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, MainService.class), mMainServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override

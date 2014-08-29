@@ -110,7 +110,7 @@ public class KeyboardInputMethodService extends InputMethodService
     public void onCreate() {
         super.onCreate();
 
-        if (!this.bindService(new Intent(MainService.ACTION_CONNECT), mainServiceConnection, BIND_AUTO_CREATE)) {
+        if (!this.bindService(new Intent(this, MainService.class), mainServiceConnection, BIND_AUTO_CREATE)) {
             throw new RuntimeException("failed to connect to mainService");
         }
     }
