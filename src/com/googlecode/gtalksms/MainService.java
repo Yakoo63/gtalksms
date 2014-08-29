@@ -148,9 +148,6 @@ public class MainService extends Service {
         }
     }
 
-    static Thread sThread = null;
-    static boolean sIsConnecting = false;
-    static boolean sIsDisconnecting = false;
     void connectTransport() {
         sXmppMgr.xmppRequestStateChange(XmppManager.CONNECTED);
     }
