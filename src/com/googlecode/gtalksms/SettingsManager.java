@@ -1,6 +1,7 @@
 package com.googlecode.gtalksms;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -296,9 +297,9 @@ public class SettingsManager {
             Tools.setLocale(this, mContext);
         }
 
-        for (OnSettingChangeListener listener : mSettingChangeListeners) {
+        for (Iterator<OnSettingChangeListener> it = mSettingChangeListeners.iterator(); it.hasNext(); ) {
             try {
-                listener.OnSettingChanged(connectionSettingsObsolete);
+                it.next().OnSettingChanged(connectionSettingsObsolete);
             } catch (Exception e) {
                 Log.e("Failed to notified listener.", e);
             }
