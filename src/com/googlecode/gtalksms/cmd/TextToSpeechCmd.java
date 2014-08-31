@@ -22,16 +22,17 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
 
     public TextToSpeechCmd(MainService mainService) {
         super(mainService, CommandHandlerBase.TYPE_MESSAGE, "TTS",
-                new Cmd("tts", "say"), 
-                new Cmd("tts-lang", "ttslang"), 
-                new Cmd("tts-lang-list", "ttslanglist"), 
-                new Cmd("tts-engine", "ttsengine"), 
-                new Cmd("tts-engine-list", "ttsenginelist"));
+                new Cmd("tts", Cmd.DISABLED, "say"),
+                new Cmd("tts-lang", Cmd.DISABLED, "ttslang"),
+                new Cmd("tts-lang-list", Cmd.DISABLED, "ttslanglist"),
+                new Cmd("tts-engine", Cmd.DISABLED, "ttsengine"),
+                new Cmd("tts-engine-list", Cmd.DISABLED, "ttsenginelist"));
     }
 
     @Override
     protected void onCommandActivated() {
         mLocale = Locale.getDefault();
+        mTts = new TextToSpeech(sContext, this);
     }
 
     @Override
@@ -46,26 +47,27 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
 
             mTts = null;
         }
+        mTtsAvailable = false;
     }
-
-    private TextToSpeech getTts() { return mTts == null ? mTts = new TextToSpeech(sContext, this) : mTts; }
 
     protected void execute(Command cmd) {
         Log.i("TTS: " + cmd.getOriginalCommand());
         
         if (isMatchingCmd(cmd, "tts")) {
             if (mTtsAvailable) {
-                getTts().speak(cmd.getAllArg1(), TextToSpeech.QUEUE_ADD, null);
+                mTts.speak(cmd.getAllArg1(), TextToSpeech.QUEUE_ADD, null);
             } else {
                 send(R.string.chat_tts_installation);
-                sContext.startActivity(new Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA));
+                Intent intent = new Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                sContext.startActivity(intent);
             }
         } else if (isMatchingCmd(cmd, "tts-engine-list")) {
             if (Build.VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
                 send(R.string.android_version_incompatible, "ICE CREAM SANDWICH");
             } else {
                 StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_engines));
-                for (EngineInfo engine : getTts().getEngines()) {
+                for (EngineInfo engine : mTts.getEngines()) {
                     sb.append(engine.label).append(" - ").append(engine.name).append("\n");
                 }
                 send(sb.substring(0, Math.max(0,sb.length() - 1)));
@@ -73,7 +75,7 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
         } else if (isMatchingCmd(cmd, "tts-lang-list")) {
             StringBuilder sb = new StringBuilder(getString(R.string.chat_tts_languages));
             for (Locale locale : Locale.getAvailableLocales()) {
-                switch (getTts().isLanguageAvailable(locale)) {
+                switch (mTts.isLanguageAvailable(locale)) {
                     case TextToSpeech.LANG_AVAILABLE:
                         sb.append(locale.getDisplayLanguage());
                         if (locale.getDisplayCountry() != null && locale.getDisplayCountry().length() > 0)  {
@@ -94,19 +96,19 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
                 send(R.string.android_version_incompatible, "ICE CREAM SANDWICH");
             } else {
                 mTts = new TextToSpeech(sContext, this, cmd.getAllArg1());
-                send(getString(R.string.chat_tts_engine) + getTts().getDefaultEngine());
+                send(getString(R.string.chat_tts_engine) + mTts.getDefaultEngine());
             }
         } else if (isMatchingCmd(cmd, "tts-lang")) {
             String arg1 = cmd.getArg1();
             String arg2 = cmd.getArg2();
             if (!arg1.equals("") && !arg2.equals("")) {
                 mLocale = new Locale(arg1, arg2);
-                getTts().setLanguage(mLocale);
+                mTts.setLanguage(mLocale);
             } else if (!arg1.equals("")) {
                 mLocale = new Locale(arg1);
-                getTts().setLanguage(mLocale);
+                mTts.setLanguage(mLocale);
             } 
-            send(getString(R.string.chat_tts_language) + getTts().getLanguage().getDisplayName());
+            send(getString(R.string.chat_tts_language) + mTts.getLanguage().getDisplayName());
         }
     }
     
@@ -121,9 +123,9 @@ public class TextToSpeechCmd extends CommandHandlerBase implements OnInitListene
 
     @Override
     public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS && getTts() != null) {
+        if (status == TextToSpeech.SUCCESS && mTts != null) {
             Log.i("TTS initialized!");
-            getTts().setLanguage(mLocale);
+            mTts.setLanguage(mLocale);
             mTtsAvailable = true;
         } else {
             Log.e("Can't initialise TTS!");
