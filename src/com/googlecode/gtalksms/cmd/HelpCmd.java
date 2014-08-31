@@ -60,8 +60,8 @@ public class HelpCmd extends CommandHandlerBase {
         String copyCmds = "";
         String internalCmds = "";
             
-        commands = MainService.getActiveCommands();
-        Set<CommandHandlerBase> commandSet = MainService.getActiveCommandSet();
+        commands = MainService.getCommandHandlersMap();
+        Set<CommandHandlerBase> commandSet = MainService.getCommandHandlersSet();
         
         _msg.appendLine(getString(R.string.chat_help_title));
         _msg.appendLine(format(R.string.chat_help_help, "\"help\""));

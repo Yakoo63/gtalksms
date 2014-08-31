@@ -122,7 +122,7 @@ public class CommandsTabFragment extends SherlockFragment {
     }
     
     public void updateCommands() {
-        Set<CommandHandlerBase> commands = MainService.getAvailableCommandSet();
+        Set<CommandHandlerBase> commands = MainService.getCommandHandlersSet();
         if (commands != null && commands.size() > 0) {
             mListCommands.clear();
             for (CommandHandlerBase cmdBase : commands) {

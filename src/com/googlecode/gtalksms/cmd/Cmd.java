@@ -59,8 +59,18 @@ public class Cmd {
     private final String [] mAlias;
     private final ArrayList<SubCmd> mSubCmds;
     private static Context sContext;
-    
+    private boolean mDefaultActivationValue;
+
+    // Default status
+    public final static boolean ENABLED = true;
+    public final static boolean DISABLED = false;
+
     Cmd(String name, String... alias) {
+        this(name, Cmd.ENABLED, alias);
+    }
+
+    Cmd(String name, boolean defaultActivationValue, String... alias) {
+        mDefaultActivationValue = defaultActivationValue;
         mName = name.toLowerCase();
         mAlias = new String[alias.length];
         for (int i = 0 ; i < alias.length ; ++i) {
@@ -70,7 +80,7 @@ public class Cmd {
     }
 
     public boolean isActive() {
-        return PreferenceManager.getDefaultSharedPreferences(sContext).getBoolean("cmd_" + mName, true);
+        return PreferenceManager.getDefaultSharedPreferences(sContext).getBoolean("cmd_" + mName, mDefaultActivationValue);
     }
 
     public void setActive(boolean val) {

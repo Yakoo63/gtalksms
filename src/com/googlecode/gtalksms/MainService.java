@@ -314,23 +314,16 @@ public class MainService extends Service {
         return sXmppMgr == null ? "" : sXmppMgr.getConnectionStatusAction();
     }
     
-    public static Set<CommandHandlerBase> getAvailableCommandSet() {
+    public static Set<CommandHandlerBase> getCommandHandlersSet() {
         if (sIntance != null && sIntance.mCommandManager != null) {
-            return sIntance.mCommandManager.getAvailableCommandSet();
+            return sIntance.mCommandManager.getCommandHandlerSet();
         }
         return null;
     }
 
-    public static Map<String, CommandHandlerBase> getActiveCommands() {
+    public static Map<String, CommandHandlerBase> getCommandHandlersMap() {
         if (sIntance != null && sIntance.mCommandManager != null) {
-            return sIntance.mCommandManager.getActiveCommands();
-        }
-        return null;
-    }
-
-    public static Set<CommandHandlerBase> getActiveCommandSet() {
-        if (sIntance != null && sIntance.mCommandManager != null) {
-            return sIntance.mCommandManager.getActiveCommandSet();
+            return sIntance.mCommandManager.getCommandHandlersMap();
         }
         return null;
     }
@@ -578,7 +571,7 @@ public class MainService extends Service {
         assert (cmd != null);
         cmd = cmd.toLowerCase();
 
-        CommandHandlerBase exec = mCommandManager.getActiveCommand(cmd);
+        CommandHandlerBase exec = mCommandManager.getCommandHandler(cmd);
         if (exec != null) {
             Log.d("MainService executing command: \"" + cmd + ":" + Tools.shortenMessage(args) + "\"");
             try {

@@ -81,31 +81,25 @@ public class CommandManager {
         HelpCmd.class,
     };
 
-    private final Set<CommandHandlerBase> mAvailableCommandSet = new HashSet<CommandHandlerBase>();
-    private final Map<String, CommandHandlerBase> mActiveCommands = Collections.synchronizedMap(new HashMap<String, CommandHandlerBase>());
-    private final Set<CommandHandlerBase> mActiveCommandSet = Collections.synchronizedSet(new HashSet<CommandHandlerBase>());
+    private final Map<String, CommandHandlerBase> mCommandHandlersMap = Collections.synchronizedMap(new HashMap<String, CommandHandlerBase>());
+    private final Set<CommandHandlerBase> mCommandHandlersSet = Collections.synchronizedSet(new HashSet<CommandHandlerBase>());
 
-    public Set<CommandHandlerBase> getAvailableCommandSet() {
-        return mAvailableCommandSet;
+    public Map<String, CommandHandlerBase> getCommandHandlersMap() {
+        return mCommandHandlersMap;
     }
-
-    public Map<String, CommandHandlerBase> getActiveCommands() {
-        return mActiveCommands;
-    }
-
-    public Set<CommandHandlerBase> getActiveCommandSet() {
-        return mActiveCommandSet;
+    public Set<CommandHandlerBase> getCommandHandlerSet() {
+        return mCommandHandlersSet;
     }
 
     public void updateAndReturnStatus() {
-        for (CommandHandlerBase c : mAvailableCommandSet) {
+        for (CommandHandlerBase c : mCommandHandlersSet) {
             c.updateAndReturnStatus();
         }
     }
 
-    public CommandHandlerBase getActiveCommand(String cmd) {
-        if (mActiveCommands.containsKey(cmd)) {
-            return mActiveCommands.get(cmd);
+    public CommandHandlerBase getCommandHandler(String cmd) {
+        if (mCommandHandlersMap.containsKey(cmd)) {
+            return mCommandHandlersMap.get(cmd);
         }
         return null;
     }
@@ -117,19 +111,15 @@ public class CommandManager {
         for (Class<?> commandClass : sCommands) {
             try {
                 CommandHandlerBase cmd = (CommandHandlerBase) commandClass.getConstructor(MainService.class).newInstance(mainService);
-                mAvailableCommandSet.add(cmd);
-
-                if (cmd.updateAndReturnStatus()) {
-                    for (Cmd subCmd : cmd.getCommands()) {
-                        mActiveCommands.put(subCmd.getName().toLowerCase(), cmd);
-                        if (subCmd.getAlias() != null) {
-                            for (String a : subCmd.getAlias()) {
-                                mActiveCommands.put(a.toLowerCase(), cmd);
-                            }
+                for (Cmd subCmd : cmd.getCommands()) {
+                    mCommandHandlersMap.put(subCmd.getName().toLowerCase(), cmd);
+                    if (subCmd.getAlias() != null) {
+                        for (String a : subCmd.getAlias()) {
+                            mCommandHandlersMap.put(a.toLowerCase(), cmd);
                         }
                     }
-                    mActiveCommandSet.add(cmd);
                 }
+                mCommandHandlersSet.add(cmd);
             } catch (Exception e) {
                 // Should not happen.
                 Log.e("Failed to register command " + commandClass.getName(), e);
@@ -142,7 +132,7 @@ public class CommandManager {
      */
     public void cleanupCommands() {
         // Make a copy of the activeCommandSet as deactivate() may remove a command from mActiveCommandSet
-        Set<CommandHandlerBase> currentActiveCommandSet = new HashSet<CommandHandlerBase>(mActiveCommandSet);
+        Set<CommandHandlerBase> currentActiveCommandSet = new HashSet<CommandHandlerBase>(mCommandHandlersSet);
         for (CommandHandlerBase cmd : currentActiveCommandSet) {
             try {
                 cmd.deactivate();
@@ -156,7 +146,7 @@ public class CommandManager {
      * Stop all the commands. Used for pending actions like ringing
      */
     public void stopCommands() {
-        for (CommandHandlerBase c : mAvailableCommandSet) {
+        for (CommandHandlerBase c : mCommandHandlersSet) {
             c.stop();
         }
     }
@@ -165,7 +155,7 @@ public class CommandManager {
      * Update and refresh the activation status of the command
      */
     public void updateCommandState() {
-        for (CommandHandlerBase c : mAvailableCommandSet) {
+        for (CommandHandlerBase c : mCommandHandlersSet) {
             c.updateAndReturnStatus();
         }
     }

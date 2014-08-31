@@ -17,7 +17,7 @@ public class CommandActivationCmd extends CommandHandlerBase {
 
     @Override
     protected void onCommandActivated() {
-        Set<CommandHandlerBase> commands = MainService.getAvailableCommandSet();
+        Set<CommandHandlerBase> commands = MainService.getCommandHandlersSet();
         mListCommands.clear();
         for (CommandHandlerBase cmdBase : commands) {
             if (cmdBase.getType() != CommandHandlerBase.TYPE_INTERNAL) {

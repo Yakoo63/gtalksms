@@ -81,19 +81,8 @@ public abstract class CommandHandlerBase {
      * activated
      */
     public final void activate() {
-        Map<String, CommandHandlerBase> activeCommands = MainService.getActiveCommands();
-        Set<CommandHandlerBase> activeCommandSet = MainService.getActiveCommandSet(); 
-        
-        for (Cmd c : getCommands()) {
-            activeCommands.put(c.getName().toLowerCase(), this);
-            if (c.getAlias() != null) {
-                for (String a : c.getAlias()) {
-                    activeCommands.put(a.toLowerCase(), this);
-                }
-            }
-        }
-        activeCommandSet.add(this);
         mIsActivated = true;
+        Log.i("Activating command " + mName);
         onCommandActivated();
     }
 
@@ -103,20 +92,8 @@ public abstract class CommandHandlerBase {
      * Usually issued on the stop of the MainService
      */
     public final void deactivate() {
-        Map<String, CommandHandlerBase> activeCommands = MainService.getActiveCommands();
-        Set<CommandHandlerBase> activeCommandSet = MainService.getActiveCommandSet(); 
-        
-        for (Cmd c : getCommands()) {
-            activeCommands.remove(c.getName().toLowerCase());
-            if (c.getAlias() != null) {
-                for (String a : c.getAlias()) {
-                    activeCommands.remove(a.toLowerCase());
-                }
-            }
-        }
-        activeCommandSet.remove(this);
         mIsActivated = false;
-
+        Log.i("Deactivating command " + mName);
         onCommandDeactivated();
     }
 
