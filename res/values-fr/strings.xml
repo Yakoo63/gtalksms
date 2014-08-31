@@ -413,6 +413,7 @@
     <string name="xmpp_manager_connection_failed">Echec de la connexion.</string>
     <string name="xmpp_manager_invalid_credentials">Nom d\'utilisateur ou mot de passe incorrect.</string>
     <string name="xmpp_manager_login_failed">Echec lors de l\'identification.</string>
+    <string name="xmpp_manager_unreachable_servers">Serveur injoignable</string>
     <string name="xmpp_muc_sms">Conversation par SMS avec&#xA0;</string>
     <string name="xmpp_muc_shell">Nouveau Terminal Android&#xA0;</string>
 </resources>

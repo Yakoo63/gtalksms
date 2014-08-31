@@ -413,6 +413,7 @@
     <string name="xmpp_manager_connection_failed">Verbindungsversuch gescheitert.</string>
     <string name="xmpp_manager_invalid_credentials">Falscher Benutzername oder Passwort</string>
     <string name="xmpp_manager_login_failed">GTalk/XMPP Login fehlgeschlagen.</string>
+    <string name="xmpp_manager_unreachable_servers">Nicht erreichbar Server</string>
     <string name="xmpp_muc_sms">SMS Unterhaltung mit&#xA0;</string>
     <string name="xmpp_muc_shell">Neues Android Terminal&#xA0;</string>
 </resources>

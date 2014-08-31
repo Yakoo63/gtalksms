@@ -23,6 +23,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
 import org.jivesoftware.smack.parsing.UnparsablePacket;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.util.dns.HostAddress;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.disco.packet.DiscoverInfo;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -35,6 +36,7 @@ import android.content.Intent;
 import android.os.Handler;
 
 import com.googlecode.gtalksms.tools.Log;
+import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.ChatPacketListener;
 import com.googlecode.gtalksms.xmpp.ClientOfflineMessages;
@@ -493,10 +495,22 @@ public class XmppManager {
             updateAction("Connecting to " + sConnectionConfiguration.getServiceName());
             connection.connect();
         } catch (Exception e) {
-            Log.w("XMPP connection failed", e);
+
             if (e instanceof XMPPException) {
                 Log.w("XMPP connection failed because of stream error: " + e.getMessage());
+            } else if (e instanceof SmackException.ConnectionException) {
+                // Check if the error is due to the server configuration
+                SmackException.ConnectionException connectionException = (SmackException.ConnectionException)e;
+                ArrayList<String> hosts = new ArrayList<String>();
+                for(HostAddress host: connectionException.getFailedAddresses()) {
+                    hosts.add("\t" + host.getFQDN() + ":" + host.getPort());
+                }
+                Log.e("Connection error due to unreachable servers: " + StringFmt.join(hosts, ", "));
+                MainService.displayToast(R.string.xmpp_manager_unreachable_servers, StringFmt.join(hosts, "\n"));
+            } else {
+                Log.w("XMPP connection failed", e);
             }
+
             maybeStartReconnect();
             return false;
         }          
@@ -512,7 +526,7 @@ public class XmppManager {
             
             @Override
             public void pingFailed() {
-            // TODO remember that maybeStartReconnect is called from a different thread (the PingTask) here, it may causes synchronization problems
+            // Note: remember that maybeStartReconnect is called from a different thread (the PingTask) here, it may causes synchronization problems
             long now = new Date().getTime();
             if (now - mLastPing > mSettings.pingIntervalInSec * 500) {
                 Log.w("PingManager reported failed ping, calling maybeStartReconnect()");
@@ -542,8 +556,7 @@ public class XmppManager {
             // sadly, smack throws the same generic XMPPException for network
             // related messages (eg "no response from the server") as for
             // authoritative login errors (ie, bad password).  The only
-            // differentiator is the message itself which starts with this
-            // hard-coded string.
+            // differentiator is the message itself which starts with this hard-coded string.
             if (e.getMessage() == null || !e.getMessage().contains("SASLError using PLAIN: not-authorized")) {
                 // doesn't look like a bad username/password, so retry
                 maybeStartReconnect();
