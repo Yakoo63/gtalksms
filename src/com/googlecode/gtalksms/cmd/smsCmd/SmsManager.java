@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.googlecode.gtalksms.tools.Log;
@@ -139,11 +140,14 @@ public class SmsManager {
 
     /** Adds the text of the message to the sent box */
     public void addSmsToSentBox(String message, String phoneNumber) {
-        ContentValues values = new ContentValues();
-        values.put("address", phoneNumber);
-        values.put("date", System.currentTimeMillis());
-        values.put("body", message);
-        _context.getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+        // Starting KITKAT, the sent sms are logged by the default application
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            ContentValues values = new ContentValues();
+            values.put("address", phoneNumber);
+            values.put("date", System.currentTimeMillis());
+            values.put("body", message);
+            _context.getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+        }
     }
 
     public int deleteAllSms() {
