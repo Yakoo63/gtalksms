@@ -82,6 +82,8 @@ public class CallCmd extends CommandHandlerBase {
             ignoreIncomingCall();
         } else if (subCmd.equals("reject")) {
             rejectIncomingCall();
+        } else {
+            executeNewCmd("?", "phone");
         }
     }
 

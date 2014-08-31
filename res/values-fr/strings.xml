@@ -177,7 +177,7 @@
     <string name="chat_help_notif_unhide">Supprime une application de la liste noire.</string>
     <string name="chat_help_notif_unhide_msg">Supprime un message de la liste noire.</string>
     <string name="chat_help_notif_ignore_delay">Définit le delai minimum en ms entre 2 notifications identiques.</string>
-    <string name="chat_help_phone">Appelle le numéro du contact spécifié.</string>
+    <string name="chat_help_phone">Gère les appels téléphoniques.</string>
     <string name="chat_help_phone_call">Appelle le numéro du contact spécifié.</string>
     <string name="chat_help_phone_calls">Affiche l\'historique d\'appels.</string>
     <string name="chat_help_phone_callspeaker">Appelle le numéro du contact spécifié en activant le haut-parleur.</string>
