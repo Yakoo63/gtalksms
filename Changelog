@@ -1,7 +1,7 @@
 4.4.5
 * Fix MUC creation with OpenFire
 * Fix "where" command infinite notifications
-* Remove MUC password from the logs
+* Enhanced application configuration
 * New ASmack version
 * Fix vulnerability
 
