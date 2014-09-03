@@ -331,12 +331,16 @@ public class XmppManager {
     }
 
     private void maybeStartReconnect() {
+        maybeStartReconnect("");
+    }
+
+    private void maybeStartReconnect(String status) {
         cleanupConnection();
 
         // a simple linear back off strategy with 5 min max
         // + 100ms to avoid post delayed issue
         int timeout = mCurrentRetryCount < 20 ? 5000 * mCurrentRetryCount + 100 : 1000 * 60 * 5;
-        updateStatus(WAITING_TO_CONNECT, "Attempt #" + mCurrentRetryCount + " in " + timeout / 1000 + "s");
+        updateStatus(WAITING_TO_CONNECT, status + "\n" + "Attempt #" + mCurrentRetryCount + " in " + timeout / 1000 + "s");
         Log.i("maybeStartReconnect scheduling retry in " + timeout + "ms. Retry #" + mCurrentRetryCount);
         mReconnectHandler = new Handler(MainService.getServiceLooper());
         if (!mReconnectHandler.postDelayed(mReconnectRunnable, timeout)) {
@@ -495,7 +499,7 @@ public class XmppManager {
             updateAction("Connecting to " + sConnectionConfiguration.getServiceName());
             connection.connect();
         } catch (Exception e) {
-
+            String status = "";
             if (e instanceof XMPPException) {
                 Log.w("XMPP connection failed because of stream error: " + e.getMessage());
             } else if (e instanceof SmackException.ConnectionException) {
@@ -505,13 +509,13 @@ public class XmppManager {
                 for(HostAddress host: connectionException.getFailedAddresses()) {
                     hosts.add("\t" + host.getFQDN() + ":" + host.getPort());
                 }
-                Log.e("Connection error due to unreachable servers: " + StringFmt.join(hosts, ", "));
-                MainService.displayToast(R.string.xmpp_manager_unreachable_servers, StringFmt.join(hosts, "\n"));
+                Log.e("Server " + StringFmt.join(hosts, ", ") + " unreachable");
+                status = mContext.getString(R.string.xmpp_manager_unreachable_servers, StringFmt.join(hosts, "\n"));
             } else {
                 Log.w("XMPP connection failed", e);
             }
 
-            maybeStartReconnect();
+            maybeStartReconnect(status);
             return false;
         }          
         
@@ -553,16 +557,14 @@ public class XmppManager {
             connection.login(mSettings.getLogin(), mSettings.getPassword(), Tools.APP_NAME);
         } catch (Exception e) {
             Log.e("Xmpp login failed", e);
-            // sadly, smack throws the same generic XMPPException for network
-            // related messages (eg "no response from the server") as for
-            // authoritative login errors (ie, bad password).  The only
-            // differentiator is the message itself which starts with this hard-coded string.
-            if (e.getMessage() == null || !e.getMessage().contains("SASLError using PLAIN: not-authorized")) {
+            // sadly, smack throws the same generic XMPPException for network related messages (eg "no response from the server") as for
+            // authoritative login errors (ie, bad password).  The only differentiator is the message itself which starts with this hard-coded string.
+            if (e.getMessage() != null && e.getMessage().startsWith("SASLError") && e.getMessage().endsWith("not-authorized")) {
+                stop();
+                updateAction(mContext.getString(R.string.xmpp_manager_invalid_credentials));
+            } else {
                 // doesn't look like a bad username/password, so retry
                 maybeStartReconnect();
-            } else {
-                MainService.displayToast(R.string.xmpp_manager_invalid_credentials, null);
-                stop();
             }
             return false;
         }

@@ -414,7 +414,7 @@
     <string name="xmpp_manager_connection_failed">Connection failed.</string>
     <string name="xmpp_manager_invalid_credentials">Invalid username or password.</string>
     <string name="xmpp_manager_login_failed">Login failed.</string>
-    <string name="xmpp_manager_unreachable_servers">Unreachable server</string>
+    <string name="xmpp_manager_unreachable_servers">Server %1$s unreachable</string>
     <string name="xmpp_muc_sms">SMS conversation with&#xA0;</string>
     <string name="xmpp_muc_shell">New Android Terminal&#xA0;</string>
 </resources>
