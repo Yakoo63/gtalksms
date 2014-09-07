@@ -177,16 +177,16 @@
     <string name="chat_help_notif_unhide">Entfernt eine Anwendung von der Blacklist.</string>
     <string name="chat_help_notif_unhide_msg">Entfernt eine Nachricht von der Blacklist.</string>
     <string name="chat_help_notif_ignore_delay">setzt die Pause (in Millisekunden) zum Ignorieren doppelter Benachrichtigungen.</string>
-    <string name="chat_help_phone">**manages your outgoing and ingoing phone calls</string>
+    <string name="chat_help_phone">Verwaltet ein- und ausgehende Telefonate</string>
     <string name="chat_help_phone_call">Ruft den Kontakt an.</string>
     <string name="chat_help_phone_calls">Zeigt die Anrufeliste an. Optional kann die Anzal der Einträge angegeben werden</string>
-    <string name="chat_help_phone_callspeaker">**calls the specified contact with the phone speaker on.</string>
+    <string name="chat_help_phone_callspeaker">Ruft den gewählten Kontakt mit aktiviertem Lautsprecher an.</string>
     <string name="chat_help_phone_dial">Ruft den angegebenen Kontakt an.</string>
-    <string name="chat_help_phone_hangup">**hangs up the current phone call.</string>
+    <string name="chat_help_phone_hangup">Beendet den aktuellen Anruf.</string>
     <string name="chat_help_phone_ignore">Ignoriert den eingehenden Anruf.</string>
     <string name="chat_help_phone_reject">Weist den eingehenden Anruf ab.</string>
-    <string name="chat_help_phone_speaker">**displays the current state of the phone speaker.</string>
-    <string name="chat_help_phone_speaker_set">**sets the phone speaker to on/off.</string>
+    <string name="chat_help_phone_speaker">Zeigt den aktuellen Status des Lautsprechers an.</string>
+    <string name="chat_help_phone_speaker_set">Schaltet den Lautsprecher ein/aus.</string>
     <string name="chat_help_recipient">Zeigt den letzten Empfänger an.</string>
     <string name="chat_help_ring">Lässt das Telefon klingeln bis stop gesendet wird.</string>
     <string name="chat_help_ring_stop">Beendent das Klingeln.</string>
@@ -414,7 +414,7 @@
     <string name="xmpp_manager_connection_failed">Verbindungsversuch gescheitert.</string>
     <string name="xmpp_manager_invalid_credentials">Falscher Benutzername oder Passwort</string>
     <string name="xmpp_manager_login_failed">GTalk/XMPP Login fehlgeschlagen.</string>
-    <string name="xmpp_manager_unreachable_servers">Nicht erreichbar Server %1$s</string>
+    <string name="xmpp_manager_unreachable_servers">Server nicht erreichbar %1$s</string>
     <string name="xmpp_muc_sms">SMS Unterhaltung mit&#xA0;</string>
     <string name="xmpp_muc_shell">Neues Android Terminal&#xA0;</string>
 </resources>
