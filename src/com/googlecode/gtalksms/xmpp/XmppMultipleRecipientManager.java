@@ -3,6 +3,7 @@ package com.googlecode.gtalksms.xmpp;
 import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.SettingsManager;
 
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
@@ -42,6 +43,15 @@ public class XmppMultipleRecipientManager {
                 Log.d("Sending message to " + toList.size() + " recipients");
                 MultipleRecipientManager.send(connection, msg, toList, null, null);
             } catch (Exception e) {
+                Log.d("Failed to send message using MultipleRecipientManager method. Sending messages one by one. Ex: " + e.getMessage());
+                for (String notifiedAddress : toList) {
+                    msg.setTo(notifiedAddress);
+                    try {
+                        connection.sendPacket(msg);
+                    } catch (SmackException.NotConnectedException ex) {
+                        Log.e("Send message error. Ex: " + ex.getMessage());
+                    }
+                }
                 return false;
             }
         }
@@ -56,6 +66,7 @@ public class XmppMultipleRecipientManager {
      */
     private static List<String> getAllowedNotifiedAddresses(XMPPConnection connection) {
         List<String> toList = new LinkedList<String>();
+        List<String> toListWithEmptyResources = new LinkedList<String>();
 
         // Removing blacklisted resources for notified addresses
         for (String notifiedAddress : sSettingsManager.getNotifiedAddresses().getAll()) {
@@ -82,10 +93,16 @@ public class XmppMultipleRecipientManager {
                     }
                 } else {
                     Log.d("Message not sent to " + toPresence + " because resource is empty");
+                    toListWithEmptyResources.add(toPresence);
                 }
             }
         }
-        return toList;
+
+        if (toList.size() > 0) {
+            return toList;
+        }
+        Log.d("No valid address with resources. Trying with empty resources.");
+        return toListWithEmptyResources;
     }
 
     /**
