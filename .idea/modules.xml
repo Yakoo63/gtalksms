@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GTalkSMS.iml" filepath="$PROJECT_DIR$/GTalkSMS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/external-libs/ActionBarSherlock/external-libs_ActionBarSherlock.iml" filepath="$PROJECT_DIR$/external-libs/ActionBarSherlock/external-libs_ActionBarSherlock.iml" />
+      <module fileurl="file://$PROJECT_DIR$/external-libs/MemorizingTrustManager/external-libs_MemorizingTrustManager.iml" filepath="$PROJECT_DIR$/external-libs/MemorizingTrustManager/external-libs_MemorizingTrustManager.iml" />
     </modules>
   </component>
 </project>
