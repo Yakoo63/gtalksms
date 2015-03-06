@@ -1,6 +1,7 @@
 5.0.1
 * New aSmack and java-dns versions
 * Fix reconnection issues with google apps (Issue 377)
+* Adding shortcut to change keyboard
 
 5.0.0
 * Fix MUC creation with OpenFire
