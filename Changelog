@@ -1,3 +1,7 @@
+5.0.1
+* New aSmack and java-dns versions
+* Fix reconnection issues with google apps (Issue 377)
+
 5.0.0
 * Fix MUC creation with OpenFire
 * Fix "where" command infinite notifications
@@ -13,7 +17,7 @@
 
 4.4.3
 * New ASmack library
-* New subcommand to filter notification by content
+* New sub-command to filter notification by content
 * Fix several Force Close
 * Fix regression on sms when the message contains a :
 
