@@ -319,7 +319,7 @@ public class XmppManager {
         if (action != mStatusAction) {
             // ensure action is set before broadcast, just in-case a receiver happens to wind up querying the state on delivery.
             mStatusAction = action;
-            Log.i("broadcasting new action " + action + "for status " + statusAsString(mStatus) + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
+            Log.i("broadcasting new action " + action + " for status " + statusAsString(mStatus) + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);
             broadcastStatus(mContext, mStatus, mStatus, action);
         }
     }
@@ -394,6 +394,9 @@ public class XmppManager {
             connection = mConnection;
             // we reuse the xmpp connection so only connect() is needed
             if (!connectAndAuth(connection)) {
+                // if we fail to reconnect, marking settings as obsolete
+                // Solves issue 377 where the server name is replaced by service name...
+                SettingsManager.connectionSettingsObsolete = true;
                 // connection failure
                 return;
             }
@@ -578,7 +581,8 @@ public class XmppManager {
      */
     private XMPPConnection createNewConnection(SettingsManager settings) throws XMPPException {
         ConnectionConfiguration conf;
-        
+        Log.i("Creating new XMPP connection configuration");
+
         if (settings.manuallySpecifyServerSettings) {
             // trim the serverHost here because of Issue 122
             conf = new ConnectionConfiguration(settings.serverHost.trim(), settings.serverPort, settings.serviceName);
