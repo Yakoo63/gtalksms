@@ -97,10 +97,12 @@ public class GoogleMail {
 
         if (attachments != null) {
             for(String file : attachments) {
-                Log.d("Attaching new file to the email: " + file);
-                MimeBodyPart mbpFile = new MimeBodyPart();
-                mbpFile.attachFile(file);
-                mp.addBodyPart(mbpFile);
+                if (!file.equals("")) {
+                    Log.d("Attaching new file to the email: " + file);
+                    MimeBodyPart mbpFile = new MimeBodyPart();
+                    mbpFile.attachFile(file);
+                    mp.addBodyPart(mbpFile);
+                }
             }
         }
         message.setContent(mp);

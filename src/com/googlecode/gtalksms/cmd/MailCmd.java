@@ -14,7 +14,7 @@ public class MailCmd extends CommandHandlerBase {
 
     @Override
     protected void execute(Command cmd) {
-        if (cmd.getCommand().equals("email")) {
+        if (isMatchingCmd(cmd, "email")) {
             try {
                 String dest = cmd.getArg1();
                 String subject = cmd.getArg2();
@@ -25,7 +25,7 @@ public class MailCmd extends CommandHandlerBase {
                 Log.e("Error", e);
                 send("Error: " + e.getMessage());
             }
-        } else if (cmd.getCommand().equals("emailfile")) {
+        } else if (isMatchingCmd(cmd, "emailfile")) {
             try {
                 String dest = cmd.getArg1();
                 String subject = cmd.getArg2();
