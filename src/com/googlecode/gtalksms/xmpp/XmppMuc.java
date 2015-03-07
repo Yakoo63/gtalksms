@@ -291,6 +291,12 @@ public class XmppMuc {
             }
 
             try {
+                submitForm.setAnswer("muc#roomconfig_whois", "anyone");
+            } catch (Exception ex) {
+                Log.w("Unable to configure setting whois");
+            }
+
+            try {
                 List<String> owners = new ArrayList<String>();
                 if (mConnection.getUser() != null) {
                     owners.add(mConnection.getUser());
