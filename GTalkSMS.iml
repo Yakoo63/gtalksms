@@ -84,7 +84,10 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
     <orderEntry type="library" exported="" name="dnsjava-2.1.7" level="project" />
+    <orderEntry type="library" exported="" name="additionnal" level="project" />
+    <orderEntry type="library" exported="" name="mail" level="project" />
     <orderEntry type="library" exported="" name="asmack-android-8-4.0.7" level="project" />
+    <orderEntry type="library" exported="" name="activation" level="project" />
     <orderEntry type="library" exported="" name="play-services-5.0.89" level="project" />
     <orderEntry type="library" exported="" name="external-libs/MemorizingTrustManager-unspecified" level="project" />
     <orderEntry type="library" exported="" name="external-libs/ActionBarSherlock-unspecified" level="project" />

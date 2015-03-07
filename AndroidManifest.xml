@@ -4,7 +4,7 @@
     package="com.googlecode.gtalksms"
 
     android:versionName="5.0.1"
-    android:versionCode="82">
+    android:versionCode="83">
 
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="19"/>
     
@@ -41,6 +41,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
 
     <application 
         android:icon="@drawable/icon_green" 

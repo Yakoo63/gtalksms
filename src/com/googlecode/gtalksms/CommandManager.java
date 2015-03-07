@@ -17,6 +17,7 @@ import com.googlecode.gtalksms.cmd.GeoCmd;
 import com.googlecode.gtalksms.cmd.HelpCmd;
 import com.googlecode.gtalksms.cmd.KeyboardCmd;
 import com.googlecode.gtalksms.cmd.LogsCmd;
+import com.googlecode.gtalksms.cmd.MailCmd;
 import com.googlecode.gtalksms.cmd.MmsCmd;
 import com.googlecode.gtalksms.cmd.MusicCmd;
 import com.googlecode.gtalksms.cmd.NotificationsCmd;
@@ -73,6 +74,7 @@ public class CommandManager {
         BluetoothCmd.class,
         WifiCmd.class,
         RebootCmd.class,
+        MailCmd.class,
         RecipientCmd.class,
         // used for debugging
         SystemCmd.class,

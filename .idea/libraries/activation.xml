@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="asmack-android-8-4.0.7">
+  <library name="activation">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/asmack-android-8-4.0.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/activation.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
