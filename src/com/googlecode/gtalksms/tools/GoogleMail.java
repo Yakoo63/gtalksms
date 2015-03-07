@@ -7,14 +7,19 @@ import android.content.Context;
 import com.sun.mail.smtp.SMTPTransport;
 import com.sun.mail.util.BASE64EncoderStream;
 
+import java.util.Date;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.mail.Message;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.URLName;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
 public class GoogleMail {
@@ -70,18 +75,36 @@ public class GoogleMail {
         return transport;
     }
 
-
     public synchronized void send(String subject, String body, String recipients) throws Exception {
+        send(subject, body, recipients, null);
+    }
+
+    public synchronized void send(String subject, String body, String recipients, String attachment) throws Exception {
         Account account = getFirstAccount();
 
         SMTPTransport smtpTransport = connect("smtp.gmail.com", 587, account.name, getAuthenticationToken(account), true);
 
         MimeMessage message = new MimeMessage(session);
-        DataHandler handler = new DataHandler(new ByteArrayDataSource(body.getBytes(), "text/plain"));
         message.setSender(new InternetAddress(account.name));
         message.setSubject(subject);
-        message.setDataHandler(handler);
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
+        message.setSentDate(new Date());
+
+        if (attachment == null) {
+            DataHandler handler = new DataHandler(new ByteArrayDataSource(body.getBytes(), "text/plain"));
+            message.setDataHandler(handler);
+        } else {
+            Multipart mp = new MimeMultipart();
+            MimeBodyPart mbp1 = new MimeBodyPart();
+            mbp1.setContent(body, "text/html");
+            mp.addBodyPart(mbp1);
+
+            MimeBodyPart mbpFile = new MimeBodyPart();
+            mbpFile.attachFile(attachment);
+            mp.addBodyPart(mbpFile);
+
+            message.setContent(mp);
+        }
 
         smtpTransport.sendMessage(message, message.getAllRecipients());
     }
