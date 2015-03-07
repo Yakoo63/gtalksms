@@ -79,32 +79,31 @@ public class GoogleMail {
         send(subject, body, recipients, null);
     }
 
-    public synchronized void send(String subject, String body, String recipients, String attachment) throws Exception {
+    public synchronized void send(String subject, String body, String recipients, String[] attachments) throws Exception {
         Account account = getFirstAccount();
-
+        Log.d("Sending new email");
         SMTPTransport smtpTransport = connect("smtp.gmail.com", 587, account.name, getAuthenticationToken(account), true);
 
         MimeMessage message = new MimeMessage(session);
         message.setSender(new InternetAddress(account.name));
         message.setSubject(subject);
-        message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipients.equals("") ? account.name : recipients));
         message.setSentDate(new Date());
 
-        if (attachment == null) {
-            DataHandler handler = new DataHandler(new ByteArrayDataSource(body.getBytes(), "text/plain"));
-            message.setDataHandler(handler);
-        } else {
-            Multipart mp = new MimeMultipart();
-            MimeBodyPart mbp1 = new MimeBodyPart();
-            mbp1.setContent(body, "text/html");
-            mp.addBodyPart(mbp1);
+        Multipart mp = new MimeMultipart();
+        MimeBodyPart mbp1 = new MimeBodyPart();
+        mbp1.setContent(body, "text/html");
+        mp.addBodyPart(mbp1);
 
-            MimeBodyPart mbpFile = new MimeBodyPart();
-            mbpFile.attachFile(attachment);
-            mp.addBodyPart(mbpFile);
-
-            message.setContent(mp);
+        if (attachments != null) {
+            for(String file : attachments) {
+                Log.d("Attaching new file to the email: " + file);
+                MimeBodyPart mbpFile = new MimeBodyPart();
+                mbpFile.attachFile(file);
+                mp.addBodyPart(mbpFile);
+            }
         }
+        message.setContent(mp);
 
         smtpTransport.sendMessage(message, message.getAllRecipients());
     }

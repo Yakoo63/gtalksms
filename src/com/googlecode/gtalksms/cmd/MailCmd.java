@@ -29,13 +29,14 @@ public class MailCmd extends CommandHandlerBase {
             try {
                 String dest = cmd.getArg1();
                 String subject = cmd.getArg2();
-                String files = cmd.getArg(3);
+                String files[] = cmd.getArg(3).split("\\|");
                 String message = cmd.getAllArg(4);
+                send("Sending files '" + cmd.getArg(3) + "'...");
                 new GoogleMail(sContext).send(subject, message, dest, files);
                 send("Email sent");
             } catch (Exception e) {
                 Log.e("Error", e);
-                send("Error: " + e.getMessage());
+                send("Email error: " + e.getMessage());
             }
         }
     }
