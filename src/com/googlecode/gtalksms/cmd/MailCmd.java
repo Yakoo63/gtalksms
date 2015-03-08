@@ -1,43 +1,40 @@
 package com.googlecode.gtalksms.cmd;
 
-import android.text.TextUtils;
-
 import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.GoogleMail;
 import com.googlecode.gtalksms.tools.Log;
 
 public class MailCmd extends CommandHandlerBase {
 
+    public static final String CMD_EMAIL = "email";
+    public static final String CMD_EMAIL_FILE = "emailfile";
+
     public MailCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_INTERNAL, "EMail", new Cmd("email", "e"), new Cmd("emailfile", "ef"));
+        super(mainService, CommandHandlerBase.TYPE_MESSAGE, "EMail", new Cmd(CMD_EMAIL, "e"), new Cmd(CMD_EMAIL_FILE, "ef"));
     }
 
     @Override
     protected void execute(Command cmd) {
-        if (isMatchingCmd(cmd, "email")) {
-            try {
+        try {
+            if (isMatchingCmd(cmd, CMD_EMAIL)) {
                 String dest = cmd.getArg1();
                 String subject = cmd.getArg2();
                 String message = cmd.getAllArg(3);
                 new GoogleMail(sContext).send(subject, message, dest);
-                send("Email sent");
-            } catch (Exception e) {
-                Log.e("Error", e);
-                send("Error: " + e.getMessage());
-            }
-        } else if (isMatchingCmd(cmd, "emailfile")) {
-            try {
+                send(R.string.chat_email_sent);
+            } else if (isMatchingCmd(cmd, CMD_EMAIL_FILE)) {
                 String dest = cmd.getArg1();
                 String subject = cmd.getArg2();
                 String files[] = cmd.getArg(3).split("\\|");
                 String message = cmd.getAllArg(4);
-                send("Sending files '" + cmd.getArg(3) + "'...");
+                send(R.string.chat_emailfile_sending, cmd.getArg(3));
                 new GoogleMail(sContext).send(subject, message, dest, files);
-                send("Email sent");
-            } catch (Exception e) {
-                Log.e("Error", e);
-                send("Email error: " + e.getMessage());
+                send(R.string.chat_email_sent);
             }
+        } catch (Exception e) {
+            Log.e("Email error for command: " + cmd.getOriginalCommand(), e);
+            send(R.string.chat_error, e.getMessage());
         }
     }
 
@@ -46,5 +43,9 @@ public class MailCmd extends CommandHandlerBase {
 
     @Override
     protected void initializeSubCommands() {
+        Cmd cam = mCommandMap.get("email");
+        cam.setHelp(R.string.chat_help_email, "[#to#]:#subject#:#message#");
+        Cmd flash = mCommandMap.get("emailfile");
+        flash.setHelp(R.string.chat_help_emailfile, "[#to#]:#subject#:#file1#[|#file2#|#file3#]:#message#");
     }
 }

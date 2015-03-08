@@ -590,7 +590,7 @@ public class MainService extends Service {
                 // Display the user detailed information about the exception if debugLog is enabled
                 if (sSettingsMgr.debugLog) {
                     XmppMsg msg = new XmppMsg();
-                    msg.appendBold(chatError);
+                    msg.appendBoldLine(chatError);
                     msg.append(Tools.STMArrayToString(e.getStackTrace()));
                     send(msg, answerTo);
                 } else {

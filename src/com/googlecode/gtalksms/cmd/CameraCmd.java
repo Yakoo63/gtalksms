@@ -1,6 +1,8 @@
 package com.googlecode.gtalksms.cmd;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -22,6 +24,7 @@ import com.googlecode.gtalksms.cmd.cameraCmd.EmailCallback;
 import com.googlecode.gtalksms.cmd.cameraCmd.VoidCallback;
 import com.googlecode.gtalksms.cmd.cameraCmd.XMPPTransferCallback;
 import com.googlecode.gtalksms.tools.Log;
+import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 
 public class CameraCmd extends CommandHandlerBase {
@@ -102,8 +105,10 @@ public class CameraCmd extends CommandHandlerBase {
                 if (!arg2.equals("")){
                     setCamera(arg2);
                 }
-            }           
-        } 
+            } else if (arg1.equals("sizes")) {
+                send(getCameraSupportedSizes());
+            }
+        }
         else if (isMatchingCmd(cmd, "flash")) {
             if (!arg1.equals("")) {
                 setLight(arg1.equals("on"));
@@ -144,10 +149,10 @@ public class CameraCmd extends CommandHandlerBase {
                 
                 res.append(i);
                 if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
-                    res.append(sContext.getString(R.string.chat_camera_back)).append(Tools.LineSep);
+                    res.append(" - " + sContext.getString(R.string.chat_camera_back)).append(Tools.LineSep);
                 } else if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
-                    res.append(sContext.getString(R.string.chat_camera_front)).append(Tools.LineSep);
-                }    
+                    res.append(" - " + sContext.getString(R.string.chat_camera_front)).append(Tools.LineSep);
+                }
             }
             send(res.toString());
         } else {
@@ -155,7 +160,7 @@ public class CameraCmd extends CommandHandlerBase {
             send(R.string.chat_camera_error_version);
         }
     }
-    
+
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     private int getCameraOrientation() {
         CameraInfo info = new CameraInfo();
@@ -172,13 +177,49 @@ public class CameraCmd extends CommandHandlerBase {
         int result;
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             result = (info.orientation + degrees) % 360;
-            result = (360 - result) % 360;  // compensate the mirror
+            result = (360 - result) % 180;  // compensate the mirror
         } else {  // back-facing
-            result = (info.orientation - degrees + 360) % 360;
+            result = (info.orientation - degrees + 360) % 180;
         }
         return result;
     }
-    
+
+    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
+    private String getCameraName() {
+        CameraInfo info = new CameraInfo();
+        Camera.getCameraInfo(mCameraId, info);
+
+        if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
+            return sContext.getString(R.string.chat_camera_back);
+        } else {
+            return sContext.getString(R.string.chat_camera_front);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
+    private String getCameraSupportedSizes() {
+        Camera camera = Camera.open(mCameraId);
+        Camera.Parameters parameters = camera.getParameters();
+        camera.release();
+
+        List<String> list = new ArrayList<String>();
+        for (Camera.Size size : parameters.getSupportedPictureSizes()) {
+            list.add(size.width + "x" + size.height);
+        }
+
+        return StringFmt.join(list, ", ");
+    }
+
+    private void setMaxPictureSize(Camera.Parameters parameters) {
+        try {
+            Camera.Size size = parameters.getSupportedPictureSizes().get(0);
+            Log.e("Setting picture size to " + size.width + "x" + size.height);
+            parameters.setPictureSize(size.width, size.height);
+        } catch (Exception e) {
+            Log.e("Fails to set picture size", e);
+        }
+    }
+
     private void takePicture(int pCallbackMethod) {
         releaseResources();
         PictureCallback pictureCallback;
@@ -190,6 +231,11 @@ public class CameraCmd extends CommandHandlerBase {
             } else {
                 mCamera = Camera.open();
             }
+
+            Camera.Parameters parameters = mCamera.getParameters();
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            setMaxPictureSize(parameters);
+            mCamera.setParameters(parameters);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 mCamera.setPreviewTexture(new SurfaceTexture(0));
@@ -221,7 +267,14 @@ public class CameraCmd extends CommandHandlerBase {
                     mAudioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, mStreamVolume, 0);
                 }
             };
-            send("Taking picture");
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+                Camera.Size size = parameters.getPictureSize();
+                send("Taking picture - " + size.width + "x" + size.height + " - " + getCameraName());
+            } else {
+                send("Taking picture");
+            }
+
             mCamera.takePicture(cb, null, pictureCallback);
         } catch (Exception e) {
             Log.w("Error taking picture", e);

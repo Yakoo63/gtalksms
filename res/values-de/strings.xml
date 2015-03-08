@@ -75,12 +75,12 @@
     <string name="chat_call_missed">Verpasster Anruf</string>
     <string name="chat_call_outgoing">Ausgehender Anruf</string>
     <string name="chat_call_unknown">Unbekannt</string>
-    <string name="chat_camera_back"> - Hintere Kamera</string>
+    <string name="chat_camera_back">Hintere Kamera</string>
     <string name="chat_camera_back_activated">Hintere Kamera aktiviert</string>
     <string name="chat_camera_error_picture">Fehler beim erstellen des Bildes: %1$s</string>
     <string name="chat_camera_error_version">Der Befehl ist in deiner Android Version nicht verfügbar</string>
     <string name="chat_camera_flash_mode">Blitzlicht/Lampe ist %1$s</string>
-    <string name="chat_camera_front"> - Front Kamera</string>
+    <string name="chat_camera_front">Front Kamera</string>
     <string name="chat_camera_front_activated">Front Kamera aktiviert</string>
     <string name="chat_choose_activity">GTalkSMS: Anwendung auswählen</string>
     <string name="chat_clipboard">Clipboardinhalt: %s</string>

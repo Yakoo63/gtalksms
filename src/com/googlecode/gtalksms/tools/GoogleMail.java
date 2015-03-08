@@ -55,7 +55,8 @@ public class GoogleMail {
         props.put("mail.smtp.starttls.required", "true");
         props.put("mail.smtp.sasl.enable", "false");
         session = Session.getInstance(props);
-        session.setDebug(debug);
+        // TODO bind on settings mng
+        session.setDebug(false);
 
         final URLName unusedUrlName = null;
         SMTPTransport transport = new SMTPTransport(session, unusedUrlName);

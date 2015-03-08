@@ -75,12 +75,12 @@
     <string name="chat_call_missed">Missed</string>
     <string name="chat_call_outgoing">Outgoing</string>
     <string name="chat_call_unknown">Unknown</string>
-    <string name="chat_camera_back"> - Back camera</string>
+    <string name="chat_camera_back">Back camera</string>
     <string name="chat_camera_back_activated">Back camera activated</string>
     <string name="chat_camera_error_picture">Error while getting picture: %1$s</string>
     <string name="chat_camera_error_version">Your Android version doesn\'t allow this command</string>
     <string name="chat_camera_flash_mode">The actual flash mode of the camera is %1$s</string>
-    <string name="chat_camera_front"> - Front camera</string>
+    <string name="chat_camera_front">Front camera</string>
     <string name="chat_camera_front_activated">Front camera activated</string>
     <string name="chat_choose_activity">GTalkSMS: choose an activity</string>
     <string name="chat_clipboard">GPhone clipboard: %s</string>
@@ -91,6 +91,8 @@
     <string name="chat_del_sms_nb">%d SMS deleted.</string>
     <string name="chat_del_sms_syntax">Syntax is:\ndelsms:contact:[contact]\ndelsms:number:[number]\ndelsms:sent\ndelsms:last\ndelsms:lastin\ndelsms:lastout\ndelsms:all</string>
     <string name="chat_dial">Dial %s</string>
+    <string name="chat_email_sent">Email sent</string>
+    <string name="chat_emailfile_sending">Sending files \"%1$s\"... Please wait.</string>
     <string name="chat_emails">Emails</string>
     <string name="chat_error">Error: %s</string>
     <string name="chat_error_clipboard">Clipboard access failed</string>
@@ -150,6 +152,8 @@
     <string name="chat_help_del_sms_last_in">Delete last [number] received SMS, 1 by default.</string>    
     <string name="chat_help_del_sms_last_out">Delete last [number] sent SMS, 1 by default.</string>    
     <string name="chat_help_del_sms_sent">Delete all sent SMS without confirmation!</string>
+    <string name="chat_help_email">send an email using the first google account of the phone. If #to# is not specified, the mail will be sent to yourself.</string>
+    <string name="chat_help_emailfile">send an email using the first google account with an attachment. If #to# is not specified, the mail will be sent to yourself.</string>
     <string name="chat_help_find_sms">search specific message in all SMS from searched contacts.</string>
     <string name="chat_help_find_sms_all">search specific message in all SMS.</string>
     <string name="chat_help_flash_off">turns flashlight off.</string>

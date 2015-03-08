@@ -75,12 +75,12 @@
     <string name="chat_call_missed">Manqué</string>
     <string name="chat_call_outgoing">Sortant</string>
     <string name="chat_call_unknown">Inconnu</string>
-    <string name="chat_camera_back"> - Caméra arrière</string>
+    <string name="chat_camera_back">Caméra arrière</string>
     <string name="chat_camera_back_activated">Caméra arrière activée</string>
     <string name="chat_camera_error_picture">Erreur lors de la récupération de l\'image: %1$s</string>
     <string name="chat_camera_error_version">La version Android de ce téléphone ne permet pas d\exécuter cette commande.</string>
     <string name="chat_camera_flash_mode">Le mode flash de la caméra est sur %1$s</string>
-    <string name="chat_camera_front"> - Caméra frontale</string>
+    <string name="chat_camera_front">Caméra frontale</string>
     <string name="chat_camera_front_activated">Caméra frontale activée</string>
     <string name="chat_choose_activity">GTalkSMS : choisir l\'application</string>
     <string name="chat_clipboard">Presse-papier du téléphone : %s</string>
@@ -91,6 +91,8 @@
     <string name="chat_del_sms_nb">%d SMS supprimés.</string>
     <string name="chat_del_sms_syntax">La syntaxe de la commande est :\ndelsms:contact:[contact]\ndelsms:number:[number]\ndelsms:sent\ndelsms:last\ndelsms:lastin\ndelsms:lastout\ndelsms:all</string>
     <string name="chat_dial">%s a été composé</string>
+    <string name="chat_email_sent">Email envoyé</string>
+    <string name="chat_emailfile_sending">Envoi des fichiers \"%1$s\" en cours... Veuillez patienter.</string>
     <string name="chat_emails">Emails</string>
     <string name="chat_error">Erreur : %s</string>
     <string name="chat_error_clipboard">Accès au presse-papier impossible</string>
@@ -150,6 +152,8 @@
     <string name="chat_help_del_sms_last_in">Supprime les [n] derniers SMS entrants, 1 par défaut.</string>    
     <string name="chat_help_del_sms_last_out">Supprime les [n] derniers SMS sortants, 1 par défaut.</string>    
     <string name="chat_help_del_sms_sent">Supprime tous les SMS envoyés sans confirmation !</string>
+    <string name="chat_help_email">Envoie un mail en utilisant le compte Google principal du téléphone. Si #to# n\'est pas renseigné, le destinataire sera le même compte.</string>
+    <string name="chat_help_emailfile">Envoie un mail avec une ou plusieurs pièces jointes. Si #to# n\'est pas renseigné, le destinataire sera le même compte.</string>
     <string name="chat_help_find_sms">Effectue une recherche dans les SMS des contacts spécifiés.</string>
     <string name="chat_help_find_sms_all">Effectue une recherche dans tous les SMS.</string>
     <string name="chat_help_flash_off">Eteint le flash.</string>
