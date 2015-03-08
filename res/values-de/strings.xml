@@ -91,6 +91,8 @@
     <string name="chat_del_sms_nb">%d SMS Nachricht(n) gelöscht.</string>
     <string name="chat_del_sms_syntax">Syntax :\ndelsms:contact:[contact]\ndelsms:number:[number]\ndelsms:sent\ndelsms:last\ndelsms:lastin\ndelsms:lastout\ndelsms:all</string>
     <string name="chat_dial">Wähle %s</string>
+    <string name="chat_email_sent">Email sent</string>
+    <string name="chat_emailfile_sending">Sending files \"%1$s\"... Please wait.</string>
     <string name="chat_emails">E-Mail</string>
     <string name="chat_error">Fehler: %s</string>
     <string name="chat_error_clipboard">Fehler bei Zugriff auf Clipboard</string>
@@ -150,6 +152,8 @@
     <string name="chat_help_del_sms_last_in">Löscht letzten [number] empfangen SMS. Ohne Angabe einer Wertes wird nur die letzte gelöscht.</string>    
     <string name="chat_help_del_sms_last_out">Löscht letzten [number] gesendeten SMS. Ohne Angabe einer Wertes wird nur die letzte gelöscht.</string>
     <string name="chat_help_del_sms_sent">Lösche alle gesendeten SMS Nachrichten ohne Nachfrage!</string>
+    <string name="chat_help_email">send an email using the first google account of the phone. If #to# is not specified, the mail will be sent to yourself.</string>
+    <string name="chat_help_emailfile">send an email using the first google account with an attachment. If #to# is not specified, the mail will be sent to yourself.</string>
     <string name="chat_help_find_sms">Suche nach SMS Nachrichten von bestimmten Kontakt.</string>
     <string name="chat_help_find_sms_all">Suche nach SMS Nachrichten.</string>
     <string name="chat_help_flash_off">Deaktiviert das Blitzlicht/Lampe</string>

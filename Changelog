@@ -2,6 +2,7 @@
 * New aSmack and java-dns versions
 * Fix reconnection issues with google apps (Issue 377)
 * Adding shortcut to change keyboard
+* New command to send email without user interaction with the phone using the main Google account of the phone
 
 5.0.0
 * Fix MUC creation with OpenFire
