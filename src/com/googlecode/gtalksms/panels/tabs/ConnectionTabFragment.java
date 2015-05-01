@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.panels.tabs;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -42,10 +43,15 @@ public class ConnectionTabFragment extends SherlockFragment {
     SettingsManager.OnSettingChangeListener mSettingListerner = new SettingsManager.OnSettingChangeListener() {
         @Override
         public void OnSettingChanged(boolean connectionSettingsObsolete) {
-            mEditTextLogin.setText(mSettingsMgr.getLogin());
-            mEditNotificationAddress.setText(mSettingsMgr.getNotifiedAddresses().get());
-            mEditTextPassword.setText(mSettingsMgr.getPassword());
-            mSwitchConnection.setChecked(mSettingsMgr.getConnectOnMainScreenStartup());
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mEditTextLogin.setText(mSettingsMgr.getLogin());
+                    mEditNotificationAddress.setText(mSettingsMgr.getNotifiedAddresses().get());
+                    mEditTextPassword.setText(mSettingsMgr.getPassword());
+                    mSwitchConnection.setChecked(mSettingsMgr.getConnectOnMainScreenStartup());
+                }
+            });
         }
     };
 
