@@ -46,11 +46,13 @@ public class ArrayStringSetting {
         update();
     }
 
-    void update() {
+    synchronized void update() {
+        int nb = _strings.size();
         _strings.clear();
         for (String str : TextUtils.split(_string, "\\" + _separator)) {
             _strings.add(str);
         }
+        Log.d("Updating string arrays for " + _key + " " + nb + " => " + _strings.size());
     }
 
     public boolean contains(String value) {
@@ -66,6 +68,9 @@ public class ArrayStringSetting {
     public void add(String value) {
         if (! contains(value)) {
             _strings.add(value);
+            Log.d("Adding '" + value + "' to " + _key);
+        } else {
+            Log.d("'" + value + "' already present in " + _key);
         }
         set(TextUtils.join(_separator, _strings));
     }
@@ -73,6 +78,9 @@ public class ArrayStringSetting {
     public void remove(String value) {
         if (contains(value)) {
             _strings.remove(value);
+            Log.d("Removing '" + value + "' from " + _key);
+        } else {
+            Log.d("'" + value + "' not present in " + _key);
         }
         set(TextUtils.join(_separator, _strings));
     }
