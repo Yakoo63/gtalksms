@@ -353,4 +353,26 @@ public class Tools {
         }
         return res;
     }
+
+    /**
+     * Checks if the given fromJid is part of the notified Address set. fromJid can either be a fullJid or a bareJid
+     *
+     * @param list List of allowed addresses
+     * @param fromJid The JID we received a message from
+     * @return true if the given JID is part of the notified Address set, otherwise false
+     */
+    public static boolean cameFromNotifiedAddress(String[] list , String fromJid) {
+        String sanitizedNotifiedAddress;
+        String sanitizedJid = fromJid.toLowerCase();
+        for (String notifiedAddress : list) {
+            sanitizedNotifiedAddress = notifiedAddress.toLowerCase();
+            // If it's a fullJID, append a slash for security reasons
+            if (sanitizedJid.startsWith(sanitizedNotifiedAddress + "/")
+                    // A bare JID should be equals to one of the notified Address set
+                    || sanitizedNotifiedAddress.equals(sanitizedJid)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
