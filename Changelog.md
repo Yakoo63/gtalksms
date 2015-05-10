@@ -1,0 +1,1 @@
+[Changelog](http://code.google.com/p/gtalksms/source/browse/Changelog)
