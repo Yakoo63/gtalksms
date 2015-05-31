@@ -1,12 +1,10 @@
 package com.googlecode.gtalksms.panels;
 
 import android.content.Context;
-import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.Keyboard.Key;
 import android.util.AttributeSet;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 public class KeyboardMainView extends KeyboardView {
 

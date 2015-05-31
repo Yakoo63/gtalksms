@@ -2,8 +2,6 @@ package com.googlecode.gtalksms.cmd;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import android.content.Context;
 import android.content.Intent;

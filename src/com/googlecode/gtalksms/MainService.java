@@ -87,7 +87,6 @@ public class MainService extends Service {
     private static BroadcastReceiver sXmppConChangedReceiver;
     private static BroadcastReceiver sStorageLowReceiver;
     private static KeyboardInputMethodService sKeyboardInputMethodService;
-    private static PowerManager sPm;
     private static PowerManager.WakeLock sWl;
     private static PendingIntent sPendingIntentLaunchApplication = null;
     private static PendingIntent sPendingIntentStopRinging = null;
@@ -369,8 +368,8 @@ public class MainService extends Service {
         sIntance = this;
 
         NetworkConnectivityReceiver.setLastActiveNetworkName(this);
-        
-        sPm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+
+        PowerManager sPm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         sWl = sPm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, Tools.APP_NAME + " WakeLock");
 
         sSettingsMgr = SettingsManager.getSettingsManager(this);

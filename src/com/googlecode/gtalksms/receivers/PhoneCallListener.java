@@ -11,7 +11,6 @@ import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.data.contacts.ContactsManager;
 import com.googlecode.gtalksms.tools.Log;
-import com.googlecode.gtalksms.tools.Tools;
 
 public class PhoneCallListener extends PhoneStateListener {
     public PhoneCallListener(MainService svc) {

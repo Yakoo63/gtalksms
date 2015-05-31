@@ -87,7 +87,7 @@ public class LocationService extends Service {
                 allowedLocationProviders += "," + LocationManager.GPS_PROVIDER;
             }
             Settings.System.putString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED, allowedLocationProviders);
-            Method m = _locationManager.getClass().getMethod("updateProviders", new Class[] {});
+            Method m = _locationManager.getClass().getMethod("updateProviders");
             m.setAccessible(true);
             m.invoke(_locationManager);
         // use the security hole from http://code.google.com/p/android/issues/detail?id=7890

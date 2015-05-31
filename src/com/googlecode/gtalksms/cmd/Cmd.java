@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.StringFmt;
-import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class Cmd {
     public class SubCmd {
@@ -88,7 +87,7 @@ public class Cmd {
     }
 
     public void AddSubCmd(String name, int resHelp) {
-        mSubCmds.add(new SubCmd(name, this, resHelp, null, new Object[]{}));
+        mSubCmds.add(new SubCmd(name, this, resHelp, null));
     }
 
     public void AddSubCmd(String name, int resHelp, String args, Object... alias) {

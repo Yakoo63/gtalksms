@@ -1,8 +1,5 @@
 package com.googlecode.gtalksms.cmd;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import android.text.TextUtils;
 
 import com.googlecode.gtalksms.MainService;

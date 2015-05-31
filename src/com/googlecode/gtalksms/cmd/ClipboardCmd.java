@@ -6,7 +6,6 @@ import android.text.ClipboardManager;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.R;
 import com.googlecode.gtalksms.tools.Log;
-import com.googlecode.gtalksms.tools.Tools;
 
 
 // The Honeycomb (API >= 11) ClipboardManager (andriod.content.ClipboardManager)

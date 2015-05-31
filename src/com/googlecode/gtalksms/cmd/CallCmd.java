@@ -124,7 +124,7 @@ public class CallCmd extends CommandHandlerBase {
                 send(R.string.chat_no_match_for, contactInformation);
             } else if (resolvedContact.isDistinct()) {
                 doDial(resolvedContact.getName(), resolvedContact.getNumber(), makeTheCall, usePhoneSpeaker);
-            } else if (!resolvedContact.isDistinct()) {
+            } else {
                 askForMoreDetails(resolvedContact.getCandidates());
             }
         }

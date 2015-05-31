@@ -18,14 +18,12 @@ public class XmppFont {
     }
     
     public String toString() {        
-        if (mFont != null && mColor == null) {
-            return  "font-family:" + this.mFont;
-        } else if (mFont != null && mColor != null) {
-            return "font-family:" + this.mFont + "; " + "color:" + this.mColor;
-        } else if (mFont == null && mColor == null) {
-            return "font-family:null";
-        } else {
+        if (mFont != null) {
+            return  "font-family:" + this.mFont + (mColor == null ? "" : "; " + "color:" + this.mColor);
+        } else if (mColor != null) {
             return "color:" + this.mColor;
+        } else {
+            return "font-family:null";
         }
     }
 }

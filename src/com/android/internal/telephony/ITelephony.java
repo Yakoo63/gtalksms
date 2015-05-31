@@ -23,7 +23,7 @@ import android.telephony.NeighboringCellInfo;
 /**
  * Interface used to interact with the phone.  Mostly this is used by the
  * TelephonyManager class.  A few places are still using this directly.
- * Please clean them up if possible and use TelephonyManager insteadl.
+ * Please clean them up if possible and use TelephonyManager instead.
  *
  * {@hide}
  */
@@ -45,7 +45,7 @@ public interface ITelephony {
 
     /**
      * If there is currently a call in progress, show the call screen.
-     * The DTMF dialpad may or may not be visible initially, depending on
+     * The DTMF dial pad may or may not be visible initially, depending on
      * whether it was up when the user last exited the InCallScreen.
      *
      * @return true if the call screen was shown.
@@ -80,9 +80,9 @@ public interface ITelephony {
      * TODO: provide a flag to let the caller specify what policy to use
      * if both lines are in use.  (The current behavior is hardwired to
      * "answer incoming, end ongoing", which is how the CALL button
-     * is specced to behave.)
+     * is specified to behave.)
      *
-     * TODO: this should be a oneway call (especially since it's called
+     * TODO: this should be a one way call (especially since it's called
      * directly from the key queue thread).
      */
     void answerRingingCall();
@@ -94,9 +94,9 @@ public interface ITelephony {
      * It's safe to call this if the ringer has already been silenced, or
      * even if there's no incoming call.  (If so, this method will do nothing.)
      *
-     * TODO: this should be a oneway call too (see above).
+     * TODO: this should be a one way call too (see above).
      *       (Actually *all* the methods here that return void can
-     *       probably be oneway.)
+     *       probably be one way.)
      */
     void silenceRinger();
 

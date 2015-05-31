@@ -316,7 +316,7 @@ public class XmppManager {
     }
 
     private void updateAction(String action) {
-        if (action != mStatusAction) {
+        if (!action.equals(mStatusAction)) {
             // ensure action is set before broadcast, just in-case a receiver happens to wind up querying the state on delivery.
             mStatusAction = action;
             Log.i("broadcasting new action " + action + " for status " + statusAsString(mStatus) + " via Intent " + MainService.ACTION_XMPP_CONNECTION_CHANGED);

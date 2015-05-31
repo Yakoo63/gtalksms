@@ -1,8 +1,6 @@
 package com.googlecode.gtalksms.panels.tabs;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;

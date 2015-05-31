@@ -136,7 +136,7 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
             
             PingManager pingManager = params[0];
             Log.d("Issuing pingMyServer in PingMyServerAsyncTask");
-            Boolean res = null;
+            Boolean res;
             try {
                 res = pingManager.pingMyServer();
             } catch (SmackException.NotConnectedException e) {

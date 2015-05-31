@@ -1,10 +1,8 @@
 package com.googlecode.gtalksms.xmpp;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.offline.OfflineMessageManager;

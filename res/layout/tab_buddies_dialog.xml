@@ -42,6 +42,7 @@
              android:id="@+id/editTextBuddyName"
              android:layout_width="0dip"
              android:layout_height="wrap_content"
+             android:inputType="text"
              android:textSize="14dip"
              android:textStyle="bold"
              android:layout_weight="9" />

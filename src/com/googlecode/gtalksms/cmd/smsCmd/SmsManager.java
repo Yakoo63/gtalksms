@@ -175,24 +175,31 @@ public class SmsManager {
 
         ContentResolver cr = _context.getContentResolver();
         Cursor c = cr.query(deleteUri, new String[] { "thread_id" }, where, null, null);
-        try {
-            Set<String> threads = new HashSet<String>();
-            
-            while (c.moveToNext()) {
-                threads.add(c.getString(0));
+        if (c != null) {
+            try {
+                Set<String> threads = new HashSet<String>();
+
+                while (c.moveToNext()) {
+                    threads.add(c.getString(0));
+                }
+
+                for (String thread : threads) {
+                    // Delete the SMS
+                    String uri = "content://sms/conversations/" + thread;
+                    result += cr.delete(Uri.parse(uri), null, null);
+                }
+            } catch (Exception e) {
+                Log.e("exception in deleteSms:", e);
+                if (result == 0) {
+                    result = -1;
+                }
             }
-            
-            for (String thread : threads) {
-                // Delete the SMS
-                String uri = "content://sms/conversations/" + thread;
-                result += cr.delete(Uri.parse(uri), null, null);
-            }
-        } catch (Exception e) {
-            Log.e("exception in deleteSms:", e);
-            if (result == 0) {
-                result = -1;
-            }
+            c.close();
+        } else {
+            Log.e("no result");
+            result = -1;
         }
+
         return result;
     }
 
@@ -201,17 +208,23 @@ public class SmsManager {
 
         ContentResolver cr = _context.getContentResolver();
         Cursor c = cr.query(deleteUri, new String[] { "_id" }, where, null, null);
-        try {
-            while (c.moveToNext()) {
-                // Delete the SMS
-                String uri = "content://sms/" + c.getString(0);
-                result += cr.delete(Uri.parse(uri), null, null);
+        if (c != null) {
+            try {
+                while (c.moveToNext()) {
+                    // Delete the SMS
+                    String uri = "content://sms/" + c.getString(0);
+                    result += cr.delete(Uri.parse(uri), null, null);
+                }
+            } catch (Exception e) {
+                Log.e("exception in deleteSms:", e);
+                if (result == 0) {
+                    result = -1;
+                }
             }
-        } catch (Exception e) {
-            Log.e("exception in deleteSms:", e);
-            if (result == 0) {
-                result = -1;
-            }
+            c.close();
+        } else {
+            Log.e("no result");
+            result = -1;
         }
 
         return result;
@@ -234,17 +247,23 @@ public class SmsManager {
 
         ContentResolver cr = _context.getContentResolver();
         Cursor c = cr.query(deleteUri, new String[] { "_id" }, null, null, SORT_ORDER);
-        try {
-            for (int i = 0 ; i < number && c.moveToNext() ; ++i) {
-                // Delete the SMS
-                String uri = "content://sms/" + c.getString(0);
-                result += cr.delete(Uri.parse(uri), null, null);
+        if (c != null) {
+            try {
+                for (int i = 0 ; i < number && c.moveToNext() ; ++i) {
+                    // Delete the SMS
+                    String uri = "content://sms/" + c.getString(0);
+                    result += cr.delete(Uri.parse(uri), null, null);
+                }
+            } catch (Exception e) {
+                Log.e("exception in deleteSms:", e);
+                if (result == 0) {
+                    result = -1;
+                }
             }
-        } catch (Exception e) {
-            Log.e("exception in deleteSms:", e);
-            if (result == 0) {
-                result = -1;
-            }
+            c.close();
+        } else {
+            Log.e("no result");
+            result = -1;
         }
 
         return result;

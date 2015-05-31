@@ -19,10 +19,12 @@ public class CommandActivationCmd extends CommandHandlerBase {
     protected void onCommandActivated() {
         Set<CommandHandlerBase> commands = MainService.getCommandHandlersSet();
         mListCommands.clear();
-        for (CommandHandlerBase cmdBase : commands) {
-            if (cmdBase.getType() != CommandHandlerBase.TYPE_INTERNAL) {
-                for (Cmd c : cmdBase.getCommands()) {
-                    mListCommands.put(c.getName().toLowerCase(), c);
+        if (commands != null) {
+            for (CommandHandlerBase cmdBase : commands) {
+                if (cmdBase.getType() != CommandHandlerBase.TYPE_INTERNAL) {
+                    for (Cmd c : cmdBase.getCommands()) {
+                        mListCommands.put(c.getName().toLowerCase(), c);
+                    }
                 }
             }
         }

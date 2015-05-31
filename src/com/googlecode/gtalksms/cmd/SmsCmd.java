@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jivesoftware.smack.XMPPException;
-
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -245,7 +243,7 @@ public class SmsCmd extends CommandHandlerBase {
             } catch (Exception e) {
                 send(R.string.chat_error, e.getLocalizedMessage());
             }
-        } else if (!res.isDistinct()) {
+        } else {
             askForMoreDetails(res.getCandidates());
         }
     }
@@ -310,7 +308,7 @@ public class SmsCmd extends CommandHandlerBase {
             send(R.string.chat_no_match_for, contactInformation);
         } else if (rc.isDistinct()) {
             sendSMSByPhoneNumber(message, rc.getNumber(), rc.getName());
-        } else if (!rc.isDistinct()) {
+        } else {
             askForMoreDetails(rc.getCandidates());
         }
     }

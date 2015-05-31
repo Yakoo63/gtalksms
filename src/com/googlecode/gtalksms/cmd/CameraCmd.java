@@ -149,9 +149,9 @@ public class CameraCmd extends CommandHandlerBase {
                 
                 res.append(i);
                 if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
-                    res.append(" - " + sContext.getString(R.string.chat_camera_back)).append(Tools.LineSep);
+                    res.append(" - ").append(sContext.getString(R.string.chat_camera_back)).append(Tools.LineSep);
                 } else if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
-                    res.append(" - " + sContext.getString(R.string.chat_camera_front)).append(Tools.LineSep);
+                    res.append(" - ").append(sContext.getString(R.string.chat_camera_front)).append(Tools.LineSep);
                 }
             }
             send(res.toString());

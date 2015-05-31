@@ -70,7 +70,7 @@ class MUCPacketListener implements PacketListener {
         } else if (mMode == XmppMuc.MODE_SMS) {
             if (!fromBareResource.equals(mName)) {
                 if (message.getBody() != null) {
-                    DelayInformation inf = (DelayInformation) message.getExtension("x", "jabber:x:delay");
+                    DelayInformation inf = message.getExtension("x", "jabber:x:delay");
                     Date sentDate = inf != null ? inf.getStamp(): new Date();
 
                     if (sentDate.compareTo(mLastDate) > 0) {

@@ -21,7 +21,7 @@ public class Command {
     public Command(String originalCommand, String replyTo) {
         this.originalCommand = originalCommand == null ? "" : originalCommand.trim();
         this.replyTo = replyTo;
-        this.args = this.originalCommand == null ? new String[] { "" } : TextUtils.split(this.originalCommand, separator);
+        this.args = originalCommand == null ? new String[] { "" } : TextUtils.split(this.originalCommand, separator);
     }
 
     public Command(String cmd, String args, String replyTo) {

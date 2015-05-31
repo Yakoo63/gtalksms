@@ -22,7 +22,7 @@ public class SmsReceiver extends BroadcastReceiver {
         Map<String, String> msg = RetrieveMessages(intent);
 
         if (msg == null) {
-            // unable to retrieve SMS
+            Log.i("Unable to retrieve SMS");
         } else if (MainService.IsRunning) {
             // send all SMS via XMPP by sender
             for (String sender : msg.keySet()) {

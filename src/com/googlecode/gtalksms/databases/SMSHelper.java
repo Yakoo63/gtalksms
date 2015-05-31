@@ -82,7 +82,7 @@ public class SMSHelper {
             // OoB check, see issue 187
             if (partNum < sentIntent.length) {
                 sentIntent[partNum] = 'X';
-                SMSDatabase.putSentIntent(smsID, sentIntent.toString());
+                SMSDatabase.putSentIntent(smsID, new String(sentIntent));
             } else {
                 Log.e("SMSHelper.setSentIntent() OutOfBounds: " +
                         "partNum=" + partNum +
@@ -99,7 +99,7 @@ public class SMSHelper {
             // OoB check, see issue 208
             if (partNum < delIntent.length) {
                 delIntent[partNum] = 'X';
-                SMSDatabase.putDelIntent(smsID, delIntent.toString());
+                SMSDatabase.putDelIntent(smsID, new String(delIntent));
             } else {
                 Log.e("SMSHelper.setSentIntent() OutOfBounds: " +
                         "partNum=" + partNum +
