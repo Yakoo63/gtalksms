@@ -1,5 +1,6 @@
 package com.googlecode.gtalksms.cmd;
 
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -68,12 +69,21 @@ public class MusicCmd extends CommandHandlerBase {
 
     private void sendKeyEvent(int key) {
         Log.d("Sending event key " + key);
-        handleMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, key));
-        handleMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, key));
+        if (!handleMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, key)) || !handleMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, key))) {
+            try {
+                Log.d("Sending using instrumentation event key " + key);
+                new Instrumentation().sendKeyDownUpSync(key);
+            } catch(Exception e){
+                Log.e("Error using instrumentation for event key " + e.getMessage(), e);
+                Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                intent.putExtra(Intent.EXTRA_KEY_EVENT, key);
+                sContext.sendOrderedBroadcast(intent, null);
+            }
+        }
     }
 
-    private void handleMediaKeyEvent(KeyEvent keyEvent) {
-        boolean hasDispatchSucceeded = false;
+
+    private boolean handleMediaKeyEvent(KeyEvent keyEvent) {
         try {
             // Get binder from ServiceManager.checkService(String)
             IBinder iBinder = (IBinder) Class.forName("android.os.ServiceManager")
@@ -86,17 +96,12 @@ public class MusicCmd extends CommandHandlerBase {
             // Dispatch keyEvent using IAudioService.dispatchMediaKeyEvent(KeyEvent)
             Class.forName("android.media.IAudioService").getDeclaredMethod("dispatchMediaKeyEvent", KeyEvent.class)
                     .invoke(audioService, keyEvent);
-            hasDispatchSucceeded = true;
+            return true;
         } catch (Exception e) {
             Log.e("Error sending event key " + e.getMessage(), e);
         }
         
-        // If dispatchMediaKeyEvent failed then try using broadcast
-        if (!hasDispatchSucceeded) {
-            Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-            intent.putExtra(Intent.EXTRA_KEY_EVENT, keyEvent);
-            sContext.sendOrderedBroadcast(intent, null);
-        }
+        return false;
     }
 
     @Override
