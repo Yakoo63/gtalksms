@@ -5,5 +5,7 @@ local.properties
 /Releases
 out/
 .gradle/*
-.idea\*
-external-libs/*
+.idea/*
+external-libs
+todo
+.idea/workspace.xml
