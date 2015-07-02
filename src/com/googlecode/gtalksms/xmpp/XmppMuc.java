@@ -407,11 +407,12 @@ public class XmppMuc {
      * @return
      */
     private boolean affiliateCheck(Collection<Affiliate> affCol) {
-        Set<String> ids = new HashSet<String>();
         for (Affiliate a : affCol) {
-            ids.add(a.getJid());
+            if(a.getJid().equalsIgnoreCase(mSettings.getLogin()) || a.getJid().equalsIgnoreCase(mSettings.getLogin() + "@" + mSettings.serviceName)) {
+                return true;
+            }
         }
-        return ids.contains(mSettings.getLogin());
+        return false;
     }
     /**
      * Extracts the room random integer from the room JID
@@ -498,11 +499,10 @@ public class XmppMuc {
                             continue;
                         }
                     } catch (Exception e) {
-                        Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
-
                         // TODO decide in which cases it would be the best to remove the room from the DB, because of a persistent error
                         // and in which cases the error will not be permanent
                         if (mConnection.isAuthenticated()) {
+                            Log.i("rejoinRooms: leaving " + muc.getRoom() + " because of XMMPException", e);
                             try {
                                 leaveRoom(muc);
                             } catch (SmackException.NotConnectedException e1) {
