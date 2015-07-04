@@ -3,16 +3,16 @@ package com.googlecode.gtalksms.xmpp;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterListener;
+import org.jivesoftware.smack.filter.StanzaFilter;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smack.roster.RosterEntry;
+import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
-import org.jivesoftware.smack.packet.RosterPacket;
-import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smack.roster.packet.RosterPacket;
+import org.jxmpp.util.XmppStringUtils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -40,14 +40,11 @@ public class XmppBuddies implements RosterListener {
 		XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
 			public void newConnection(XMPPConnection connection) {
 				sConnection = connection;
-				sRoster = connection.getRoster();
+				sRoster = Roster.getInstanceFor(connection);
 				checkNotificationAddressRoster();
 
-				connection.addPacketListener(new PresencePacketListener(connection, sSettings), new PacketTypeFilter(
-				        Presence.class));
-
 				try {
-					connection.getRoster().addRosterListener(XmppBuddies.this);
+                    sRoster.addRosterListener(XmppBuddies.this);
 					retrieveFriendList();
 				} catch (Exception ex) {
 					Log.e("Failed to setup XMPP friend list roster.", ex);
@@ -68,7 +65,7 @@ public class XmppBuddies implements RosterListener {
         if (sRoster != null) {
             if (!sRoster.contains(userID)) {
                 try {
-                    sRoster.createEntry(userID, StringUtils.parseBareAddress(userID), null);
+                    sRoster.createEntry(userID, XmppStringUtils.parseBareJid(userID), null);
                     retrieveFriendList();
                 } catch (Exception e) {
                     System.err.println("Error in adding friend " + e.getMessage());
@@ -97,7 +94,7 @@ public class XmppBuddies implements RosterListener {
     
     public boolean removeFriend(String userID) {
         if (sConnection != null && sConnection.isConnected()) {
-            Roster roster = sConnection.getRoster();
+            Roster roster = Roster.getInstanceFor(sConnection);
             if (roster.contains(userID)) {
                 try {
                     roster.removeEntry(roster.getEntry(userID));
@@ -112,12 +109,12 @@ public class XmppBuddies implements RosterListener {
     
     public boolean renameFriend(String userID, String name) {
         if (sConnection != null && sConnection.isConnected()) {
-            Roster roster = sConnection.getRoster();
+            Roster roster = Roster.getInstanceFor(sConnection);
             if (roster.contains(userID)) {
                 RosterEntry entry  = roster.getEntry(userID);
                 try {
                     entry.setName(name);
-                } catch (SmackException.NotConnectedException e) {
+                } catch (Exception e) {
                     return false;
                 }
                 return true;
@@ -142,7 +139,7 @@ public class XmppBuddies implements RosterListener {
             try {
                 String userID;
                 String status;
-                Roster roster = sConnection.getRoster();
+                Roster roster = Roster.getInstanceFor(sConnection);
 
                 for (RosterEntry r : roster.getEntries()) {
                     userID = r.getUser();
@@ -187,7 +184,7 @@ public class XmppBuddies implements RosterListener {
         String userStatus; // default return value
 
         try {
-            userStatus = sConnection.getRoster().getPresence(userID).getStatus();
+            userStatus = Roster.getInstanceFor(sConnection).getPresence(userID).getStatus();
         } catch (NullPointerException e) {
             Log.e("Invalid connection or user in retrieveStatus() - NPE", e);
             userStatus = "";
@@ -205,7 +202,7 @@ public class XmppBuddies implements RosterListener {
         Presence userFromServer;
 
         try {
-            userFromServer = sConnection.getRoster().getPresence(userID);
+            userFromServer = Roster.getInstanceFor(sConnection).getPresence(userID);
             userState = retrieveState(userFromServer.getMode(), userFromServer.isAvailable());
         } catch (NullPointerException e) {
             Log.e("retrieveState(): Invalid connection or user - NPE", e);
@@ -253,7 +250,7 @@ public class XmppBuddies implements RosterListener {
     // careful, this method does also get called by the SmackListener Thread
     @Override    
     public void presenceChanged(Presence presence) {
-        String bareUserId = StringUtils.parseBareAddress(presence.getFrom());
+        String bareUserId = XmppStringUtils.parseBareAddress(presence.getFrom());
         
         Intent intent = new Intent(MainService.ACTION_XMPP_PRESENCE_CHANGED);
         intent.putExtra("userid", bareUserId);

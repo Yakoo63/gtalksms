@@ -10,9 +10,8 @@ import java.util.List;
 import org.apache.http.conn.ssl.StrictHostnameVerifier;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.SmackAndroid;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
@@ -22,7 +21,9 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
 import org.jivesoftware.smack.parsing.UnparsablePacket;
+import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smack.util.dns.HostAddress;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.disco.packet.DiscoverInfo;
@@ -30,6 +31,7 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
+import org.jivesoftware.smackx.xhtmlim.XHTMLText;
 
 import android.content.Context;
 import android.content.Intent;
@@ -75,7 +77,7 @@ public class XmppManager {
     private static XmppManager sXmppManager = null;
     private static int sReusedConnectionCount = 0;
     private static int sNewConnectionCount = 0;
-    private static ConnectionConfiguration sConnectionConfiguration = null;
+    private static XMPPTCPConnectionConfiguration sConnectionConfiguration = null;
 
     // Indicates the current state of the service (disconnected/connecting/connected)
     private int mStatus = DISCONNECTED;
@@ -86,8 +88,8 @@ public class XmppManager {
     private long mLastPing = new Date().getTime();
 
     private final List<XmppConnectionChangeListener> mConnectionChangeListeners;
-    private XMPPConnection mConnection = null;
-	private PacketListener mPacketListener = null;
+    private XMPPTCPConnection mConnection = null;
+	private MessageListener mPacketListener = null;
     private PingManager mPingManager = null;
     private ConnectionListener mConnectionListener = null;    
     private final XmppMuc mXmppMuc;
@@ -111,14 +113,14 @@ public class XmppManager {
 
     private final SettingsManager mSettings;
     private final Context mContext;
-    final SmackAndroid mSmackAndroid;
+    final SmackConfiguration mSmackAndroid;
 
     static {
         ServiceDiscoveryManager.setDefaultIdentity(new DiscoverInfo.Identity("client", Tools.APP_NAME, "bot"));
     }
 
     private XmppManager(Context context) {
-        mSmackAndroid = SmackAndroid.init(context);
+        mSmackAndroid = new SmackConfiguration();
 
         mReconnectHandler = new Handler(MainService.getServiceLooper());
         
@@ -221,19 +223,11 @@ public class XmppManager {
         mReconnectHandler.removeCallbacks(mReconnectRunnable);
 
         if (mConnection != null) {
-			// Removing the PacketListener should not be necessary
-			// as it's also done by XMPPConnection.disconnect()
-			// but it couldn't harm anyway
-			mConnection.removePacketListener(mPacketListener);
-
             if (mConnectionListener != null) {
                 mConnection.removeConnectionListener(mConnectionListener);
             }
             if (mConnection.isConnected()) {
-                try {
-                    mConnection.disconnect();
-                } catch (SmackException.NotConnectedException e) {
-                }
+                mConnection.disconnect();
                 mConnection = null;
                 mPingManager = null;
             }
@@ -365,7 +359,7 @@ public class XmppManager {
      * 
      */
     private void initConnection() {
-        XMPPConnection connection;
+        XMPPTCPConnection connection;
 
         // assert we are only ever called from one thread
         assert (!Thread.currentThread().getName().equals(MainService.SERVICE_THREAD_NAME));
@@ -406,7 +400,7 @@ public class XmppManager {
         onConnectionEstablished(connection);
     }
     
-    private void onConnectionEstablished(XMPPConnection connection) {
+    private void onConnectionEstablished(XMPPTCPConnection connection) {
         mConnection = connection;
         updateAction("Configuring listeners and retrieving offline messages");
         mConnectionListener = new ConnectionListener() {
@@ -416,7 +410,7 @@ public class XmppManager {
             }
 
             @Override
-            public void authenticated(XMPPConnection connection) {
+            public void authenticated(XMPPConnection xmppConnection, boolean b) {
                 Log.i("ConnectionListener: authenticated() called");
             }
 
@@ -454,8 +448,7 @@ public class XmppManager {
         mConnection.addConnectionListener(mConnectionListener);
 
         try {
-            PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-            mConnection.addPacketListener(mPacketListener, filter);
+           // mConnection.addPacketListener(mPacketListener, MessageTypeFilter.CHAT);
 
             // It is important that we query the server for offline messages BEFORE we send the first presence stanza
 			XmppOfflineMessages.handleOfflineMessages(mConnection, mSettings.getNotifiedAddresses().getAll(), mContext);
@@ -497,7 +490,7 @@ public class XmppManager {
      * @param connection
      * @return true if we are connected and authenticated, false otherwise
      */
-    private boolean connectAndAuth(XMPPConnection connection) {
+    private boolean connectAndAuth(XMPPTCPConnection connection) {
         try {
             updateAction("Connecting to " + sConnectionConfiguration.getServiceName());
             connection.connect();
@@ -579,27 +572,25 @@ public class XmppManager {
      * @return
      * @throws XMPPException 
      */
-    private XMPPConnection createNewConnection(SettingsManager settings) throws XMPPException {
-        ConnectionConfiguration conf;
+    private XMPPTCPConnection createNewConnection(SettingsManager settings) throws XMPPException {
+        XMPPTCPConnectionConfiguration.Builder builder = XMPPTCPConnectionConfiguration.builder();
+
         Log.i("Creating new XMPP connection configuration");
 
         if (settings.manuallySpecifyServerSettings) {
             // trim the serverHost here because of Issue 122
-            conf = new ConnectionConfiguration(settings.serverHost.trim(), settings.serverPort, settings.serviceName);
-        } else {
-            // Note: The Emulator will throw here an BadAddressFamily Exception but on a real device it just works fine
-            // see: http://stackoverflow.com/questions/2879455/android-2-2-and-bad-address-family-on-socket-connect
-            // and http://code.google.com/p/android/issues/detail?id=9431            
-            conf = new ConnectionConfiguration(settings.serviceName);
+            builder.setHost(settings.serverHost.trim());
+            builder.setPort(settings.serverPort);
         }
-        sConnectionConfiguration = conf;
-        conf.setSocketFactory(new XmppSocketFactory());
-        conf.setLegacySessionDisabled(false);
+        builder.setServiceName(settings.serviceName.trim());
+
+        builder.setSocketFactory(XmppSocketFactory.getInstance());
+        builder.setLegacySessionDisabled(false);
 
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, MemorizingTrustManager.getInstanceList(mContext), new SecureRandom());
-            conf.setCustomSSLContext(sc);
+            builder.setCustomSSLContext(sc);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         } catch (KeyManagementException e) {
@@ -608,27 +599,28 @@ public class XmppManager {
 
         switch (settings.xmppSecurityModeInt) {
         case SettingsManager.XMPPSecurityOptional:
-            conf.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
+            builder.setSecurityMode(ConnectionConfiguration.SecurityMode.ifpossible);
             break;
         case SettingsManager.XMPPSecurityRequired:
-            conf.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
+            builder.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
             break;
         case SettingsManager.XMPPSecurityDisabled:
         default:
-            conf.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+            builder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             break;
         }
         
         if (settings.useCompression) {
-            conf.setCompressionEnabled(true);
+            builder.setCompressionEnabled(true);
         }
         
         // disable the built-in ReconnectionManager since we handle this
-        conf.setReconnectionAllowed(false);
-        conf.setSendPresence(false);
-        conf.setDebuggerEnabled(settings.debugLog);
+        //builder.setReconnectionAllowed(false);
+        builder.setSendPresence(false);
+        builder.setDebuggerEnabled(settings.debugLog);
 
-        return new XMPPTCPConnection(conf);
+        sConnectionConfiguration = builder.build();
+        return new XMPPTCPConnection(sConnectionConfiguration);
     }
 
     /** returns the current connection state */
@@ -687,8 +679,7 @@ public class XmppManager {
         // - we are disconnected and therefore send the message later
         try {
             if ((to == null) || (mConnection != null && (XHTMLManager.isServiceEnabled(mConnection, to) || !mConnection.isConnected()))) {
-                String xhtmlBody = message.generateXHTMLText().toString();
-                XHTMLManager.addBody(msg, xhtmlBody);
+                XHTMLManager.addBody(msg, message.generateXHTMLText());
             }
         } catch (Exception e) {
             Log.d("XHTMLManager error. Ex:" + e.getMessage());

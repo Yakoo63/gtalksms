@@ -1,14 +1,17 @@
 package com.googlecode.gtalksms.xmpp;
 
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jxmpp.util.XmppStringUtils;
 
 import com.googlecode.gtalksms.SettingsManager;
 
-class PresencePacketListener implements PacketListener  {
+class PresencePacketListener implements MessageListener {
     private final XMPPConnection mConnection;
     private final SettingsManager mSettings;
     
@@ -18,12 +21,11 @@ class PresencePacketListener implements PacketListener  {
     }
 
     @Override
-    public void processPacket(Packet packet) {
+    public void processMessage(Message message) {
         for (String notifiedAddress : mSettings.getNotifiedAddresses().getAll()) {
-            Presence presence = (Presence) packet;
-            String fromJID = StringUtils.parseBareAddress(presence.getFrom());
-            
-            if (fromJID.equals(notifiedAddress) && presence.getType().equals(Presence.Type.subscribe)) {
+            String fromJID = XmppStringUtils.parseBareJid(message.getFrom());
+
+            if (fromJID.equals(notifiedAddress) && message.getType().equals(Presence.Type.subscribe)) {
                 XmppBuddies.grantSubscription(notifiedAddress, mConnection);
             }
         }

@@ -25,7 +25,7 @@ public class FileCmd extends CommandHandlerBase {
     private Exception mLastException;
     
     public FileCmd(MainService mainService) {
-        super(mainService, CommandHandlerBase.TYPE_SYSTEM, "File", new Cmd("send"), new Cmd("ls"), new Cmd("rm"));
+        super(mainService, CommandHandlerBase.TYPE_SYSTEM, "File", new Cmd("send", "get"), new Cmd("ls"), new Cmd("rm"));
     }
 
     @Override

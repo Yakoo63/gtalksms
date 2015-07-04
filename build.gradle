@@ -16,7 +16,6 @@ dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
     compile 'com.android.support:support-v4:19.1.+'
     compile 'com.google.android.gms:play-services:5.0.89'
-    compile files('libs/asmack-android-8-4.0.7.jar')
 }
 
 android {

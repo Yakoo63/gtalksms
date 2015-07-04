@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -18,6 +19,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.muc.Occupant;
 import org.jivesoftware.smackx.muc.RoomInfo;
 import org.jivesoftware.smackx.xdata.Form;
@@ -80,7 +82,7 @@ public class XmppMuc {
                 t.start();
 
                 try {
-                    Collection<String> mucComponents = MultiUserChat.getServiceNames(connection);
+                    Collection<String> mucComponents = MultiUserChatManager.getInstanceFor(connection).getServiceNames();
                     if (mucComponents.size() > 0) {
                         mMucServer = mucComponents.iterator().next();
                     }
@@ -132,7 +134,7 @@ public class XmppMuc {
                 Message msg = new Message(muc.getRoom());
                 msg.setBody(message.generateFmtTxt());
                 if (mode == MODE_SHELL) {
-                    XHTMLManager.addBody(msg, message.generateXHTMLText().toString());
+                    XHTMLManager.addBody(msg, message.generateXHTMLText());
                 }
                 msg.setType(Message.Type.groupchat);
                 muc.sendMessage(msg);
@@ -266,7 +268,8 @@ public class XmppMuc {
         
         // See issue 136
         try {
-            multiUserChat = new MultiUserChat(mConnection, roomJID);
+
+            multiUserChat = MultiUserChatManager.getInstanceFor(mConnection).getMultiUserChat(roomJID);
         } catch (Exception e) {  
             Log.e("MUC creation failed: ", e);
             throw new Exception("MUC creation failed for " + roomJID + ": " + e.getLocalizedMessage(), e);
@@ -376,7 +379,7 @@ public class XmppMuc {
     }
     
     private void registerRoom(MultiUserChat muc, String number, String name, Integer randomInt, int mode) {
-        MUCPacketListener chatListener = new MUCPacketListener(number, muc, name, mode, mCtx);
+        MessageListener chatListener = new MUCPacketListener(number, muc, name, mode, mCtx);
         muc.addMessageListener(chatListener);
         mRoomNumbers.add(randomInt);
         mRooms.put(number, muc);
@@ -393,7 +396,7 @@ public class XmppMuc {
     private RoomInfo getRoomInfo(String room) {
         RoomInfo info;
         try {
-            info = MultiUserChat.getRoomInfo(mConnection, room);
+            info = MultiUserChatManager.getInstanceFor(mConnection).getRoomInfo(room);
         } catch (Exception e) {
             return null;
         }
@@ -453,7 +456,7 @@ public class XmppMuc {
                 RoomInfo info = getRoomInfo(aMucDB[0]);
                 // if info is not null, the room exists on the server, so lets check if we can reuse it
                 if (info != null) {
-                    MultiUserChat muc = new MultiUserChat(mConnection, aMucDB[0]);
+                    MultiUserChat muc = MultiUserChatManager.getInstanceFor(mConnection).getMultiUserChat(aMucDB[0]);
                     int mode = Integer.parseInt(aMucDB[2]);
                     // Hardcoded room name for shell
                     String name = mode == MODE_SMS ? ContactsManager.getContactName(mCtx, aMucDB[1]) : "Shell " + aMucDB[1];

@@ -22,7 +22,7 @@ public class XmppDeliveryReceipts {
         XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
             public void newConnection(XMPPConnection connection) {
                 final DeliveryReceiptManager drm = DeliveryReceiptManager.getInstanceFor(connection);
-                drm.enableAutoReceipts();
+                drm.setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
             }
         };
         xmppMgr.registerConnectionChangeListener(listener);

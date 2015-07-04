@@ -55,7 +55,7 @@ public class XmppFileManager implements FileTransferListener {
         XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
             public void newConnection(XMPPConnection connection) {
                 mConnection = connection;
-                mFileTransferManager = new FileTransferManager(mConnection);
+                mFileTransferManager = FileTransferManager.getInstanceFor(mConnection);
                 mFileTransferManager.addFileTransferListener(XmppFileManager.this);
             }            
         };
@@ -126,9 +126,7 @@ public class XmppFileManager implements FileTransferListener {
                     }
                 } else if (transfer.getStatus() == Status.error) {
                     send(returnAndLogError(transfer));
-                    if (saveTo.exists()) {
-                        saveTo.delete();
-                    }
+                    saveTo.deleteOnExit();
                     return;
                 // If we are not in progress state, increase the cycles count;
                 } else {
@@ -148,6 +146,7 @@ public class XmppFileManager implements FileTransferListener {
                }
             } else {
                 send(returnAndLogError(transfer));
+                saveTo.deleteOnExit();
             }
         } catch (Exception ex) {
             Log.e("Cannot send the file because an error occurred during the process.", ex);

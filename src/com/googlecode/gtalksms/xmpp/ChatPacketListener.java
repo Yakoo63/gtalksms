@@ -1,8 +1,7 @@
 package com.googlecode.gtalksms.xmpp;
 
-import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 
 import android.content.Context;
 
@@ -11,7 +10,7 @@ import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.tools.Tools;
 
-public class ChatPacketListener implements PacketListener {
+public class ChatPacketListener implements MessageListener {
 	private final SettingsManager mSettings;
 	private final Context mCtx;
 
@@ -20,8 +19,8 @@ public class ChatPacketListener implements PacketListener {
 		this.mSettings = SettingsManager.getSettingsManager(ctx);
 	}
 
-	public void processPacket(Packet packet) {
-		Message message = (Message) packet;
+	@Override
+	public void processMessage(Message message) {
 		String from = message.getFrom();
 
 		if (Tools.cameFromNotifiedAddress(mSettings.getNotifiedAddresses().getAll(), from) && message.getBody() != null) {
@@ -32,9 +31,9 @@ public class ChatPacketListener implements PacketListener {
 		} else {
 			if (!Tools.cameFromNotifiedAddress(mSettings.getNotifiedAddresses().getAll(), from)) {
 				Log.i("XMPP packet received - but from address \"" + from.toLowerCase()
-	                + "\" does not match notification address \""
-	                + mSettings.getNotifiedAddresses().get()
-	                + "\"");
+						+ "\" does not match notification address \""
+						+ mSettings.getNotifiedAddresses().get()
+						+ "\"");
 			} else if (message.getBody() == null) {
 				Log.i("XMPP Packet received - but without body (body == null)");
 			}

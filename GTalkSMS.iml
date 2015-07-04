@@ -83,13 +83,30 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
-    <orderEntry type="library" exported="" name="dnsjava-2.1.7" level="project" />
+    <orderEntry type="library" exported="" name="smack-android-extensions-4.1.2" level="project" />
     <orderEntry type="library" exported="" name="additionnal" level="project" />
+    <orderEntry type="library" exported="" name="smack-java7-4.1.2" level="project" />
     <orderEntry type="library" exported="" name="mail" level="project" />
-    <orderEntry type="library" exported="" name="asmack-android-8-4.0.7" level="project" />
+    <orderEntry type="library" exported="" name="smack-jingle-old-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="jxmpp-core-0.5.0-alpha6" level="project" />
+    <orderEntry type="library" exported="" name="smack-resolver-dnsjava-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="smack-android-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="smack-sasl-javax-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="smack-core-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="smack-compression-jzlib-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="smack-sasl-provided-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
+    <orderEntry type="library" exported="" name="smack-legacy-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="smack-im-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="smack-tcp-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="smack-resolver-javax-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="smack-resolver-minidns-4.1.2" level="project" />
     <orderEntry type="library" exported="" name="activation" level="project" />
+    <orderEntry type="library" exported="" name="smack-extensions-4.1.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-5.0.89" level="project" />
+    <orderEntry type="library" exported="" name="smack-bosh-4.1.2" level="project" />
+    <orderEntry type="library" exported="" name="jxmpp-util-cache-0.5.0-alpha6" level="project" />
+    <orderEntry type="library" exported="" name="smack-experimental-4.1.2" level="project" />
     <orderEntry type="library" exported="" name="external-libs/MemorizingTrustManager-unspecified" level="project" />
     <orderEntry type="library" exported="" name="external-libs/ActionBarSherlock-unspecified" level="project" />
   </component>
