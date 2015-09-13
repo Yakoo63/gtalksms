@@ -120,6 +120,7 @@ public class SmsManager {
     
     
     /**
+     * Not supported in Android 5
      * Marks all SMS from a given phone number as read
      * 
      * @param smsNumber The phone number

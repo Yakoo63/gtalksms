@@ -529,20 +529,7 @@ public class XmppManager {
 
         updateAction("Service discovery");
         mPingManager = PingManager.getInstanceFor(connection);
-        mPingManager.registerPingFailedListener(new PingFailedListener() {
-            
-            @Override
-            public void pingFailed() {
-            // Note: remember that maybeStartReconnect is called from a different thread (the PingTask) here, it may causes synchronization problems
-            long now = new Date().getTime();
-            if (now - mLastPing > mSettings.pingIntervalInSec * 500) {
-                Log.w("PingManager reported failed ping, calling maybeStartReconnect()");
-                restartConnection();
-                mLastPing = now;
-            } else {
-                Log.i("Ping failure reported too early. Skipping this occurrence.");
-            }
-        }});
+        mPingManager.setPingInterval(mSettings.pingIntervalInSec);
 
         try {
             XHTMLManager.setServiceEnabled(connection, false);
