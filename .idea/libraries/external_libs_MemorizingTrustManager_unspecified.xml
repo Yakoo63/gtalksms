@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="external-libs/MemorizingTrustManager-unspecified">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/build/intermediates/exploded-aar/GTalkSMS/external-libs@MemorizingTrustManager/unspecified/classes.jar!/" />
       <root url="file://$PROJECT_DIR$/build/intermediates/exploded-aar/GTalkSMS/external-libs@MemorizingTrustManager/unspecified/res" />
+      <root url="jar://$PROJECT_DIR$/build/intermediates/exploded-aar/GTalkSMS/external-libs@MemorizingTrustManager/unspecified/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
