@@ -27,9 +27,9 @@ import com.googlecode.gtalksms.SettingsManager;
 import com.googlecode.gtalksms.xmpp.XmppMsg;
 
 public class Tools {
-    public static final String AUTHORS_URL = "http://gtalksms.googlecode.com/git/AUTHORS";
-    public static final String DONORS_URL = "http://gtalksms.googlecode.com/git/Donors";
-    public static final String CHANGELOG_URL = "http://gtalksms.googlecode.com/git/Changelog";
+    public static final String AUTHORS_URL = "https://raw.githubusercontent.com/Yakoo63/gtalksms/master/AUTHORS";
+    public static final String DONORS_URL = "https://raw.githubusercontent.com/Yakoo63/gtalksms/master/Donors";
+    public static final String CHANGELOG_URL = "https://raw.githubusercontent.com/Yakoo63/gtalksms/master/Changelog";
     public final static String LOG_TAG = "gtalksms";
     public final static String APP_NAME = "GTalkSMS";
     public final static String LineSep = System.getProperty("line.separator");
