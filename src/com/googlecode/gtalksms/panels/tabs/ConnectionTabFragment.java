@@ -41,6 +41,9 @@ public class ConnectionTabFragment extends SherlockFragment {
     SettingsManager.OnSettingChangeListener mSettingListerner = new SettingsManager.OnSettingChangeListener() {
         @Override
         public void OnSettingChanged(boolean connectionSettingsObsolete) {
+            if(getActivity() == null)
+                return;
+
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
