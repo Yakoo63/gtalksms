@@ -2,7 +2,7 @@
   <library name="external-libs/ActionBarSherlock-unspecified">
     <CLASSES>
       <root url="file://$PROJECT_DIR$/build/intermediates/exploded-aar/GTalkSMS/external-libs@ActionBarSherlock/unspecified/res" />
-      <root url="jar://$PROJECT_DIR$/build/intermediates/exploded-aar/GTalkSMS/external-libs@ActionBarSherlock/unspecified/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/intermediates/exploded-aar/GTalkSMS/external-libs@ActionBarSherlock/unspecified/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

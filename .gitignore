@@ -9,3 +9,4 @@ out/
 external-libs
 todo
 .idea/workspace.xml
+keystore.properties
