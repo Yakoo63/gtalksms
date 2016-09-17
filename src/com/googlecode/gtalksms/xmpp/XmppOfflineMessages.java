@@ -41,7 +41,11 @@ public class XmppOfflineMessages {
                     }
                 }
             }
-            offlineMessageManager.deleteMessages();
+            try {
+                offlineMessageManager.deleteMessages();
+            } catch (Exception e) {
+                Log.e("Failed to delete offline messages from server");
+            }
         }
 		Log.i("End of retrieval of offline messages from server");
 	}
