@@ -1,3 +1,10 @@
+5.1.1
+* Ads removed
+
+5.0.2
+* Links updated to the new repo
+* Fix crash on connection tab
+
 5.0.1
 * New aSmack and java-dns versions
 * Fix reconnection issues with google apps (Issue 377)
@@ -203,4 +210,4 @@
 0.1
 * Create GTalkSMS from TalkMyPhone
 * Fix long SMS issues
-* Add new features as formated responses, dial number...
+* Add new features as formatted responses, dial number...
