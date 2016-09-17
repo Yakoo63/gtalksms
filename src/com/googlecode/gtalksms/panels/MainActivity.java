@@ -19,7 +19,6 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -43,8 +42,6 @@ import com.googlecode.gtalksms.panels.tabs.HelpTabFragment;
 import com.googlecode.gtalksms.tools.StringFmt;
 import com.googlecode.gtalksms.tools.Tools;
 import com.googlecode.gtalksms.xmpp.XmppFriend;
-
-import com.google.android.gms.ads.*;
 
 public class MainActivity extends SherlockFragmentActivity {
     
@@ -101,7 +98,6 @@ public class MainActivity extends SherlockFragmentActivity {
     private MainService mMainService;
     private ActionBar mActionBar;
     private ViewPager mPager;
-    private AdView mAdView;
     private final ConnectionTabFragment mConnectionTabFragment = new ConnectionTabFragment();
     private final BuddiesTabFragment mBuddiesTabFragment = new BuddiesTabFragment();
     private final CommandsTabFragment mCommandsTabFragment = new CommandsTabFragment();
@@ -183,14 +179,6 @@ public class MainActivity extends SherlockFragmentActivity {
                     Tools.openLink(MainActivity.this, "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WQDV6S67WAC7A&lc=US&item_name=GTalkSMS&item_number=WEB&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted");
                 }
             });
-
-            // Create the adView
-            mAdView = new AdView(this);
-            mAdView.setAdUnitId("ca-app-pub-1255069456864059/8040023329");
-            mAdView.setAdSize(AdSize.BANNER);
-            LinearLayout  layout = (LinearLayout) findViewById(R.id.StatusBar);
-            layout.addView(mAdView, 0);
-            mAdView.loadAd(new AdRequest.Builder().build());
         }
         
         mFragments.add(mConnectionTabFragment);
@@ -208,32 +196,6 @@ public class MainActivity extends SherlockFragmentActivity {
                 mActionBar.getTabAt(index).select();
             }
         }); 
-    }
-
-    @Override
-    public void onDestroy() {
-        if (mAdView != null) {
-            mAdView.removeAllViews();
-            mAdView.destroy();
-            mAdView = null;
-        }
-        super.onDestroy();
-    }
-
-    @Override
-    public void onPause() {
-        if (mAdView != null) {
-            mAdView.pause();
-        }
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mAdView != null) {
-            mAdView.resume();
-        }
     }
 
     @Override

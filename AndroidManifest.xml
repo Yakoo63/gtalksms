@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.googlecode.gtalksms"
 
-    android:versionName="5.0.2"
-    android:versionCode="85">
+    android:versionName="5.1.0"
+    android:versionCode="86">
 
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="19"/>
     
@@ -166,10 +166,6 @@
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAI8M6AdV8LJxkmMhej-2G7N_JLe-1BbFB-qOoM7Q" />
 
-        <meta-data android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
-        <activity android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
         <activity android:name="de.duenndns.ssl.MemorizingActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
