@@ -119,11 +119,12 @@ public class ConnectionStatusTabFragment extends SherlockFragment {
         if (pingManager == null) {
             return;
         }
-        
-        long lastPing = pingManager.getLastReceivedPong();
-        Date date = new Date(lastPing);
-        mPingTime.setText(SimpleDateFormat.getTimeInstance().format(date));
-        mPingDate.setText(SimpleDateFormat.getDateInstance().format(date));
+
+        //TODO to fix
+        //long lastPing = pingManager.getLastReceivedPong();
+        //Date date = new Date(lastPing);
+        //mPingTime.setText(SimpleDateFormat.getTimeInstance().format(date));
+        //mPingDate.setText(SimpleDateFormat.getDateInstance().format(date));
     }
     
     private class PingMyServerAsyncTask extends AsyncTask<PingManager, Void, Boolean> {

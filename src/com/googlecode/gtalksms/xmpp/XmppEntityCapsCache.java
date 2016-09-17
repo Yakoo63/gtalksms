@@ -3,7 +3,7 @@ package com.googlecode.gtalksms.xmpp;
 import java.io.File;
 import java.io.IOException;
 
-import org.jivesoftware.smack.util.Base32Encoder;
+import org.jivesoftware.smack.util.stringencoder.Base32;
 import org.jivesoftware.smackx.caps.EntityCapsManager;
 import org.jivesoftware.smackx.caps.cache.EntityCapsPersistentCache;
 import org.jivesoftware.smackx.caps.cache.SimpleDirectoryPersistentCache;
@@ -23,10 +23,10 @@ public class XmppEntityCapsCache {
             if (!cacheDir.mkdir())
                 throw new IllegalStateException("Can not create entity caps cache dir");
 
-        sCache = new SimpleDirectoryPersistentCache(cacheDir, Base32Encoder.getInstance());
+        sCache = new SimpleDirectoryPersistentCache(cacheDir, Base32.getStringEncoder());
         try {
             EntityCapsManager.setPersistentCache(sCache);
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.w("XmppEntityCapsCache: Could not set persistent cache", e);
         }
     }

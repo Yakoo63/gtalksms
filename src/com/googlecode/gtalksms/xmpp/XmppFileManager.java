@@ -55,7 +55,7 @@ public class XmppFileManager implements FileTransferListener {
         XmppConnectionChangeListener listener = new XmppConnectionChangeListener() {
             public void newConnection(XMPPConnection connection) {
                 mConnection = connection;
-                mFileTransferManager = new FileTransferManager(mConnection);
+                mFileTransferManager = FileTransferManager.getInstanceFor(mConnection);
                 mFileTransferManager.addFileTransferListener(XmppFileManager.this);
             }            
         };

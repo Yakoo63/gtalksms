@@ -7,8 +7,9 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smackx.address.MultipleRecipientManager;
+import org.jxmpp.util.XmppStringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -70,10 +71,10 @@ public class XmppMultipleRecipientManager {
 
         // Removing blacklisted resources for notified addresses
         for (String notifiedAddress : sSettingsManager.getNotifiedAddresses().getAll()) {
-            List<Presence> presences = connection.getRoster().getPresences(notifiedAddress);
+            List<Presence> presences = Roster.getInstanceFor(connection).getPresences(notifiedAddress);
             for (Presence p : presences) {
                 String toPresence = p.getFrom();
-                String toResource = StringUtils.parseResource(toPresence);
+                String toResource = XmppStringUtils.parseResource(toPresence);
                 // Don't send messages to GTalk Android devices
                 // It would be nice if there was a better way to detect
                 // an Android gTalk XMPP client, but currently there is none
@@ -115,10 +116,10 @@ public class XmppMultipleRecipientManager {
 
         Log.d("Looking for hangout addresses");
         for (String notifiedAddress : toList) {
-            String toResource = StringUtils.parseResource(notifiedAddress);
+            String toResource = XmppStringUtils.parseResource(notifiedAddress);
             if (toResource.toLowerCase().startsWith("messaging")) {
                 Log.d("Hangout address detected: " + notifiedAddress);
-                String bareAddress = StringUtils.parseBareAddress(notifiedAddress);
+                String bareAddress = XmppStringUtils.parseBareAddress(notifiedAddress);
                 if (!results.contains(bareAddress)) {
                     results.add(bareAddress);
                     Log.d("Sending message to " + bareAddress);
@@ -127,7 +128,7 @@ public class XmppMultipleRecipientManager {
         }
 
         for (String notifiedAddress : toList) {
-            String bareAddress = StringUtils.parseBareAddress(notifiedAddress);
+            String bareAddress = XmppStringUtils.parseBareAddress(notifiedAddress);
             if (!results.contains(bareAddress)) {
                 results.add(notifiedAddress);
             }

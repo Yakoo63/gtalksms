@@ -1,8 +1,10 @@
 package com.googlecode.gtalksms.xmpp;
 
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.Stanza;
 
 import android.content.Context;
 
@@ -20,7 +22,8 @@ public class ChatPacketListener implements PacketListener {
 		this.mSettings = SettingsManager.getSettingsManager(ctx);
 	}
 
-	public void processPacket(Packet packet) {
+	@Override
+	public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
 		Message message = (Message) packet;
 		String from = message.getFrom();
 

@@ -1,11 +1,13 @@
 package com.googlecode.gtalksms.xmpp;
 
-import org.jivesoftware.smack.AccountManager;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jxmpp.util.XmppStringUtils;
 
 import android.content.SharedPreferences.Editor;
 
@@ -32,10 +34,8 @@ class XmppAccountManager {
 
         // TODO throws NetworkOnMainThreadException on Honycomb or higher
         // Fix it!
-        ConnectionConfiguration conf = new ConnectionConfiguration(host);
-        XMPPConnection connection = new XMPPTCPConnection(conf);
+        XMPPTCPConnection connection = createConnection(host);
         connection.connect();
-
         AccountManager accManager = AccountManager.getInstance(connection);
         if(!accManager.supportsAccountCreation()) {
             throw new Exception("Server does not support account creation");
@@ -43,7 +43,13 @@ class XmppAccountManager {
         accManager.createAccount(username, password);
         return connection;
     }
-    
+
+    private static XMPPTCPConnection createConnection(String server) {
+        XMPPTCPConnectionConfiguration.Builder confBuilder = XMPPTCPConnectionConfiguration.builder();
+        confBuilder.setHost(server);
+        return new XMPPTCPConnection(confBuilder.build());
+    }
+
     /**
      * Tries to return the correct username for the given host.
      * 
@@ -105,15 +111,15 @@ class XmppAccountManager {
      * @throws XMPPException 
      */
     public static XMPPConnection makeConnectionAndSavePreferences(String jid, String password, String notifiedAddress, SettingsManager settings) throws Exception {
-        String domain = StringUtils.parseServer(jid);
+        String domain = XmppStringUtils.parseDomain(jid);
 
         // TODO throws NetworkOnMainThreadException on Honeycomb or higher
         // Fix it!
-        XMPPConnection con = new XMPPTCPConnection(new ConnectionConfiguration(domain));
-        con.connect();
-        con.login(jid, password);
+        XMPPTCPConnection connection = createConnection(domain);
+        connection.connect();
+        connection.login(jid, password);
         // looks like we have successfully established a connection save the settings
         savePreferences(jid, password, notifiedAddress, settings);
-        return con;
+        return connection;
     }
 }

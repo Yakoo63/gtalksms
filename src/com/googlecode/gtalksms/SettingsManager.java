@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.jivesoftware.smack.util.StringUtils;
+import org.jxmpp.util.XmppStringUtils;
 
 import android.annotation.TargetApi;
 import android.app.backup.BackupManager;
@@ -335,7 +336,8 @@ public class SettingsManager {
         if (manuallySpecifyServerSettings) {
             serviceName = getString("serviceName", "gmail.com");
         } else {
-            serviceName = StringUtils.parseServer(_login);
+            //Todo check parseServer =>?
+            serviceName = XmppStringUtils.parseDomain(_login);
         }
         
         _password =  getString("password", "");

@@ -3,12 +3,11 @@ package com.googlecode.gtalksms.xmpp;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.delay.packet.DelayInformation;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jxmpp.util.XmppStringUtils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +16,7 @@ import com.googlecode.gtalksms.tools.Log;
 import com.googlecode.gtalksms.MainService;
 import com.googlecode.gtalksms.SettingsManager;
 
-class MUCPacketListener implements PacketListener {
+class MUCPacketListener implements MessageListener {
     private final String mNumber;
     private final String mName; // the name of GTalkSMS in this room
     private Date mLastDate;
@@ -51,10 +50,9 @@ class MUCPacketListener implements PacketListener {
     }
 
     @Override
-    public void processPacket(Packet packet) {
-        Message message = (Message) packet;
+    public void processMessage(Message message) {
         String from = message.getFrom();
-        String fromBareResource = StringUtils.parseResource(from);
+        String fromBareResource = XmppStringUtils.parseResource(from);
 
         Log.d("MUCPacketListener: packet received. messageFrom=" + message.getFrom() + " messageBody=" + message.getBody());
         
