@@ -159,12 +159,15 @@ public class XmppMsg implements Parcelable {
         x.appendOpenParagraphTag(mMainFont.toString()); // open a paragraph with default font. When null, clients will fall back to their default font
         x.appendOpenSpanTag("");  // needed because we close span on fontbegin
         while((pos = getTagPos(m)) != -1) {
-            procesTagAt(pos, x, m, fonts);
+            processTagAt(pos, x, m, fonts);
         }
-        if(m.length() != 0) 
+        if(m.length() != 0) {
             x.append(m.toString());
+        }
         x.appendCloseSpanTag();
         x.appendCloseParagraphTag();
+        x.appendCloseBodyTag();
+
         return x;
         
     }
@@ -203,7 +206,7 @@ public class XmppMsg implements Parcelable {
         }
     }
     
-    private static void procesTagAt(int i, XHTMLText x, StringBuilder msg, ArrayList<XmppFont> fonts) {
+    private static void processTagAt(int i, XHTMLText x, StringBuilder msg, ArrayList<XmppFont> fonts) {
         String s = msg.substring(0, i);
         msg.delete(0, i);
         x.append(s);
@@ -212,18 +215,14 @@ public class XmppMsg implements Parcelable {
             msg.delete(0, "\n".length());
         } else if (msg.indexOf(BOLD_BEGIN) == 0) {       // bold
             x.appendOpenSpanTag("font-weight:bold");  
-//            x.appendOpenStrongTag();
             msg.delete(0, BOLD_BEGIN.length());
         } else if (msg.indexOf(BOLD_END) == 0) {
             x.appendCloseSpanTag();
-//            x.appendCloseStrongTag();
             msg.delete(0, BOLD_END.length());
         } else if (msg.indexOf(ITALIC_BEGIN) == 0) {     // italic
-//            x.appendOpenSpanTag("font-style:italic");
             x.appendOpenEmTag();
             msg.delete(0, ITALIC_BEGIN.length());
         } else if (msg.indexOf(ITALIC_END) == 0) {
-//            x.appendCloseSpanTag();
             x.appendCloseEmTag();
             msg.delete(0, ITALIC_END.length());
         } else if (msg.indexOf(FONT_BEGIN) == 0) {       // font

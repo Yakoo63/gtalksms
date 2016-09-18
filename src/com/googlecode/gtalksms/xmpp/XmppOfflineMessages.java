@@ -30,7 +30,7 @@ public class XmppOfflineMessages {
             List<Message> msgs = offlineMessageManager.getMessages();
             for (Message msg : msgs) {
                 String fullJid = msg.getFrom();
-                String bareJid = XmppStringUtils.parseBareAddress(fullJid);
+                String bareJid = XmppStringUtils.parseBareJid(fullJid);
                 String messageBody = msg.getBody();
                 if (messageBody != null) {
                     Log.d("Retrieved offline message from " + fullJid + " with content: " + messageBody.substring(0, Math.min(40, messageBody.length())));

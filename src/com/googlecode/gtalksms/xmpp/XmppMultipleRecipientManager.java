@@ -119,7 +119,7 @@ public class XmppMultipleRecipientManager {
             String toResource = XmppStringUtils.parseResource(notifiedAddress);
             if (toResource.toLowerCase().startsWith("messaging")) {
                 Log.d("Hangout address detected: " + notifiedAddress);
-                String bareAddress = XmppStringUtils.parseBareAddress(notifiedAddress);
+                String bareAddress = XmppStringUtils.parseBareJid(notifiedAddress);
                 if (!results.contains(bareAddress)) {
                     results.add(bareAddress);
                     Log.d("Sending message to " + bareAddress);
@@ -128,7 +128,7 @@ public class XmppMultipleRecipientManager {
         }
 
         for (String notifiedAddress : toList) {
-            String bareAddress = XmppStringUtils.parseBareAddress(notifiedAddress);
+            String bareAddress = XmppStringUtils.parseBareJid(notifiedAddress);
             if (!results.contains(bareAddress)) {
                 results.add(notifiedAddress);
             }

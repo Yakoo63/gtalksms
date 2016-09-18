@@ -378,7 +378,7 @@ public class XmppMuc {
     
     private void registerRoom(MultiUserChat muc, String number, String name, Integer randomInt, int mode) {
         MUCPacketListener chatListener = new MUCPacketListener(number, muc, name, mode, mCtx);
-        muc.addMessageListener( chatListener);
+        muc.addMessageListener(chatListener);
         mRoomNumbers.add(randomInt);
         mRooms.put(number, muc);
         mMucHelper.addMUC(muc.getRoom(), number, mode);

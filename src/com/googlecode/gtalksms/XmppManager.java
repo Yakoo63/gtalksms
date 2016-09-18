@@ -10,17 +10,13 @@ import java.util.List;
 import org.apache.http.conn.ssl.StrictHostnameVerifier;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.StanzaFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.parsing.ParsingExceptionCallback;
 import org.jivesoftware.smack.parsing.UnparsablePacket;
 import org.jivesoftware.smack.roster.Roster;
@@ -30,7 +26,6 @@ import org.jivesoftware.smack.util.dns.HostAddress;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.disco.packet.DiscoverInfo;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
@@ -78,7 +73,6 @@ public class XmppManager {
     private static XmppManager sXmppManager = null;
     private static int sReusedConnectionCount = 0;
     private static int sNewConnectionCount = 0;
-    private static XMPPTCPConnectionConfiguration sConnectionConfiguration = null;
 
     // Indicates the current state of the service (disconnected/connecting/connected)
     private int mStatus = DISCONNECTED;
@@ -90,7 +84,7 @@ public class XmppManager {
 
     private final List<XmppConnectionChangeListener> mConnectionChangeListeners;
     private XMPPTCPConnection mConnection = null;
-	private PacketListener mPacketListener = null;
+	private StanzaListener mPacketListener = null;
     private PingManager mPingManager = null;
     private ConnectionListener mConnectionListener = null;    
     private final XmppMuc mXmppMuc;
@@ -114,7 +108,7 @@ public class XmppManager {
 
     private final SettingsManager mSettings;
     private final Context mContext;
-    final SmackConfiguration mSmackAndroid;
+    final private SmackConfiguration mSmackAndroid;
 
     static {
         ServiceDiscoveryManager.setDefaultIdentity(new DiscoverInfo.Identity("client", Tools.APP_NAME, "bot"));
@@ -124,7 +118,7 @@ public class XmppManager {
         mSmackAndroid = new SmackConfiguration();
         mReconnectHandler = new Handler(MainService.getServiceLooper());
         
-        mConnectionChangeListeners = new ArrayList<XmppConnectionChangeListener>();
+        mConnectionChangeListeners = new ArrayList<>();
         mSettings = SettingsManager.getSettingsManager(context);
         Log.initialize(mSettings);
         mContext = context;
@@ -226,7 +220,7 @@ public class XmppManager {
 			// Removing the PacketListener should not be necessary
 			// as it's also done by XMPPConnection.disconnect()
 			// but it couldn't harm anyway
-			mConnection.removePacketListener(mPacketListener);
+			mConnection.removeAsyncStanzaListener(mPacketListener);
 
             if (mConnectionListener != null) {
                 mConnection.removeConnectionListener(mConnectionListener);
@@ -500,7 +494,7 @@ public class XmppManager {
      */
     private boolean connectAndAuth(XMPPTCPConnection connection) {
         try {
-            updateAction("Connecting to " + sConnectionConfiguration.getServiceName());
+            updateAction("Connecting to " + connection.getConfiguration().getServiceName());
             connection.connect();
         } catch (Exception e) {
             String status = "";
@@ -509,7 +503,7 @@ public class XmppManager {
             } else if (e instanceof SmackException.ConnectionException) {
                 // Check if the error is due to the server configuration
                 SmackException.ConnectionException connectionException = (SmackException.ConnectionException)e;
-                ArrayList<String> hosts = new ArrayList<String>();
+                ArrayList<String> hosts = new ArrayList<>();
                 for(HostAddress host: connectionException.getFailedAddresses()) {
                     hosts.add("\t" + host.getFQDN() + ":" + host.getPort());
                 }
@@ -571,16 +565,17 @@ public class XmppManager {
         Log.i("Creating new XMPP connection configuration");
         XMPPTCPConnectionConfiguration.Builder confBuilder = XMPPTCPConnectionConfiguration.builder();
 
+        // Set connection timeout to 10s
+        confBuilder.setConnectTimeout(10000);
+
         if (settings.manuallySpecifyServerSettings) {
             // trim the serverHost here because of Issue 122
             confBuilder.setHost(settings.serverHost.trim());
             confBuilder.setPort(settings.serverPort);
-            confBuilder.setServiceName(settings.serviceName);
         }
 
         confBuilder.setServiceName(settings.serviceName);
         confBuilder.setSocketFactory(new XmppSocketFactory());
-        confBuilder.setLegacySessionDisabled(false);
 
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
@@ -609,14 +604,10 @@ public class XmppManager {
             confBuilder.setCompressionEnabled(true);
         }
         
-        // disable the built-in ReconnectionManager since we handle this
-        //TODO to check confBuilder.setReconnectionAllowed(false);
         confBuilder.setSendPresence(false);
         confBuilder.setDebuggerEnabled(settings.debugLog);
 
-        sConnectionConfiguration = confBuilder.build();
-
-        return new XMPPTCPConnection(sConnectionConfiguration);
+        return new XMPPTCPConnection(confBuilder.build());
     }
 
     /** returns the current connection state */
@@ -662,21 +653,11 @@ public class XmppManager {
             // check if "to" is an known MUC JID
             muc = mXmppMuc.getRoomViaRoomName(to);
         }
+        msg.setFrom(mConnection.getUser());
+        msg.setBody(mSettings.formatResponses ? message.generateFmtTxt() : message.generateTxt());
 
-        if (mSettings.formatResponses) {
-            msg.setBody(message.generateFmtTxt());
-        } else {
-            msg.setBody(message.generateTxt());
-        }
-
-        // add an XTHML Body either when
-        // - we don't know the recipient
-        // - we know that the recipient is able to read XHTML-IM
-        // - we are disconnected and therefore send the message later
         try {
-            if ((to == null) || (mConnection != null && (XHTMLManager.isServiceEnabled(mConnection, to) || !mConnection.isConnected()))) {
-                XHTMLManager.addBody(msg, message.generateXHTMLText());
-            }
+            XHTMLManager.addBody(msg, message.generateXHTMLText());
         } catch (Exception e) {
             Log.d("XHTMLManager error. Ex:" + e.getMessage());
         }
@@ -693,7 +674,7 @@ public class XmppManager {
             // And we have set the to-address before
             } else if (muc == null) {
                 try {
-                    mConnection.sendPacket(msg);
+                    mConnection.sendStanza(msg);
                 } catch (SmackException.NotConnectedException e) {
                     Log.e("Send message error. Ex:" + e.getMessage());
                     return false;
