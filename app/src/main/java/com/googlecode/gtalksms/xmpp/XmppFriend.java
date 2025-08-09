@@ -2,6 +2,8 @@ package com.googlecode.gtalksms.xmpp;
 
 import com.googlecode.gtalksms.tools.Log;
 
+import org.jxmpp.jid.BareJid;
+
 public class XmppFriend {
     
     public static final int ONLINE = 0;
@@ -16,8 +18,8 @@ public class XmppFriend {
     public final String mStatus;
     public final int mState;
 
-    public XmppFriend(String userID, String username, String retrieveStatus, int retrieveState) {
-        mId = userID;
+    public XmppFriend(BareJid userID, String username, String retrieveStatus, int retrieveState) {
+        mId = String.valueOf(userID);
         mName = username;
         mStatus = retrieveStatus;
         mState = retrieveState;
