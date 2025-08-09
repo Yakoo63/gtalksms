@@ -1,0 +1,46 @@
+package com.googlecode.gtalksms.xmpp;
+
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.StanzaListener;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Stanza;
+
+import android.content.Context;
+
+import com.googlecode.gtalksms.tools.Log;
+import com.googlecode.gtalksms.MainService;
+import com.googlecode.gtalksms.SettingsManager;
+import com.googlecode.gtalksms.tools.Tools;
+
+public class ChatPacketListener implements StanzaListener {
+	private final SettingsManager mSettings;
+	private final Context mCtx;
+
+	public ChatPacketListener(Context ctx) {
+		this.mCtx = ctx;
+		this.mSettings = SettingsManager.getSettingsManager(ctx);
+	}
+
+	@Override
+	public void processStanza(Stanza packet) throws SmackException.NotConnectedException {
+		Message message = (Message) packet;
+		String from = String.valueOf(message.getFrom());
+
+		if (Tools.cameFromNotifiedAddress(mSettings.getNotifiedAddresses().getAll(), from) && message.getBody() != null) {
+			Log.d("XMPP packet received - sending Intent: " + MainService.ACTION_XMPP_MESSAGE_RECEIVED);
+			// Acquire a WakeLock just before we are about to send the intent
+			MainService.maybeAcquireWakeLock();
+			Tools.startSvcXMPPMsg(mCtx, message.getBody(), from);
+		} else {
+			if (!Tools.cameFromNotifiedAddress(mSettings.getNotifiedAddresses().getAll(), from)) {
+				Log.i("XMPP packet received - but from address \"" + from.toLowerCase()
+	                + "\" does not match notification address \""
+	                + mSettings.getNotifiedAddresses().get()
+	                + "\"");
+			} else if (message.getBody() == null) {
+				Log.i("XMPP Packet received - but without body (body == null)");
+			}
+		}
+	}
+}
